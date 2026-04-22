@@ -1,0 +1,121 @@
+{
+  "APP_TITLE": "KhmerPOS",
+  "NAV": {
+    "SALES": "Sales",
+    "PRODUCTS": "Products",
+    "REPORTS": "Reports",
+    "USERS": "Users",
+    "LOGOUT": "Logout"
+  },
+  "LOGIN": {
+    "TITLE": "Sign In",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "SUBMIT": "Sign In",
+    "ERROR": "Invalid username or password",
+    "DEMO": "Demo credentials"
+  },
+  "SALES": {
+    "TITLE": "Point of Sale",
+    "SEARCH": "Search or scan barcode...",
+    "CART": "Cart",
+    "CART_EMPTY": "Cart is empty",
+    "CLEAR": "Clear",
+    "SUBTOTAL": "Subtotal",
+    "DISCOUNT": "Discount",
+    "TAX": "Tax",
+    "TOTAL": "TOTAL",
+    "PAY": "Pay",
+    "QUANTITY": "Qty",
+    "IN_STOCK": "in stock",
+    "OUT_OF_STOCK": "Out of stock",
+    "LOW_STOCK": "Low stock"
+  },
+  "PAYMENT": {
+    "TITLE": "Choose Payment",
+    "AMOUNT_DUE": "Amount Due",
+    "METHOD": "Payment Method",
+    "CASH": "Cash",
+    "ABA": "ABA",
+    "CARD": "Card",
+    "CASH_RECEIVED": "Cash Received",
+    "CHANGE": "Change",
+    "INSUFFICIENT": "Insufficient amount",
+    "CONFIRM": "Confirm Payment",
+    "SCAN_ABA": "Scan ABA QR Code",
+    "SWIPE_CARD": "Swipe/tap card"
+  },
+  "RECEIPT": {
+    "TITLE": "Receipt",
+    "STORE": "KhmerPOS Store",
+    "DATE": "Date",
+    "CASHIER": "Cashier",
+    "PAYMENT": "Payment",
+    "RECEIVED": "Received",
+    "CHANGE": "Change",
+    "THANK_YOU": "Thank you! Please come again.",
+    "PRINT": "Print",
+    "NEW_SALE": "New Sale"
+  },
+  "PRODUCTS": {
+    "TITLE": "Products",
+    "ADD": "Add Product",
+    "EDIT": "Edit Product",
+    "DELETE": "Delete",
+    "SAVE": "Save Product",
+    "CANCEL": "Cancel",
+    "NAME": "Name",
+    "NAME_EN": "Name (English)",
+    "NAME_KM": "Name (Khmer)",
+    "PRICE": "Price",
+    "STOCK": "Stock",
+    "BARCODE": "Barcode",
+    "CATEGORY": "Category",
+    "LOW_STOCK_THRESHOLD": "Low Stock Threshold",
+    "SEARCH": "Search products...",
+    "NO_PRODUCTS": "No products found",
+    "LOW_STOCK_ALERT": "products with low stock",
+    "ACTIONS": "Actions"
+  },
+  "REPORTS": {
+    "TITLE": "Reports",
+    "REVENUE_TODAY": "Revenue Today",
+    "TRANSACTIONS": "Transactions",
+    "TOTAL_PRODUCTS": "Total Products",
+    "LOW_STOCK": "Low Stock",
+    "PAYMENT_BREAKDOWN": "Payment Breakdown",
+    "RECENT": "Recent Transactions",
+    "HISTORY": "Transaction History",
+    "NO_DATA": "No transactions today",
+    "TXNS": "txns"
+  },
+  "USERS": {
+    "TITLE": "Users",
+    "ADD": "Add User",
+    "EDIT": "Edit",
+    "REMOVE": "Remove",
+    "ROLE": "Role",
+    "STATUS": "Status",
+    "LAST_LOGIN": "Last Login",
+    "TOTAL": "Total Users",
+    "ADMINS": "Admins",
+    "CASHIERS": "Cashiers",
+    "PERMISSIONS": "Role Permissions",
+    "FEATURE": "Feature"
+  },
+  "COMMON": {
+    "LOADING": "Loading...",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "DELETE": "Delete",
+    "CONFIRM": "Confirm",
+    "ALL": "All",
+    "TODAY": "Today"
+  },
+  "NOT_FOUND": {
+    "TITLE": "Page Not Found",
+    "SUBTITLE": "The page you are looking for does not exist or has been moved.",
+    "BACK": "Go Back",
+    "HOME": "Back to Dashboard"
+  }
+}

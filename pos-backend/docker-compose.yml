@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  # ─── MySQL Database ──────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: pos_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pos_db
+      MYSQL_USER: pos_user
+      MYSQL_PASSWORD: pos_password
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro   # read-only is safer
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - pos_network
+
+  # ─── NestJS API ──────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: pos_api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      NODE_ENV: development   
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: pos_user
+      DB_PASS: pos_password
+      DB_NAME: pos_db
+      JWT_SECRET: ${JWT_SECRET:-change-this-in-production-use-env-file}
+      JWT_EXPIRES_IN: 8h
+    ports:
+      - '3000:3000'
+    networks:
+      - pos_network
+
+volumes:
+  mysql_data:
+
+networks:
+  pos_network:
+    driver: bridge

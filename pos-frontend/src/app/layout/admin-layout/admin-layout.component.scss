@@ -1,0 +1,79 @@
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+}
+
+.custom-scrollbar-light::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar-light::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.dark .custom-scrollbar-light::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  background-clip: content-box;
+}
+
+.nav-item {
+  @apply flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-200 relative;
+  
+  // Dark theme (default or via parent class)
+  .dark & {
+    @apply text-slate-400 hover:text-white hover:bg-white/[0.03];
+  }
+  
+  // Light theme fallback/specifics
+  @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100/50;
+}
+
+.active-link {
+  @apply bg-indigo-500/10 text-indigo-600 font-semibold shadow-[inset_0_0_20px_rgba(99,102,241,0.05)];
+  
+  .dark & {
+    @apply bg-indigo-500/10 text-indigo-400;
+  }
+}
+
+.active-link .active-accent {
+  @apply opacity-100;
+}
+
+.active-link svg {
+  @apply text-indigo-600;
+  
+  .dark & {
+    @apply text-indigo-400;
+  }
+}
+
+.mobile-nav-active {
+  @apply text-indigo-500 !important;
+  transform: translateY(-4px);
+}
+
+.mobile-nav-active svg {
+  @apply drop-shadow-[0_0_8px_rgba(99,102,241,0.5)];
+  stroke: #6366f1;
+}
+
+.mobile-nav-active .active-dot {
+  @apply opacity-100 scale-150;
+  box-shadow: 0 0 10px rgba(99,102,241,0.8);
+}
+

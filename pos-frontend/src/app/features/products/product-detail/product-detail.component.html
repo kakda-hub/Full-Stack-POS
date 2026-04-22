@@ -1,0 +1,222 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    @backdropAnimation
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+    (click)="cancel.emit()"
+  ></div>
+  <div
+    @modalAnimation
+    [class.bg-slate-800]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    class="relative rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-100]="!theme.isDark()"
+      class="px-6 py-4 border-b flex items-center justify-between sticky top-0 z-10"
+    >
+      <h2 class="text-lg font-bold text-slate-800">
+        {{
+          product
+            ? lang.currentLang() === 'km'
+              ? 'កែប្រែ'
+              : 'Edit Product'
+            : lang.currentLang() === 'km'
+              ? 'បន្ថែមផលិតផល'
+              : 'Add Product'
+        }}
+      </h2>
+      <button
+        type="button"
+        aria-label="Toggle cart"
+        (click)="cancel.emit()"
+        [class.hover:bg-slate-700]="theme.isDark()"
+        [class.hover:bg-slate-100]="!theme.isDark()"
+        class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'ឈ្មោះ (English)' : 'Name (English)' }} *</label
+          >
+          <input
+            aria-label="Name"
+            formControlName="name"
+            type="text"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            [class.border-rose-400]="form.get('name')?.invalid && form.get('name')?.touched"
+          />
+        </div>
+        <div class="col-span-2">
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'ឈ្មោះ (ខ្មែរ)' : 'Name (Khmer)' }}</label
+          >
+          <input
+            aria-label="Name (Khmer)"
+            formControlName="nameKm"
+            type="text"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          />
+        </div>
+        <div>
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'តម្លៃ ($)' : 'Price ($)' }} *</label
+          >
+          <input
+            aria-label="Price"
+            formControlName="price"
+            type="number"
+            step="0.01"
+            min="0"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            [class.border-rose-400]="form.get('price')?.invalid && form.get('price')?.touched"
+          />
+        </div>
+        <div>
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }} *</label
+          >
+          <input
+            aria-label="Stock"
+            formControlName="stock"
+            type="number"
+            min="0"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            [class.border-rose-400]="form.get('stock')?.invalid && form.get('stock')?.touched"
+          />
+        </div>
+        <div class="col-span-2">
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }} *</label
+          >
+          <input
+            aria-label="Barcode"
+            formControlName="barcode"
+            type="text"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            [class.border-rose-400]="form.get('barcode')?.invalid && form.get('barcode')?.touched"
+          />
+        </div>
+        <div>
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }} *</label
+          >
+          <select
+            aria-label="Category"
+            formControlName="category"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          >
+            <option *ngFor="let cat of categories" [value]="cat.id" [disabled]="cat.id === 'all'">
+              {{ lang.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+            class="block text-sm font-semibold mb-1.5"
+            >{{ lang.currentLang() === 'km' ? 'ស្តុកទាបបំផុត' : 'Low Stock Threshold' }}</label
+          >
+          <input
+            aria-label="Low Stock Threshold"
+            formControlName="lowStockThreshold"
+            type="number"
+            min="0"
+            [class.bg-slate-700]="theme.isDark()"
+            [class.border-slate-600]="theme.isDark()"
+            [class.text-slate-100]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button
+          type="button"
+          (click)="cancel.emit()"
+          [class.border-slate-600]="theme.isDark()"
+          [class.text-slate-300]="theme.isDark()"
+          [class.hover:bg-slate-700]="theme.isDark()"
+          [class.border-slate-200]="!theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+          [class.hover:bg-slate-50]="!theme.isDark()"
+          class="flex-1 px-4 py-2.5 rounded-xl border font-semibold text-sm transition-all"
+        >
+          {{ lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel' }}
+        </button>
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl transition-all text-sm"
+        >
+          {{ lang.currentLang() === 'km' ? 'រក្សាទុក' : 'Save Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

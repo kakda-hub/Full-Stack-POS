@@ -1,0 +1,294 @@
+<div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black text-slate-900">
+        {{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Products' }}
+      </h1>
+      <p class="text-sm text-slate-500 mt-0.5">
+        {{ productService.products().length }}
+        {{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'total products' }}
+      </p>
+    </div>
+
+    <!-- <button (click)="openAdd()"
+          class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add Product' }}
+        </button> -->
+    <button matButton="filled" (click)="openAdd()">
+      <mat-icon>add</mat-icon>
+      {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add Product' }}
+    </button>
+  </div>
+
+  <!-- Low stock alert -->
+  <div
+    *ngIf="productService.lowStockProducts().length > 0"
+    @fadeIn
+    [class.bg-amber-900\/20]="theme.isDark()"
+    [class.border-amber-700\/40]="theme.isDark()"
+    [class.bg-amber-50]="!theme.isDark()"
+    [class.border-amber-200]="!theme.isDark()"
+    class="border rounded-xl p-4 flex items-center gap-3"
+  >
+    <svg
+      class="w-5 h-5 text-amber-600 flex-shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+      />
+    </svg>
+    <p class="text-sm text-amber-800 font-medium">
+      {{ productService.lowStockProducts().length }}
+      {{
+        lang.currentLang() === 'km'
+          ? 'ផលិតផលស្តុកទាប'
+          : 'products
+            with low stock'
+      }}:
+      <span *ngFor="let p of productService.lowStockProducts(); let last = last" class="font-bold">
+        {{ p.name }}{{ !last ? ', ' : '' }}
+      </span>
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex gap-2 sm:gap-3 flex-wrap">
+    <div id="search" class="relative flex-1 min-w-48">
+      <svg
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+      <input
+        aria-label="Search"
+        type="text"
+        (input)="onSearch($event)"
+        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកផលិតផល...' : 'Search products...'"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.text-slate-100]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        class="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      />
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <button
+        *ngFor="let cat of productService.categories()"
+        (click)="productService.setCategory(cat.id)"
+        [class]="
+          cat.id === productService.selectedCategory()
+            ? 'px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold transition-all'
+            : 'px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium transition-all'
+        "
+      >
+        {{ lang.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Skeleton loading state -->
+  <div
+    *ngIf="isLoading()"
+    class="rounded-2xl border overflow-hidden"
+    [class.bg-white]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+    [class.bg-slate-800]="theme.isDark()"
+    [class.border-slate-700]="theme.isDark()"
+  >
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead
+          [class.bg-slate-50]="!theme.isDark()"
+          [class.bg-slate-900]="theme.isDark()"
+          class="border-b"
+          [class.border-slate-200]="!theme.isDark()"
+          [class.border-slate-700]="theme.isDark()"
+        >
+          <tr>
+            <th class="px-4 py-3 text-left">
+              <app-skeleton variant="text" width="60px" height="12px"></app-skeleton>
+            </th>
+            <th class="px-4 py-3 text-left">
+              <app-skeleton variant="text" width="55px" height="12px"></app-skeleton>
+            </th>
+            <th class="px-4 py-3 text-left">
+              <app-skeleton variant="text" width="65px" height="12px"></app-skeleton>
+            </th>
+            <th class="px-4 py-3 text-right">
+              <app-skeleton variant="text" width="40px" height="12px"></app-skeleton>
+            </th>
+            <th class="px-4 py-3 text-right">
+              <app-skeleton variant="text" width="40px" height="12px"></app-skeleton>
+            </th>
+            <th class="px-4 py-3 text-right">
+              <app-skeleton variant="text" width="55px" height="12px"></app-skeleton>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <app-skeleton *ngFor="let i of [1, 2, 3, 4, 5, 6, 7]" variant="table-row"></app-skeleton>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div
+    [class.bg-slate-800]="theme.isDark()"
+    [class.border-slate-700]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+    class="rounded-2xl border overflow-hidden shadow-sm"
+  >
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead
+          [class.bg-slate-900]="theme.isDark()"
+          [class.border-slate-700]="theme.isDark()"
+          [class.bg-slate-50]="!theme.isDark()"
+          [class.border-slate-200]="!theme.isDark()"
+          class="border-b"
+        >
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name' }}
+            </th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }}
+            </th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}
+            </th>
+            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price' }}
+            </th>
+            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }}
+            </th>
+            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+              {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          [@listAnimation]="productService.filteredProducts().length"
+          class="divide-y divide-slate-100"
+        >
+          <tr
+            *ngFor="let product of productService.filteredProducts(); trackBy: trackById"
+            @fadeIn
+            [class.hover:bg-slate-700]="theme.isDark()"
+            [class.hover:bg-slate-50]="!theme.isDark()"
+            class="transition-colors group"
+          >
+            <td class="px-4 py-3">
+              <div class="font-semibold text-slate-900">{{ product.name }}</div>
+              <div *ngIf="product.nameKm" class="text-xs text-slate-400">{{ product.nameKm }}</div>
+            </td>
+            <td class="px-4 py-3">
+              <span
+                [class.bg-slate-700]="theme.isDark()"
+                [class.text-slate-300]="theme.isDark()"
+                [class.bg-slate-100]="!theme.isDark()"
+                class="font-mono text-xs px-2 py-1 rounded-lg"
+                >{{ product.barcode }}</span
+              >
+            </td>
+            <td class="px-4 py-3">
+              <span class="capitalize text-slate-600">{{ product.category }}</span>
+            </td>
+            <td class="px-4 py-3 text-right font-bold text-indigo-600">
+              ${{ product.price.toFixed(2) }}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <span [class]="getStockClass(product)">{{ product.stock }}</span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <div
+                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <button
+                  type="button"
+                  aria-label="Edit product"
+                  (click)="openEdit(product)"
+                  class="p-1.5 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Delete product"
+                  (click)="deleteProduct(product)"
+                  class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="productService.filteredProducts().length === 0">
+            <td colspan="6" class="px-4 py-16 text-center text-slate-400">
+              <svg
+                class="w-12 h-12 mx-auto mb-3 opacity-30"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
+                />
+              </svg>
+              <p class="text-sm">
+                {{ lang.currentLang() === 'km' ? 'គ្មានផលិតផល' : 'No products found' }}
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Form Modal -->
+<app-product-detail
+  *ngIf="showForm"
+  [product]="editingProduct"
+  (save)="onSave($event)"
+  (cancel)="showForm = false; editingProduct = null"
+></app-product-detail>

@@ -1,0 +1,129 @@
+<div
+  class="h-screen flex flex-col"
+  [class.bg-slate-900]="theme.isDark()"
+  [class.bg-slate-50]="!theme.isDark()"
+>
+  <!-- Top Nav -->
+  <header
+    class="border-b px-4 py-3 flex items-center justify-between shadow-sm z-10"
+    [class.bg-slate-800]="theme.isDark()"
+    [class.border-slate-700]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+  >
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <!-- <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg> -->
+        <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
+      </div>
+      <span
+        class="font-bold text-lg"
+        [class.text-white]="theme.isDark()"
+        [class.text-slate-800]="!theme.isDark()"
+        >KhmerPOS</span
+      >
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Dark Mode Toggle -->
+      <button
+        (click)="theme.toggle()"
+        class="p-2 rounded-lg transition-colors"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.hover:bg-slate-600]="theme.isDark()"
+        [class.bg-slate-100]="!theme.isDark()"
+        [class.hover:bg-slate-200]="!theme.isDark()"
+        [title]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        type="button"
+        aria-label="Toggle theme"
+      >
+        <svg
+          *ngIf="theme.isDark()"
+          class="w-4 h-4 text-amber-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+        <svg
+          *ngIf="!theme.isDark()"
+          class="w-4 h-4 text-slate-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+
+      <button
+        (click)="langService.toggle()"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.hover:bg-slate-600]="theme.isDark()"
+        [class.text-slate-200]="theme.isDark()"
+        [class.bg-slate-100]="!theme.isDark()"
+        [class.hover:bg-slate-200]="!theme.isDark()"
+        [class.text-slate-700]="!theme.isDark()"
+      >
+        <span>{{ langService.currentLang() === 'en' ? '🇰🇭 ខ្មែរ' : '🇬🇧 EN' }}</span>
+      </button>
+      <div
+        class="flex items-center gap-2 text-sm"
+        [class.text-slate-300]="theme.isDark()"
+        [class.text-slate-600]="!theme.isDark()"
+      >
+        <div
+          class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs"
+          [class.bg-indigo-700]="theme.isDark()"
+          [class.text-indigo-200]="theme.isDark()"
+          [class.bg-indigo-100]="!theme.isDark()"
+          [class.text-indigo-700]="!theme.isDark()"
+        >
+          <!-- {{ auth.currentUser()?.name?.charAt(0) }} -->
+          <img class="w-full h-full object-cover" [src]="auth.currentUser()?.profile" alt="" />
+        </div>
+        <span class="hidden sm:inline font-medium">{{ auth.currentUser()?.name }}</span>
+      </div>
+      <button
+        (click)="auth.logout()"
+        class="p-2 rounded-lg transition-colors"
+        [class.text-slate-400]="true"
+        [class.hover:bg-rose-500\/10]="true"
+        [class.hover:text-rose-400]="true"
+        title="Logout"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-hidden">
+    <router-outlet></router-outlet>
+  </main>
+</div>

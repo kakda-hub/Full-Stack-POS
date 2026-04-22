@@ -1,0 +1,66 @@
+<div class="flex flex-col min-h-[80vh] items-center justify-center space-y-8 text-center p-4">
+  <!-- ⚠️ THEME-SAFE GRAPHIC -->
+  <div class="w-40 h-40">
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-full h-full"
+    >
+      <!-- Icon base (always visible) -->
+      <g class="icon-base">
+        <circle cx="50" cy="50" r="45" class="stroke-current" [class.text-slate-500]="theme.isDark()" [class.text-slate-400]="!theme.isDark()" />
+        <path d="M50 35v30" class="stroke-current" [class.text-slate-500]="theme.isDark()" [class.text-slate-400]="!theme.isDark()" stroke-width="8" stroke-linecap="round" />
+        <path d="M50 65h0.001" class="stroke-current text-indigo-600" stroke-width="8" stroke-linecap="round" />
+      </g>
+
+      <!-- Accent color highlight (always visible) -->
+      <circle cx="50" cy="50" r="35" stroke="currentColor" stroke-width="2" fill="transparent" class="text-indigo-600 opacity-20 animate-pulse" />
+    </svg>
+  </div>
+
+  <div class="flex flex-col items-center max-w-md">
+    <p class="text-lg font-medium text-slate-500 uppercase tracking-[0.3em] animate-pulse">404</p>
+    <p
+      class="text-3xl font-bold mt-1"
+      [class.text-white]="theme.isDark()"
+      [class.text-slate-900]="!theme.isDark()"
+    >
+      {{ 'NOT_FOUND.TITLE' | translate }}
+    </p>
+    <p
+      class="text-sm text-slate-500 mt-2"
+      [class.text-slate-400]="theme.isDark()"
+    >
+      {{ 'NOT_FOUND.SUBTITLE' | translate }}
+    </p>
+  </div>
+
+  <div class="flex space-x-2">
+    <button
+      (click)="goBack()"
+      class="px-4 py-2 rounded-lg text-xs font-medium border transition-all"
+      [class.bg-indigo-600]="theme.isDark()"
+      [class.border-indigo-600]="theme.isDark()"
+      [class.text-white]="theme.isDark()"
+      [class.bg-slate-900]="!theme.isDark()"
+      [class.border-slate-900]="!theme.isDark()"
+      [class.text-white]="!theme.isDark()"
+    >
+      {{ 'NOT_FOUND.BACK' | translate }}
+    </button>
+
+    <button
+      (click)="goToHome()"
+      class="px-4 py-2 rounded-lg text-xs font-medium border transition-all"
+      [class.border-indigo-600]="theme.isDark()"
+      [class.text-indigo-600]="theme.isDark()"
+      [class.bg-indigo-600-soft]="theme.isDark()"
+      [class.border-slate-900]="!theme.isDark()"
+      [class.text-slate-900]="!theme.isDark()"
+      [class.bg-slate-100]="!theme.isDark()"
+    >
+      {{ 'NOT_FOUND.HOME' | translate }}
+    </button>
+  </div>
+</div>

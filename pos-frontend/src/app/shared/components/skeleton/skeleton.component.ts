@@ -1,0 +1,184 @@
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ThemeService } from '../../../core/services/theme.service';
+
+export type SkeletonVariant =
+  | 'text'
+  | 'circle'
+  | 'rect'
+  | 'product-card'
+  | 'table-row'
+  | 'kpi-card'
+  | 'user-card'
+  | 'list-item'
+  | 'receipt';
+
+@Component({
+  selector: 'app-skeleton',
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+
+    <!-- TEXT line -->
+    <div *ngIf="variant === 'text'"
+      class="skeleton-base rounded-md"
+      [style.width]="width || '100%'"
+      [style.height]="height || '14px'"
+      [ngClass]="darkClass">
+    </div>
+
+    <!-- CIRCLE -->
+    <div *ngIf="variant === 'circle'"
+      class="skeleton-base rounded-full flex-shrink-0"
+      [style.width]="size || '40px'"
+      [style.height]="size || '40px'"
+      [ngClass]="darkClass">
+    </div>
+
+    <!-- RECT -->
+    <div *ngIf="variant === 'rect'"
+      class="skeleton-base rounded-xl"
+      [style.width]="width || '100%'"
+      [style.height]="height || '80px'"
+      [ngClass]="darkClass">
+    </div>
+
+    <!-- PRODUCT CARD -->
+    <div *ngIf="variant === 'product-card'"
+      class="rounded-2xl p-3 border"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()">
+      <!-- color block -->
+      <div class="skeleton-base rounded-xl w-full h-16 mb-3" [ngClass]="darkClass"></div>
+      <!-- name line 1 -->
+      <div class="skeleton-base rounded-md h-3 w-4/5 mb-1.5" [ngClass]="darkClass"></div>
+      <!-- name line 2 -->
+      <div class="skeleton-base rounded-md h-3 w-3/5 mb-2.5" [ngClass]="darkClass"></div>
+      <!-- price -->
+      <div class="skeleton-base rounded-md h-4 w-1/2" [ngClass]="darkClass"></div>
+    </div>
+
+    <!-- TABLE ROW -->
+    <tr *ngIf="variant === 'table-row'" class="border-b"
+      [class.border-slate-100]="!theme.isDark()"
+      [class.border-slate-700]="theme.isDark()">
+      <td class="px-4 py-3"><div class="skeleton-base rounded-md h-3.5 w-32" [ngClass]="darkClass"></div></td>
+      <td class="px-4 py-3"><div class="skeleton-base rounded-md h-3.5 w-24" [ngClass]="darkClass"></div></td>
+      <td class="px-4 py-3"><div class="skeleton-base rounded-full h-5 w-16" [ngClass]="darkClass"></div></td>
+      <td class="px-4 py-3 text-right"><div class="skeleton-base rounded-md h-3.5 w-14 ml-auto" [ngClass]="darkClass"></div></td>
+      <td class="px-4 py-3 text-right"><div class="skeleton-base rounded-md h-3.5 w-10 ml-auto" [ngClass]="darkClass"></div></td>
+      <td class="px-4 py-3 text-right">
+        <div class="flex gap-2 justify-end">
+          <div class="skeleton-base rounded-lg h-7 w-7" [ngClass]="darkClass"></div>
+          <div class="skeleton-base rounded-lg h-7 w-7" [ngClass]="darkClass"></div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- KPI CARD -->
+    <div *ngIf="variant === 'kpi-card'"
+      class="rounded-2xl border p-5"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()">
+      <div class="flex items-center justify-between mb-4">
+        <div class="skeleton-base rounded-xl w-10 h-10" [ngClass]="darkClass"></div>
+        <div class="skeleton-base rounded-full h-5 w-14" [ngClass]="darkClass"></div>
+      </div>
+      <div class="skeleton-base rounded-md h-7 w-28 mb-2" [ngClass]="darkClass"></div>
+      <div class="skeleton-base rounded-md h-3.5 w-20" [ngClass]="darkClass"></div>
+    </div>
+
+    <!-- USER CARD -->
+    <div *ngIf="variant === 'user-card'"
+      class="rounded-2xl border p-5"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="skeleton-base rounded-xl w-11 h-11 flex-shrink-0" [ngClass]="darkClass"></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="skeleton-base rounded-md h-3.5 w-32" [ngClass]="darkClass"></div>
+          <div class="skeleton-base rounded-md h-3 w-20" [ngClass]="darkClass"></div>
+        </div>
+        <div class="skeleton-base rounded-full w-2.5 h-2.5" [ngClass]="darkClass"></div>
+      </div>
+      <div class="space-y-2.5">
+        <div class="flex justify-between items-center">
+          <div class="skeleton-base rounded h-3 w-10" [ngClass]="darkClass"></div>
+          <div class="skeleton-base rounded-lg h-5 w-16" [ngClass]="darkClass"></div>
+        </div>
+        <div class="flex justify-between items-center">
+          <div class="skeleton-base rounded h-3 w-14" [ngClass]="darkClass"></div>
+          <div class="skeleton-base rounded h-3 w-12" [ngClass]="darkClass"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIST ITEM -->
+    <div *ngIf="variant === 'list-item'" class="flex items-center gap-3 p-3">
+      <div class="skeleton-base rounded-xl w-9 h-9 flex-shrink-0" [ngClass]="darkClass"></div>
+      <div class="flex-1 space-y-1.5">
+        <div class="skeleton-base rounded-md h-3 w-3/4" [ngClass]="darkClass"></div>
+        <div class="skeleton-base rounded-md h-2.5 w-1/2" [ngClass]="darkClass"></div>
+      </div>
+      <div class="skeleton-base rounded-md h-4 w-14" [ngClass]="darkClass"></div>
+    </div>
+
+    <!-- RECEIPT -->
+    <div *ngIf="variant === 'receipt'" class="space-y-2 p-2">
+      <div class="skeleton-base rounded h-3 w-2/3 mx-auto" [ngClass]="darkClass"></div>
+      <div class="skeleton-base rounded h-2.5 w-1/2 mx-auto" [ngClass]="darkClass"></div>
+      <div class="my-3 border-t border-dashed" [class.border-slate-200]="!theme.isDark()" [class.border-slate-600]="theme.isDark()"></div>
+      <div *ngFor="let i of [1,2,3]" class="flex justify-between">
+        <div class="skeleton-base rounded h-2.5 w-24" [ngClass]="darkClass"></div>
+        <div class="skeleton-base rounded h-2.5 w-12" [ngClass]="darkClass"></div>
+      </div>
+      <div class="my-2 border-t border-dashed" [class.border-slate-200]="!theme.isDark()" [class.border-slate-600]="theme.isDark()"></div>
+      <div class="flex justify-between">
+        <div class="skeleton-base rounded h-4 w-16" [ngClass]="darkClass"></div>
+        <div class="skeleton-base rounded h-4 w-20" [ngClass]="darkClass"></div>
+      </div>
+    </div>
+
+  `,
+  styles: [`
+    .skeleton-base {
+      background: linear-gradient(90deg,
+        #e2e8f0 25%,
+        #f1f5f9 50%,
+        #e2e8f0 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+    }
+    .skeleton-dark {
+      background: linear-gradient(90deg,
+        #1e293b 25%,
+        #293548 50%,
+        #1e293b 75%
+      ) !important;
+      background-size: 200% 100% !important;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  `],
+})
+export class SkeletonComponent {
+  @Input() variant: SkeletonVariant = 'text';
+  @Input() width?: string;
+  @Input() height?: string;
+  @Input() size?: string;
+  @Input() count: number = 1;
+
+  constructor(public theme: ThemeService) {}
+
+  get darkClass(): string {
+    return this.theme.isDark() ? 'skeleton-dark' : '';
+  }
+}

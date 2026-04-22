@@ -1,0 +1,162 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    @backdropAnimation
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+    (click)="close.emit()"
+  ></div>
+  <div
+    @modalAnimation
+    [class.bg-slate-800]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    class="relative rounded-2xl shadow-2xl w-full max-w-sm"
+  >
+    <div
+      [class.border-slate-700]="theme.isDark()"
+      [class.border-slate-100]="!theme.isDark()"
+      class="px-6 py-4 border-b flex items-center justify-between"
+    >
+      <h2 class="text-lg font-bold text-slate-800">
+        {{ lang.currentLang() === 'km' ? 'វិក្កយបត្រ' : 'Receipt' }}
+      </h2>
+      <button
+        (click)="close.emit()"
+        class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <!-- Receipt body -->
+      <div id="receipt-print" class="font-mono text-xs space-y-2">
+        <!-- Header -->
+        <div class="text-center space-y-1 pb-3 border-b border-dashed border-slate-300">
+          <h3 class="font-black text-base">KhmerPOS Store</h3>
+          <p class="text-slate-500">Phnom Penh, Cambodia</p>
+          <p class="text-slate-500">Tel: +855 23 000 000</p>
+        </div>
+
+        <!-- Meta -->
+        <div class="py-2 border-b border-dashed border-slate-300 space-y-1">
+          <div class="flex justify-between">
+            <span class="text-slate-500"
+              >{{ lang.currentLang() === 'km' ? 'លេខ' : 'Receipt' }}:</span
+            >
+            <span class="font-bold">{{ transaction.id }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">{{ lang.currentLang() === 'km' ? 'ថ្ងៃ' : 'Date' }}:</span>
+            <span>{{ transaction.timestamp | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500"
+              >{{ lang.currentLang() === 'km' ? 'អ្នកលក់' : 'Cashier' }}:</span
+            >
+            <span>{{ transaction.cashier }}</span>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="py-2 border-b border-dashed border-slate-300 space-y-1.5">
+          <div *ngFor="let item of transaction.items">
+            <div class="flex justify-between font-semibold">
+              <span class="flex-1 pr-2 truncate">{{ item.product.name }}</span>
+              <span
+                >\${{
+                  (item.product.price * item.quantity * (1 - item.discount / 100)).toFixed(2)
+                }}</span
+              >
+            </div>
+            <div class="text-slate-400 flex justify-between pl-2">
+              <span>{{ item.quantity }} × \${{ item.product.price.toFixed(2) }}</span>
+              <span *ngIf="item.discount > 0" class="text-emerald-600">-{{ item.discount }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
+          <div class="flex justify-between text-slate-600">
+            <span>{{ lang.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
+            <span>\${{ transaction.subtotal.toFixed(2) }}</span>
+          </div>
+          <div *ngIf="transaction.totalDiscount > 0" class="flex justify-between text-emerald-600">
+            <span>{{ lang.currentLang() === 'km' ? 'បញ្ចុះ' : 'Discount' }}</span>
+            <span>-\${{ transaction.totalDiscount.toFixed(2) }}</span>
+          </div>
+          <div *ngIf="transaction.tax > 0" class="flex justify-between text-slate-600">
+            <span>{{ lang.currentLang() === 'km' ? 'អាករ' : 'Tax' }}</span>
+            <span>\${{ transaction.tax.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between font-black text-base pt-1">
+            <span>{{ lang.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+            <span class="text-indigo-700">\${{ transaction.total.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
+          <div class="flex justify-between">
+            <span class="text-slate-500">{{
+              lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment'
+            }}</span>
+            <span class="font-bold uppercase">{{ transaction.paymentMethod }}</span>
+          </div>
+          <ng-container *ngIf="transaction.paymentMethod === 'cash'">
+            <div class="flex justify-between">
+              <span class="text-slate-500">{{
+                lang.currentLang() === 'km' ? 'ប្រាក់ទទួល' : 'Received'
+              }}</span>
+              <span>\${{ transaction.cashReceived?.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between text-emerald-600 font-bold">
+              <span>{{ lang.currentLang() === 'km' ? 'ប្រាក់អាប់' : 'Change' }}</span>
+              <span>\${{ transaction.change?.toFixed(2) }}</span>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center pt-2 text-slate-400">
+          <p>
+            {{
+              lang.currentLang() === 'km' ? 'អរគុណ! សូមមកម្តងទៀត' : 'Thank you! Please come again.'
+            }}
+          </p>
+          <p class="mt-1">Powered by KhmerPOS</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-5 flex gap-3">
+        <button
+          (click)="printReceipt()"
+          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+            />
+          </svg>
+          {{ lang.currentLang() === 'km' ? 'បោះពុម្ព' : 'Print' }}
+        </button>
+        <button
+          (click)="close.emit()"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all"
+        >
+          {{ lang.currentLang() === 'km' ? 'លក់ថ្មី' : 'New Sale' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

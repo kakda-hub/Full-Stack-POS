@@ -1,0 +1,117 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4"
+>
+  <!-- Background pattern -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"
+    ></div>
+  </div>
+
+  <div @fadeIn class="relative w-full max-w-md">
+    <!-- Card -->
+    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div
+          class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/30"
+        >
+          <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-black text-white">KhmerPOS</h1>
+        <p class="text-indigo-300 text-sm mt-1">
+          {{ lang.currentLang() === 'km' ? 'ប្រព័ន្ធគ្រប់គ្រងការលក់' : 'Point of Sale System' }}
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form (submit)="onLogin($event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
+            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Username' }}
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            required
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            placeholder="{{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Enter username' }}"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
+            {{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Password' }}
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            placeholder="{{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Enter password' }}"
+          />
+        </div>
+
+        <div
+          *ngIf="error()"
+          class="bg-rose-500/20 border border-rose-500/30 rounded-xl p-3 text-rose-300 text-sm text-center"
+        >
+          {{
+            lang.currentLang() === 'km'
+              ? 'ឈ្មោះ ឬ ពាក្យសម្ងាត់មិនត្រឹមត្រូវ'
+              : 'Invalid username or password'
+          }}
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-70 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 flex items-center justify-center gap-2"
+        >
+          <app-loader *ngIf="loading()" variant="spinner" size="sm"></app-loader>
+          {{ lang.currentLang() === 'km' ? 'ចូល' : 'Sign In' }}
+        </button>
+      </form>
+
+      <!-- Demo credentials -->
+      <div class="mt-6 pt-5 border-t border-white/10">
+        <p class="text-xs text-indigo-300 text-center mb-3">
+          {{ lang.currentLang() === 'km' ? 'ព័ត៌មានសាកល្បង' : 'Demo credentials' }}
+        </p>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            (click)="fillDemo('admin')"
+            class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
+          >
+            👤 admin / 1234
+          </button>
+          <button
+            (click)="fillDemo('cashier')"
+            class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
+          >
+            🧾 cashier / 1234
+          </button>
+        </div>
+      </div>
+
+      <!-- Language toggle -->
+      <div class="mt-4 text-center">
+        <button
+          (click)="lang.toggle()"
+          class="text-xs text-indigo-400 hover:text-indigo-200 transition-colors"
+        >
+          {{ lang.currentLang() === 'en' ? '🇰🇭 ប្តូរភាសាខ្មែរ' : '🇬🇧 Switch to English' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

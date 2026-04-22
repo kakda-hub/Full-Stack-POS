@@ -1,0 +1,45 @@
+<section class="p-4 min-w-[500px]">
+    <h3 mat-dialog-title class="!m-0 !pb-4 text-xl font-bold text-slate-800">
+        {{ data.name === 'New User' ? 'Add New User' : 'User Detail' }}
+    </h3>
+    
+    <mat-dialog-content class="!m-0">
+        <div class="flex flex-col gap-4 py-2">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Full Name</mat-label>
+              <input matInput [ngModel]="name()" (ngModelChange)="name.set($event)" placeholder="Enter full name" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Email Address</mat-label>
+              <input matInput type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" placeholder="user@example.com" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Phone Number</mat-label>
+              <input matInput [ngModel]="phone()" (ngModelChange)="phone.set($event)" placeholder="012 345 678" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Address</mat-label>
+              <textarea matInput [ngModel]="address()" (ngModelChange)="address.set($event)" placeholder="Enter address"></textarea>
+            </mat-form-field>
+
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-medium text-slate-600">User Role</span>
+                <mat-radio-group [ngModel]="role()" (ngModelChange)="role.set($event)" class="flex gap-4">
+                  <mat-radio-button value="admin">Admin</mat-radio-button>
+                  <mat-radio-button value="cashier">Cashier</mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="!px-0 !pt-6">
+      <button mat-button (click)="onNoClick()" class="text-slate-500">Cancel</button>
+      <button mat-flat-button color="primary" [mat-dialog-close]="getSaveData()" cdkFocusInitial class="px-6 rounded-lg">
+        Save User
+      </button>
+    </mat-dialog-actions>
+</section>
+

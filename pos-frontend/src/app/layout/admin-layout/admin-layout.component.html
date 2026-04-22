@@ -1,0 +1,396 @@
+<div
+  class="h-screen flex overflow-hidden font-sans relative transition-colors duration-500"
+  [class.bg-slate-950]="theme.isDark()"
+  [class.bg-[#F8FAFC]]="!theme.isDark()"
+>
+  <!-- Sidebar -->
+  <aside
+    [class.w-64]="!isCollapsed()"
+    [class.w-20]="isCollapsed()"
+    [class.bg-[#0B1120]]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    class="hidden md:flex flex-col transition-all duration-300 ease-in-out relative z-40 border-r"
+    [class.border-slate-800]="theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+    [class.text-slate-300]="theme.isDark()"
+    [class.text-slate-600]="!theme.isDark()"
+  >
+    <!-- Toggle Button -->
+    <button
+      (click)="toggleSidebar()"
+      class="flex absolute -right-3 top-10 w-6 h-6 bg-indigo-600 rounded-full border-2 items-center justify-center text-white hover:bg-indigo-500 transition-all shadow-lg z-50 transform hover:scale-110 active:scale-95"
+      [class.border-[#0B1120]]="theme.isDark()"
+      [class.border-white]="!theme.isDark()"
+      [class.rotate-180]="isCollapsed()"
+      [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
+      [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
+      type="button"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+
+    <!-- Header -->
+    <div class="p-6 h-24 flex items-center mb-2">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div
+          class="w-11 h-11"
+        >
+          <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
+        </div>
+        <div *ngIf="!isCollapsed()" class="flex flex-col">
+          <div
+            class="font-black text-2xl tracking-tight whitespace-nowrap transition-colors leading-tight"
+            [class.text-white]="theme.isDark()"
+            [class.text-slate-900]="!theme.isDark()"
+          >
+            System<span class="text-indigo-600">POS</span>
+          </div>
+          <div
+            class="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-black mt-0.5 opacity-80"
+          >
+            Smart Solutions
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div
+        *ngIf="!isCollapsed()"
+        class="px-4 pb-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] opacity-60"
+      >
+        Menu Overview
+      </div>
+
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="active-link"
+        class="nav-item group"
+        [title]="
+          isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''
+        "
+        [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+      >
+        <div
+          class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+        >
+          <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
+            <svg
+              *ngIf="item.icon === 'sale'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <svg
+              *ngIf="item.icon === 'product'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="m7.5 4.27 9 5.15" />
+              <path
+                d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+              />
+              <path d="m3.27 6.96 8.73 5.05 8.73-5.05" />
+              <path d="M12 22.08V12" />
+            </svg>
+            <svg
+              *ngIf="item.icon === 'report'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 3v18h18" />
+              <path d="m19 9-5 5-4-4-3 3" />
+            </svg>
+            <svg
+              *ngIf="item.icon === 'user'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+        </div>
+
+        <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap">
+          {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
+        </span>
+        <div
+          class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all"
+        ></div>
+      </a>
+    </nav>
+
+    <!-- Footer -->
+    <div
+      class="p-4 space-y-3 border-t transition-colors"
+      [class.bg-slate-900/50]="theme.isDark()"
+      [class.bg-slate-50]="!theme.isDark()"
+      [class.border-slate-800]="theme.isDark()"
+      [class.border-slate-100]="!theme.isDark()"
+    >
+      <!-- Dark Mode Toggle -->
+      <button
+        (click)="theme.toggle()"
+        class="w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2"
+        [class.bg-slate-800/40]="theme.isDark()"
+        [class.hover:bg-slate-800]="theme.isDark()"
+        [class.border-slate-700/50]="theme.isDark()"
+        [class.text-slate-400]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.hover:bg-slate-50]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.text-slate-600]="!theme.isDark()"
+        [title]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        [attr.aria-label]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      >
+        <div
+          class="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors"
+          [class.bg-indigo-600]="theme.isDark()"
+          [class.bg-indigo-500]="!theme.isDark()"
+        >
+          <!-- Moon icon (dark mode active) -->
+          <svg
+            *ngIf="theme.isDark()"
+            class="w-4 h-4 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <!-- Sun icon (light mode active) -->
+          <svg
+            *ngIf="!theme.isDark()"
+            class="w-4 h-4 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </div>
+        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
+          {{
+            theme.isDark()
+              ? langService.currentLang() === 'km'
+                ? 'ពន្លឺ'
+                : 'Light'
+              : langService.currentLang() === 'km'
+                ? 'ងងឹត'
+                : 'Dark'
+          }}
+        </span>
+      </button>
+
+      <!-- Language Toggle -->
+      <button
+        (click)="langService.toggle()"
+        class="w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2"
+        [class.bg-slate-800/40]="theme.isDark()"
+        [class.hover:bg-slate-800]="theme.isDark()"
+        [class.border-slate-700/50]="theme.isDark()"
+        [class.text-slate-400]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.hover:bg-slate-50]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.text-slate-600]="!theme.isDark()"
+        [title]="langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'"
+        [attr.aria-label]="
+          langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'
+        "
+      >
+        <div
+          class="w-7 h-7 rounded-md bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold"
+        >
+          {{ langService.currentLang() === 'en' ? 'KH' : 'EN' }}
+        </div>
+        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
+          {{ langService.currentLang() === 'en' ? 'ភាសាខ្មែរ' : 'English' }}
+        </span>
+      </button>
+
+      <!-- User Profile -->
+      <div
+        class="flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300 hover:shadow-lg"
+        [class.bg-slate-800/40]="theme.isDark()"
+        [class.border-slate-700/50]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200/80]="!theme.isDark()"
+        [class.hover:border-indigo-500/30]="!theme.isDark()"
+      >
+        <div *ngIf="!isCollapsed()" class="relative flex-shrink-0">
+          <div class="w-10 h-10">
+            <img
+              [src]="auth.currentUser()?.profile"
+              alt="Profile"
+              class="w-full h-full object-cover"
+              onerror="this.src='https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'"
+            />
+          </div>
+          <!-- Status Indicator -->
+          <div
+            class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#0B1120] rounded-full"
+            [class.border-[#0B1120]]="theme.isDark()"
+            [class.border-white]="!theme.isDark()"
+          ></div>
+        </div>
+        <div *ngIf="!isCollapsed()" class="min-w-0 flex-1">
+          <div
+            class="text-sm font-bold truncate transition-colors leading-tight"
+            [class.text-white]="theme.isDark()"
+            [class.text-slate-900]="!theme.isDark()"
+          >
+            {{ auth.currentUser()?.name }}
+          </div>
+          <div class="text-indigo-500 text-[10px] font-black uppercase tracking-wider mt-0.5">
+            {{ auth.currentUser()?.role }}
+          </div>
+        </div>
+        <button
+          (click)="auth.logout()"
+          class="pl-1 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all group"
+          title="Logout"
+        >
+          <svg
+            class="w-5 h-5 transition-transform group-hover:rotate-12"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main
+    class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar-light pb-24 md:pb-6 transition-all duration-500"
+    [class.bg-slate-950]="theme.isDark()"
+    [class.bg-[#F8FAFC]]="!theme.isDark()"
+  >
+    <!-- max-w-7xl -->
+    <div class="mx-auto">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Navigation (visible < md) -->
+  <nav
+    class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around px-4 border-t z-50 transition-all backdrop-blur-lg"
+    [class.bg-slate-900/80]="theme.isDark()"
+    [class.border-slate-800]="theme.isDark()"
+    [class.bg-white/80]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+  >
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.route"
+      routerLinkActive="mobile-nav-active"
+      class="relative flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300"
+      [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+    >
+      <div class="z-10 transition-transform duration-300 transform group-active:scale-90">
+        <svg
+          class="w-6 h-6"
+          *ngIf="item.icon === 'sale'"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+          <path d="M3 6h18" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        <svg
+          class="w-6 h-6"
+          *ngIf="item.icon === 'product'"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+          />
+          <path d="m3.27 6.96 8.73 5.05 8.73-5.05" />
+          <path d="M12 22.08V12" />
+        </svg>
+        <svg
+          class="w-6 h-6"
+          *ngIf="item.icon === 'report'"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 3v18h18" />
+          <path d="m19 9-5 5-4-4-3 3" />
+        </svg>
+        <svg
+          class="w-6 h-6"
+          *ngIf="item.icon === 'user'"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+        </svg>
+      </div>
+      <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{
+        langService.currentLang() === 'km' ? item.labelKm : item.label
+      }}</span>
+      
+      <!-- Active indicator dot -->
+      <div class="active-dot absolute -bottom-1 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all"></div>
+    </a>
+  </nav>
+</div>
