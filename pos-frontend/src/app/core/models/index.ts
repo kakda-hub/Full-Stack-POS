@@ -15,7 +15,7 @@ export interface Product {
   barcode: string;
   category: string;
   stock: number;
-  image?: string;
+  imgUrl?: string;
   lowStockThreshold?: number;
 }
 

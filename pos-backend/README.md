@@ -39,17 +39,17 @@ docker-compose down
 
 ## ⚙️ Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | API listen port |
-| `NODE_ENV` | `development` | `development` or `production` |
-| `DB_HOST` | `localhost` | MySQL host |
-| `DB_PORT` | `3306` | MySQL port |
-| `DB_USER` | `pos_user` | MySQL username |
-| `DB_PASS` | `pos_password` | MySQL password |
-| `DB_NAME` | `pos_db` | Database name |
-| `JWT_SECRET` | — | **Required in production** |
-| `JWT_EXPIRES_IN` | `8h` | Token lifetime |
+| Variable         | Default        | Description                   |
+| ---------------- | -------------- | ----------------------------- |
+| `PORT`           | `3000`         | API listen port               |
+| `NODE_ENV`       | `development`  | `development` or `production` |
+| `DB_HOST`        | `localhost`    | MySQL host                    |
+| `DB_PORT`        | `3306`         | MySQL port                    |
+| `DB_USER`        | `pos_user`     | MySQL username                |
+| `DB_PASS`        | `pos_password` | MySQL password                |
+| `DB_NAME`        | `pos_db`       | Database name                 |
+| `JWT_SECRET`     | —              | **Required in production**    |
+| `JWT_EXPIRES_IN` | `8h`           | Token lifetime                |
 
 ---
 
@@ -62,6 +62,7 @@ Authorization: Bearer <token>
 ```
 
 ### Default Admin Credentials (Docker seed)
+
 ```
 Email:    admin@pos.com
 Password: password   ← change immediately in production
@@ -85,6 +86,7 @@ All responses follow this envelope:
 ```
 
 Error responses:
+
 ```json
 {
   "success": false,
@@ -101,39 +103,48 @@ Error responses:
 
 <!-- http://localhost:3000/api/v1/auth/profile -->
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/auth/login` | ❌ | Login and receive JWT |
-| GET | `/auth/profile` | ✅ | Get current user profile |
+| Method | Endpoint        | Auth | Description              |
+| ------ | --------------- | ---- | ------------------------ |
+| POST   | `/auth/login`   | ❌   | Login and receive JWT    |
+| GET    | `/auth/profile` | ✅   | Get current user profile |
 
 **POST /auth/login**
+
 ```json
 {
   "email": "admin@pos.com",
-  "password": "Admin@123"
+  "password": "admin123"
 }
 ```
+
 Response:
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-  "user": { "id": 1, "name": "System Admin", "email": "admin@pos.com", "role": "admin" }
+  "user": {
+    "id": 1,
+    "name": "System Admin",
+    "email": "admin@pos.com",
+    "role": "admin"
+  }
 }
 ```
 
 ---
 
-### 👥 Users  `[admin only]`
+### 👥 Users `[admin only]`
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/users` | Create user |
-| GET | `/users` | List all users |
-| GET | `/users/:id` | Get user by ID |
-| PATCH | `/users/:id` | Update user |
-| DELETE | `/users/:id` | Delete user |
+| Method | Endpoint     | Description    |
+| ------ | ------------ | -------------- |
+| POST   | `/users`     | Create user    |
+| GET    | `/users`     | List all users |
+| GET    | `/users/:id` | Get user by ID |
+| PATCH  | `/users/:id` | Update user    |
+| DELETE | `/users/:id` | Delete user    |
 
 **POST /users**
+
 ```json
 {
   "name": "Jane Smith",
@@ -147,15 +158,16 @@ Response:
 
 ### 📂 Categories
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/categories` | admin | Create category |
-| GET | `/categories` | all | List categories |
-| GET | `/categories/:id` | all | Get category |
-| PATCH | `/categories/:id` | admin | Update category |
+| Method | Endpoint          | Auth  | Description     |
+| ------ | ----------------- | ----- | --------------- |
+| POST   | `/categories`     | admin | Create category |
+| GET    | `/categories`     | all   | List categories |
+| GET    | `/categories/:id` | all   | Get category    |
+| PATCH  | `/categories/:id` | admin | Update category |
 | DELETE | `/categories/:id` | admin | Delete category |
 
 **POST /categories**
+
 ```json
 { "name": "Beverages" }
 ```
@@ -164,29 +176,31 @@ Response:
 
 ### 📦 Products
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/products` | admin | Create product |
-| GET | `/products` | all | List products |
-| GET | `/products?includeInactive=true` | admin | Include inactive |
-| GET | `/products/:id` | all | Get product |
-| GET | `/products/barcode/:barcode` | all | Find by barcode |
-| PATCH | `/products/:id` | admin | Update product |
-| PATCH | `/products/:id/stock` | admin | Adjust stock |
-| DELETE | `/products/:id` | admin | Deactivate product |
+| Method | Endpoint                         | Auth  | Description        |
+| ------ | -------------------------------- | ----- | ------------------ |
+| POST   | `/products`                      | admin | Create product     |
+| GET    | `/products`                      | all   | List products      |
+| GET    | `/products?includeInactive=true` | admin | Include inactive   |
+| GET    | `/products/:id`                  | all   | Get product        |
+| GET    | `/products/barcode/:barcode`     | all   | Find by barcode    |
+| PATCH  | `/products/:id`                  | admin | Update product     |
+| PATCH  | `/products/:id/stock`            | admin | Adjust stock       |
+| DELETE | `/products/:id`                  | admin | Deactivate product |
 
 **POST /products**
+
 ```json
 {
   "name": "Iced Americano",
   "barcode": "8851234567890",
-  "price": 3.50,
+  "price": 3.5,
   "stock": 100,
   "categoryId": 1
 }
 ```
 
 **PATCH /products/:id/stock** (adjust stock, positive = add, negative = subtract)
+
 ```json
 { "quantity": 50 }
 ```
@@ -195,21 +209,22 @@ Response:
 
 ### 🧾 Sales
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/sales` | all | Create new sale |
-| GET | `/sales` | all | List sales (cashier: own only) |
-| GET | `/sales/:id` | all | Get sale detail |
+| Method | Endpoint     | Auth | Description                    |
+| ------ | ------------ | ---- | ------------------------------ |
+| POST   | `/sales`     | all  | Create new sale                |
+| GET    | `/sales`     | all  | List sales (cashier: own only) |
+| GET    | `/sales/:id` | all  | Get sale detail                |
 
 **POST /sales** — triggers full transaction: validates stock → deducts → saves
+
 ```json
 {
   "items": [
     { "productId": 1, "quantity": 2 },
     { "productId": 3, "quantity": 1 }
   ],
-  "discount": 1.00,
-  "tax": 0.50,
+  "discount": 1.0,
+  "tax": 0.5,
   "paymentMethod": "cash"
 }
 ```
@@ -217,22 +232,24 @@ Response:
 `paymentMethod` values: `cash` | `aba` | `card`
 
 Response includes computed totals:
+
 ```json
 {
   "id": 42,
-  "subtotal": 10.50,
-  "discount": 1.00,
-  "tax": 0.50,
-  "total": 10.00,
+  "subtotal": 10.5,
+  "discount": 1.0,
+  "tax": 0.5,
+  "total": 10.0,
   "paymentMethod": "cash",
   "items": [
-    { "productId": 1, "quantity": 2, "price": 3.50 },
-    { "productId": 3, "quantity": 1, "price": 3.50 }
+    { "productId": 1, "quantity": 2, "price": 3.5 },
+    { "productId": 3, "quantity": 1, "price": 3.5 }
   ]
 }
 ```
 
 If stock is insufficient:
+
 ```json
 {
   "success": false,
@@ -243,24 +260,25 @@ If stock is insufficient:
 
 ---
 
-### 📊 Reports  `[admin only]`
+### 📊 Reports `[admin only]`
 
 All report endpoints accept optional `from` and `to` query params (`YYYY-MM-DD`).
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/reports/summary` | Dashboard overview + low stock alert |
-| GET | `/reports/daily-revenue` | Revenue grouped by day |
-| GET | `/reports/top-products?limit=5` | Best-selling products |
-| GET | `/reports/payment-summary` | Revenue by payment method |
-| GET | `/reports/sales-by-cashier` | Performance per cashier |
+| Method | Endpoint                        | Description                          |
+| ------ | ------------------------------- | ------------------------------------ |
+| GET    | `/reports/summary`              | Dashboard overview + low stock alert |
+| GET    | `/reports/daily-revenue`        | Revenue grouped by day               |
+| GET    | `/reports/top-products?limit=5` | Best-selling products                |
+| GET    | `/reports/payment-summary`      | Revenue by payment method            |
+| GET    | `/reports/sales-by-cashier`     | Performance per cashier              |
 
 **GET /reports/summary?from=2025-01-01&to=2025-01-31**
+
 ```json
 {
   "totalSales": 128,
-  "totalRevenue": 1540.50,
-  "totalDiscount": 45.00,
+  "totalRevenue": 1540.5,
+  "totalDiscount": 45.0,
   "averageOrderValue": 12.03,
   "lowStockProducts": [
     { "id": 5, "name": "Espresso Beans", "stock": 3, "barcode": "..." }
@@ -269,26 +287,47 @@ All report endpoints accept optional `from` and `to` query params (`YYYY-MM-DD`)
 ```
 
 **GET /reports/daily-revenue**
+
 ```json
 [
-  { "date": "2025-01-31", "totalSales": 24, "revenue": 312.00, "totalDiscount": 5.00, "totalTax": 10.00 },
-  { "date": "2025-01-30", "totalSales": 18, "revenue": 228.50, "totalDiscount": 3.00, "totalTax": 7.50 }
+  {
+    "date": "2025-01-31",
+    "totalSales": 24,
+    "revenue": 312.0,
+    "totalDiscount": 5.0,
+    "totalTax": 10.0
+  },
+  {
+    "date": "2025-01-30",
+    "totalSales": 18,
+    "revenue": 228.5,
+    "totalDiscount": 3.0,
+    "totalTax": 7.5
+  }
 ]
 ```
 
 **GET /reports/top-products?limit=5**
+
 ```json
 [
-  { "productId": 1, "productName": "Iced Americano", "barcode": "...", "totalQuantitySold": 240, "totalRevenue": 840.00 }
+  {
+    "productId": 1,
+    "productName": "Iced Americano",
+    "barcode": "...",
+    "totalQuantitySold": 240,
+    "totalRevenue": 840.0
+  }
 ]
 ```
 
 **GET /reports/payment-summary**
+
 ```json
 [
-  { "paymentMethod": "cash", "totalTransactions": 80, "totalRevenue": 960.00 },
-  { "paymentMethod": "aba",  "totalTransactions": 35, "totalRevenue": 430.50 },
-  { "paymentMethod": "card", "totalTransactions": 13, "totalRevenue": 150.00 }
+  { "paymentMethod": "cash", "totalTransactions": 80, "totalRevenue": 960.0 },
+  { "paymentMethod": "aba", "totalTransactions": 35, "totalRevenue": 430.5 },
+  { "paymentMethod": "card", "totalTransactions": 13, "totalRevenue": 150.0 }
 ]
 ```
 
@@ -324,18 +363,18 @@ created_at
 
 ## 🛡 Role Permissions Matrix
 
-| Module | Admin | Cashier |
-|---|---|---|
-| Auth login | ✅ | ✅ |
-| Users CRUD | ✅ | ❌ |
-| Categories (read) | ✅ | ✅ |
-| Categories (write) | ✅ | ❌ |
-| Products (read) | ✅ | ✅ |
-| Products (write) | ✅ | ❌ |
-| Sales (create) | ✅ | ✅ |
-| Sales (read own) | ✅ | ✅ |
-| Sales (read all) | ✅ | ❌ |
-| Reports | ✅ | ❌ |
+| Module             | Admin | Cashier |
+| ------------------ | ----- | ------- |
+| Auth login         | ✅    | ✅      |
+| Users CRUD         | ✅    | ❌      |
+| Categories (read)  | ✅    | ✅      |
+| Categories (write) | ✅    | ❌      |
+| Products (read)    | ✅    | ✅      |
+| Products (write)   | ✅    | ❌      |
+| Sales (create)     | ✅    | ✅      |
+| Sales (read own)   | ✅    | ✅      |
+| Sales (read all)   | ✅    | ❌      |
+| Reports            | ✅    | ❌      |
 
 ---
 
@@ -403,3 +442,15 @@ src/
 ├── config/             DB config, app config, TypeORM CLI config
 └── main.ts             Bootstrap: Helmet, CORS, ValidationPipe
 ```
+
+# 1. Create the folder and module
+
+nest g mo uploads
+
+# 2. Create the service inside that folder
+
+nest g s uploads
+
+# 3. Create the controller
+
+nest g co uploads

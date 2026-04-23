@@ -58,7 +58,6 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
-
 # KhmerPOS — Angular Point of Sale System
 
 A fully production-ready Angular POS system with Khmer/English support.
@@ -77,13 +76,14 @@ Open **http://localhost:4200**
 ## Demo Login Credentials
 
 | Role    | Username | Password |
-|---------|----------|----------|
+| ------- | -------- | -------- |
 | Admin   | admin    | 1234     |
 | Cashier | cashier  | 1234     |
 
 ## Features
 
 ### Cashier View (/sales)
+
 - Product grid with category filter tabs
 - Barcode scanner support (type barcode + Enter)
 - Cart with quantity controls and per-item discounts
@@ -94,6 +94,7 @@ Open **http://localhost:4200**
 - Real-time reactive state via Angular Signals
 
 ### Admin View (/products, /reports, /users)
+
 - Full product CRUD with barcode, category, stock management
 - Low-stock alerts and indicators
 - Daily revenue KPI cards
@@ -102,6 +103,7 @@ Open **http://localhost:4200**
 - User management with role permissions table
 
 ### Architecture
+
 ```
 src/app/
 ├── core/
@@ -122,6 +124,7 @@ src/app/
 ```
 
 ### Tech Stack
+
 - **Angular 21** with NgModules + lazy loading
 - **Angular Signals** for reactive cart state
 - **Angular Animations** (180-200ms, OnPush throughout)
@@ -130,12 +133,14 @@ src/app/
 - **Hanuman** font for Khmer, **Inter** for English
 
 ### Language Support
+
 - Real-time switching (no reload)
 - Persisted to localStorage
 - Translation files: `src/assets/i18n/en.json` + `km.json`
 - `html[lang="km"]` switches to Hanuman font automatically
 
 ### Role-Based Access
+
 - **Admin**: products, reports, users, sales
 - **Cashier**: sales only
 - Route guards enforce permissions

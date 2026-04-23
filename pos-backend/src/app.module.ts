@@ -7,8 +7,11 @@ import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SalesModule } from './sales/sales.module';
 import { ReportsModule } from './reports/reports.module';
+import { UploadModule } from './upload/upload.module';
 import { databaseConfig } from './config/database.config';
+import { UploadDynamicModule } from './upload-dynamic/upload-dynamic.module';
 import appConfig from './config/app.config';
+import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import appConfig from './config/app.config';
     CategoriesModule,
     SalesModule,
     ReportsModule,
+    UploadModule,
+    UploadDynamicModule,
+    UploadCloudinaryModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

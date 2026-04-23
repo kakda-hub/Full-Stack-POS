@@ -33,22 +33,24 @@ import { Category } from '../categories/entities/category.entity';
 import { Product } from '../products/entities/product.entity';
 import { Sale } from '../sales/entities/sale.entity';
 import { SaleItem } from '../sales/entities/sale-item.entity';
+import { FileUpload } from '../upload/entities/upload.entity';
 
 export const databaseConfig = (): TypeOrmModuleOptions => ({
   type: 'mysql',
+  autoLoadEntities: true,
 
-  // ✅ FIX
+  // FIX
   host: process.env.DB_HOST || 'db',
 
   port: parseInt(process.env.DB_PORT, 10) || 3306,
   username: process.env.DB_USER || 'root',
 
-  // ✅ FIX
+  // FIX
   password: process.env.DB_PASSWORD || '',
 
   database: process.env.DB_NAME || 'pos_db',
 
-  entities: [User, Category, Product, Sale, SaleItem],
+  entities: [User, Category, Product, Sale, SaleItem, FileUpload],
 
   // synchronize: process.env.NODE_ENV !== 'production',
   synchronize: true,

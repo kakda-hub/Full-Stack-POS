@@ -4,6 +4,7 @@ import { Product } from '../../../core/models';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
+import { ProductService } from '../../../services/product.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -29,6 +30,7 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public lang: LanguageService,
+    private productService: ProductService,
     public theme: ThemeService,
   ) { }
 
@@ -41,6 +43,16 @@ export class ProductDetailComponent implements OnInit {
       barcode: [this.product?.barcode || '', [Validators.required]],
       category: [this.product?.category || 'beverages', [Validators.required]],
       lowStockThreshold: [this.product?.lowStockThreshold || 10],
+      imgUrl: [this.product?.imgUrl || ''],
+    });
+
+    this.getProduct();
+  }
+
+  private getProduct() {
+    this.productService.getAllProducts().subscribe((products) => {
+      console.log(products);
+      // this.product = products;
     });
   }
 

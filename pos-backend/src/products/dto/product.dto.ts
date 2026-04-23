@@ -15,6 +15,10 @@ export class CreateProductDto {
   name: string;
 
   @IsString()
+  @IsOptional()
+  imgUrl?: string;
+
+  @IsString()
   @IsNotEmpty()
   barcode: string;
 
@@ -40,6 +44,10 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   barcode?: string;
+
+  @IsString()
+  @IsOptional()
+  imgUrl?: string;
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
