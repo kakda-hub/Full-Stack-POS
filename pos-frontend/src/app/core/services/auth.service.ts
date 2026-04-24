@@ -1,11 +1,8 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, map, of } from 'rxjs';
 import { User } from '../models';
-
-const MOCK_USERS: User[] = [
-  { id: '1', username: 'admin', name: 'Admin User', role: 'admin', token: 'mock-admin-token', profile: 'https://png.pngtree.com/png-clipart/20241125/original/pngtree-cartoon-user-avatar-vector-png-image_17295195.png' },
-  { id: '2', username: 'cashier', name: 'John Cashier', role: 'cashier', token: 'mock-cashier-token', profile: 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg' },
-];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -15,16 +12,32 @@ export class AuthService {
   isAdmin = computed(() => this._currentUser()?.role === 'admin');
   isCashier = computed(() => this._currentUser()?.role === 'cashier');
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private http: HttpClient) { }
 
-  login(username: string, password: string): boolean {
-    const user = MOCK_USERS.find(u => u.username === username);
-    if (user && password === '1234') {
-      this._currentUser.set(user);
-      localStorage.setItem('pos_user', JSON.stringify(user));
-      return true;
-    }
-    return false;
+  login(username: string, password: string): Observable<boolean> {
+    return this.http.post<any>('http://localhost:3000/api/v1/auth/login', { email: username, password })
+      .pipe(
+        map(response => {
+          const data = response?.data;
+          if (data && data.accessToken) {
+            const user: User = {
+              id: String(data.user.id),
+              username: data.user.email,
+              name: data.user.name,
+              role: data.user.role as 'admin' | 'cashier',
+              token: data.accessToken,
+            };
+            this._currentUser.set(user);
+            localStorage.setItem('pos_user', JSON.stringify(user));
+            return true;
+          }
+          return false;
+        }),
+        catchError(error => {
+          console.error('Login error', error);
+          return of(false);
+        })
+      );
   }
 
   logout(): void {
@@ -40,5 +53,9 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  getToken(): string | null {
+    return this._currentUser()?.token || null;
   }
 }

@@ -43,7 +43,12 @@ const routes: Routes = [
       {
         path: 'page-not-found',
         loadChildren: () => import('./features/page-not-found/page-not-found.module').then((m) => m.PageNotFoundModule),
-      }
+      },
+      {
+        path: 'categories',
+        loadChildren: () =>
+          import('./features/categories/categories.module').then((m) => m.CategoriesModule),
+      },
     ],
   },
   // { path: '**', redirectTo: 'sales' },

@@ -19,30 +19,25 @@
     >
       <h2 class="text-lg font-bold text-slate-800">
         {{
-          product
+          category
             ? lang.currentLang() === 'km'
-              ? 'កែប្រែ'
-              : 'Edit Product'
+              ? 'កែប្រែប្រភេទ'
+              : 'Edit Category'
             : lang.currentLang() === 'km'
-              ? 'បន្ថែមផលិតផល'
-              : 'Add Product'
+              ? 'បន្ថែមប្រភេទ'
+              : 'Add Category'
         }}
       </h2>
       <button
         type="button"
-        aria-label="Toggle cart"
+        aria-label="Toggle close"
         (click)="cancel.emit()"
         [class.hover:bg-slate-700]="theme.isDark()"
         [class.hover:bg-slate-100]="!theme.isDark()"
         class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
@@ -88,98 +83,13 @@
             class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           />
         </div>
-        <div>
-          <label
-            [class.text-slate-300]="theme.isDark()"
-            [class.text-slate-700]="!theme.isDark()"
-            class="block text-sm font-semibold mb-1.5"
-            >{{ lang.currentLang() === 'km' ? 'តម្លៃ ($)' : 'Price ($)' }} *</label
-          >
-          <input
-            aria-label="Price"
-            formControlName="price"
-            type="number"
-            step="0.01"
-            min="0"
-            [class.bg-slate-700]="theme.isDark()"
-            [class.border-slate-600]="theme.isDark()"
-            [class.text-slate-100]="theme.isDark()"
-            [class.bg-white]="!theme.isDark()"
-            [class.border-slate-200]="!theme.isDark()"
-            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            [class.border-rose-400]="form.get('price')?.invalid && form.get('price')?.touched"
-          />
-        </div>
-        <div>
-          <label
-            [class.text-slate-300]="theme.isDark()"
-            [class.text-slate-700]="!theme.isDark()"
-            class="block text-sm font-semibold mb-1.5"
-            >{{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }} *</label
-          >
-          <input
-            aria-label="Stock"
-            formControlName="stock"
-            type="number"
-            min="0"
-            [class.bg-slate-700]="theme.isDark()"
-            [class.border-slate-600]="theme.isDark()"
-            [class.text-slate-100]="theme.isDark()"
-            [class.bg-white]="!theme.isDark()"
-            [class.border-slate-200]="!theme.isDark()"
-            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            [class.border-rose-400]="form.get('stock')?.invalid && form.get('stock')?.touched"
-          />
-        </div>
-        <div class="col-span-2">
-          <label
-            [class.text-slate-300]="theme.isDark()"
-            [class.text-slate-700]="!theme.isDark()"
-            class="block text-sm font-semibold mb-1.5"
-            >{{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }} *</label
-          >
-          <input
-            aria-label="Barcode"
-            formControlName="barcode"
-            type="text"
-            [class.bg-slate-700]="theme.isDark()"
-            [class.border-slate-600]="theme.isDark()"
-            [class.text-slate-100]="theme.isDark()"
-            [class.bg-white]="!theme.isDark()"
-            [class.border-slate-200]="!theme.isDark()"
-            class="w-full border rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            [class.border-rose-400]="form.get('barcode')?.invalid && form.get('barcode')?.touched"
-          />
-        </div>
-        <div>
-          <label
-            [class.text-slate-300]="theme.isDark()"
-            [class.text-slate-700]="!theme.isDark()"
-            class="block text-sm font-semibold mb-1.5"
-            >{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }} *</label
-          >
-          <select
-            aria-label="Category"
-            formControlName="categoryId"
-            [class.bg-slate-700]="theme.isDark()"
-            [class.border-slate-600]="theme.isDark()"
-            [class.text-slate-100]="theme.isDark()"
-            [class.bg-white]="!theme.isDark()"
-            [class.border-slate-200]="!theme.isDark()"
-            class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          >
-            <option *ngFor="let cat of categories" [value]="cat.id">
-              {{ lang.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
-            </option>
-          </select>
-        </div>
 
         <div class="col-span-2">
           <label
             [class.text-slate-300]="theme.isDark()"
             [class.text-slate-700]="!theme.isDark()"
             class="block text-sm font-semibold mb-1.5"
-            >{{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Product Image' }}</label
+            >{{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}</label
           >
           <div
             class="flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all overflow-hidden relative"
@@ -255,12 +165,9 @@
           class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
         >
           <span *ngIf="isSaving()" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-          {{ lang.currentLang() === 'km' ? 'រក្សាទុក' : 'Save Product' }}
+          {{ lang.currentLang() === 'km' ? 'រក្សាទុក' : 'Save Category' }}
         </button>
       </div>
-      <pre>
-        {{ this.form.value | json }}
-      </pre>
     </form>
   </div>
 </div>

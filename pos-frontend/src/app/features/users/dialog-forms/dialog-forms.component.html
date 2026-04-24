@@ -1,0 +1,20 @@
+<section>
+  <header>
+    <h3 mat-dialog-title class="header-dialog">
+      ​​បង្កើតថ្មី
+    </h3>
+  </header>
+
+  <form [formGroup]="form">
+    <app-input-field formControlName="username" placeholder="Username" [isRequired]="true"></app-input-field>
+    <app-input-field formControlName="email" type="email" placeholder="Email"></app-input-field>
+    <pre>
+      {{ form.value | json }}
+    </pre>
+  </form>
+
+  <mat-dialog-actions align="end">
+    <button mat-raised-button mat-dialog-close color="warn">ចាកចេញ</button>
+    <button mat-raised-button mat-dialog-close color="primary">រក្សាទុក</button>
+  </mat-dialog-actions>
+</section>

@@ -16,6 +16,14 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
+  nameKh: string;
+
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsString()
+  @IsNotEmpty()
   imgUrl?: string;
 
   @IsString()
@@ -43,10 +51,18 @@ export class UpdateProductDto {
 
   @IsString()
   @IsOptional()
-  barcode?: string;
+  nameKh?: string;
 
   @IsString()
   @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  barcode?: string;
+
+  @IsString()
+  @IsNotEmpty()
   imgUrl?: string;
 
   @IsNumber({ maxDecimalPlaces: 2 })

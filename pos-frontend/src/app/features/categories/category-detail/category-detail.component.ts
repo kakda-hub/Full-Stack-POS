@@ -1,23 +1,20 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Product } from '../../../core/models';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
-import { ProductService } from '../../../services/product.service';
 import { CategoriesService } from '../../../services/categories.service';
+import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-product-detail',
+  selector: 'app-category-detail',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [modalAnimation, backdropAnimation],
-  templateUrl: './product-detail.component.html',
-  styleUrl: './product-detail.component.scss',
+  templateUrl: './category-detail.component.html',
 })
-export class ProductDetailComponent implements OnInit {
-  @Input() product: any | null = null;
+export class CategoryDetailComponent implements OnInit {
+  @Input() category: any | null = null;
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -25,46 +22,20 @@ export class ProductDetailComponent implements OnInit {
   isSaving = signal(false);
   isUploading = signal(false);
 
-  categories = [
-    { id: 1, name: 'Beverages', nameKm: 'ភេសជ្ជៈ' },
-    { id: 2, name: 'Food', nameKm: 'អាហារ' },
-    { id: 3, name: 'Snacks', nameKm: 'អាហារសម្រន់' },
-    { id: 4, name: 'Dairy', nameKm: 'ផលិតផលទឹកដោះ' },
-  ];
-
   constructor(
     private fb: FormBuilder,
     public lang: LanguageService,
-    private categoryService: CategoriesService,
-    private productService: ProductService,
+    private categoriesService: CategoriesService,
     public theme: ThemeService,
     private http: HttpClient
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.initForm();
-    this.getAllCategories();
-  }
-
-  private initForm() {
     this.form = this.fb.group({
-      name: [this.product?.name || '', [Validators.required]],
-      nameKh: [this.product?.nameKh || this.product?.nameKm || ''],
-      price: [this.product?.price || 0, [Validators.required, Validators.min(0)]],
-      stock: [this.product?.stock || 0, [Validators.required, Validators.min(0)]],
-      barcode: [this.product?.barcode || ''],
-      categoryId: [this.product?.categoryId || 1, [Validators.required]],
-      imgUrl: [this.product?.imgUrl || ''],
-      description: [this.product?.description || ''],
-    });
-  }
-
-  getAllCategories() {
-    this.categoryService.list().subscribe((res: any) => {
-      console.log('Categories fetched:', res);
-      if (res && res.data) {
-        this.categories = res.data;
-      }
+      name: [this.category?.name || '', [Validators.required]],
+      nameKh: [this.category?.nameKh || this.category?.nameKm || ''],
+      description: [this.category?.description || ''],
+      imgUrl: [this.category?.imgUrl || this.category?.icon || ''],
     });
   }
 
@@ -81,7 +52,6 @@ export class ProductDetailComponent implements OnInit {
         if (res.data && res.data.data && res.data.data.length > 0) {
           this.form.patchValue({ imgUrl: res.data.data[0].fileUrl });
         }
-        console.log('Upload success', res);
         this.isUploading.set(false);
       },
       error: (err) => {
@@ -100,8 +70,8 @@ export class ProductDetailComponent implements OnInit {
     this.isSaving.set(true);
     const payload = this.form.value;
 
-    if (this.product?.id) {
-      this.productService.updateProduct(this.product.id, payload).subscribe({
+    if (this.category?.id) {
+      this.categoriesService.update(this.category.id, payload).subscribe({
         next: (res) => {
           this.isSaving.set(false);
           this.save.emit(res);
@@ -113,7 +83,7 @@ export class ProductDetailComponent implements OnInit {
         }
       });
     } else {
-      this.productService.createProduct(payload).subscribe({
+      this.categoriesService.save(payload).subscribe({
         next: (res) => {
           this.isSaving.set(false);
           this.save.emit(res);
@@ -127,12 +97,3 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 }
-
-
-
-// categories = [
-//   { id: 'beverages', name: 'Beverages', nameKm: 'ភេសជ្ជៈ' },
-//   { id: 'food', name: 'Food', nameKm: 'អាហារ' },
-//   { id: 'snacks', name: 'Snacks', nameKm: 'អាហារសម្រន់' },
-//   { id: 'dairy', name: 'Dairy', nameKm: 'ផលិតផលទឹកដោះ' },
-// ];

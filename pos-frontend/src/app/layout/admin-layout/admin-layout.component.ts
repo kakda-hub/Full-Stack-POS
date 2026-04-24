@@ -24,6 +24,7 @@ export class AdminLayoutComponent {
         { label: 'Products', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
         { label: 'Reports', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
         { label: 'Users', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },
+        { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
     ];
 
     constructor(

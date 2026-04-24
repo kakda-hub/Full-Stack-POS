@@ -18,6 +18,9 @@ export class Product {
   @Column({ length: 150 })
   name: string;
 
+  @Column({ length: 150 })
+  nameKh: string;
+
   @Column({ length: 255, nullable: true })
   imgUrl: string;
 
@@ -32,6 +35,9 @@ export class Product {
 
   @Column({ name: "category_id" })
   categoryId: number;
+
+  @Column({ name: "description" })
+  description: string;
 
   @ManyToOne(() => Category, (category) => category.products, {
     onDelete: "RESTRICT",

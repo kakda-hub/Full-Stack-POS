@@ -1,0 +1,284 @@
+<!-- ─────────────────────────────────────────
+  SKELETON STATE
+───────────────────────────────────────── -->
+<div
+  *ngIf="isLoading"
+  class="rounded-2xl border overflow-hidden"
+  [class.bg-white]="!theme.isDark()"
+  [class.border-slate-200]="!theme.isDark()"
+  [class.bg-slate-800]="theme.isDark()"
+  [class.border-slate-700]="theme.isDark()"
+>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead
+        class="border-b"
+        [class.bg-slate-50]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.bg-slate-900]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+      >
+        <tr>
+          <th class="px-4 py-3 text-center w-14">
+            <app-skeleton variant="text" width="20px" height="12px"></app-skeleton>
+          </th>
+          <th class="px-4 py-3 text-center w-16">
+            <div class="flex justify-center">
+              <app-skeleton variant="circle" size="36px"></app-skeleton>
+            </div>
+          </th>
+          <th *ngFor="let col of columns" class="px-4 py-3">
+            <app-skeleton variant="text" width="70px" height="12px"></app-skeleton>
+          </th>
+          <th class="px-4 py-3 text-right">
+            <div class="flex justify-end">
+              <app-skeleton variant="text" width="50px" height="12px"></app-skeleton>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <app-skeleton *ngFor="let i of skeletonRows" variant="table-row"></app-skeleton>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────
+  DATA TABLE
+───────────────────────────────────────── -->
+<div
+  *ngIf="!isLoading"
+  class="rounded-2xl border overflow-hidden shadow-sm"
+  [class.bg-white]="!theme.isDark()"
+  [class.border-slate-200]="!theme.isDark()"
+  [class.bg-slate-800]="theme.isDark()"
+  [class.border-slate-700]="theme.isDark()"
+>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+
+      <!-- Header -->
+      <thead
+        class="border-b"
+        [class.bg-slate-50]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.bg-slate-900]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+      >
+        <tr>
+          <th
+            class="px-4 py-3 text-center w-14 font-semibold text-xs uppercase tracking-wider"
+            [class.text-slate-400]="theme.isDark()"
+            [class.text-slate-500]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'ល.រ' : 'No' }}
+          </th>
+          <th
+            class="px-4 py-3 text-center w-16 font-semibold text-xs uppercase tracking-wider"
+            [class.text-slate-400]="theme.isDark()"
+            [class.text-slate-500]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}
+          </th>
+          <th
+            *ngFor="let col of columns"
+            class="px-4 py-3 font-semibold text-xs uppercase tracking-wider"
+            [class.text-center]="col.align === 'center'"
+            [class.text-right]="col.align === 'right'"
+            [class.text-left]="!col.align || col.align === 'left'"
+            [class.text-slate-400]="theme.isDark()"
+            [class.text-slate-500]="!theme.isDark()"
+            [class.hidden]="col.responsive === 'md'"
+            [class.md:table-cell]="col.responsive === 'md'"
+          >
+            {{ colLabel(col) }}
+          </th>
+          <th
+            class="px-4 py-3 text-right font-semibold text-xs uppercase tracking-wider"
+            [class.text-slate-400]="theme.isDark()"
+            [class.text-slate-500]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+          </th>
+        </tr>
+      </thead>
+
+      <!-- Body -->
+      <tbody
+        [@listAnimation]="rows.length"
+        class="divide-y"
+        [class.divide-slate-100]="!theme.isDark()"
+        [class.divide-slate-700]="theme.isDark()"
+      >
+        <tr
+          *ngFor="let row of rows; let i = index; trackBy: trackById"
+          @fadeIn
+          class="transition-colors duration-150 group"
+          [class.hover:bg-slate-50]="!theme.isDark()"
+          [class.hover:bg-slate-700]="theme.isDark()"
+        >
+          <!-- Row number -->
+          <td
+            class="px-4 py-3 text-center text-sm font-medium"
+            [class.text-slate-400]="!theme.isDark()"
+            [class.text-slate-500]="theme.isDark()"
+          >
+            {{ rowNumber(i) }}
+          </td>
+
+          <!-- Image -->
+          <td class="px-4 py-3 text-center">
+            <img
+              *ngIf="row.imgUrl || row.icon"
+              [src]="row.imgUrl || row.icon"
+              [alt]="row.name"
+              class="w-10 h-10 object-cover rounded-xl border mx-auto bg-white shadow-sm"
+              [class.border-slate-200]="!theme.isDark()"
+              [class.border-slate-600]="theme.isDark()"
+            />
+            <div
+              *ngIf="!row.imgUrl && !row.icon"
+              class="w-10 h-10 flex items-center justify-center rounded-xl border mx-auto font-bold text-sm"
+              [class.bg-indigo-50]="!theme.isDark()"
+              [class.border-indigo-100]="!theme.isDark()"
+              [class.text-indigo-500]="!theme.isDark()"
+              [class.bg-slate-700]="theme.isDark()"
+              [class.border-slate-600]="theme.isDark()"
+              [class.text-slate-300]="theme.isDark()"
+            >
+              {{ row.name?.[0]?.toUpperCase() || '?' }}
+            </div>
+          </td>
+
+          <!-- Dynamic cells -->
+          <ng-container *ngFor="let col of columns">
+            <td
+              *ngIf="!col.type || col.type === 'text' || col.type === 'subtext'"
+              class="px-4 py-3"
+              [class.hidden]="col.responsive === 'md'"
+              [class.md:table-cell]="col.responsive === 'md'"
+              [class.text-center]="col.align === 'center'"
+              [class.text-right]="col.align === 'right'"
+            >
+              <div
+                class="font-medium text-sm"
+                [class.text-slate-800]="!theme.isDark()"
+                [class.text-slate-100]="theme.isDark()"
+              >{{ cellValue(row, col) }}</div>
+              <div
+                *ngIf="col.type === 'subtext' && subValue(row, col)"
+                class="text-xs mt-0.5 text-slate-400"
+              >{{ subValue(row, col) }}</div>
+            </td>
+            <td
+              *ngIf="col.type === 'description'"
+              class="px-4 py-3"
+              [class.hidden]="col.responsive === 'md'"
+              [class.md:table-cell]="col.responsive === 'md'"
+            >
+              <div class="text-xs max-w-xs truncate text-slate-500" [title]="cellValue(row, col)">
+                {{ cellValue(row, col) }}
+              </div>
+            </td>
+            <td
+              *ngIf="col.type === 'badge'"
+              class="px-4 py-3"
+              [class.hidden]="col.responsive === 'md'"
+              [class.md:table-cell]="col.responsive === 'md'"
+              [class.text-center]="col.align === 'center'"
+            >
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                [class.bg-indigo-100]="!theme.isDark()"
+                [class.text-indigo-700]="!theme.isDark()"
+                [class.bg-indigo-900]="theme.isDark()"
+                [class.text-indigo-300]="theme.isDark()"
+              >{{ cellValue(row, col) }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <td class="px-4 py-3 text-right">
+            <div class="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+              <button
+                type="button"
+                [title]="lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit'"
+                (click)="onEdit.emit(row)"
+                class="p-1.5 rounded-lg transition-colors"
+                [class.hover:bg-indigo-50]="!theme.isDark()"
+                [class.text-slate-400]="!theme.isDark()"
+                [class.hover:text-indigo-600]="!theme.isDark()"
+                [class.hover:bg-indigo-900]="theme.isDark()"
+                [class.text-slate-500]="theme.isDark()"
+                [class.hover:text-indigo-400]="theme.isDark()"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                [title]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+                (click)="onDelete.emit(row)"
+                class="p-1.5 rounded-lg transition-colors"
+                [class.hover:bg-rose-50]="!theme.isDark()"
+                [class.text-slate-400]="!theme.isDark()"
+                [class.hover:text-rose-600]="!theme.isDark()"
+                [class.hover:bg-rose-900]="theme.isDark()"
+                [class.text-slate-500]="theme.isDark()"
+                [class.hover:text-rose-400]="theme.isDark()"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="rows.length === 0">
+          <td [attr.colspan]="columns.length + 3" class="px-4 py-16 text-center">
+            <svg
+              class="w-12 h-12 mx-auto mb-3 opacity-20"
+              [class.text-slate-400]="!theme.isDark()"
+              [class.text-slate-500]="theme.isDark()"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+            </svg>
+            <p
+              class="text-sm font-medium"
+              [class.text-slate-400]="!theme.isDark()"
+              [class.text-slate-500]="theme.isDark()"
+            >
+              {{ lang.currentLang() === 'km' ? 'រកមិនឃើញទិន្នន័យ' : 'No data found' }}
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginator -->
+    <div
+      class="border-t px-2"
+      [class.border-slate-100]="!theme.isDark()"
+      [class.border-slate-700]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.bg-slate-800]="theme.isDark()"
+    >
+      <mat-paginator
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)"
+        aria-label="Select page"
+      ></mat-paginator>
+    </div>
+  </div>
+</div>

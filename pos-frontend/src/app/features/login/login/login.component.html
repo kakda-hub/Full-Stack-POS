@@ -33,19 +33,21 @@
       </div>
 
       <!-- Form -->
-      <form (submit)="onLogin($event)" class="space-y-4">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-4">
         <div>
           <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
-            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Username' }}
+            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ / អ៊ីមែល' : 'Email' }}
           </label>
           <input
-            type="text"
-            [(ngModel)]="username"
-            name="username"
-            required
+            type="email"
+            formControlName="username"
             class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            placeholder="{{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Enter username' }}"
+            placeholder="{{ lang.currentLang() === 'km' ? 'បញ្ចូលអ៊ីមែល' : 'Enter email' }}"
+            [class.border-rose-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
           />
+          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="text-xs text-rose-400 mt-1">
+            {{ lang.currentLang() === 'km' ? 'អ៊ីមែលមិនត្រឹមត្រូវទេ' : 'Valid email is required' }}
+          </div>
         </div>
         <div>
           <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
@@ -53,12 +55,14 @@
           </label>
           <input
             type="password"
-            [(ngModel)]="password"
-            name="password"
-            required
+            formControlName="password"
             class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             placeholder="{{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Enter password' }}"
+            [class.border-rose-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
           />
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-xs text-rose-400 mt-1">
+            {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលពាក្យសម្ងាត់' : 'Password is required' }}
+          </div>
         </div>
 
         <div
@@ -92,13 +96,13 @@
             (click)="fillDemo('admin')"
             class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
           >
-            👤 admin / 1234
+            👤 admin@pos.com
           </button>
           <button
             (click)="fillDemo('cashier')"
             class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
           >
-            🧾 cashier / 1234
+            🧾 cashier@pos.com
           </button>
         </div>
       </div>

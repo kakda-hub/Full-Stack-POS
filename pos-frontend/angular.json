@@ -28,6 +28,10 @@
         "@schematics/angular:service": {
           "skipTests": true,
           "type": "service"
+        },
+        "@schematics/angular:module": {
+          "skipTests": true,
+          "type": "module"
         }
       },
       "root": "",
@@ -53,7 +57,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "./src/styles.scss"
             ]
           },
           "configurations": {

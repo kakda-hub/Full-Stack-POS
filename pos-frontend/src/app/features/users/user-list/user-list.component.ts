@@ -3,9 +3,11 @@ import { User } from '../../../core/models';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { fadeIn, pageTransition } from '../../../shared/animations/animations';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { UserService } from '../../../services/user.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { DialogFormsComponent } from '../dialog-forms/dialog-forms.component';
 
 
 @Component({
@@ -32,25 +34,34 @@ export class UserListComponent {
     { label: 'Export Data', labelKm: 'នាំចេញទិន្នន័យ', admin: true, cashier: false },
   ];
 
+  private defaultOption: MatDialogConfig = {
+    panelClass: 'medium-dialog',
+    disableClose: true
+  }
+
   constructor(
     public lang: LanguageService,
     public theme: ThemeService,
+    private reusableDialogService: ReusableDialogService,
     private userService: UserService,
     private dialog: MatDialog,
-  ) { }
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(UserDetailComponent, {
-      data: { name: 'New User' },
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed', result);
-      if (result) {
-        // Handle the result (e.g., add user to list)
-      }
-    });
+  ) {
+    this.reusableDialogService.setDialogComponent(DialogFormsComponent);
+    this.reusableDialogService.setDialogConfigOption(this.defaultOption);
   }
+
+  // openDialog(): void {
+  //   const dialogRef = this.dialog.open(UserDetailComponent, {
+  //     data: { name: 'New User' },
+  //   });
+
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     console.log('The dialog was closed', result);
+  //     if (result) {
+  //       // Handle the result (e.g., add user to list)
+  //     }
+  //   });
+  // }
 
 
   ngOnInit() {
@@ -72,6 +83,27 @@ export class UserListComponent {
         // this.isLoading.set(false);
       },
     });
+  }
+
+
+  onOpenDialog() {
+
+    const dialogRef = this.reusableDialogService.open();
+    dialogRef.subscribe((result) => {
+
+      if (!result) {
+        return;
+      }
+
+      console.log(result)
+
+
+      // this.addCategory(result)
+      // console.log("result -> ", result)
+
+
+    });
+
   }
 }
 

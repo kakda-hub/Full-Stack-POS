@@ -11,6 +11,8 @@ import { AlertHostComponent } from './components/alert/alert-host.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { SkeletonComponent } from './components/skeleton/skeleton.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     AlertHostComponent,
     LoaderComponent,
     SkeletonComponent,
+    DynamicTableComponent,
   ],
   imports: [
     CommonModule,
@@ -28,6 +31,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     TranslateModule,
     RouterModule,
     MatDialogModule,
+    MatPaginatorModule,
   ],
   exports: [
     CommonModule,
@@ -41,6 +45,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     AlertHostComponent,
     LoaderComponent,
     SkeletonComponent,
+    DynamicTableComponent,
   ],
 })
-export class SharedModule { }
+export class SharedModule {}

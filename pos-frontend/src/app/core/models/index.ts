@@ -17,6 +17,7 @@ export interface Product {
   stock: number;
   imgUrl?: string;
   lowStockThreshold?: number;
+  description?: string;
 }
 
 export interface CartItem {
