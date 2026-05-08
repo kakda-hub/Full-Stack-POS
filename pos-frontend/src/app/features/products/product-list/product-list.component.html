@@ -1,24 +1,8 @@
-<div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+<div @pageTransition class="p-3 space-y-4">
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-black text-slate-900">
-        {{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Products' }}
-      </h1>
-      <p class="text-sm text-slate-500 mt-0.5">
-        {{ productService.products().length }}
-        {{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'total products' }}
-      </p>
-    </div>
-
-    <!-- <button (click)="openAdd()"
-          class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-          </svg>
-          {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add Product' }}
-        </button> -->
-    <button matButton="filled" (click)="openAdd()">
+    <app-breadcrumb></app-breadcrumb>
+    <button matButton="filled" (click)="onAdd()">
       <mat-icon>add</mat-icon>
       {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add Product' }}
     </button>
@@ -323,14 +307,15 @@
           </tr>
         </tbody>
       </table>
+
+      <app-pagination
+        [totalItems]="productService.filteredProducts().length"
+        [pageSize]="10"
+        [currentPage]="currentPage()"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-pagination>
     </div>
   </div>
 </div>
 
-<!-- Form Modal -->
-<app-product-detail
-  *ngIf="showForm"
-  [product]="editingProduct"
-  (save)="onSave($event)"
-  (cancel)="showForm = false; editingProduct = null"
-></app-product-detail>

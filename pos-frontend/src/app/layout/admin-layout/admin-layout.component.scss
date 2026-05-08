@@ -77,3 +77,11 @@
   box-shadow: 0 0 10px rgba(99,102,241,0.8);
 }
 
+.active-sub-link {
+  @apply bg-indigo-50/80 text-indigo-600 font-bold !important;
+  
+  .dark & {
+    @apply bg-indigo-500/10 text-indigo-400 !important;
+  }
+}
+

@@ -6,6 +6,9 @@ import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { ProductDetailComponent } from '../product-detail/product-detail.component';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { MatDialogConfig } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-product-list',
@@ -19,8 +22,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
   showForm = false;
   isLoading = signal(true);
   editingProduct: Product | null = null;
+  currentPage = signal(1);
+
+  onPageChange(page: number) {
+    this.currentPage.set(page);
+  }
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
+  private defaultOption: MatDialogConfig = {
+    panelClass: 'medium-dialog',
+    disableClose: true
+  }
 
   constructor(
     public productService: ProductService,
@@ -28,7 +40,11 @@ export class ProductListComponent implements OnInit, OnDestroy {
     public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
-  ) { }
+    private reusableDialogService: ReusableDialogService,
+  ) {
+    this.reusableDialogService.setDialogComponent(ProductDetailComponent);
+    this.reusableDialogService.setDialogConfigOption(this.defaultOption);
+  }
 
   ngOnInit(): void {
     // Simulate initial data load
@@ -41,7 +57,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   onSearch(e: Event): void { this.searchSubject.next((e.target as HTMLInputElement).value); }
 
-  openAdd(): void { this.editingProduct = null; this.showForm = true; }
+  onAdd(): void {
+    this.openDialog();
+  }
+
   openEdit(p: Product): void { this.editingProduct = p; this.showForm = true; }
 
   deleteProduct(p: Product): void {
@@ -81,4 +100,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   trackById(_: number, p: Product): string { return p.id; }
+
+  openDialog() {
+    const dialogRef = this.reusableDialogService.open();
+    dialogRef.subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      console.log(result)
+      // this.addProduct(result)
+    });
+  }
 }

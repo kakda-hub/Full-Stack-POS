@@ -10,14 +10,16 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 export class DialogFormsComponent implements OnInit {
 
   form: FormGroup;
+  id: number | undefined;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       username: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.email]],
+      password: ['', [Validators.minLength(6)]],
+      phone: ['']
     });
   }
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
   }
 }

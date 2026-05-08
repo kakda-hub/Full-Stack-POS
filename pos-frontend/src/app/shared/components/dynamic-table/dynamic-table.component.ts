@@ -88,8 +88,20 @@ export class DynamicTableComponent implements OnChanges {
     return item?.id ?? _;
   }
 
-  onPageChange(event: PageEvent): void {
-    this.pageChange.emit(event);
+  onPageChange(page: number): void {
+    this.pageChange.emit({
+      pageIndex: page - 1,
+      pageSize: this.pageSize,
+      length: this.totalCount,
+    });
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pageChange.emit({
+      pageIndex: 0,
+      pageSize: pageSize,
+      length: this.totalCount,
+    });
   }
 
   /** Returns the label for a column in the active language */

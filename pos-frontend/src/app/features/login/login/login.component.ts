@@ -18,6 +18,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   error = signal(false);
   loading = signal(false);
+  showPassword = signal(false);
 
   constructor(
     private auth: AuthService,

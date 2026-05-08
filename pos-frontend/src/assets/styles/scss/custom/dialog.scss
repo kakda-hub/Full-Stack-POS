@@ -1,67 +1,97 @@
-.header-dialog {
-    padding: 10px;
-    margin: -15px 0px 12px -15px !important;
-    border-bottom: 1px solid whitesmoke;
-    font-size: 14px !important;
-}
-    
+// .header-dialog {
+//   padding: 10px;
+//   margin: -15px 0px 12px -15px !important;
+//   border-bottom: 1px solid whitesmoke;
+//   font-size: 14px !important;
+// }
+
 .responsive-dialog {
-    width: min(80vw, 1980px);
-    max-width: unset !important;
-    max-height: 98vh;
+  width: min(80vw, 1980px);
+  max-width: unset !important;
+  max-height: 98vh;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  .mat-dialog-container {
+    overflow: hidden !important;
     border-radius: 10px;
-    transition: all 0.3s ease-in-out;
-    .mat-dialog-container {
-        overflow: hidden !important;
-        border-radius: 10px;
-        padding: unset !important;
-    }
-    .mat-dialog-actions {
-        padding-right: 6px;
-        padding-bottom: 18px !important;    
-    }
-    @media screen and (max-width: 960px) {
-        width: 100vw;
-        max-height: 100vh;
-    }
+    padding: unset !important;
+  }
+  .mat-dialog-actions {
+    padding-right: 6px;
+    padding-bottom: 18px !important;
+  }
+  @media screen and (max-width: 960px) {
+    width: 100vw;
+    max-height: 100vh;
+  }
 }
-   
+
 .small-dialog {
+  border-radius: 10px;
+  background-color: white !important;
+  transition: all 0.3s ease-in-out;
+  .mat-dialog-container {
+    overflow: hidden !important;
     border-radius: 10px;
-    background-color: white !important;
-    transition: all 0.3s ease-in-out;
-    .mat-dialog-container {
-        overflow: hidden !important;
-        border-radius: 10px;
-        padding: unset !important;
-    }
-    .mat-dialog-actions {
-        padding-right: 6px;
-        padding-bottom: 18px !important;   
-    }
-    @media screen and (max-width: 960px) {
-        width: 100vw;
-    }
+    padding: unset !important;
+  }
+  .mat-dialog-actions {
+    padding-right: 6px;
+    padding-bottom: 18px !important;
+  }
+  @media screen and (max-width: 960px) {
+    width: 100vw;
+  }
 }
 
 .medium-dialog {
+  border-radius: 16px;
+  background-color: #fff !important;
+  width: min(600px, 1980px);
+  max-width: unset !important;
+  max-height: 98vh;
+  transition: all 0.3s ease-in-out;
+  .mat-dialog-container {
+    overflow: hidden !important;
     border-radius: 10px;
-    background-color: white !important;
-    width: min(600px, 1980px);
-    max-width: unset !important;
-    max-height: 98vh;
-    transition: all 0.3s ease-in-out;
-    .mat-dialog-container {
-        overflow: hidden !important;
-        border-radius: 10px;
-        padding: 0px 5px 8px 0px;
-    }
-    .mat-dialog-actions {
-        padding-right: 6px;
-        padding-bottom: 18px !important;    
-    }
-    @media screen and (max-width: 960px) {
-        width: 100vw;
-    }
+    padding: 0px 5px 8px 0px;
+  }
+  .mat-dialog-actions {
+    padding-right: 6px;
+    padding-bottom: 18px !important;
+  }
+  @media screen and (max-width: 960px) {
+    width: 100vw;
+  }
 }
 
+// .header-dialog {
+//   @apply p-[10px] !-mt-[15px] !mb-[12px] !-ml-[15px] border-b border-[whitesmoke] !text-[14px];
+// }
+
+// .responsive-dialog {
+//   @apply w-[min(80vw,1980px)] !max-w-none max-h-[98vh] rounded-[10px] transition-all duration-300 ease-in-out;
+//   @apply max-[960px]:w-screen max-[960px]:max-h-screen;
+
+//   // Nested elements
+//   @apply [&_.mat-dialog-container]:!overflow-hidden [&_.mat-dialog-container]:rounded-[10px] [&_.mat-dialog-container]:!p-0;
+//   @apply [&_.mat-dialog-actions]:pr-[6px] [&_.mat-dialog-actions]:!pb-[18px];
+// }
+
+// .small-dialog {
+//   @apply rounded-[10px] !bg-white transition-all duration-300 ease-in-out;
+//   @apply max-[960px]:w-screen;
+
+//   // Nested elements
+//   @apply [&_.mat-dialog-container]:!overflow-hidden [&_.mat-dialog-container]:rounded-[10px] [&_.mat-dialog-container]:!p-0;
+//   @apply [&_.mat-dialog-actions]:pr-[6px] [&_.mat-dialog-actions]:!pb-[18px];
+// }
+
+// .medium-dialog {
+//   @apply rounded-[10px] !bg-white w-[min(600px,1980px)] !max-w-none max-h-[98vh] transition-all duration-300 ease-in-out;
+//   @apply max-[960px]:w-screen;
+
+//   // Nested elements
+//   @apply [&_.mat-dialog-container]:!overflow-hidden [&_.mat-dialog-container]:rounded-[10px] [&_.mat-dialog-container]:pt-0 [&_.mat-dialog-container]:pr-[5px] [&_.mat-dialog-container]:pb-[8px] [&_.mat-dialog-container]:pl-0;
+//   @apply [&_.mat-dialog-actions]:pr-[6px] [&_.mat-dialog-actions]:!pb-[18px];
+// }

@@ -7,7 +7,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { UserService } from '../../../services/user.service';
 import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
-import { DialogFormsComponent } from '../dialog-forms/dialog-forms.component';
 
 
 @Component({
@@ -22,17 +21,13 @@ import { DialogFormsComponent } from '../dialog-forms/dialog-forms.component';
 export class UserListComponent {
   users = MOCK_USERS;
   isLoading = signal(true);
+  currentPage = signal(1);
+  totalUsers = MOCK_USERS.length;
 
-  permissions = [
-    { label: 'Access Sales', labelKm: 'ចូលប្រើការលក់', admin: true, cashier: true },
-    { label: 'Process Payments', labelKm: 'ដំណើរការទូទាត់', admin: true, cashier: true },
-    { label: 'View Reports', labelKm: 'មើលរបាយការណ៍', admin: true, cashier: false },
-    { label: 'Manage Products', labelKm: 'គ្រប់គ្រងផលិតផល', admin: true, cashier: false },
-    { label: 'Manage Users', labelKm: 'គ្រប់គ្រងអ្នកប្រើ', admin: true, cashier: false },
-    { label: 'Apply Discounts', labelKm: 'បញ្ចុះតម្លៃ', admin: true, cashier: true },
-    { label: 'Delete Transactions', labelKm: 'លុបប្រតិបត្តិការ', admin: true, cashier: false },
-    { label: 'Export Data', labelKm: 'នាំចេញទិន្នន័យ', admin: true, cashier: false },
-  ];
+  onPageChange(page: number) {
+    this.currentPage.set(page);
+    // Add logic here to fetch users for the specific page if needed
+  }
 
   private defaultOption: MatDialogConfig = {
     panelClass: 'medium-dialog',
@@ -46,23 +41,9 @@ export class UserListComponent {
     private userService: UserService,
     private dialog: MatDialog,
   ) {
-    this.reusableDialogService.setDialogComponent(DialogFormsComponent);
+    this.reusableDialogService.setDialogComponent(UserDetailComponent);
     this.reusableDialogService.setDialogConfigOption(this.defaultOption);
   }
-
-  // openDialog(): void {
-  //   const dialogRef = this.dialog.open(UserDetailComponent, {
-  //     data: { name: 'New User' },
-  //   });
-
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     console.log('The dialog was closed', result);
-  //     if (result) {
-  //       // Handle the result (e.g., add user to list)
-  //     }
-  //   });
-  // }
-
 
   ngOnInit() {
     setTimeout(() => this.isLoading.set(false), 500);
@@ -85,9 +66,15 @@ export class UserListComponent {
     });
   }
 
+  onEdit(id: string) {
+    this.openDialog();
+  }
 
-  onOpenDialog() {
+  onDelete(id: string) {
+    alert(id);
+  }
 
+  openDialog() {
     const dialogRef = this.reusableDialogService.open();
     dialogRef.subscribe((result) => {
 
@@ -96,14 +83,9 @@ export class UserListComponent {
       }
 
       console.log(result)
-
-
       // this.addCategory(result)
       // console.log("result -> ", result)
-
-
     });
-
   }
 }
 

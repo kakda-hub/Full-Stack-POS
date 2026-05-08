@@ -4,7 +4,6 @@ import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material-module';
 import { UserListComponent } from './user-list/user-list.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
-import { UserDetailRouteComponent } from './user-detail/user-detail-route.component';
 import { DialogFormsComponent } from './dialog-forms/dialog-forms.component';
 import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
 
@@ -12,7 +11,6 @@ import { ReusableComponentModule } from '../../shared/reusable-component/reusabl
   declarations: [
     UserListComponent,
     UserDetailComponent,
-    UserDetailRouteComponent,
     DialogFormsComponent
   ],
   imports: [

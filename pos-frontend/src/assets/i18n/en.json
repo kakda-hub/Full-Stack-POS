@@ -1,121 +1,158 @@
 {
-  "APP_TITLE": "KhmerPOS",
-  "NAV": {
-    "SALES": "Sales",
-    "PRODUCTS": "Products",
-    "REPORTS": "Reports",
-    "USERS": "Users",
-    "LOGOUT": "Logout"
+  "app_title": "KhmerPOS",
+  "nav": {
+    "sales": "Sales",
+    "products": "Products",
+    "reports": "Reports",
+    "users": "Users",
+    "logout": "Logout"
   },
-  "LOGIN": {
-    "TITLE": "Sign In",
-    "USERNAME": "Username",
-    "PASSWORD": "Password",
-    "SUBMIT": "Sign In",
-    "ERROR": "Invalid username or password",
-    "DEMO": "Demo credentials"
+  "login": {
+    "title": "Sign In",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign In",
+    "error": "Invalid username or password",
+    "demo": "Demo credentials"
   },
-  "SALES": {
-    "TITLE": "Point of Sale",
-    "SEARCH": "Search or scan barcode...",
-    "CART": "Cart",
-    "CART_EMPTY": "Cart is empty",
-    "CLEAR": "Clear",
-    "SUBTOTAL": "Subtotal",
-    "DISCOUNT": "Discount",
-    "TAX": "Tax",
-    "TOTAL": "TOTAL",
-    "PAY": "Pay",
-    "QUANTITY": "Qty",
-    "IN_STOCK": "in stock",
-    "OUT_OF_STOCK": "Out of stock",
-    "LOW_STOCK": "Low stock"
+  "sales": {
+    "title": "Point of Sale",
+    "search": "Search or scan barcode...",
+    "cart": "Cart",
+    "cart_empty": "Cart is empty",
+    "clear": "Clear",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax",
+    "total": "TOTAL",
+    "pay": "Pay",
+    "quantity": "Qty",
+    "in_stock": "in stock",
+    "out_of_stock": "Out of stock",
+    "low_stock": "Low stock"
   },
-  "PAYMENT": {
-    "TITLE": "Choose Payment",
-    "AMOUNT_DUE": "Amount Due",
-    "METHOD": "Payment Method",
-    "CASH": "Cash",
-    "ABA": "ABA",
-    "CARD": "Card",
-    "CASH_RECEIVED": "Cash Received",
-    "CHANGE": "Change",
-    "INSUFFICIENT": "Insufficient amount",
-    "CONFIRM": "Confirm Payment",
-    "SCAN_ABA": "Scan ABA QR Code",
-    "SWIPE_CARD": "Swipe/tap card"
+  "payment": {
+    "title": "Choose Payment",
+    "amount_due": "Amount Due",
+    "method": "Payment Method",
+    "cash": "Cash",
+    "aba": "ABA",
+    "card": "Card",
+    "cash_received": "Cash Received",
+    "change": "Change",
+    "insufficient": "Insufficient amount",
+    "confirm": "Confirm Payment",
+    "scan_aba": "Scan ABA QR Code",
+    "swipe_card": "Swipe/tap card"
   },
-  "RECEIPT": {
-    "TITLE": "Receipt",
-    "STORE": "KhmerPOS Store",
-    "DATE": "Date",
-    "CASHIER": "Cashier",
-    "PAYMENT": "Payment",
-    "RECEIVED": "Received",
-    "CHANGE": "Change",
-    "THANK_YOU": "Thank you! Please come again.",
-    "PRINT": "Print",
-    "NEW_SALE": "New Sale"
+  "receipt": {
+    "title": "Receipt",
+    "store": "KhmerPOS Store",
+    "date": "Date",
+    "cashier": "Cashier",
+    "payment": "Payment",
+    "received": "Received",
+    "change": "Change",
+    "thank_you": "Thank you! Please come again.",
+    "print": "Print",
+    "new_sale": "New Sale"
   },
-  "PRODUCTS": {
-    "TITLE": "Products",
-    "ADD": "Add Product",
-    "EDIT": "Edit Product",
-    "DELETE": "Delete",
-    "SAVE": "Save Product",
-    "CANCEL": "Cancel",
-    "NAME": "Name",
-    "NAME_EN": "Name (English)",
-    "NAME_KM": "Name (Khmer)",
-    "PRICE": "Price",
-    "STOCK": "Stock",
-    "BARCODE": "Barcode",
-    "CATEGORY": "Category",
-    "LOW_STOCK_THRESHOLD": "Low Stock Threshold",
-    "SEARCH": "Search products...",
-    "NO_PRODUCTS": "No products found",
-    "LOW_STOCK_ALERT": "products with low stock",
-    "ACTIONS": "Actions"
+  "products": {
+    "title": "Products",
+    "add": "Add Product",
+    "edit": "Edit Product",
+    "delete": "Delete",
+    "save": "Save Product",
+    "cancel": "Cancel",
+    "name": "Name",
+    "name_en": "Name (English)",
+    "name_km": "Name (Khmer)",
+    "price": "Price",
+    "stock": "Stock",
+    "barcode": "Barcode",
+    "category": "Category",
+    "low_stock_threshold": "Low Stock Threshold",
+    "search": "Search products...",
+    "no_products": "No products found",
+    "low_stock_alert": "products with low stock",
+    "actions": "Actions"
   },
-  "REPORTS": {
-    "TITLE": "Reports",
-    "REVENUE_TODAY": "Revenue Today",
-    "TRANSACTIONS": "Transactions",
-    "TOTAL_PRODUCTS": "Total Products",
-    "LOW_STOCK": "Low Stock",
-    "PAYMENT_BREAKDOWN": "Payment Breakdown",
-    "RECENT": "Recent Transactions",
-    "HISTORY": "Transaction History",
-    "NO_DATA": "No transactions today",
-    "TXNS": "txns"
+  "reports": {
+    "title": "Reports",
+    "revenue_today": "Revenue Today",
+    "transactions": "Transactions",
+    "total_products": "Total Products",
+    "low_stock": "Low Stock",
+    "payment_breakdown": "Payment Breakdown",
+    "recent": "Recent Transactions",
+    "history": "Transaction History",
+    "no_data": "No transactions today",
+    "txns": "txns"
   },
-  "USERS": {
-    "TITLE": "Users",
-    "ADD": "Add User",
-    "EDIT": "Edit",
-    "REMOVE": "Remove",
-    "ROLE": "Role",
-    "STATUS": "Status",
-    "LAST_LOGIN": "Last Login",
-    "TOTAL": "Total Users",
-    "ADMINS": "Admins",
-    "CASHIERS": "Cashiers",
-    "PERMISSIONS": "Role Permissions",
-    "FEATURE": "Feature"
+  "users": {
+    "title": "Users",
+    "add": "Add User",
+    "edit": "Edit",
+    "remove": "Remove",
+    "role": "Role",
+    "status": "Status",
+    "last_login": "Last Login",
+    "total": "Total Users",
+    "admins": "Admins",
+    "cashiers": "Cashiers",
+    "permissions": "Role Permissions",
+    "feature": "Feature"
   },
-  "COMMON": {
-    "LOADING": "Loading...",
-    "SAVE": "Save",
-    "CANCEL": "Cancel",
-    "DELETE": "Delete",
-    "CONFIRM": "Confirm",
-    "ALL": "All",
-    "TODAY": "Today"
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "all": "All",
+    "today": "Today"
   },
-  "NOT_FOUND": {
-    "TITLE": "Page Not Found",
-    "SUBTITLE": "The page you are looking for does not exist or has been moved.",
-    "BACK": "Go Back",
-    "HOME": "Back to Dashboard"
+  "not_found": {
+    "title": "Page Not Found",
+    "subtitle": "The page you are looking for does not exist or has been moved.",
+    "back": "Go Back",
+    "home": "Back to Dashboard"
+  },
+  "button_actions": {
+    "addNew": "Add New",
+    "update": "Update",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "validate": {
+    "required": "is required"
+  },
+  "label": {
+    "name": "Name",
+    "username": "Username",
+    "phone": "Phone",
+    "role": "Role",
+    "email": "Email",
+    "password": "Password",
+    "description": "Description",
+    "category": "Category"
+  },
+  "field": {
+    "role": "Role",
+    "admin": "Admin",
+    "cashier": "Cashier",
+    "status": "Status",
+    "lastLogin": "Last Login"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "items_per_page": "Items per page"
   }
 }

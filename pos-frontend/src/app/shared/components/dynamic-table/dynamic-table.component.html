@@ -264,21 +264,13 @@
     </table>
 
     <!-- Paginator -->
-    <div
-      class="border-t px-2"
-      [class.border-slate-100]="!theme.isDark()"
-      [class.border-slate-700]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.bg-slate-800]="theme.isDark()"
-    >
-      <mat-paginator
-        [length]="totalCount"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageChange($event)"
-        aria-label="Select page"
-      ></mat-paginator>
-    </div>
+    <app-pagination
+      [totalItems]="totalCount"
+      [pageSize]="pageSize"
+      [currentPage]="pageIndex + 1"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
   </div>
 </div>

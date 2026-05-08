@@ -1,0 +1,51 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: aliceblue;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel {
+  background: rgba(236, 240, 236, 0.356);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.login-button {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.demo-btn {
+  @apply bg-white/5 hover:bg-white/10 text-indigo-300 border border-white/5 hover:border-white/10;
+  transition: all 0.2s;
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+

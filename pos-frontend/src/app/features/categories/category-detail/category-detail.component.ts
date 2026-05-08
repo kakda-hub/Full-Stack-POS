@@ -21,6 +21,7 @@ export class CategoryDetailComponent implements OnInit {
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
+  id: number | undefined;
 
   constructor(
     private fb: FormBuilder,
@@ -28,7 +29,7 @@ export class CategoryDetailComponent implements OnInit {
     private categoriesService: CategoriesService,
     public theme: ThemeService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({

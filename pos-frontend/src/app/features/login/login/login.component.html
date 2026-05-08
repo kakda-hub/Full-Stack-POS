@@ -1,120 +1,158 @@
-<div
-  class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4"
->
-  <!-- Background pattern -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
-    <div
-      class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"
-    ></div>
-  </div>
-
-  <div @fadeIn class="relative w-full max-w-md">
-    <!-- Card -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div
-          class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/30"
+<div class="login-container min-h-screen flex items-center justify-center p-4">
+  <div @fadeIn class="relative w-full max-w-md z-10">
+    <!-- Main Card -->
+    <div class="glass-panel rounded-[2.5rem] p-8 md:p-10">
+      
+      <!-- Top Actions (Language Toggle) -->
+      <div class="flex justify-end mb-4">
+        <button
+          (click)="lang.toggle()"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-medium text-indigo-200 transition-all border border-white/5"
         >
-          <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
+          <span class="opacity-70">{{ lang.currentLang() === 'en' ? '🇰🇭' : '🇬🇧' }}</span>
+          {{ lang.currentLang() === 'en' ? 'ខ្មែរ' : 'English' }}
+        </button>
+      </div>
+
+      <!-- Header Section -->
+      <div class="text-center mb-10">
+        <div class="inline-flex p-4 rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-600 shadow-2xl shadow-indigo-600/40 mb-6 group transition-transform hover:scale-110 duration-500">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <h1 class="text-2xl font-black text-white">KhmerPOS</h1>
-        <p class="text-indigo-300 text-sm mt-1">
-          {{ lang.currentLang() === 'km' ? 'ប្រព័ន្ធគ្រប់គ្រងការលក់' : 'Point of Sale System' }}
+        <h1 class="text-3xl font-black text-white tracking-tight mb-2">
+          {{ lang.currentLang() === 'km' ? 'សូមស្វាគមន៍' : 'Welcome Back' }}
+        </h1>
+        <p class="text-indigo-200/60 font-medium">
+          {{ lang.currentLang() === 'km' ? 'ចូលទៅកាន់ប្រព័ន្ធគ្រប់គ្រង KhmerPOS' : 'Sign in to manage your KhmerPOS system' }}
         </p>
       </div>
 
-      <!-- Form -->
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
-            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ / អ៊ីមែល' : 'Email' }}
-          </label>
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6">
+        <!-- Username/Email Field -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ / អ៊ីមែល' : 'Email Address' }}</mat-label>
+          <mat-icon matPrefix>email</mat-icon>
           <input
+            matInput
             type="email"
             formControlName="username"
-            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            placeholder="{{ lang.currentLang() === 'km' ? 'បញ្ចូលអ៊ីមែល' : 'Enter email' }}"
-            [class.border-rose-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            [placeholder]="lang.currentLang() === 'km' ? 'បញ្ចូលអ៊ីមែល' : 'name@example.com'"
+            required
           />
-          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="text-xs text-rose-400 mt-1">
-            {{ lang.currentLang() === 'km' ? 'អ៊ីមែលមិនត្រឹមត្រូវទេ' : 'Valid email is required' }}
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-indigo-200 mb-1.5">
-            {{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Password' }}
-          </label>
+          @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+            <mat-error>
+              @if (loginForm.get('username')?.hasError('required')) {
+                {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលឈ្មោះអ្នកប្រើ' : 'Please enter your username' }}
+              } @else if (loginForm.get('username')?.hasError('email')) {
+                {{ lang.currentLang() === 'km' ? 'អ៊ីមែលមិនត្រឹមត្រូវទេ' : 'Please enter a valid email address' }}
+              } @else {
+                {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើមិនត្រឹមត្រូវ' : 'Invalid username' }}
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Password' }}</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
           <input
-            type="password"
+            matInput
+            [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
-            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-indigo-300/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            placeholder="{{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Enter password' }}"
-            [class.border-rose-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            [placeholder]="lang.currentLang() === 'km' ? 'បញ្ចូលពាក្យសម្ងាត់' : '••••••••'"
+            required
           />
-          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-xs text-rose-400 mt-1">
-            {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលពាក្យសម្ងាត់' : 'Password is required' }}
-          </div>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="showPassword.set(!showPassword())"
+            [attr.aria-label]="'Toggle password visibility'"
+          >
+            <mat-icon>{{ showPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <mat-error>
+              {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលពាក្យសម្ងាត់' : 'Password is required' }}
+            </mat-error>
+          }
+          <mat-hint align="end">
+            <a href="javascript:void(0)" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+              {{ lang.currentLang() === 'km' ? 'ភ្លេចពាក្យសម្ងាត់?' : 'Forgot password?' }}
+            </a>
+          </mat-hint>
+        </mat-form-field>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="flex items-center justify-between px-1">
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="relative flex items-center justify-center">
+              <input type="checkbox" class="peer sr-only" />
+              <div class="w-5 h-5 border-2 border-white/20 rounded-md bg-white/5 peer-checked:bg-indigo-500 peer-checked:border-indigo-500 transition-all duration-200"></div>
+              <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-indigo-200/60 group-hover:text-indigo-200 transition-colors">
+              {{ lang.currentLang() === 'km' ? 'ចងចាំខ្ញុំ' : 'Remember me' }}
+            </span>
+          </label>
         </div>
 
+        <!-- Error Message -->
         <div
           *ngIf="error()"
-          class="bg-rose-500/20 border border-rose-500/30 rounded-xl p-3 text-rose-300 text-sm text-center"
+          class="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 text-rose-300 text-sm flex items-center gap-3 animate-shake"
         >
-          {{
-            lang.currentLang() === 'km'
-              ? 'ឈ្មោះ ឬ ពាក្យសម្ងាត់មិនត្រឹមត្រូវ'
-              : 'Invalid username or password'
-          }}
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ lang.currentLang() === 'km' ? 'ឈ្មោះ ឬ ពាក្យសម្ងាត់មិនត្រឹមត្រូវ' : 'Invalid email or password' }}</span>
         </div>
 
+        <!-- Submit Button -->
         <button
           type="submit"
           [disabled]="loading()"
-          class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-70 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 flex items-center justify-center gap-2"
+          class="login-button w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 text-lg"
         >
           <app-loader *ngIf="loading()" variant="spinner" size="sm"></app-loader>
-          {{ lang.currentLang() === 'km' ? 'ចូល' : 'Sign In' }}
+          {{ lang.currentLang() === 'km' ? 'ចូលប្រព័ន្ធ' : 'Sign In' }}
         </button>
       </form>
 
-      <!-- Demo credentials -->
-      <div class="mt-6 pt-5 border-t border-white/10">
-        <p class="text-xs text-indigo-300 text-center mb-3">
-          {{ lang.currentLang() === 'km' ? 'ព័ត៌មានសាកល្បង' : 'Demo credentials' }}
+      <!-- Demo Credentials Section -->
+      <div class="mt-10 pt-8 border-t border-white/5">
+        <p class="text-xs font-bold text-indigo-300/40 uppercase tracking-widest text-center mb-5">
+          {{ lang.currentLang() === 'km' ? 'គណនីសាកល្បង' : 'Demo Accounts' }}
         </p>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-3">
           <button
             (click)="fillDemo('admin')"
-            class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
+            class="demo-btn p-3 rounded-2xl text-left"
           >
-            👤 admin@pos.com
+            <div class="text-[10px] opacity-50 uppercase font-bold mb-1">Admin</div>
+            <div class="text-xs font-semibold truncate">admin@pos.com</div>
           </button>
           <button
             (click)="fillDemo('cashier')"
-            class="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 py-2 px-3 rounded-lg transition-all font-medium"
+            class="demo-btn p-3 rounded-2xl text-left"
           >
-            🧾 cashier@pos.com
+            <div class="text-[10px] opacity-50 uppercase font-bold mb-1">Cashier</div>
+            <div class="text-xs font-semibold truncate">cashier@pos.com</div>
           </button>
         </div>
       </div>
 
-      <!-- Language toggle -->
-      <div class="mt-4 text-center">
-        <button
-          (click)="lang.toggle()"
-          class="text-xs text-indigo-400 hover:text-indigo-200 transition-colors"
-        >
-          {{ lang.currentLang() === 'en' ? '🇰🇭 ប្តូរភាសាខ្មែរ' : '🇬🇧 Switch to English' }}
-        </button>
+      <!-- Footer Info -->
+      <div class="mt-8 text-center">
+        <p class="text-xs text-indigo-200/30">
+          © 2024 KhmerPOS. All rights reserved.
+        </p>
       </div>
     </div>
   </div>

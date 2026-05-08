@@ -13,6 +13,8 @@ import { SkeletonComponent } from './components/skeleton/skeleton.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.component';
+import { DateFormatPipe } from './pipes/date-format-pipe';
+import { PaginationComponent } from './components/pagination/pagination.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.
     LoaderComponent,
     SkeletonComponent,
     DynamicTableComponent,
+    DateFormatPipe,
+    PaginationComponent,
   ],
   imports: [
     CommonModule,
@@ -46,6 +50,8 @@ import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.
     LoaderComponent,
     SkeletonComponent,
     DynamicTableComponent,
+    DateFormatPipe,
+    PaginationComponent,
   ],
 })
-export class SharedModule {}
+export class SharedModule { }

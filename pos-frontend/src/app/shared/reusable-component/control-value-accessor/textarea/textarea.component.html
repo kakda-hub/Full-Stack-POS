@@ -1,0 +1,16 @@
+<mat-form-field class="w-full" appearance="outline">
+  <mat-label>{{ placeholder }}</mat-label>
+  <textarea
+    matInput
+    [formControl]="inputControl"
+    [placeholder]="placeholder"
+    [rows]="rows"
+    (blur)="onTouched()"
+  ></textarea>
+  
+  @if (inputControl.invalid && (inputControl.touched || inputControl.dirty)) {
+    <mat-error>
+      {{ placeholder }} is required
+    </mat-error>
+  }
+</mat-form-field>

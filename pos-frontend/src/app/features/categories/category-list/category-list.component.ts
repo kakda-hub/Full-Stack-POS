@@ -7,6 +7,9 @@ import { CategoriesService } from '../../../services/categories.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '../../../shared/components/dynamic-table/dynamic-table.component';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { CategoryDetailComponent } from '../category-detail/category-detail.component';
+import { MatDialogConfig } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-category-list',
@@ -24,11 +27,11 @@ export class CategoryListComponent implements OnInit, OnDestroy {
 
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
-    { key: 'name',        label: 'Name',         labelKm: 'ឈ្មោះ' },
-    { key: 'nameKh',      label: 'Name (Khmer)', labelKm: 'ឈ្មោះ (ខ្មែរ)' },
-    { key: 'description', label: 'Description',  labelKm: 'ការពិពណ៌នា', type: 'description', responsive: 'md' },
+    { key: 'name', label: 'Name', labelKm: 'ឈ្មោះ' },
+    { key: 'nameKh', label: 'Name (Khmer)', labelKm: 'ឈ្មោះ (ខ្មែរ)' },
+    { key: 'description', label: 'Description', labelKm: 'ការពិពណ៌នា', type: 'description', responsive: 'md' },
   ];
-  
+
   // Pagination
   pageSize = signal(10);
   pageIndex = signal(0);
@@ -39,14 +42,22 @@ export class CategoryListComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
+  private defaultOption: MatDialogConfig = {
+    panelClass: 'medium-dialog',
+    disableClose: true
+  }
 
   constructor(
     public categoriesService: CategoriesService,
     public lang: LanguageService,
+    private reusableDialogService: ReusableDialogService,
     public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {
+    this.reusableDialogService.setDialogComponent(CategoryDetailComponent);
+    this.reusableDialogService.setDialogConfigOption(this.defaultOption);
+  }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -58,8 +69,8 @@ export class CategoryListComponent implements OnInit, OnDestroy {
           this.filteredCategories.set(this.categories());
         } else {
           this.filteredCategories.set(
-            this.categories().filter(c => 
-              (c.name || '').toLowerCase().includes(query) || 
+            this.categories().filter(c =>
+              (c.name || '').toLowerCase().includes(query) ||
               (c.nameKh || '').includes(query) ||
               (c.nameKm || '').includes(query)
             )
@@ -89,7 +100,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     this.pageSize.set(event.pageSize);
   }
 
-  openAdd(): void { this.editingCategory = null; this.showForm = true; }
+  // openAdd(): void { this.editingCategory = null; this.showForm = true; }
   openEdit(c: any): void { this.editingCategory = c; this.showForm = true; }
 
   deleteCategory(c: any): void {
@@ -116,4 +127,16 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   }
 
   trackById(_: number, c: any): string { return c.id; }
+
+  openDialog() {
+    const dialogRef = this.reusableDialogService.open();
+    dialogRef.subscribe((result) => {
+
+      if (!result) {
+        return;
+      }
+
+      console.log(result)
+    });
+  }
 }

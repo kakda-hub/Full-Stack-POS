@@ -1,19 +1,15 @@
-    <div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+    <div @pageTransition class="space-y-4">
       <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-black text-slate-900">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើប្រាស់' : 'Users' }}</h1>
-          <p class="text-sm text-slate-500 mt-0.5">{{ users.length }} {{ lang.currentLang() === 'km' ? 'អ្នកប្រើ' : 'users registered' }}</p>
-        </div>
-        <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-          </svg>
-          {{ lang.currentLang() === 'km' ? 'បន្ថែមអ្នកប្រើ' : 'Add User' }}
-        </button> -->
-        <button matButton="tonal" (click)="onOpenDialog()">
+        <app-breadcrumb></app-breadcrumb>
+        <button matButton="tonal" >
           <mat-icon color="primary">add</mat-icon>
-          {{ lang.currentLang() === 'km' ? 'បន្ថែមអ្នកប្រើ' : 'Add User' }}
+          {{ 'button_actions.addNew' | translate }}
         </button>
+
+        <!-- <button (click)="openDialog()" class="inline-flex items-center justify-center gap-1 rounded-md bg-blue-300 px-4 py-2 font-medium text-neutral-50 text-sm transition active:scale-110 ">
+          <mat-icon >add</mat-icon>
+          {{ 'button_actions.addNew' | translate }}
+        </button> -->
       </div>
 
       <!-- Role stats -->
@@ -43,9 +39,7 @@
           [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div [class]="'w-11 h-11 rounded-xl flex items-center justify-center font-black text-lg ' + (user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700')">
-                {{ user.name.charAt(0) }}
-              </div>
+              <img class="w-11 h-11 rounded-xl object-contain bg-black/5" src="https://cdn-icons-png.flaticon.com/512/219/219988.png">
               <div>
                 <p class="font-bold text-slate-900">{{ user.name }}</p>
                 <p class="text-xs text-slate-400">@{{ user.username }}</p>
@@ -56,60 +50,43 @@
 
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-slate-500">{{ lang.currentLang() === 'km' ? 'តួនាទី' : 'Role' }}</span>
+              <span class="text-sm text-slate-500">{{ 'field.role' | translate }}</span>
               <span [class]="'text-xs font-bold px-2.5 py-1 rounded-lg capitalize ' + (user.role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700')">
                 {{ user.role }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-slate-500">{{ lang.currentLang() === 'km' ? 'ស្ថានភាព' : 'Status' }}</span>
+              <span class="text-sm text-slate-500">{{ 'field.status' | translate }}</span>
               <span [class]="'text-xs font-semibold capitalize ' + (user.status === 'active' ? 'text-emerald-600' : 'text-slate-400')">
                 {{ user.status }}
               </span>
             </div>
             <div *ngIf="user.lastLogin" class="flex items-center justify-between">
-              <span class="text-sm text-slate-500">{{ lang.currentLang() === 'km' ? 'ចូលចុងក្រោយ' : 'Last Login' }}</span>
+              <span class="text-sm text-slate-500">{{ 'field.lastLogin' | translate }}</span>
               <span class="text-xs text-slate-600">{{ user.lastLogin | date:'dd/MM HH:mm' }}</span>
             </div>
           </div>
 
           <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
-            <button class="flex-1 text-xs font-semibold py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors">
-              {{ lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit' }}
+            <button type="button" (click)="onEdit(user.id)" class="btn hover:bg-indigo-100 text-indigo-600" [class.bg-slate-50]="!theme.isDark()" [class.hover:bg-slate-900]="theme.isDark()">
+              <mat-icon>edit</mat-icon>
+              <span class="ml-2">{{ 'button_actions.update' | translate }}</span>
             </button>
-            <button class="flex-1 text-xs font-semibold py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors">
-              {{ lang.currentLang() === 'km' ? 'លុប' : 'Remove' }}
+            <button type="button" (click)="onDelete(user.id)" class="btn hover:bg-rose-100 text-rose-600" [class.bg-slate-50]="!theme.isDark()" [class.hover:bg-slate-900]="theme.isDark()">
+              <mat-icon>delete</mat-icon>
+              <span class="ml-2">{{ 'button_actions.delete' | translate }}</span>
             </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Permissions Table -->
-      <div @fadeIn class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-100">
-          <h2 class="font-bold text-slate-800">{{ lang.currentLang() === 'km' ? 'ការអនុញ្ញាត' : 'Role Permissions' }}</h2>
-        </div>
-        <table class="w-full text-sm">
-          <thead class="bg-slate-50 border-b border-slate-100">
-            <tr>
-              <th class="px-5 py-3 text-left font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'លក្ខណៈ' : 'Feature' }}</th>
-              <th class="px-5 py-3 text-center font-semibold text-indigo-600">Admin</th>
-              <th class="px-5 py-3 text-center font-semibold text-emerald-600">Cashier</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-50">
-            <tr *ngFor="let perm of permissions" class="hover:bg-slate-50">
-              <td class="px-5 py-3 text-slate-700">{{ lang.currentLang() === 'km' ? perm.labelKm : perm.label }}</td>
-              <td class="px-5 py-3 text-center">
-                <span *ngIf="perm.admin" class="text-emerald-500 text-lg">✓</span>
-                <span *ngIf="!perm.admin" class="text-slate-300 text-lg">✗</span>
-              </td>
-              <td class="px-5 py-3 text-center">
-                <span *ngIf="perm.cashier" class="text-emerald-500 text-lg">✓</span>
-                <span *ngIf="!perm.cashier" class="text-slate-300 text-lg">✗</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="mt-3">
+      <app-pagination
+        [totalItems]="totalUsers"
+        [pageSize]="10"
+        [currentPage]="currentPage()"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-pagination>
     </div>

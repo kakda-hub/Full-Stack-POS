@@ -1,0 +1,59 @@
+<div class="flex items-center justify-end px-4 py-2 bg-white dark:bg-slate-900 transition-colors duration-200 text-sm">
+  <!-- Items per page dropdown -->
+  <div class="flex items-center mr-8">
+    <span class="text-slate-500 dark:text-slate-400 mr-4">{{ 'pagination.items_per_page' | translate }}:</span>
+    <div class="relative">
+      <button (click)="toggleDropdown()"
+              class="flex items-center gap-4 px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 bg-white dark:bg-slate-800">
+        <span class="font-medium text-slate-900 dark:text-slate-100">{{ pageSize }}</span>
+        <svg class="w-4 h-4 text-indigo-600 transition-transform duration-200"
+             [class.rotate-180]="isDropdownOpen"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isDropdownOpen"
+           class="absolute bottom-full left-0 mb-2 w-full min-w-[70px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+        <button *ngFor="let option of pageSizeOptions"
+                (click)="onPageSizeChange(option)"
+                class="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
+                [class.bg-slate-100]="option === pageSize"
+                [class.dark:bg-slate-700]="option === pageSize">
+          <span class="text-slate-700 dark:text-slate-200" [class.font-bold]="option === pageSize">{{ option }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Range Display -->
+  <div class="mr-8 text-slate-600 dark:text-slate-400">
+    <span class="font-medium">{{ startIndex }}</span>
+    <span class="mx-1.5">-</span>
+    <span class="font-medium">{{ endIndex }}</span>
+    <span class="mx-1.5">{{ 'pagination.of' | translate }}</span>
+    <span class="font-medium">{{ totalItems }}</span>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="flex items-center gap-2">
+    <button (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+            class="p-2 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    </button>
+
+    <button (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+            class="p-2 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+

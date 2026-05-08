@@ -8,6 +8,7 @@ interface NavItem {
     labelKm: string;
     route: string;
     icon: string;
+    subMenus?: NavItem[]; // optional nested sub-menu items
 }
 
 @Component({
@@ -25,13 +26,30 @@ export class AdminLayoutComponent {
         { label: 'Reports', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
         { label: 'Users', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },
         { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
+        { label: 'Permission', labelKm: 'ការអនុញ្ញាត', route: '/permission', icon: 'permission' },
+        {
+            label: 'Settings',
+            labelKm: 'ការកំណត់',
+            route: '/settings',
+            icon: 'settings',
+            subMenus: [
+                { label: 'User Management', labelKm: 'ការគ្រប់គ្រងអ្នកប្រើ', route: '/user-management', icon: 'user' },
+                { label: 'User Role', labelKm: 'តួនាទីអ្នកប្រើ', route: '/user-role', icon: 'role' },
+            ]
+        },
     ];
+
+    selectedMenu = signal<string>('');
 
     constructor(
         public auth: AuthService,
         public langService: LanguageService,
         public theme: ThemeService,
     ) { }
+
+    toggleSubMenu(item: NavItem) {
+        this.selectedMenu.update(current => current === item.route ? '' : item.route);
+    }
 
     toggleSidebar() {
         this.isCollapsed.update((val) => !val);

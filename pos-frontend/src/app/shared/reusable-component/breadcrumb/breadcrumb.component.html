@@ -1,0 +1,11 @@
+<nav>
+  <ol>
+    <li *ngFor="let breadcrumb of breadcrumbs; let last = last">
+      <div class="flex items-center w-full">
+        <h1 *ngIf="last" class="text-lg font-medium text-slate-900">
+          {{ lang.currentLang() === 'km' ?  breadcrumb.labelKh : breadcrumb.label }}
+        </h1>
+      </div>
+    </li>
+  </ol>
+</nav>

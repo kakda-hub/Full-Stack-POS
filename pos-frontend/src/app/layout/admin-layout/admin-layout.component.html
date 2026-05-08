@@ -75,83 +75,98 @@
         Menu Overview
       </div>
 
-      <a
-        *ngFor="let item of navItems"
-        [routerLink]="item.route"
-        routerLinkActive="active-link"
-        class="nav-item group"
-        [title]="
-          isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''
-        "
-        [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-      >
-        <div
-          class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
-        >
-          <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
+      <div *ngFor="let item of navItems" class="space-y-1">
+        <!-- Main Item (Link or Toggle) -->
+        <div class="relative flex flex-col">
+          <a
+            *ngIf="!item.subMenus"
+            [routerLink]="item.route"
+            routerLinkActive="active-link"
+            class="nav-item group"
+            [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
+            [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+          >
+            <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+              <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
+                <!-- Sale Icon -->
+                <svg *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <!-- Product Icon -->
+                <svg *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
+                </svg>
+                <!-- Report Icon -->
+                <svg *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+                </svg>
+                <!-- User Icon -->
+                <svg *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <!-- Category Icon -->
+                <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
+                </svg>
+                <!-- Permission Icon -->
+                <svg *ngIf="item.icon === 'permission'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+                </svg>
+              </div>
+            </div>
+            <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap">
+              {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
+            </span>
+            <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all"></div>
+          </a>
+
+          <!-- Toggle for Submenu -->
+          <button
+            *ngIf="item.subMenus"
+            (click)="toggleSubMenu(item)"
+            class="nav-item group w-full text-left"
+            [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
+          >
+            <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+              <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
+                <!-- Settings Icon -->
+                <svg *ngIf="item.icon === 'settings'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+            </div>
+            <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap flex-1">
+              {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
+            </span>
             <svg
-              *ngIf="item.icon === 'sale'"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+              *ngIf="!isCollapsed()"
+              class="w-4 h-4 transition-transform duration-200"
+              [class.rotate-180]="selectedMenu() === item.route"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
+              <path d="m6 9 6 6 6-6" />
             </svg>
-            <svg
-              *ngIf="item.icon === 'product'"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="m7.5 4.27 9 5.15" />
-              <path
-                d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
-              />
-              <path d="m3.27 6.96 8.73 5.05 8.73-5.05" />
-              <path d="M12 22.08V12" />
-            </svg>
-            <svg
-              *ngIf="item.icon === 'report'"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M3 3v18h18" />
-              <path d="m19 9-5 5-4-4-3 3" />
-            </svg>
-            <svg
-              *ngIf="item.icon === 'user'"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="7" height="7" />
-              <rect x="14" y="4" width="7" height="7" />
-              <rect x="14" y="13" width="7" height="7" />
-              <rect x="3" y="13" width="7" height="7" />
-            </svg>
-          </div>
+          </button>
         </div>
 
-        <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap">
-          {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
-        </span>
+        <!-- Submenu Content -->
         <div
-          class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all"
-        ></div>
-      </a>
+          *ngIf="item.subMenus && selectedMenu() === item.route && !isCollapsed()"
+          class="ml-10 space-y-1 transition-all duration-300"
+        >
+          <a
+            *ngFor="let sub of item.subMenus"
+            [routerLink]="sub.route"
+            routerLinkActive="active-sub-link"
+            class="flex items-center py-2 px-3 text-[13px] text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 rounded-lg transition-all group/sub"
+          >
+            <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-3 group-[.active-sub-link]/sub:bg-indigo-500 transition-colors"></div>
+            <span class="font-medium">
+              {{ langService.currentLang() === 'km' ? sub.labelKm : sub.label }}
+            </span>
+          </a>
+        </div>
+      </div>
     </nav>
 
     <!-- Footer -->

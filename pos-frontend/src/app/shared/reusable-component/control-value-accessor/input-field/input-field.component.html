@@ -1,4 +1,4 @@
-<mat-form-field appearance="outline" style="width: 100%;">
+<mat-form-field appearance="outline" class="w-full">
   <mat-label>{{ placeholder }}</mat-label>
   
   <input
@@ -10,7 +10,7 @@
     [required]="isRequired"
   />
 
-  @if (inputControl && inputControl.invalid && inputControl.touched) {
-    <mat-error>{{ errorMessage }}</mat-error>
+  @if (inputControl.invalid && inputControl.touched) {
+    <mat-error> {{ placeholder }} {{ "validate.required" | translate }}</mat-error>
   }
 </mat-form-field>

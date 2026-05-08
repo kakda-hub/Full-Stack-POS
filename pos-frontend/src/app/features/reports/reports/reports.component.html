@@ -1,11 +1,6 @@
     <div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       <!-- Header -->
-      <div>
-        <h1 class="text-2xl font-black text-slate-900">
-          {{ lang.currentLang() === 'km' ? 'របាយការណ៍' : 'Reports' }}
-        </h1>
-        <p class="text-sm text-slate-500 mt-0.5">{{ today | date:'EEEE, MMMM d, y' }}</p>
-      </div>
+      <app-breadcrumb></app-breadcrumb>
 
       <!-- KPI Skeletons -->
       <div *ngIf="isLoading()" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
