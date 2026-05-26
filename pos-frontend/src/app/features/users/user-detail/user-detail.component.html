@@ -2,7 +2,7 @@
   <app-header-detail [id]="id"></app-header-detail>
 
   <mat-dialog-content>
-    <div class="flex flex-col gap-2 w-full">
+    <div class="flex flex-col gap-4 w-full">
       <app-input-field
         formControlName="username"
         [placeholder]="'label.username' | translate"
@@ -12,14 +12,16 @@
       <app-input-field formControlName="phone" [placeholder]="'label.phone' | translate" [isRequired]="true">
       </app-input-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="form-field-outline" subscriptSizing="dynamic">
         <mat-label>{{'label.role' | translate}}</mat-label>
         <mat-select formControlName="role">
           @for (role of roles; track role) {
             <mat-option [value]="role.value">{{ role.viewValue }}</mat-option>
           }
         </mat-select>
-        <mat-error *ngIf="form.get('role')?.hasError('required')">{{'validate.required' | translate}}</mat-error>
+        @if (form.get('role')?.invalid && form.get('role')?.touched) {
+          <mat-error> {{ 'validate.required' | translate }}</mat-error>
+        }
       </mat-form-field>
 
       <app-input-field formControlName="email" type="email" [placeholder]="'label.email' | translate">
@@ -37,14 +39,10 @@
         [placeholder]="'label.description' | translate"
       ></app-textarea>
     </div>
-    <pre>
-        {{ form.value | json }}
-      </pre
-    >
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button matButton mat-dialog-close>បោះបង់</button>
-    <button type="submit" matButton>រក្សាទុក</button>
+  <mat-dialog-actions align="end" class="w-full gap-3" >
+    <app-ui-button [variant]="'secondary'" [shape]="'outline'" [size]="'md'" mat-dialog-close type="button">{{'button.cancel' | translate}}</app-ui-button>
+    <app-ui-button [variant]="'primary'" [shape]="'outline'" [size]="'md'" type="submit">{{'button.save' | translate}}</app-ui-button>
   </mat-dialog-actions>
 </form>

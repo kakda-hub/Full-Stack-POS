@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 
 import { UiButtonComponent } from './components/ui-button/ui-button.component';
-import { ModalComponent } from './components/modal/modal.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { AlertHostComponent } from './components/alert/alert-host.component';
 import { LoaderComponent } from './components/loader/loader.component';
@@ -15,6 +14,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.component';
 import { DateFormatPipe } from './pipes/date-format-pipe';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { ModalComponent } from './components/modal/modal.component';
 
 @NgModule({
   declarations: [

@@ -28,6 +28,7 @@ export class LoginComponent {
     private fb: FormBuilder
   ) {
     this.loginForm = this.fb.group({
+      station: ['Front Counter - Register 1'],
       username: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
@@ -45,7 +46,6 @@ export class LoginComponent {
     const { username, password } = this.loginForm.value;
 
     this.auth.login(username, password).subscribe((ok) => {
-      console.log(ok);
       this.loading.set(false);
       if (ok) {
         const user = this.auth.currentUser();

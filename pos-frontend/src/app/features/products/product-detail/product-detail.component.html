@@ -2,34 +2,37 @@
   <app-header-detail [id]="product?.id"></app-header-detail>
 
   <mat-dialog-content>
-    <div>
-      <app-input-field formControlName="name" placeholder="ឈ្មោះ" [isRequired]="true">
-      </app-input-field>
+    <div class="flex flex-col">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+        <app-input-field formControlName="name" placeholder="ឈ្មោះ" [isRequired]="true">
+        </app-input-field>
 
-      <app-input-field formControlName="nameKh" placeholder="ឈ្មោះខ្មែរ" [isRequired]="true">
-      </app-input-field>
+        <app-input-field formControlName="nameKh" placeholder="ឈ្មោះខ្មែរ" [isRequired]="true">
+        </app-input-field>
+  
+        <app-input-field formControlName="price" placeholder="តម្លៃ ($)" [isRequired]="true">
+        </app-input-field>
+  
+        <app-input-field formControlName="stock" placeholder="ស្តុក" [isRequired]="true">
+        </app-input-field>
+  
+        <app-input-field formControlName="barcode" placeholder="បាកូដ" [isRequired]="true">
+        </app-input-field>
 
-      <app-input-field formControlName="price" placeholder="តម្លៃ ($)" [isRequired]="true">
-      </app-input-field>
+        <mat-form-field appearance="outline" class="w-full form-field-outline">
+          <mat-label>{{ 'label.category' | translate }}</mat-label>
+          <mat-select formControlName="categoryId">
+            @for (item of categories; track item) {
+              <mat-option [value]="item.id">{{ item.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-error *ngIf="form.get('categoryId')?.hasError('required')"
+            >{{ 'validate.required' | translate }}
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-      <app-input-field formControlName="stock" placeholder="ស្តុក" [isRequired]="true">
-      </app-input-field>
-
-      <app-input-field formControlName="barcode" placeholder="បាកូដ" [isRequired]="true">
-      </app-input-field>
-
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>{{'label.category' | translate}}</mat-label>
-        <mat-select formControlName="categoryId">
-          @for (item of categories; track item) {
-          <mat-option [value]="item.id">{{ item.name }}</mat-option>
-          }
-        </mat-select>
-        <mat-error *ngIf="form.get('categoryId')?.hasError('required')">{{'validate.required' | translate}}
-        </mat-error>
-      </mat-form-field>
-
-      <app-textarea formControlName="description" placeholder="ការពិពណ៌នា" class="w-full">
+      <app-textarea [rows]="2" formControlName="description" placeholder="ការពិពណ៌នា" class="w-full">
       </app-textarea>
 
       <div class="col-span-2">
@@ -112,14 +115,11 @@
           </label>
         </div>
       </div>
-
-      <!-- <pre>
-      {{ this.form.value | json }}
-    </pre> -->
-  </div>
+    </div>
   </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-raised-button mat-dialog-close>បោះបង់</button>
-    <button type="submit" [disabled]="form.invalid" mat-raised-button>រក្សាទុក</button>
-  </mat-dialog-actions>
+    <mat-dialog-actions align="end" class="w-full gap-3">
+      <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{'button.cancel' |
+        translate}}</app-ui-button>
+      <app-ui-button [variant]="'primary'" [size]="'md'" type="submit">{{'button.save' | translate}}</app-ui-button>
+    </mat-dialog-actions>
 </form>

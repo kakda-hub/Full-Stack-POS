@@ -118,7 +118,7 @@
     "back": "Go Back",
     "home": "Back to Dashboard"
   },
-  "button_actions": {
+  "button": {
     "addNew": "Add New",
     "update": "Update",
     "cancel": "Cancel",
@@ -126,7 +126,8 @@
     "close": "Close",
     "back": "Back",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "save": "Save"
   },
   "validate": {
     "required": "is required"

@@ -2,10 +2,9 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <app-breadcrumb></app-breadcrumb>
-    <button matButton="filled" (click)="onAdd()">
-      <mat-icon>add</mat-icon>
-      {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add Product' }}
-    </button>
+    <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="onAdd()">
+      <span>{{ 'button.addNew' | translate }}</span>
+    </app-ui-button>
   </div>
 
   <!-- Low stock alert -->
@@ -33,12 +32,7 @@
     </svg>
     <p class="text-sm text-amber-800 font-medium">
       {{ productService.lowStockProducts().length }}
-      {{
-        lang.currentLang() === 'km'
-          ? 'ផលិតផលស្តុកទាប'
-          : 'products
-            with low stock'
-      }}:
+      {{ lang.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock'}}:
       <span *ngFor="let p of productService.lowStockProducts(); let last = last" class="font-bold">
         {{ p.name }}{{ !last ? ', ' : '' }}
       </span>
@@ -250,15 +244,15 @@
             </td>
             <td class="px-4 py-3 text-right">
               <div
-                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                class="flex items-center justify-end gap-2"
               >
                 <button
                   type="button"
                   aria-label="Edit product"
                   (click)="openEdit(product)"
-                  class="p-1.5 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors"
+                  class="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -271,9 +265,9 @@
                   type="button"
                   aria-label="Delete product"
                   (click)="deleteProduct(product)"
-                  class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                  class="p-1.5 rounded-lg hover:bg-rose-50 text-rose-600 transition-colors"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"

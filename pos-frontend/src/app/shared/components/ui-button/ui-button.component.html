@@ -1,0 +1,13 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  [ngClass]="['variant-' + variant, 'shape-' + shape]"
+  [class.size-sm]="size === 'sm'"
+  [class.size-md]="size === 'md'"
+  [class.size-lg]="size === 'lg'"
+  [class.size-xl]="size === 'xl'"
+  (click)="onClick.emit($event)"
+>
+  <span *ngIf="loading" class="loader"></span>
+  <ng-content></ng-content>
+</button>

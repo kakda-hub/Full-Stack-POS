@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use './assets/styles/scss/custom/dialog.scss';
+@use './assets/styles/scss/custom/material.scss';
 
 html {
   height: 100%;
@@ -150,14 +151,7 @@ input[type='number']::-webkit-outer-spin-button {
   overflow: hidden;
 }
 
-/* =====================================================
-   RESPONSIVE DESIGN SYSTEM
-   Mobile-first: phone → tablet → laptop → monitor
-   ===================================================== */
-
-/* ---- Mobile (< 640px): stack everything ---- */
 @media (max-width: 639px) {
-  /* Sales page: stack left/right panels vertically */
   .sales-layout {
     flex-direction: column !important;
   }
@@ -230,82 +224,6 @@ input[type='number']::-webkit-outer-spin-button {
   border-radius: 8px;
 }
 
-/* Card base */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
-  border-radius: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
-}
-.card:hover { box-shadow: var(--shadow-md); }
-.card-interactive:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px -6px rgba(0,0,0,0.12);
-}
-
-html.dark .card-interactive:hover {
-  box-shadow: 0 8px 25px -6px rgba(0,0,0,0.5);
-}
-
-/* Button base polish */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  border-radius: 0.75rem;
-  transition: all 0.15s ease;
-  cursor: pointer;
-  border: none;
-  font-size: 0.875rem;
-  padding: 0.625rem 1.25rem;
-  line-height: 1.25;
-}
-.btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
-  box-shadow: 0 4px 14px -2px rgba(99,102,241,0.4);
-}
-.btn-primary:hover { box-shadow: 0 6px 20px -2px rgba(99,102,241,0.5); filter: brightness(1.05); }
-
-.btn-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  box-shadow: 0 4px 14px -2px rgba(239,68,68,0.35);
-}
-.btn-danger:hover { filter: brightness(1.05); }
-
-.btn-ghost {
-  background: transparent;
-  color: #64748b;
-  border: 1px solid var(--border-primary);
-}
-.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-/* Input polish */
-.input-base {
-  width: 100%;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-primary);
-  border-radius: 0.75rem;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-  outline: none;
-}
-.input-base:focus {
-  border-color: #6366f1;
-  background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-}
-.input-base::placeholder { color: var(--text-muted); }
-
 /* Chip / badge */
 .badge {
   display: inline-flex;
@@ -350,34 +268,6 @@ html.dark .card-interactive:hover {
 html.dark ::-webkit-scrollbar-track { background: #0f172a; }
 html.dark ::-webkit-scrollbar-thumb { background: #334155; }
 html.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-/* Table polish */
-.table-base { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.table-base th {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-primary);
-}
-.table-base td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-secondary); }
-.table-base tr:last-child td { border-bottom: none; }
-.table-base tr:hover td { background: var(--bg-hover); }
-
-/* Glass card effect */
-.glass-card {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.5);
-}
-html.dark .glass-card {
-  background: rgba(30,41,59,0.7);
-  border-color: rgba(255,255,255,0.05);
-}
 
 /* POS-specific product card hover glow */
 .product-card-hover:hover {

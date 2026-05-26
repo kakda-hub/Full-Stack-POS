@@ -1,0 +1,94 @@
+@use '@angular/material' as mat;
+
+.small-form-field {
+  @include mat.form-field-density(-3);
+}
+
+// .form-field-outline {
+//   @include mat.form-field-overrides((
+
+//     container-height: 40px,
+//     container-vertical-padding: 8px,
+
+//     // set Font Battambang for input & placeholder
+//     container-text-font: ('Battambang', system-ui),
+//     container-text-size: 13px,
+
+//     // set Font Battambang for label
+//     outlined-label-text-font: ('Battambang', system-ui),
+//     outlined-label-text-size: 13px,
+//     outlined-label-text-populated-size: 11px, // size when it pop up
+
+//     // set color for placeholder (Optional)
+//     outlined-input-text-placeholder-color: rgba(0, 0, 0, 0.5),
+//   ));
+// }
+
+// // set icon size for Battambang font
+// .small-form-field {
+//   .mat-mdc-form-field-icon-suffix {
+//     .mat-icon {
+//       font-size: 18px;
+//       width: 18px;
+//       height: 18px;
+//     }
+//   }
+// }
+
+.form-field {
+  @include mat.form-field-overrides((
+    // 1. set height of box (small)
+    container-height: 42px,
+    
+    // 2. set Font Battambang and size 12px
+    container-text-font: 'Battambang',
+    container-text-size: 12px,
+
+    // set Font Battambang for label
+    filled-label-text-font: 'Battambang',
+    filled-label-text-size: 12px,
+    
+    // set Padding for top and bottom (Important for Fill)
+    filled-with-label-container-padding-top: 16px,
+    filled-with-label-container-padding-bottom: 4px,
+    
+    // set color for background (Optional)
+    filled-container-color: #f5f5f5, 
+    filled-active-indicator-height: 1px, // height of line below
+  ));
+
+  // set placeholder for Battambang font
+  input.mat-mdc-input-element::placeholder {
+    font-size: 12px !important;
+    font-family: 'Battambang' !important;
+    opacity: 0.6;
+  }
+
+  // set icon size for Battambang font
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
+    display: flex;
+    align-items: center;
+  }
+}
+
+// .custom-filled-button {
+//   @include mat.button-overrides((
+//     // 'filled-container-color': #6366f1,
+//     'filled-label-text-color': white,
+//     'filled-label-text-font': 'Battambang',
+//     'filled-label-text-size': 14px,
+//     'filled-container-height': 40px,
+//   ));
+//   // @apply transition active:scale-95;
+// }
+
+// button {
+//   @include mat.button-overrides((
+//     'filled-container-color': #6366f1,
+//   ));
+//   @apply transition active:scale-95;
+// }

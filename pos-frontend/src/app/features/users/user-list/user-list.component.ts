@@ -74,6 +74,10 @@ export class UserListComponent {
     alert(id);
   }
 
+  onAdd() {
+    this.openDialog();
+  }
+
   openDialog() {
     const dialogRef = this.reusableDialogService.open();
     dialogRef.subscribe((result) => {

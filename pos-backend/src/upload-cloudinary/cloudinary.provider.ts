@@ -22,6 +22,6 @@ export const CloudinaryProvider = {
       api_key: '672462659274597',
       api_secret: 'WVTkBmRHVkoWrxnL0E6Ie8L0lU8',
     });
-    return cloudinary; // ត្រូវ Return អាហ្នឹងចេញមកវិញ
+    return cloudinary;
   },
 };
