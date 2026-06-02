@@ -32,7 +32,7 @@
     </svg>
     <p class="text-sm text-amber-800 font-medium">
       {{ productService.lowStockProducts().length }}
-      {{ lang.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock'}}:
+      {{ lang.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}:
       <span *ngFor="let p of productService.lowStockProducts(); let last = last" class="font-bold">
         {{ p.name }}{{ !last ? ', ' : '' }}
       </span>
@@ -184,7 +184,11 @@
           class="divide-y divide-slate-100"
         >
           <tr
-            *ngFor="let product of productService.filteredProducts(); index as i; trackBy: trackById"
+            *ngFor="
+              let product of productService.filteredProducts();
+              index as i;
+              trackBy: trackById
+            "
             @fadeIn
             [class.hover:bg-slate-700]="theme.isDark()"
             [class.hover:bg-slate-50]="!theme.isDark()"
@@ -196,10 +200,10 @@
             <td class="px-4 py-3">
               <ng-container *ngIf="false; else hasImage">
                 <img
-                [src]="'/assets/images/no-image.png'"
-                alt="Product Image"
-                class="w-24 h-24 object-cover rounded-lg"
-              />
+                  [src]="'/assets/images/no-image.png'"
+                  alt="Product Image"
+                  class="w-24 h-24 object-cover rounded-lg"
+                />
               </ng-container>
               <ng-template #hasImage>
                 <div>
@@ -243,9 +247,7 @@
               <span [class]="getStockClass(product)">{{ product.stock }}</span>
             </td>
             <td class="px-4 py-3 text-right">
-              <div
-                class="flex items-center justify-end gap-2"
-              >
+              <div class="flex items-center justify-end gap-2">
                 <button
                   type="button"
                   aria-label="Edit product"
@@ -312,4 +314,3 @@
     </div>
   </div>
 </div>
-

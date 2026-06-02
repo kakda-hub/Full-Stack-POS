@@ -11,8 +11,8 @@ import {
 import { UploadCloudinaryService } from './upload-cloudinary.service';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 
-@ApiTags('Cloudinary File Upload') // ប្តូរឈ្មោះឱ្យស្អាតក្នុង Swagger
-@Controller('cloudinary') // ដាក់ Version ឱ្យចំស្តង់ដារ POS
+@ApiTags('Cloudinary File Upload') 
+@Controller('cloudinary') 
 export class UploadCloudinaryController {
   constructor(private readonly cloudinaryService: UploadCloudinaryService) { }
 
@@ -53,7 +53,7 @@ export class UploadCloudinaryController {
     };
   }
 
-  @Put('rename') // ប្តូរមកប្រើ Body វិញដើម្បីងាយស្រួលក្នុង Swagger
+  @Put('rename')
   @ApiOperation({ summary: 'Rename (move) a Cloudinary resource' })
   @ApiBody({
     schema: {

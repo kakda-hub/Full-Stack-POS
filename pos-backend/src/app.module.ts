@@ -15,20 +15,20 @@ import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.mo
 
 @Module({
   imports: [
-    // ─── Config ─────────────────────────────────────────────────────────────
+    // ─── Config 
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig],
       envFilePath: '.env',
     }),
 
-    // ─── Database ────────────────────────────────────────────────────────────
+    // ─── Database 
     TypeOrmModule.forRootAsync({
       useFactory: databaseConfig,
       inject: [],
     }),
 
-    // ─── Feature Modules ─────────────────────────────────────────────────────
+    // ─── Feature Modules
     AuthModule,
     UsersModule,
     ProductsModule,

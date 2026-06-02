@@ -107,7 +107,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
       if (!result) {
         return;
       }
-      console.log(result)
       // this.addProduct(result)
     });
   }

@@ -1,7 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Product } from '../../../core/models';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
@@ -38,8 +45,8 @@ export class ProductDetailComponent implements OnInit {
     private categoryService: CategoriesService,
     private productService: ProductService,
     public theme: ThemeService,
-    private http: HttpClient
-  ) { }
+    private http: HttpClient,
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -87,7 +94,7 @@ export class ProductDetailComponent implements OnInit {
       error: (err) => {
         console.error('Upload failed', err);
         this.isUploading.set(false);
-      }
+      },
     });
   }
 
@@ -110,7 +117,7 @@ export class ProductDetailComponent implements OnInit {
           console.error(err);
           this.isSaving.set(false);
           this.save.emit(payload); // emit anyway to close modal for demo
-        }
+        },
       });
     } else {
       this.productService.createProduct(payload).subscribe({
@@ -122,17 +129,8 @@ export class ProductDetailComponent implements OnInit {
           console.error(err);
           this.isSaving.set(false);
           this.save.emit(payload); // emit anyway to close modal for demo
-        }
+        },
       });
     }
   }
 }
-
-
-
-// categories = [
-//   { id: 'beverages', name: 'Beverages', nameKm: 'ភេសជ្ជៈ' },
-//   { id: 'food', name: 'Food', nameKm: 'អាហារ' },
-//   { id: 'snacks', name: 'Snacks', nameKm: 'អាហារសម្រន់' },
-//   { id: 'dairy', name: 'Dairy', nameKm: 'ផលិតផលទឹកដោះ' },
-// ];

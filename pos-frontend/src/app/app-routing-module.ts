@@ -54,7 +54,7 @@ const routes: Routes = [
       },
       {
         path: 'permission',
-        loadChildren: () => import('./features/permissions/permissions-routing-module').then((m) => m.PermissionsRoutingModule),
+        loadChildren: () => import('./features/permissions/permissions.module').then((m) => m.PermissionsModule),
         data: { breadcrumb: 'Permission', labelKh: 'ការអនុញ្ញាត' }
       },
       {

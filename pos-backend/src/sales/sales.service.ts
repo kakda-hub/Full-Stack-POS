@@ -27,22 +27,18 @@ export class SalesService {
     private readonly dataSource: DataSource,
   ) {}
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // CREATE SALE  (Transaction-safe: validates stock → deducts → saves → commits)
-  // ─────────────────────────────────────────────────────────────────────────────
   async create(dto: CreateSaleDto, userId: number): Promise<Sale> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // ── Step 1: Load & validate all products within the transaction ──────────
       const productMap = new Map<number, Product>();
 
       for (const item of dto.items) {
         const product = await queryRunner.manager.findOne(Product, {
           where: { id: item.productId, isActive: true },
-          lock: { mode: 'pessimistic_write' }, // row-level lock prevents race conditions
+          lock: { mode: 'pessimistic_write' },
         });
 
         if (!product) {
@@ -51,7 +47,6 @@ export class SalesService {
           );
         }
 
-        // ── Step 2: Stock protection ─────────────────────────────────────────
         if (product.stock < item.quantity) {
           throw new BadRequestException(
             `Insufficient stock for "${product.name}". ` +
@@ -62,7 +57,6 @@ export class SalesService {
         productMap.set(item.productId, product);
       }
 
-      // ── Step 3: Calculate totals ─────────────────────────────────────────────
       let subtotal = 0;
       for (const item of dto.items) {
         const product = productMap.get(item.productId);
@@ -77,7 +71,6 @@ export class SalesService {
         throw new BadRequestException('Sale total cannot be negative');
       }
 
-      // ── Step 4: Create Sale record ───────────────────────────────────────────
       const sale = queryRunner.manager.create(Sale, {
         userId,
         subtotal,
@@ -89,11 +82,9 @@ export class SalesService {
 
       const savedSale = await queryRunner.manager.save(Sale, sale);
 
-      // ── Step 5: Create SaleItems + deduct stock ──────────────────────────────
       for (const item of dto.items) {
         const product = productMap.get(item.productId);
 
-        // Snapshot price at time of sale
         const saleItem = queryRunner.manager.create(SaleItem, {
           saleId: savedSale.id,
           productId: item.productId,
@@ -103,7 +94,6 @@ export class SalesService {
 
         await queryRunner.manager.save(SaleItem, saleItem);
 
-        // Deduct stock
         await queryRunner.manager.decrement(
           Product,
           { id: item.productId },
@@ -112,13 +102,10 @@ export class SalesService {
         );
       }
 
-      // ── Step 6: Commit ───────────────────────────────────────────────────────
       await queryRunner.commitTransaction();
 
-      // Return full sale with items
       return this.findOne(savedSale.id);
     } catch (err) {
-      // ── Rollback on any error ────────────────────────────────────────────────
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
@@ -126,9 +113,6 @@ export class SalesService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // READ
-  // ─────────────────────────────────────────────────────────────────────────────
   async findAll(userId?: number, role?: string): Promise<Sale[]> {
     const query = this.saleRepository
       .createQueryBuilder('sale')
