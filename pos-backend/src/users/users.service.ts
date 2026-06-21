@@ -38,7 +38,7 @@ export class UsersService {
 
   async findAll(): Promise<Omit<User, 'password'>[]> {
     const users = await this.userRepository.find({
-      select: ['id', 'name', 'email', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'name', 'email', 'role', 'isActive', 'avatarUrl', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
     return users;
@@ -47,7 +47,7 @@ export class UsersService {
   async findOne(id: number): Promise<Omit<User, 'password'>> {
     const user = await this.userRepository.findOne({
       where: { id },
-      select: ['id', 'name', 'email', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'name', 'email', 'role', 'isActive', 'avatarUrl', 'createdAt'],
     });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
@@ -69,6 +69,16 @@ export class UsersService {
       throw new NotFoundException(`User #${id} not found`);
     }
 
+    // Check email uniqueness if email is being changed
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      const emailTaken = await this.userRepository.findOne({
+        where: { email: updateUserDto.email },
+      });
+      if (emailTaken) {
+        throw new ConflictException('Email already in use');
+      }
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
@@ -86,5 +96,16 @@ export class UsersService {
     }
     await this.userRepository.remove(user);
     return { message: `User #${id} deleted successfully` };
+  }
+
+  async uploadAvatar(id: number, avatarUrl: string): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
+    user.avatarUrl = avatarUrl;
+    const saved = await this.userRepository.save(user);
+    const { password, ...result } = saved;
+    return result;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, forwardRef, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, forwardRef, signal, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../../../core/services/language.service';
@@ -7,6 +7,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 @Component({
   selector: 'app-drag-drop-upload',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './drag-drop-upload.component.html',
   styleUrl: './drag-drop-upload.component.scss',
   providers: [
@@ -17,7 +18,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     },
   ],
 })
-export class DragDropUploadComponent implements ControlValueAccessor, OnInit {
+export class DragDropUploadComponent implements ControlValueAccessor {
   @Input() label: string = 'Image';
   @Input() labelKm: string = 'រូបភាព';
   @Input() uploadUrl: string = 'http://localhost:3000/api/v1/dynamicFileupload';
@@ -34,8 +35,6 @@ export class DragDropUploadComponent implements ControlValueAccessor, OnInit {
   // CVA Callbacks
   onChange = (value: any) => { };
   onTouched = () => { };
-
-  ngOnInit(): void { }
 
   // Writes value from the parent form to the component
   writeValue(value: any): void {

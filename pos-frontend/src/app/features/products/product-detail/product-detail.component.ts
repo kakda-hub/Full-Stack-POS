@@ -1,14 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   signal,
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
@@ -25,19 +24,12 @@ import { CategoriesService } from '../../../services/categories.service';
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: any | null = null;
-  @Output() save = new EventEmitter<any>();
-  @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
 
-  categories = [
-    { id: 1, name: 'Beverages', nameKm: 'ភេសជ្ជៈ' },
-    { id: 2, name: 'Food', nameKm: 'អាហារ' },
-    { id: 3, name: 'Snacks', nameKm: 'អាហារសម្រន់' },
-    { id: 4, name: 'Dairy', nameKm: 'ផលិតផលទឹកដោះ' },
-  ];
+  categories: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +38,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     public theme: ThemeService,
     private http: HttpClient,
+    private dialogRef: MatDialogRef<ProductDetailComponent>,
   ) {}
 
   ngOnInit(): void {
@@ -68,7 +61,6 @@ export class ProductDetailComponent implements OnInit {
 
   getAllCategories() {
     this.categoryService.list().subscribe((res: any) => {
-      console.log('Categories fetched:', res);
       if (res && res.data) {
         this.categories = res.data;
       }
@@ -85,10 +77,11 @@ export class ProductDetailComponent implements OnInit {
 
     this.http.post<any>('http://localhost:3000/api/v1/dynamicFileupload', formData).subscribe({
       next: (res) => {
-        if (res.data && res.data.data && res.data.data.length > 0) {
+        if (res?.data?.fileUrl) {
+          this.form.patchValue({ imgUrl: res.data.fileUrl });
+        } else if (res?.data?.data?.[0]?.fileUrl) {
           this.form.patchValue({ imgUrl: res.data.data[0].fileUrl });
         }
-        console.log('Upload success', res);
         this.isUploading.set(false);
       },
       error: (err) => {
@@ -107,30 +100,19 @@ export class ProductDetailComponent implements OnInit {
     this.isSaving.set(true);
     const payload = this.form.value;
 
-    if (this.product?.id) {
-      this.productService.updateProduct(this.product.id, payload).subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.save.emit(res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.isSaving.set(false);
-          this.save.emit(payload); // emit anyway to close modal for demo
-        },
-      });
-    } else {
-      this.productService.createProduct(payload).subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.save.emit(res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.isSaving.set(false);
-          this.save.emit(payload); // emit anyway to close modal for demo
-        },
-      });
-    }
+    const request$ = this.product?.id
+      ? this.productService.updateProduct(this.product.id, payload)
+      : this.productService.createProduct(payload);
+
+    request$.subscribe({
+      next: (res) => {
+        this.isSaving.set(false);
+        this.dialogRef.close(res);
+      },
+      error: (err) => {
+        console.error('Failed to save product', err);
+        this.isSaving.set(false);
+      },
+    });
   }
 }

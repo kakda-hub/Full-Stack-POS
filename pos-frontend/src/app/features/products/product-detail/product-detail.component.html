@@ -1,133 +1,133 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  >
   <app-header-detail [id]="product?.id"></app-header-detail>
 
-  <mat-dialog-content>
-    <div class="flex flex-col">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
-        <app-input-field formControlName="name" placeholder="ឈ្មោះ" [isRequired]="true">
-        </app-input-field>
-
-        <app-input-field formControlName="nameKh" placeholder="ឈ្មោះខ្មែរ" [isRequired]="true">
-        </app-input-field>
-
-        <app-input-field formControlName="price" placeholder="តម្លៃ ($)" [isRequired]="true">
-        </app-input-field>
-
-        <app-input-field formControlName="stock" placeholder="ស្តុក" [isRequired]="true">
-        </app-input-field>
-
-        <app-input-field formControlName="barcode" placeholder="បាកូដ" [isRequired]="true">
-        </app-input-field>
-
-        <mat-form-field appearance="outline" class="w-full form-field-outline">
-          <mat-label>{{ 'label.category' | translate }}</mat-label>
-          <mat-select formControlName="categoryId">
-            @for (item of categories; track item) {
-              <mat-option [value]="item.id">{{ item.name }}</mat-option>
-            }
-          </mat-select>
-          <mat-error *ngIf="form.get('categoryId')?.hasError('required')"
-            >{{ 'validate.required' | translate }}
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <app-textarea
-        [rows]="2"
-        formControlName="description"
-        placeholder="ការពិពណ៌នា"
-        class="w-full"
-      >
-      </app-textarea>
-
-      <div class="col-span-2">
-        <label
-          [class.text-slate-300]="theme.isDark()"
-          [class.text-slate-700]="!theme.isDark()"
-          class="block text-sm font-semibold mb-1.5"
-          >{{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Product Image' }}</label
-        >
+  <mat-dialog-content class="!pb-2">
+    <div class="flex flex-col gap-4">
+      <!-- Image upload -->
+      <div class="flex justify-center">
         <div
-          class="flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all overflow-hidden relative"
+          class="relative w-44 h-44 rounded-2xl border-2 border-dashed transition-all overflow-hidden group cursor-pointer"
           [class.bg-slate-700]="theme.isDark()"
           [class.border-slate-600]="theme.isDark()"
           [class.hover:border-indigo-500]="theme.isDark()"
           [class.bg-slate-50]="!theme.isDark()"
           [class.border-slate-300]="!theme.isDark()"
           [class.hover:border-indigo-400]="!theme.isDark()"
+          (click)="fileInput.click()"
         >
-          <label class="flex flex-col items-center justify-center w-full h-32 cursor-pointer">
-            <div *ngIf="form.get('imgUrl')?.value; else noImage" class="absolute inset-0">
-              <img
-                [src]="form.get('imgUrl')?.value"
-                class="w-full h-full object-contain bg-black/5"
-              />
-              <div
-                class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-              >
-                <span class="text-white text-sm font-semibold">{{
-                  lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
-                }}</span>
-              </div>
+          @if (form.get('imgUrl')?.value) {
+            <img
+              [src]="form.get('imgUrl')?.value"
+              class="w-full h-full object-cover"
+              (error)="form.patchValue({ imgUrl: '' })"
+            />
+            <div
+              class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <span class="text-white text-sm font-semibold">{{
+                lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
+              }}</span>
             </div>
-            <ng-template #noImage>
-              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          } @else {
+            <div class="flex flex-col items-center justify-center w-full h-full">
+              @if (isUploading()) {
+                <span
+                  class="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"
+                ></span>
+                <span class="mt-2 text-xs text-slate-400">{{
+                  lang.currentLang() === 'km' ? 'កំពុងបង្ហោះ...' : 'Uploading...'
+                }}</span>
+              } @else {
                 <svg
-                  *ngIf="!isUploading()"
-                  class="w-8 h-8 mb-3 text-slate-400"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-10 h-10 mb-2 text-slate-400"
                   fill="none"
-                  viewBox="0 0 20 16"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                    stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span
-                  *ngIf="isUploading()"
-                  class="w-8 h-8 mb-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"
-                ></span>
-                <p
-                  class="mb-2 text-sm"
-                  [class.text-slate-400]="theme.isDark()"
-                  [class.text-slate-500]="!theme.isDark()"
-                >
-                  <span class="font-semibold">{{
-                    lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើសរូបភាព' : 'Click to upload'
-                  }}</span>
+                <p class="text-xs text-slate-400">
+                  {{ lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើសរូបភាព' : 'Click to upload' }}
                 </p>
-                <p
-                  class="text-xs"
-                  [class.text-slate-500]="theme.isDark()"
-                  [class.text-slate-400]="!theme.isDark()"
-                >
-                  SVG, PNG, JPG or GIF
-                </p>
-              </div>
-            </ng-template>
-            <input
-              type="file"
-              class="hidden"
-              accept="image/*"
-              (change)="onFileSelected($event)"
-              [disabled]="isUploading()"
-            />
-          </label>
+              }
+            </div>
+          }
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            [disabled]="isUploading()"
+          />
         </div>
       </div>
+
+      <!-- Form fields grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-input-field
+          formControlName="name"
+          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+          [isRequired]="true"
+        ></app-input-field>
+
+        <app-input-field
+          formControlName="nameKh"
+          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះខ្មែរ' : 'Name (Khmer)'"
+        ></app-input-field>
+
+        <app-input-field
+          formControlName="price"
+          [placeholder]="lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price'"
+          [isRequired]="true"
+        >
+          <span prefix class="text-slate-400 mr-1">$</span>
+        </app-input-field>
+
+        <app-input-field
+          formControlName="stock"
+          [placeholder]="lang.currentLang() === 'km' ? 'បរិមាណស្តុក' : 'Stock'"
+          [isRequired]="true"
+        ></app-input-field>
+
+        <app-input-field
+          formControlName="barcode"
+          [placeholder]="lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode'"
+          [isRequired]="true"
+        ></app-input-field>
+
+        <mat-form-field appearance="outline" class="w-full form-field-outline">
+          <mat-label>{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}</mat-label>
+          <mat-select formControlName="categoryId">
+            @for (item of categories; track item.id) {
+              <mat-option [value]="item.id">
+                {{ lang.currentLang() === 'km' && item.nameKh ? item.nameKh : item.name }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-error>{{ 'validate.required' | translate }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Description -->
+      <app-textarea
+        [rows]="2"
+        formControlName="description"
+        [placeholder]="lang.currentLang() === 'km' ? 'ការពិពណ៌នា' : 'Description'"
+      ></app-textarea>
     </div>
   </mat-dialog-content>
-  <mat-dialog-actions align="end" class="w-full gap-3">
+
+  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-4">
     <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{
       'button.cancel' | translate
     }}</app-ui-button>
-    <app-ui-button [variant]="'primary'" [size]="'md'" type="submit">{{
+    <app-ui-button [variant]="'primary'" [size]="'md'" type="submit" [loading]="isSaving()">{{
       'button.save' | translate
     }}</app-ui-button>
   </mat-dialog-actions>

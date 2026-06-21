@@ -85,6 +85,49 @@
       </div>
     </div>
 
+    <!-- Low-stock alert bar -->
+    @if (productService.lowStockProducts().length > 0) {
+      <div
+        @fadeIn
+        [class.bg-amber-900\/20]="theme.isDark()"
+        [class.border-amber-700\/40]="theme.isDark()"
+        [class.bg-amber-50]="!theme.isDark()"
+        [class.border-amber-200]="!theme.isDark()"
+        class="mx-4 mt-3 border rounded-xl p-3 flex items-center gap-3"
+      >
+        <svg
+          class="w-5 h-5 text-amber-600 flex-shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <div class="flex-1">
+          <p class="text-sm text-amber-800 font-medium">
+            {{ productService.lowStockProducts().length }}
+            {{ langService.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}:
+            @for (p of productService.lowStockProducts(); track p.id; let last = $last) {
+              <span class="font-bold">{{ p.name }}{{ !last ? ', ' : '' }}</span>
+            }
+          </p>
+        </div>
+        @if (auth.isAdmin()) {
+          <a
+            routerLink="/products"
+            class="flex-shrink-0 text-xs font-bold text-amber-700 hover:text-amber-800 bg-amber-200\/60 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            {{ langService.currentLang() === 'km' ? 'គ្រប់គ្រង' : 'Manage' }}
+          </a>
+        }
+      </div>
+    }
+
     <!-- Product Grid -->
     <div class="flex-1 overflow-y-auto p-4">
       <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -108,19 +151,36 @@
           [class.border-slate-700]="theme.isDark()"
           [class.bg-white]="!theme.isDark()"
           [class.border-slate-200]="!theme.isDark()"
-          class="relative rounded-2xl border p-3 text-left product-card-hover active:scale-95 transition-all group"
+          [class.animate-shake]="shakingProductId() === product.id"
+          class="relative overflow-hidden rounded-2xl border p-3 text-left product-card-hover product-card-ripple active:scale-95 transition-all group"
         >
-          <!-- <div
-            [class]="
-              getProductColor(product.category) +
-              ' w-full h-16 rounded-xl mb-3 flex items-center justify-center text-2xl'
-            "
-          >
-            {{ getCategoryEmoji(product.category) }}
-          </div> -->
+          <!-- Stock add animation indicator -->
+          @if (lastAddedId() === product.id) {
+            <span
+              class="stock-add-fly"
+              [class.text-indigo-500]="!theme.isDark()"
+              [class.text-indigo-300]="theme.isDark()"
+            >+1</span>
+          }
+          <!-- Low-stock badge -->
+          @if (product.stock > 0 && product.stock <= 5) {
+            <span
+              class="absolute -top-2 -right-2 z-10 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
+            >
+              {{ product.stock }}
+              {{ langService.currentLang() === 'km' ? 'នៅសល់' : 'left' }}
+            </span>
+          } @else if (product.stock === 0) {
+            <span
+              class="absolute -top-2 -right-2 z-10 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
+            >
+              {{ langService.currentLang() === 'km' ? 'អស់' : 'Out' }}
+            </span>
+          }
           <img
-            [src]="getProductPhoto(product.category)"
+            [src]="product.imgUrl || getProductPhoto(product.category)"
             [alt]="product.name"
+            [class.opacity-40]="product.stock === 0"
             class="w-full h-20 rounded-xl mb-3 object-cover"
           />
           <div class="space-y-1">
@@ -130,10 +190,22 @@
               }}
             </p>
             <p class="text-indigo-600 font-bold text-sm">${{ product.price.toFixed(2) }}</p>
-            <p class="text-[10px] text-slate-400 uppercase tracking-wider">
-              {{ product.stock }}
-              {{ langService.currentLang() === 'km' ? 'ក្នុងស្តុក' : 'in stock' }}
-            </p>
+            @if (product.stock === 0) {
+              <p class="text-[10px] text-rose-500 uppercase font-bold tracking-wider">
+                {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
+              </p>
+            } @else {
+              <p
+                class="text-[10px] uppercase tracking-wider"
+                [class.animate-stock-flash]="lastAddedId() === product.id"
+                [class.text-rose-500]="lastAddedId() === product.id"
+                [class.font-bold]="lastAddedId() === product.id"
+                [class.text-slate-400]="lastAddedId() !== product.id"
+              >
+                {{ product.stock }}
+                {{ langService.currentLang() === 'km' ? 'ក្នុងស្តុក' : 'in stock' }}
+              </p>
+            }
           </div>
         </button>
       </div>
@@ -190,6 +262,7 @@
     <div class="flex-1 overflow-y-auto p-3 space-y-2">
       <div
         *ngIf="cart.items().length === 0"
+        @fadeIn
         class="flex flex-col items-center justify-center h-full text-slate-300"
       >
         <svg
@@ -253,7 +326,7 @@
             >
               -
             </button>
-            <span class="w-6 text-center text-sm font-bold">{{ item.quantity }}</span>
+            <span class="w-6 text-center text-sm font-bold" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
               class="w-7 h-7 rounded-lg border bg-white flex items-center justify-center text-slate-600"
@@ -281,11 +354,29 @@
       <div class="space-y-2 text-sm">
         <div class="flex justify-between text-slate-500">
           <span>{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
-          <span class="font-bold text-slate-700">${{ cart.subtotal().toFixed(2) }}</span>
+          <div class="relative h-5 overflow-hidden text-right">
+            @if (showOldSubtotal()) {
+              <span class="absolute inset-0 font-bold text-slate-700 flex items-center justify-end" @slideOut>
+                ${{ prevSubtotalVal.toFixed(2) }}
+              </span>
+            }
+            <span class="font-bold text-slate-700" @slideIn>
+              ${{ cart.subtotal().toFixed(2) }}
+            </span>
+          </div>
         </div>
         <div class="flex justify-between text-lg font-black text-slate-900 border-t pt-2">
           <span>{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
-          <span class="text-indigo-600">${{ cart.total().toFixed(2) }}</span>
+          <div class="relative h-6 overflow-hidden text-right">
+            @if (showOldTotal()) {
+              <span class="absolute inset-0 text-indigo-600 flex items-center justify-end" @slideOut>
+                ${{ prevTotalVal.toFixed(2) }}
+              </span>
+            }
+            <span class="text-indigo-600" @slideIn>
+              ${{ cart.total().toFixed(2) }}
+            </span>
+          </div>
         </div>
       </div>
 

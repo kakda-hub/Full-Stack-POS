@@ -9,7 +9,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '../../../shared/components/dynamic-table/dynamic-table.component';
 import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { CategoryDetailComponent } from '../category-detail/category-detail.component';
-import { MatDialogConfig } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-category-list',
@@ -19,7 +20,6 @@ import { MatDialogConfig } from '@angular/material/dialog';
   templateUrl: './category-list.component.html',
 })
 export class CategoryListComponent implements OnInit, OnDestroy {
-  showForm = false;
   isLoading = signal(true);
   editingCategory: any | null = null;
   categories = signal<any[]>([]);
@@ -51,6 +51,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     public categoriesService: CategoriesService,
     public lang: LanguageService,
     private reusableDialogService: ReusableDialogService,
+    private dialog: MatDialog,
     public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
@@ -100,43 +101,61 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     this.pageSize.set(event.pageSize);
   }
 
-  // openAdd(): void { this.editingCategory = null; this.showForm = true; }
-  openEdit(c: any): void { this.editingCategory = c; this.showForm = true; }
-
-  deleteCategory(c: any): void {
-    if (confirm(this.lang.currentLang() === 'km' ? `លុប "${c.name}" មែនទេ?` : `Delete "${c.name}"?`)) {
-      this.categoriesService.delete(c.id).subscribe(() => {
-        this.alertService.warning(
-          this.lang.currentLang() === 'km' ? `"${c.name}" ត្រូវបានលុបចោល` : `"${c.name}" has been deleted`,
-          this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
-        );
-        this.loadCategories();
-      });
-    }
+  openEdit(c: any): void {
+    this.editingCategory = c;
+    this.openDialog();
   }
 
-  onSave(data: any): void {
-    const isEdit = !!this.editingCategory;
-    this.alertService.success(
-      this.lang.currentLang() === 'km' ? `ប្រភេទត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}` : `Category ${isEdit ? 'updated' : 'added'} successfully`,
-      this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
-    );
-    this.showForm = false;
-    this.editingCategory = null;
-    this.loadCategories();
+  deleteCategory(c: any): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
+        message: this.lang.currentLang() === 'km' ? `លុប "${c.name}" មែនទេ?` : `Delete "${c.name}"?`,
+        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
+        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.categoriesService.delete(c.id).subscribe({
+        next: () => {
+          this.alertService.warning(
+            this.lang.currentLang() === 'km' ? `"${c.name}" ត្រូវបានលុបចោល` : `"${c.name}" has been deleted`,
+            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+          );
+          this.loadCategories();
+        },
+        error: (err) => {
+          console.error('Failed to delete category', err);
+          this.alertService.error(
+            this.lang.currentLang() === 'km' ? 'ការលុបប្រភេទបរាជ័យ' : 'Failed to delete category'
+          );
+        },
+      });
+    });
   }
 
   trackById(_: number, c: any): string { return c.id; }
 
   openDialog() {
-    const dialogRef = this.reusableDialogService.open();
+    const dialogRef = this.reusableDialogService.open(
+      this.editingCategory ? { category: this.editingCategory } : undefined
+    );
     dialogRef.subscribe((result) => {
-
       if (!result) {
+        this.editingCategory = null;
         return;
       }
-
-      console.log(result)
+      this.loadCategories();
+      const isEdit = !!this.editingCategory;
+      this.alertService.success(
+        this.lang.currentLang() === 'km'
+          ? `ប្រភេទត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
+          : `Category ${isEdit ? 'updated' : 'added'} successfully`,
+        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+      );
+      this.editingCategory = null;
     });
   }
 }

@@ -1,5 +1,5 @@
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
 import { Subject, debounceTime } from 'rxjs';
 import { Transaction, Product, CartItem } from '../../../core/models';
 import { AlertService } from '../../../core/services/alert.service';
@@ -9,7 +9,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { TransactionService } from '../../../core/services/transaction.service';
-import { fadeIn, listAnimation, cartItemAnimation, counterAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition } from '../../../shared/animations/animations';
 
 // Sidebar specific animation
 const sidebarAnimation = trigger('sidebarAnimation', [
@@ -19,10 +19,10 @@ const sidebarAnimation = trigger('sidebarAnimation', [
 ]);
 
 @Component({
-  selector: 'app-sales',
+  selector: 'app-C',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, pageTransition, sidebarAnimation],
+  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition, sidebarAnimation],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
@@ -35,6 +35,18 @@ export class SalesComponent implements OnInit {
   showPayment = false;
   isLoadingProducts = signal(true);
   lastTransaction: Transaction | null = null;
+  lastAddedId = signal<string | null>(null);
+  shakingProductId = signal<string | null>(null);
+
+  // Price slide animation state
+  showOldSubtotal = signal(false);
+  showOldTotal = signal(false);
+  prevSubtotalVal = 0;
+  prevTotalVal = 0;
+  private priceAnimTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  private stockTimeout: ReturnType<typeof setTimeout> | null = null;
+  private shakeTimeout: ReturnType<typeof setTimeout> | null = null;
   private searchSubject = new Subject<string>();
 
   constructor(
@@ -46,10 +58,41 @@ export class SalesComponent implements OnInit {
     public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {
+    // Initialize price tracking before the effect to prevent animation on first render
+    this.prevSubtotalVal = this.cart.subtotal();
+    this.prevTotalVal = this.cart.total();
+
+    // Sync loading state with ProductService API response
+    effect(() => {
+      if (!this.productService.loading()) {
+        this.isLoadingProducts.set(false);
+        this.cdr.markForCheck();
+      }
+    });
+
+    // Watch for price changes to trigger slide animation
+    effect(() => {
+      const sub = this.cart.subtotal();
+      const tot = this.cart.total();
+      const subChanged = sub !== this.prevSubtotalVal;
+      const totChanged = tot !== this.prevTotalVal;
+      if (!subChanged && !totChanged) return;
+      // Show old values sliding out
+      this.showOldSubtotal.set(subChanged);
+      this.showOldTotal.set(totChanged);
+      if (this.priceAnimTimeout) clearTimeout(this.priceAnimTimeout);
+      this.priceAnimTimeout = setTimeout(() => {
+        this.showOldSubtotal.set(false);
+        this.showOldTotal.set(false);
+        this.prevSubtotalVal = sub;
+        this.prevTotalVal = tot;
+        this.priceAnimTimeout = null;
+      }, 200);
+    });
+  }
 
   ngOnInit(): void {
-    setTimeout(() => { this.isLoadingProducts.set(false); this.cdr.markForCheck(); }, 800);
     this.searchSubject.pipe(debounceTime(250)).subscribe(q => {
       this.productService.setSearch(q);
       this.cdr.markForCheck();
@@ -85,9 +128,23 @@ export class SalesComponent implements OnInit {
   addToCart(product: Product): void {
     if (product.stock === 0) {
       this.alertService.error('Out of stock');
+      // Shake animation on out-of-stock click
+      this.shakingProductId.set(product.id);
+      if (this.shakeTimeout) clearTimeout(this.shakeTimeout);
+      this.shakeTimeout = setTimeout(() => {
+        this.shakingProductId.set(null);
+        this.shakeTimeout = null;
+      }, 500);
       return;
     }
     this.cart.addItem(product);
+    // Stock flash animation — cancel any previous timeout to avoid glitch on rapid clicks
+    this.lastAddedId.set(product.id);
+    if (this.stockTimeout) clearTimeout(this.stockTimeout);
+    this.stockTimeout = setTimeout(() => {
+      this.lastAddedId.set(null);
+      this.stockTimeout = null;
+    }, 700);
     // If cart was closed, auto-open it when adding item
     if (!this.isCartOpen()) this.isCartOpen.set(true);
   }

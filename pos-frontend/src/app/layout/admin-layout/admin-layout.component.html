@@ -112,6 +112,10 @@
                 <svg *ngIf="item.icon === 'permission'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
                 </svg>
+                <!-- History Icon -->
+                <svg *ngIf="item.icon === 'history'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
               </div>
             </div>
             <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap">
@@ -280,7 +284,7 @@
         <div *ngIf="!isCollapsed()" class="relative flex-shrink-0">
           <div class="w-10 h-10">
             <img
-              [src]="auth.currentUser()?.profile"
+              [src]="auth.currentUser()?.avatarUrl"
               alt="Profile"
               class="w-full h-full object-cover"
               onerror="this.src='https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'"
@@ -393,6 +397,16 @@
         >
           <path d="M3 3v18h18" />
           <path d="m19 9-5 5-4-4-3 3" />
+        </svg>
+        <svg
+          class="w-6 h-6"
+          *ngIf="item.icon === 'history'"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
         <svg
           class="w-6 h-6"

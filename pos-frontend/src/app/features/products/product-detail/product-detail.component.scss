@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.mat-mdc-dialog-content {
+  --mat-dialog-content-padding: 0 24px;
+}
+
+/* Upload area hover effect */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Form field styling */
+::ng-deep {
+  .form-field-outline {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-radius: 12px !important;
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 44px;
+    }
+
+    .mat-mdc-text-field-wrapper {
+      border-radius: 12px !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      min-height: 44px;
+    }
+  }
+}
+
+/* Skeleton-like focus ring for upload area */
+input[type="file"]:focus-visible + label {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 16px;
+}

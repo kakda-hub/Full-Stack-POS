@@ -62,6 +62,20 @@ export const counterAnimation = trigger('counterAnimation', [
   ]),
 ]);
 
+export const slideOut = trigger('slideOut', [
+  transition(':enter', [
+    style({ transform: 'translateY(0)', opacity: 1 }),
+    animate('200ms ease-in', style({ transform: 'translateY(-100%)', opacity: 0 })),
+  ]),
+]);
+
+export const slideIn = trigger('slideIn', [
+  transition(':enter', [
+    style({ transform: 'translateY(100%)', opacity: 0 }),
+    animate('200ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
+  ]),
+]);
+
 export const pageTransition = trigger('pageTransition', [
   transition(':enter', [
     style({ opacity: 0, transform: 'translateY(12px)' }),

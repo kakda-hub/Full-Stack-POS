@@ -1,40 +1,26 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Product, Category } from '../models';
-
-const MOCK_CATEGORIES: Category[] = [
-  { id: 'all', name: 'All', nameKm: 'ទាំងអស់' },
-  { id: 'beverages', name: 'Beverages', nameKm: 'ភេសជ្ជៈ' },
-  { id: 'food', name: 'Food', nameKm: 'អាហារ' },
-  { id: 'snacks', name: 'Snacks', nameKm: 'អាហារសម្រន់' },
-  { id: 'dairy', name: 'Dairy', nameKm: 'ផលិតផលទឹកដោះ' },
-];
-
-const MOCK_PRODUCTS: Product[] = [
-  { id: '1', name: 'Coca-Cola 330ml', nameKm: 'កូកា-កូឡា ៣៣០មល', price: 1.25, barcode: '5000112637922', category: 'beverages', stock: 150, lowStockThreshold: 20 },
-  { id: '2', name: 'Water 500ml', nameKm: 'ទឹក ៥០០មល', price: 0.50, barcode: '8992388011027', category: 'beverages', stock: 200, lowStockThreshold: 30 },
-  { id: '3', name: 'Green Tea', nameKm: 'តែបៃតង', price: 1.00, barcode: '4902102072144', category: 'beverages', stock: 80, lowStockThreshold: 15 },
-  { id: '4', name: 'Orange Juice', nameKm: 'ទឹកក្រូច', price: 1.75, barcode: '5449000131805', category: 'beverages', stock: 60, lowStockThreshold: 10 },
-  { id: '5', name: 'Fried Rice', nameKm: 'បាយឆា', price: 3.50, barcode: 'FOOD001', category: 'food', stock: 50, lowStockThreshold: 5 },
-  { id: '6', name: 'Noodle Soup', nameKm: 'គុយទាវ', price: 3.00, barcode: 'FOOD002', category: 'food', stock: 40, lowStockThreshold: 5 },
-  { id: '7', name: 'Spring Rolls', nameKm: 'នំបញ្ចុក', price: 2.00, barcode: 'FOOD003', category: 'food', stock: 30, lowStockThreshold: 5 },
-  { id: '8', name: 'Lay\'s Chips', nameKm: 'ស្ករលីស', price: 0.75, barcode: '4800888116019', category: 'snacks', stock: 120, lowStockThreshold: 20 },
-  { id: '9', name: 'Oreo Cookies', nameKm: 'ខូគីអូរ៉េអូ', price: 1.50, barcode: '7622210449283', category: 'snacks', stock: 90, lowStockThreshold: 15 },
-  { id: '10', name: 'Pringles', nameKm: 'ប្រីងហ្គល', price: 2.25, barcode: '038000845260', category: 'snacks', stock: 8, lowStockThreshold: 10 },
-  { id: '11', name: 'Fresh Milk 1L', nameKm: 'ទឹកដោះគោ ១លីត្រ', price: 2.50, barcode: '4902201000039', category: 'dairy', stock: 5, lowStockThreshold: 10 },
-  { id: '12', name: 'Yogurt Strawberry', nameKm: 'យ៉ោហ្គឺ', price: 1.25, barcode: '3057640385775', category: 'dairy', stock: 45, lowStockThreshold: 10 },
-];
+import { ApiEndpointEnum } from '../../enums/api-endpoint-enum';
+import { Observable, of } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private _products = signal<Product[]>(MOCK_PRODUCTS);
-  private _categories = signal<Category[]>(MOCK_CATEGORIES);
+  private apiUrl = ApiEndpointEnum.PRODUCTS;
+  private categoriesApiUrl = ApiEndpointEnum.CATEGORIES;
+
+  private _products = signal<Product[]>([]);
+  private _categories = signal<Category[]>([]);
   private _searchQuery = signal<string>('');
   private _selectedCategory = signal<string>('all');
+  private _loading = signal<boolean>(true);
 
   products = this._products.asReadonly();
   categories = this._categories.asReadonly();
   searchQuery = this._searchQuery.asReadonly();
   selectedCategory = this._selectedCategory.asReadonly();
+  loading = this._loading.asReadonly();
 
   filteredProducts = computed(() => {
     let result = this._products();
@@ -56,6 +42,72 @@ export class ProductService {
     this._products().filter(p => p.stock <= (p.lowStockThreshold || 10))
   );
 
+  constructor(private http: HttpClient) {
+    this.loadProducts();
+    this.loadCategories();
+  }
+
+  private loadProducts(): void {
+    this._loading.set(true);
+    this.http.get<any>(this.apiUrl).pipe(
+      map(res => {
+        const rawProducts = res?.data ?? res ?? [];
+        return rawProducts.map((p: any) => this.mapApiProduct(p));
+      }),
+      tap(products => {
+        this._products.set(products);
+        this._loading.set(false);
+      }),
+      catchError(err => {
+        console.error('Failed to load products from API', err);
+        this._loading.set(false);
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  private loadCategories(): void {
+    this.http.get<any>(this.categoriesApiUrl).pipe(
+      map(res => {
+        const rawCategories = res?.data ?? res ?? [];
+        // Add "All" at the beginning
+        const allCategory: Category = { id: 'all', name: 'All', nameKm: 'ទាំងអស់' };
+        const mapped = rawCategories.map((c: any) => this.mapApiCategory(c));
+        return [allCategory, ...mapped];
+      }),
+      tap(categories => {
+        this._categories.set(categories);
+      }),
+      catchError(err => {
+        console.error('Failed to load categories from API', err);
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  private mapApiProduct(p: any): Product {
+    return {
+      id: String(p.id),
+      name: p.name,
+      nameKm: p.nameKh,
+      price: Number(p.price),
+      barcode: p.barcode,
+      category: String(p.categoryId), // Use category ID for filtering
+      stock: p.stock,
+      imgUrl: p.imgUrl,
+      lowStockThreshold: p.stock <= 10 ? 10 : undefined,
+      description: p.description,
+    };
+  }
+
+  private mapApiCategory(c: any): Category {
+    return {
+      id: String(c.id),
+      name: c.name,
+      nameKm: c.nameKh,
+    };
+  }
+
   setSearch(query: string): void { this._searchQuery.set(query); }
   setCategory(id: string): void { this._selectedCategory.set(id); }
 
@@ -63,7 +115,21 @@ export class ProductService {
     return this._products().find(p => p.barcode === barcode);
   }
 
+  refreshProducts(): void {
+    this.loadProducts();
+  }
+
+  refreshCategories(): void {
+    this.loadCategories();
+  }
+
+  refreshAll(): void {
+    this.loadProducts();
+    this.loadCategories();
+  }
+
   addProduct(product: Omit<Product, 'id'>): void {
+    // This is handled by the admin product service; but for local state
     const id = Date.now().toString();
     this._products.update(p => [...p, { ...product, id }]);
   }

@@ -21,7 +21,8 @@ export class AdminLayoutComponent {
     isCollapsed = signal(false);
 
     navItems: NavItem[] = [
-        { label: 'Sale', labelKm: 'លក់', route: '/sales', icon: 'sale' },
+        { label: 'POS Sale', labelKm: 'លក់', route: '/sales', icon: 'sale' },
+        { label: 'Sales History', labelKm: 'ប្រវត្តិលក់', route: '/sales-history', icon: 'history' },
         { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
         { label: 'Report', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
         { label: 'User', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },

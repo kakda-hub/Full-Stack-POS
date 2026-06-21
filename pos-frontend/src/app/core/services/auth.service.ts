@@ -26,6 +26,7 @@ export class AuthService {
               name: data.user.name,
               role: data.user.role as 'admin' | 'cashier',
               token: data.accessToken,
+              avatarUrl: data.user.avatarUrl,
             };
             this._currentUser.set(user);
             localStorage.setItem('pos_user', JSON.stringify(user));

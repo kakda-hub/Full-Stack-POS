@@ -58,6 +58,11 @@ const routes: Routes = [
         data: { breadcrumb: 'Permission', labelKh: 'ការអនុញ្ញាត' }
       },
       {
+        path: 'sales-history',
+        loadChildren: () => import('./features/sales-history/sales-history.module').then((m) => m.SalesHistoryModule),
+        data: { breadcrumb: 'Sales History', labelKh: 'ប្រវត្តិការលក់' }
+      },
+      {
         path: 'user-management',
         loadChildren: () => import('./features/user-management/user-management-module').then((m) => m.UserManagementModule),
         data: { breadcrumb: 'User Management', labelKh: 'ការគ្រប់គ្រងអ្នកប្រើប្រាស់' }

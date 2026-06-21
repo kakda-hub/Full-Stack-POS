@@ -1,10 +1,11 @@
-import { Component, Input, Self, Optional, OnInit, inject, DestroyRef, booleanAttribute } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Self, Optional, OnInit, inject, DestroyRef, booleanAttribute } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-input-field',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
 })

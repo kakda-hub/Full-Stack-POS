@@ -3,7 +3,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
   signal,
   computed,
@@ -39,7 +38,7 @@ export interface TableColumn {
   templateUrl: './dynamic-table.component.html',
   styleUrl: './dynamic-table.component.scss',
 })
-export class DynamicTableComponent implements OnChanges {
+export class DynamicTableComponent {
   /** Column definitions */
   @Input() columns: TableColumn[] = [];
 
@@ -77,8 +76,6 @@ export class DynamicTableComponent implements OnChanges {
     public theme: ThemeService,
     public lang: LanguageService,
   ) {}
-
-  ngOnChanges(): void {}
 
   rowNumber(index: number): number {
     return this.pageIndex * this.pageSize + index + 1;

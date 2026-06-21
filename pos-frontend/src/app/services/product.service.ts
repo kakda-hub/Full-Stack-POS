@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000/api/v1/products'; // Backend API URL
+  private apiUrl = ApiEndpointEnum.PRODUCTS;
 
   constructor(private http: HttpClient) { }
 
@@ -14,48 +16,44 @@ export class ProductService {
    * Get all products
    */
   getAllProducts(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any>(this.apiUrl).pipe(
+      map((res) => res?.data ?? res)
+    );
   }
 
   /**
    * Get product by ID
    */
   getProductById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map((res) => res?.data ?? res)
+    );
   }
 
   /**
    * Create a new product
    */
   createProduct(product: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, product);
+    return this.http.post<any>(this.apiUrl, product).pipe(
+      map((res) => res?.data ?? res)
+    );
   }
 
   /**
    * Update a product
    */
-  updateProduct(id: string, product: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, product);
+  updateProduct(id: number, product: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}`, product).pipe(
+      map((res) => res?.data ?? res)
+    );
   }
 
   /**
    * Delete a product
    */
   deleteProduct(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
-  }
-
-  /**
-   * Search products by name or barcode
-   */
-  searchProducts(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/search?query=${query}`);
-  }
-
-  /**
-   * Get low stock products
-   */
-  getLowStockProducts(threshold: number = 5): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/low-stock?threshold=${threshold}`);
+    return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
+      map((res) => res?.data ?? res)
+    );
   }
 }

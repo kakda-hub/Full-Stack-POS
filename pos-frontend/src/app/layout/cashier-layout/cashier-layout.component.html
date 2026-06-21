@@ -24,11 +24,17 @@
         <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
       </div>
       <span
-        class="font-bold text-lg"
+        class="font-bold text-lg flex items-center gap-2"
         [class.text-white]="theme.isDark()"
         [class.text-slate-800]="!theme.isDark()"
-        >KhmerPOS</span
-      >
+        >KhmerPOS
+        @if (cart.itemCount() > 0) {
+          <span
+            class="cart-count-badge"
+            [@counterAnimation]="cart.itemCount()"
+          >{{ cart.itemCount() }}</span>
+        }
+      </span>
     </div>
     <div class="flex items-center gap-3">
       <!-- Dark Mode Toggle -->
@@ -98,7 +104,7 @@
           [class.text-indigo-700]="!theme.isDark()"
         >
           <!-- {{ auth.currentUser()?.name?.charAt(0) }} -->
-          <img class="w-full h-full object-cover" [src]="auth.currentUser()?.profile" alt="" />
+          <img class="w-full h-full object-cover" [src]="auth.currentUser()?.avatarUrl" onerror="this.src='https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'" alt="" />
         </div>
         <span class="hidden sm:inline font-medium">{{ auth.currentUser()?.name }}</span>
       </div>

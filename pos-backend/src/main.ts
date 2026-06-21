@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -38,6 +39,16 @@ async function bootstrap() {
 
   // ─── Global Interceptors ────────────────────────────────────────────────────
   app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // ─── Swagger Documentation ──────────────────────────────────────────────────
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('POS API')
+    .setDescription('The POS system API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
 
   // ─── Start ──────────────────────────────────────────────────────────────────
   const port = configService.get<number>('PORT', 3000);

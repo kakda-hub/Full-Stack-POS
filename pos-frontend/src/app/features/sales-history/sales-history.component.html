@@ -1,0 +1,470 @@
+<div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <app-breadcrumb></app-breadcrumb>
+    <div class="flex items-center gap-2">
+      <app-ui-button [variant]="'secondary'" [size]="'sm'" (click)="refresh()" type="button">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="ml-1">{{ lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh' }}</span>
+      </app-ui-button>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="relative max-w-md">
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <input
+      type="text"
+      [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកតាមឈ្មោះអ្នកគិតប្រាក់ ឬលេខ ID...' : 'Search by cashier name or sale ID...'"
+      [value]="searchQuery()"
+      (input)="onSearch($event)"
+      class="w-full pl-9 pr-8 py-2 rounded-lg border text-sm transition-colors"
+      [class.bg-slate-700]="theme.isDark()"
+      [class.border-slate-600]="theme.isDark()"
+      [class.text-slate-200]="theme.isDark()"
+      [class.placeholder-slate-400]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      [class.text-slate-700]="!theme.isDark()"
+      [class.placeholder-slate-400]="!theme.isDark()"
+    />
+    <!-- Clear button -->
+    <button
+      *ngIf="searchQuery()"
+      (click)="clearSearch()"
+      class="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+      [class.hover:bg-slate-600]="theme.isDark()"
+      [class.hover:bg-slate-100]="!theme.isDark()"
+      type="button"
+      [attr.aria-label]="lang.currentLang() === 'km' ? 'សម្អាតការស្វែងរក' : 'Clear search'"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
+    <!-- Quick Filters -->
+    <div class="flex gap-1.5 flex-wrap">
+      <button
+        *ngFor="let f of quickFilters"
+        (click)="setQuickFilter(f.key)"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+        [class.bg-indigo-600]="activeQuickFilter() === f.key"
+        [class.text-white]="activeQuickFilter() === f.key"
+        [class.shadow-sm]="activeQuickFilter() === f.key"
+        [class.bg-slate-100]="activeQuickFilter() !== f.key && !theme.isDark()"
+        [class.hover:bg-slate-200]="activeQuickFilter() !== f.key && !theme.isDark()"
+        [class.text-slate-600]="activeQuickFilter() !== f.key && !theme.isDark()"
+        [class.bg-slate-700]="activeQuickFilter() !== f.key && theme.isDark()"
+        [class.hover:bg-slate-600]="activeQuickFilter() !== f.key && theme.isDark()"
+        [class.text-slate-300]="activeQuickFilter() !== f.key && theme.isDark()"
+        type="button"
+      >
+        {{ lang.currentLang() === 'km' ? f.labelKm : f.label }}
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <!-- From date -->
+      <div class="relative">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <input
+          type="date"
+          [value]="dateFrom()"
+          (change)="onDateChange($event, 'from')"
+          class="pl-8 pr-3 py-1.5 rounded-lg border text-xs font-medium transition-colors"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.border-slate-600]="theme.isDark()"
+          [class.text-slate-200]="theme.isDark()"
+          [class.bg-white]="!theme.isDark()"
+          [class.border-slate-200]="!theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+        />
+      </div>
+      <span class="text-xs text-slate-400">{{ lang.currentLang() === 'km' ? 'ទៅ' : 'to' }}</span>
+      <!-- To date -->
+      <div class="relative">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <input
+          type="date"
+          [value]="dateTo()"
+          (change)="onDateChange($event, 'to')"
+          [min]="dateFrom() || undefined"
+          class="pl-8 pr-3 py-1.5 rounded-lg border text-xs font-medium transition-colors"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.border-slate-600]="theme.isDark()"
+          [class.text-slate-200]="theme.isDark()"
+          [class.bg-white]="!theme.isDark()"
+          [class.border-slate-200]="!theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+        />
+      </div>
+      <!-- Clear filter -->
+      <button
+        *ngIf="dateFrom() || dateTo()"
+        (click)="setQuickFilter('all')"
+        class="px-2 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 transition-colors"
+        [class.hover:bg-rose-900/20]="theme.isDark()"
+        [class.hover:bg-rose-50]="!theme.isDark()"
+        type="button"
+      >
+        {{ lang.currentLang() === 'km' ? 'សម្អាត' : 'Clear' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center">
+    <svg class="w-12 h-12 mx-auto text-rose-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <p class="text-rose-700 font-semibold">{{ error() }}</p>
+    <button (click)="refresh()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-700 font-semibold underline">
+      {{ lang.currentLang() === 'km' ? 'ព្យាយាមម្តងទៀត' : 'Try again' }}
+    </button>
+  </div>
+
+  <!-- KPI Skeletons -->
+  <div *ngIf="isLoading() && !error()" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+    <app-skeleton *ngFor="let i of [1,2,3,4]" variant="kpi-card"></app-skeleton>
+  </div>
+
+  <!-- KPI Cards -->
+  <div *ngIf="!isLoading() && !error()" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-black text-slate-900">{{ sales().length }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការសរុប' : 'Total Transactions' }}</p>
+    </div>
+
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-black text-slate-900">${{ totalRevenue().toFixed(2) }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">{{ lang.currentLang() === 'km' ? 'ចំណូលសរុប' : 'Total Revenue' }}</p>
+    </div>
+
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-black text-slate-900">{{ uniqueCashiers().length }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</p>
+    </div>
+
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-black text-slate-900">${{ averageOrderValue().toFixed(2) }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">{{ lang.currentLang() === 'km' ? 'មធ្យមក្នុងមួយប្រតិបត្តិការ' : 'Avg Order Value' }}</p>
+    </div>
+  </div>
+
+  <!-- Skeleton Table -->
+  <div *ngIf="isLoading() && !error()">
+    <div class="rounded-2xl border p-5" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()">
+      <app-skeleton variant="text" width="200px" height="20px" class="block mb-4"></app-skeleton>
+      <div *ngFor="let i of [1,2,3,4,5]" class="mb-3">
+        <app-skeleton variant="list-item"></app-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sales Table -->
+  <div *ngIf="!isLoading() && !error()" @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border shadow-sm overflow-hidden">
+    <div [class.border-slate-100]="!theme.isDark()" [class.border-slate-700]="theme.isDark()" class="px-5 py-4 border-b flex items-center justify-between">
+      <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-200]="theme.isDark()">
+        {{ lang.currentLang() === 'km' ? 'ប្រវត្តិការលក់' : 'Sales History' }}
+      </h2>
+      <span class="text-sm text-slate-400">
+        {{ filteredSales().length }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'records' }}{{ filteredSales().length !== sales().length ? ' / ' + sales().length + ' total' : '' }}
+      </span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr [class.bg-slate-50]="!theme.isDark()" [class.bg-slate-700/50]="theme.isDark()" [class.border-slate-100]="!theme.isDark()" [class.border-slate-700]="theme.isDark()" class="border-b">
+            <th class="px-4 py-3 text-left font-semibold" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">#</th>
+            <th class="px-4 py-3 text-left font-semibold" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}</th>
+            <th class="px-4 py-3 text-left font-semibold" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</th>
+            <th class="px-4 py-3 text-left font-semibold hidden md:table-cell" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
+            <th class="px-4 py-3 text-left font-semibold" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
+            <th class="px-4 py-3 text-right font-semibold" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y" [class.divide-slate-100]="!theme.isDark()" [class.divide-slate-700/50]="theme.isDark()">
+          <tr *ngFor="let sale of paginatedSales; trackBy: trackById" @fadeIn
+            (click)="openDetail(sale)"
+            [class.hover:bg-slate-50]="!theme.isDark()"
+            [class.hover:bg-slate-700/30]="theme.isDark()"
+            class="transition-colors cursor-pointer"
+            [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
+          >
+            <td class="px-4 py-3 font-mono text-xs" [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">#{{ sale.id }}</td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col">
+                <span class="font-medium" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ sale.date | date:'dd/MM/yyyy' }}</span>
+                <span class="text-xs" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">{{ sale.date | date:'HH:mm' }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <span class="font-medium" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ sale.cashierName }}</span>
+            </td>
+            <td class="px-4 py-3 hidden md:table-cell">
+              <div class="flex flex-col">
+                <span class="text-xs font-medium" [class.text-slate-600]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ sale.itemsList }}</span>
+                <span class="text-xs mt-0.5" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-lg capitalize inline-flex items-center gap-1 ' + getPaymentBadge(sale.paymentMethod)">
+                <span>{{ getPaymentIcon(sale.paymentMethod) }}</span>
+                <span>{{ sale.paymentMethod }}</span>
+              </span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <span class="font-bold text-indigo-600">${{ sale.total.toFixed(2) }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredSales().length === 0">
+            <td colspan="6" class="px-4 py-12 text-center" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+              <svg class="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+              </svg>
+              <p class="text-sm font-medium">{{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="filteredSales().length > pageSize" [class.border-slate-100]="!theme.isDark()" [class.border-slate-700]="theme.isDark()" class="px-5 py-3 border-t flex items-center justify-between">
+      <span class="text-xs" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+        {{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }} {{ currentPage() }}/{{ totalPages }}
+      </span>
+      <div class="flex gap-2">
+        <button
+          (click)="onPageChange(currentPage() - 1)"
+          [disabled]="currentPage() <= 1"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40"
+          [class.bg-slate-100]="!theme.isDark()"
+          [class.hover:bg-slate-200]="!theme.isDark()"
+          [class.text-slate-600]="!theme.isDark()"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.hover:bg-slate-600]="theme.isDark()"
+          [class.text-slate-300]="theme.isDark()"
+          type="button"
+        >
+          {{ lang.currentLang() === 'km' ? 'មុន' : 'Prev' }}
+        </button>
+        <button
+          (click)="onPageChange(currentPage() + 1)"
+          [disabled]="currentPage() >= totalPages"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40"
+          [class.bg-slate-100]="!theme.isDark()"
+          [class.hover:bg-slate-200]="!theme.isDark()"
+          [class.text-slate-600]="!theme.isDark()"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.hover:bg-slate-600]="theme.isDark()"
+          [class.text-slate-300]="theme.isDark()"
+          type="button"
+        >
+          {{ lang.currentLang() === 'km' ? 'បន្ទាប់' : 'Next' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sale Detail Modal -->
+<div *ngIf="selectedSale()" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    @backdropAnimation
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+    (click)="closeDetail()"
+  ></div>
+  <div
+    @modalAnimation
+    [class.bg-slate-800]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    class="relative rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
+  >
+    <!-- Modal Header -->
+    <div
+      [class.border-slate-700]="theme.isDark()"
+      [class.border-slate-100]="!theme.isDark()"
+      class="px-6 py-4 border-b flex items-center justify-between sticky top-0 z-10"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+    >
+      <h2 class="text-lg font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-200]="theme.isDark()">
+        {{ lang.currentLang() === 'km' ? 'ព័ត៌មានលម្អិត' : 'Sale Details' }} #{{ selectedSale()?.id }}
+      </h2>
+      <button
+        (click)="closeDetail()"
+        class="p-1.5 rounded-lg transition-colors text-slate-400"
+        [class.hover:bg-slate-100]="!theme.isDark()"
+        [class.hover:bg-slate-700]="theme.isDark()"
+        [attr.aria-label]="lang.currentLang() === 'km' ? 'បិទ' : 'Close'"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <!-- Sale Info -->
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+            {{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}
+          </span>
+          <p class="font-bold mt-0.5" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
+            {{ selectedSale()?.date | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+            {{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}
+          </span>
+          <p class="font-bold mt-0.5" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
+            {{ selectedSale()?.cashierName }}
+          </p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+            {{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}
+          </span>
+          <p class="mt-0.5">
+            <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-lg capitalize inline-flex items-center gap-1 ' + getPaymentBadge(selectedSale()?.paymentMethod || '')">
+              <span>{{ getPaymentIcon(selectedSale()?.paymentMethod || '') }}</span>
+              <span>{{ selectedSale()?.paymentMethod }}</span>
+            </span>
+          </p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+            {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}
+          </span>
+          <p class="font-bold mt-0.5" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
+            {{ selectedSale()?.items?.length || 0 }} {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'item(s)' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div>
+        <h3 class="font-bold text-sm mb-3" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
+          {{ lang.currentLang() === 'km' ? 'បញ្ជីទំនិញ' : 'Order Items' }}
+        </h3>
+        <div class="overflow-hidden rounded-xl border" [class.border-slate-200]="!theme.isDark()" [class.border-slate-700]="theme.isDark()">
+          <table class="w-full text-sm">
+            <thead>
+              <tr [class.bg-slate-50]="!theme.isDark()" [class.bg-slate-700/50]="theme.isDark()">
+                <th class="px-3 py-2 text-left font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">#</th>
+                <th class="px-3 py-2 text-left font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Product' }}</th>
+                <th class="px-3 py-2 text-center font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'បរិមាណ' : 'Qty' }}</th>
+                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price' }}</th>
+                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" [class.divide-slate-100]="!theme.isDark()" [class.divide-slate-700/50]="theme.isDark()">
+              <tr *ngFor="let item of selectedSale()?.items || []; let i = index"
+                [class.hover:bg-slate-50]="!theme.isDark()"
+                [class.hover:bg-slate-700/30]="theme.isDark()"
+                class="transition-colors"
+              >
+                <td class="px-3 py-2 text-xs" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">{{ i + 1 }}</td>
+                <td class="px-3 py-2 font-medium" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ item.productName }}</td>
+                <td class="px-3 py-2 text-center" [class.text-slate-600]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ item.quantity }}</td>
+                <td class="px-3 py-2 text-right" [class.text-slate-600]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">${{ item.unitPrice.toFixed(2) }}</td>
+                <td class="px-3 py-2 text-right font-semibold text-indigo-600">${{ item.lineTotal.toFixed(2) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div [class.bg-slate-50]="!theme.isDark()" [class.bg-slate-700/50]="theme.isDark()" class="rounded-xl p-4 space-y-2">
+        <div class="flex justify-between text-sm">
+          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុបរង' : 'Subtotal' }}</span>
+          <span class="font-semibold" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">${{ selectedSale()?.subtotal?.toFixed(2) }}</span>
+        </div>
+        <div *ngIf="selectedSale()?.discount" class="flex justify-between text-sm">
+          <span class="text-emerald-600">{{ lang.currentLang() === 'km' ? 'បញ្ចុះតម្លៃ' : 'Discount' }}</span>
+          <span class="font-semibold text-emerald-600">-${{ selectedSale()?.discount?.toFixed(2) }}</span>
+        </div>
+        <div *ngIf="selectedSale()?.tax" class="flex justify-between text-sm">
+          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ពន្ធ' : 'Tax' }}</span>
+          <span class="font-semibold" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">${{ selectedSale()?.tax?.toFixed(2) }}</span>
+        </div>
+        <div class="flex justify-between text-base pt-2 border-t" [class.border-slate-200]="!theme.isDark()" [class.border-slate-600]="theme.isDark()">
+          <span class="font-black" [class.text-slate-800]="!theme.isDark()" [class.text-slate-200]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+          <span class="font-black text-indigo-600">${{ selectedSale()?.total?.toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          (click)="printReceipt()"
+          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
+          type="button"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          {{ lang.currentLang() === 'km' ? 'បោះពុម្ព' : 'Print Receipt' }}
+        </button>
+        <button
+          (click)="closeDetail()"
+          [class.bg-slate-100]="!theme.isDark()"
+          [class.hover:bg-slate-200]="!theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.hover:bg-slate-600]="theme.isDark()"
+          [class.text-slate-300]="theme.isDark()"
+          class="flex-1 py-3 rounded-xl font-bold transition-colors text-sm"
+          type="button"
+        >
+          {{ lang.currentLang() === 'km' ? 'បិទ' : 'Close' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

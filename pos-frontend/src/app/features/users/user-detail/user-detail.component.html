@@ -1,15 +1,30 @@
-<form [formGroup]="form">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail [id]="id"></app-header-detail>
 
   <mat-dialog-content>
     <div class="flex flex-col gap-4 w-full">
+
+      <!-- Avatar Upload -->
+      <div class="flex flex-col items-center gap-2">
+        <div class="relative group cursor-pointer" (click)="avatarInput.click()">
+          <img
+            [src]="currentAvatar"
+            class="w-24 h-24 rounded-full object-cover border-4 border-indigo-100 shadow-md"
+            alt="Avatar"
+          />
+          <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <mat-icon class="text-white" style="font-size:28px;width:28px;height:28px;">camera_alt</mat-icon>
+          </div>
+        </div>
+        <span class="text-xs text-slate-400">{{ 'label.clickToChangeAvatar' | translate }}</span>
+        <input #avatarInput type="file" accept="image/*" class="hidden" (change)="onAvatarSelected($event)" />
+      </div>
+
       <app-input-field
-        formControlName="username"
-        [placeholder]="'label.username' | translate"
+        formControlName="name"
+        [placeholder]="'label.name' | translate"
         [isRequired]="true"
       >
-      </app-input-field>
-      <app-input-field formControlName="phone" [placeholder]="'label.phone' | translate" [isRequired]="true">
       </app-input-field>
 
       <mat-form-field appearance="outline" class="form-field-outline" subscriptSizing="dynamic">
@@ -34,10 +49,6 @@
       >
       </app-input-field>
 
-      <app-textarea
-        formControlName="description"
-        [placeholder]="'label.description' | translate"
-      ></app-textarea>
     </div>
   </mat-dialog-content>
 
@@ -46,3 +57,4 @@
     <app-ui-button [variant]="'primary'" [shape]="'outline'" [size]="'md'" type="submit">{{'button.save' | translate}}</app-ui-button>
   </mat-dialog-actions>
 </form>
+

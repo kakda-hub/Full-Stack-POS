@@ -36,7 +36,7 @@ export class Product {
   @Column({ name: "category_id" })
   categoryId: number;
 
-  @Column({ name: "description" })
+  @Column({ name: "description", nullable: true })
   description: string;
 
   @ManyToOne(() => Category, (category) => category.products, {

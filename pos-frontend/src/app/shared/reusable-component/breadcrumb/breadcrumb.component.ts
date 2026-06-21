@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, startWith } from 'rxjs/operators';
 import { LanguageService } from '../../../core/services/language.service';
@@ -12,6 +12,7 @@ interface Breadcrumb {
 @Component({
   selector: 'app-breadcrumb',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.scss',
 })

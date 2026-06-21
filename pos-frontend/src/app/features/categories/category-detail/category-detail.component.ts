@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { CategoriesService } from '../../../services/categories.service';
@@ -14,29 +15,31 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './category-detail.component.html',
 })
 export class CategoryDetailComponent implements OnInit {
-  @Input() category: any | null = null;
-  @Output() save = new EventEmitter<any>();
-  @Output() cancel = new EventEmitter<void>();
-
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
-  id: number | undefined;
+
+  get id(): number | undefined {
+    return this.data?.category?.id;
+  }
 
   constructor(
     private fb: FormBuilder,
     public lang: LanguageService,
     private categoriesService: CategoriesService,
     public theme: ThemeService,
-    private http: HttpClient
+    private http: HttpClient,
+    private dialogRef: MatDialogRef<CategoryDetailComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { category?: any } | null,
   ) { }
 
   ngOnInit(): void {
+    const category = this.data?.category || null;
     this.form = this.fb.group({
-      name: [this.category?.name || '', [Validators.required]],
-      nameKh: [this.category?.nameKh || this.category?.nameKm || ''],
-      description: [this.category?.description || ''],
-      imgUrl: [this.category?.imgUrl || this.category?.icon || ''],
+      name: [category?.name || '', [Validators.required]],
+      nameKh: [category?.nameKh || category?.nameKm || ''],
+      description: [category?.description || ''],
+      imgUrl: [category?.imgUrl || category?.icon || ''],
     });
   }
 
@@ -71,30 +74,22 @@ export class CategoryDetailComponent implements OnInit {
     this.isSaving.set(true);
     const payload = this.form.value;
 
-    if (this.category?.id) {
-      this.categoriesService.update(this.category.id, payload).subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.save.emit(res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.isSaving.set(false);
-          this.save.emit(payload); // emit anyway to close modal for demo
-        }
-      });
-    } else {
-      this.categoriesService.save(payload).subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.save.emit(res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.isSaving.set(false);
-          this.save.emit(payload); // emit anyway to close modal for demo
-        }
-      });
-    }
+    const category = this.data?.category || null;
+    const id = category?.id;
+
+    const request$ = id
+      ? this.categoriesService.update(id, payload)
+      : this.categoriesService.save(payload);
+
+    request$.subscribe({
+      next: (res) => {
+        this.isSaving.set(false);
+        this.dialogRef.close(res);
+      },
+      error: (err) => {
+        console.error('Failed to save category', err);
+        this.isSaving.set(false);
+      },
+    });
   }
 }

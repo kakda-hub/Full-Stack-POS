@@ -4,7 +4,7 @@ export interface User {
   name: string;
   role: 'admin' | 'cashier';
   token?: string;
-  profile?: string;
+  avatarUrl?: string;
 }
 
 export interface Product {

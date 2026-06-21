@@ -15,11 +15,13 @@ import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.
 import { DateFormatPipe } from './pipes/date-format-pipe';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
     UiButtonComponent,
     ModalComponent,
+    ConfirmDialogComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,
@@ -45,6 +47,7 @@ import { ModalComponent } from './components/modal/modal.component';
     RouterModule,
     UiButtonComponent,
     ModalComponent,
+    ConfirmDialogComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,

@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, forwardRef, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, forwardRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-textarea',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './textarea.component.html',
   styleUrl: './textarea.component.scss',
   providers: [
