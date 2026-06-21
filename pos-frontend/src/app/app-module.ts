@@ -10,13 +10,14 @@ import { SharedModule } from './shared/shared.module';
 import { LayoutModule } from './layout/layout.module';
 import { AppRoutingModule } from './app-routing-module';
 import { AuthInterceptor } from './core/Interceptor/auth.interceptor';
+import { CloudinaryFileUploadListComponent } from './features/cloudinary-file-upload/cloudinary-file-upload-list/cloudinary-file-upload-list.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
 }
 
 @NgModule({
-  declarations: [App],
+  declarations: [App, ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -33,9 +34,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       defaultLanguage: 'en',
     }),
   ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
-  ],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [App],
 })
-export class AppModule { }
+export class AppModule {}

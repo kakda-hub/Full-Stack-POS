@@ -6,7 +6,7 @@
 //     return cloudinary.config({
 //       cloud_name: 'djltk2q3n',
 //       api_key: '672462659274597',
-//       api_secret: 'WVTkBmRHVkoWrxnL0E6Ie8L0lU8',
+//       api_secret: 'WVTkBmRHVkoWrxnf1MYn6B-JNyA',
 //     });
 //   },
 // };
@@ -20,7 +20,7 @@ export const CloudinaryProvider = {
     cloudinary.config({
       cloud_name: 'djltk2q3n',
       api_key: '672462659274597',
-      api_secret: 'WVTkBmRHVkoWrxnL0E6Ie8L0lU8',
+      api_secret: 'WVTkBmRHVkoWrxnf1MYn6B-JNyA',
     });
     return cloudinary;
   },

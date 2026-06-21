@@ -3,11 +3,13 @@ import {
   Post,
   Get,
   Put,
+  Delete,
   Param,
   Body,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCloudinaryService } from './upload-cloudinary.service';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 
@@ -29,7 +31,19 @@ export class UploadCloudinaryController {
       },
     },
   })
-
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('folder') folder?: string
+  ) {
+    const result = await this.cloudinaryService.uploadImage(file, folder);
+    return {
+      success: true,
+      statusCode: 201,
+      message: 'File uploaded successfully',
+      data: result
+    };
+  }
 
   @Get()
   @ApiOperation({ summary: 'List recent Cloudinary resources' })
@@ -73,6 +87,18 @@ export class UploadCloudinaryController {
       success: true,
       statusCode: 200,
       message: "Resource renamed successfully",
+      data: result,
+    };
+  }
+
+  @Delete(':publicId')
+  @ApiOperation({ summary: 'Delete a Cloudinary resource by public ID' })
+  async delete(@Param('publicId') publicId: string) {
+    const result = await this.cloudinaryService.deleteResource(publicId);
+    return {
+      success: true,
+      statusCode: 200,
+      message: "Resource deleted successfully",
       data: result,
     };
   }

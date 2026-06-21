@@ -1,0 +1,215 @@
+<div class="flex flex-col h-full bg-slate-50 font-['Inter']">
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Cloudinary Files</h1>
+      <p class="text-sm text-slate-500 mt-1">Manage and view your uploaded media assets.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button 
+        (click)="loadResources()"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-medium text-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Refresh
+      </button>
+      <button 
+        (click)="toggleUploadPanel()"
+        [class]="showUploadPanel 
+          ? 'flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium text-sm' 
+          : 'flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200 font-medium text-sm'"
+      >
+        <svg *ngIf="!showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+        <svg *ngIf="showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        {{ showUploadPanel ? 'Close' : 'Upload File' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Panel -->
+  <div *ngIf="showUploadPanel" class="bg-white border-b border-slate-200 px-6 py-6">
+    <div class="max-w-2xl mx-auto">
+      <!-- Hidden file input -->
+      <input 
+        type="file" 
+        #fileInput 
+        (change)="onFileSelected($event)" 
+        class="hidden" 
+        accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+      >
+
+      <!-- Drag & Drop Zone -->
+      <div 
+        *ngIf="!selectedFile"
+        (dragover)="onDragOver($event)" 
+        (dragleave)="onDragLeave($event)" 
+        (drop)="onDrop($event)"
+        (click)="triggerFileInput()"
+        class="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200"
+        [class.border-indigo-400]="isDragOver"
+        [class.bg-indigo-50]="isDragOver"
+        [class.border-slate-300]="!isDragOver"
+        [class.hover:border-indigo-300]="!isDragOver"
+        [class.hover:bg-slate-50]="!isDragOver"
+      >
+        <div class="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+        </div>
+        <p class="text-base font-semibold text-slate-700">
+          {{ isDragOver ? 'Drop your file here' : 'Drag & drop a file here' }}
+        </p>
+        <p class="text-sm text-slate-400 mt-1">or <span class="text-indigo-600 font-medium">browse from your computer</span></p>
+        <p class="text-xs text-slate-400 mt-3">Supports: Images, PDF, Word, Excel</p>
+      </div>
+
+      <!-- File Preview -->
+      <div *ngIf="selectedFile" class="border border-slate-200 rounded-2xl p-6 bg-slate-50">
+        <div class="flex items-start gap-5">
+          <!-- Preview Thumbnail -->
+          <div class="w-20 h-20 rounded-xl overflow-hidden bg-white border border-slate-200 flex items-center justify-center shrink-0">
+            <img *ngIf="selectedFilePreview" [src]="selectedFilePreview" alt="preview" class="w-full h-full object-cover">
+            <svg *ngIf="!selectedFilePreview" class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          </div>
+
+          <!-- File Info -->
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-semibold text-slate-800 truncate">{{ selectedFile.name }}</h4>
+            <p class="text-xs text-slate-500 mt-1">{{ formatBytes(selectedFile.size) }} · {{ selectedFile.type || 'Unknown type' }}</p>
+            
+            <!-- Folder Input -->
+            <div class="mt-3 flex items-center gap-2">
+              <label class="text-xs font-medium text-slate-600">Folder:</label>
+              <input 
+                type="text" 
+                [(ngModel)]="uploadFolder"
+                class="text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none w-40"
+                placeholder="pos-general"
+              >
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button 
+              (click)="resetUploadState()"
+              [disabled]="uploading"
+              class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
+            >
+              Remove
+            </button>
+            <button 
+              (click)="uploadFile()"
+              [disabled]="uploading"
+              class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            >
+              <div *ngIf="uploading" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              {{ uploading ? 'Uploading...' : 'Upload' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Success -->
+      <div *ngIf="uploadSuccess" class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-600 text-sm flex items-center gap-3">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        <span>{{ uploadSuccess }}</span>
+      </div>
+
+      <!-- Upload Error -->
+      <div *ngIf="uploadError" class="mt-4 bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-600 text-sm flex items-center gap-3">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>{{ uploadError }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="flex-1 p-6 overflow-auto">
+    
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+    </div>
+
+    <div *ngIf="error && !loading" class="bg-rose-50 text-rose-600 p-4 rounded-xl border border-rose-200 flex items-center gap-3">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <table mat-table [dataSource]="resources" class="w-full">
+        <!-- Preview Column -->
+        <ng-container matColumnDef="preview">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Preview </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-3 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+              <img *ngIf="element.resource_type === 'image'" [src]="element.secure_url" alt="preview" class="w-full h-full object-cover">
+              <svg *ngIf="element.resource_type !== 'image'" class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Public ID Column -->
+        <ng-container matColumnDef="public_id">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Public ID </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 font-medium text-slate-700"> 
+            {{element.public_id}} 
+          </td>
+        </ng-container>
+
+        <!-- Format Column -->
+        <ng-container matColumnDef="format">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Format </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100">
+            <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-md border border-slate-200 uppercase tracking-wider">
+              {{element.format}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Size Column -->
+        <ng-container matColumnDef="bytes">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Size </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 text-slate-600"> 
+            {{formatBytes(element.bytes)}} 
+          </td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Uploaded At </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 text-slate-500 text-sm"> 
+            {{element.created_at | date:'medium'}} 
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Actions </th>
+          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100">
+            <button
+              (click)="deleteResource(element)"
+              [disabled]="deleting"
+              class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rose-600 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 hover:border-rose-300 transition-colors disabled:opacity-50"
+              matTooltip="Delete this resource"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              Delete
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50/50 transition-colors"></tr>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="resources.length === 0" class="p-12 text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+          <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-800">No files found</h3>
+        <p class="text-slate-500 mt-1 max-w-sm mx-auto">You haven't uploaded any files to Cloudinary yet. Upload a file to see it listed here.</p>
+      </div>
+    </div>
+  </div>
+</div>
