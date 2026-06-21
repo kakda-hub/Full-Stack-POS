@@ -39,14 +39,12 @@ export const databaseConfig = (): TypeOrmModuleOptions => ({
   type: 'mysql',
   autoLoadEntities: true,
 
-  // FIX
-  host: process.env.DB_HOST || 'db',
+  host: process.env.DB_HOST || 'localhost',
 
   port: parseInt(process.env.DB_PORT, 10) || 3306,
   username: process.env.DB_USER || 'root',
 
-  // FIX
-  password: process.env.DB_PASSWORD || '',
+  password: process.env.DB_PASSWORD || 'rootpassword',
 
   database: process.env.DB_NAME || 'pos_db',
 

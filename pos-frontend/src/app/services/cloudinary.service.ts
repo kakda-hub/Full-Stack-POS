@@ -21,8 +21,16 @@ export interface CloudinaryApiResponse {
   success: boolean;
   statusCode: number;
   data: {
-    resources: CloudinaryResource[];
+    success: boolean;
+    statusCode: number;
+    data: {
+      resources: CloudinaryResource[];
+      rate_limit_allowed?: number;
+      rate_limit_reset_at?: string;
+      rate_limit_remaining?: number;
+    };
   };
+  timestamp?: string;
 }
 
 @Injectable({

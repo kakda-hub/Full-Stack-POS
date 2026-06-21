@@ -1,214 +1,744 @@
-<div class="flex flex-col h-full bg-slate-50 font-['Inter']">
+<div @pageTransition class="flex flex-col h-full"
+  [class.bg-slate-900]="theme.isDark()"
+  [class.bg-slate-50]="!theme.isDark()"
+>
   <!-- Header -->
-  <div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b"
+    [class.bg-slate-800]="theme.isDark()"
+    [class.border-slate-700]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+  >
     <div>
-      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Cloudinary Files</h1>
-      <p class="text-sm text-slate-500 mt-1">Manage and view your uploaded media assets.</p>
+      <h1 class="text-2xl font-bold tracking-tight"
+        [class.text-slate-100]="theme.isDark()"
+        [class.text-slate-800]="!theme.isDark()"
+      >{{ lang.currentLang() === 'km' ? 'ឯកសារ Cloudinary' : 'Cloudinary Files' }}</h1>
+      <p class="text-sm mt-1"
+        [class.text-slate-400]="theme.isDark()"
+        [class.text-slate-500]="!theme.isDark()"
+      >{{ lang.currentLang() === 'km' ? 'គ្រប់គ្រង និងមើលឯកសារប្រព័ន្ធផ្សព្វផ្សាយដែលបានផ្ទុកឡើង។' : 'Manage and view your uploaded media assets.' }}</p>
     </div>
     <div class="flex items-center gap-3">
-      <button 
+      <!-- Refresh -->
+      <button
         (click)="loadResources()"
-        class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-medium text-sm"
+        [disabled]="loading"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium text-sm disabled:opacity-50 border"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.hover:bg-slate-600]="theme.isDark()"
+        [class.text-slate-200]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.hover:bg-slate-50]="!theme.isDark()"
+        [class.text-slate-700]="!theme.isDark()"
+        [class.border-slate-300]="!theme.isDark()"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-        Refresh
+        <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        {{ lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh' }}
       </button>
-      <button 
+      <!-- Upload Toggle -->
+      <button
         (click)="toggleUploadPanel()"
-        [class]="showUploadPanel 
-          ? 'flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium text-sm' 
-          : 'flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200 font-medium text-sm'"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium text-sm"
+        [class.bg-slate-600]="showUploadPanel && theme.isDark()"
+        [class.hover:bg-slate-500]="showUploadPanel && theme.isDark()"
+        [class.bg-slate-700]="!showUploadPanel && theme.isDark()"
+        [class.hover:bg-slate-600]="!showUploadPanel && theme.isDark()"
+        [class.text-white]="theme.isDark()"
+        [class.bg-slate-600]="showUploadPanel && !theme.isDark()"
+        [class.hover:bg-slate-700]="showUploadPanel && !theme.isDark()"
+        [class.bg-indigo-600]="!showUploadPanel && !theme.isDark()"
+        [class.hover:bg-indigo-700]="!showUploadPanel && !theme.isDark()"
+        [class.text-white]="!theme.isDark()"
       >
-        <svg *ngIf="!showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-        <svg *ngIf="showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        {{ showUploadPanel ? 'Close' : 'Upload File' }}
+        <svg *ngIf="!showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        <svg *ngIf="showUploadPanel" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        {{ lang.currentLang() === 'km' ? (showUploadPanel ? 'បិទ' : 'ផ្ទុកឯកសារ') : (showUploadPanel ? 'Close' : 'Upload File') }}
       </button>
     </div>
   </div>
 
   <!-- Upload Panel -->
-  <div *ngIf="showUploadPanel" class="bg-white border-b border-slate-200 px-6 py-6">
+  <div *ngIf="showUploadPanel" @fadeIn
+    [class.bg-slate-800]="theme.isDark()"
+    [class.border-slate-700]="theme.isDark()"
+    [class.bg-white]="!theme.isDark()"
+    [class.border-slate-200]="!theme.isDark()"
+    class="border-b px-6 py-6"
+  >
     <div class="max-w-2xl mx-auto">
-      <!-- Hidden file input -->
-      <input 
-        type="file" 
-        #fileInput 
-        (change)="onFileSelected($event)" 
-        class="hidden" 
-        accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
-      >
+      <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+        [attr.aria-label]="lang.currentLang() === 'km' ? 'ជ្រើសរើសឯកសារ' : 'Choose file'">
 
       <!-- Drag & Drop Zone -->
-      <div 
+      <div
         *ngIf="!selectedFile"
-        (dragover)="onDragOver($event)" 
-        (dragleave)="onDragLeave($event)" 
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
         (drop)="onDrop($event)"
         (click)="triggerFileInput()"
-        class="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200"
+        class="border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-200"
         [class.border-indigo-400]="isDragOver"
-        [class.bg-indigo-50]="isDragOver"
-        [class.border-slate-300]="!isDragOver"
-        [class.hover:border-indigo-300]="!isDragOver"
-        [class.hover:bg-slate-50]="!isDragOver"
+        [class.bg-indigo-500/10]="isDragOver && theme.isDark()"
+        [class.bg-indigo-50]="isDragOver && !theme.isDark()"
+        [class.border-slate-600]="!isDragOver && theme.isDark()"
+        [class.hover:border-indigo-400]="!isDragOver"
+        [class.hover:bg-slate-700/50]="!isDragOver && theme.isDark()"
+        [class.border-slate-300]="!isDragOver && !theme.isDark()"
+        [class.hover:border-indigo-300]="!isDragOver && !theme.isDark()"
+        [class.hover:bg-slate-50]="!isDragOver && !theme.isDark()"
       >
-        <div class="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+          [class.bg-indigo-500/20]="theme.isDark()"
+          [class.bg-indigo-50]="!theme.isDark()"
+        >
+          <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
         </div>
-        <p class="text-base font-semibold text-slate-700">
-          {{ isDragOver ? 'Drop your file here' : 'Drag & drop a file here' }}
+        <p class="text-base font-semibold"
+          [class.text-slate-200]="theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+        >
+          {{ lang.currentLang() === 'km' 
+            ? (isDragOver ? 'ទម្លាក់ឯកសារនៅទីនេះ' : 'អូស និងទម្លាក់ឯកសារនៅទីនេះ') 
+            : (isDragOver ? 'Drop your file here' : 'Drag & drop a file here') }}
         </p>
-        <p class="text-sm text-slate-400 mt-1">or <span class="text-indigo-600 font-medium">browse from your computer</span></p>
-        <p class="text-xs text-slate-400 mt-3">Supports: Images, PDF, Word, Excel</p>
+        <p class="text-sm mt-1"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-400]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'ឬ' : 'or' }} <span class="text-indigo-500 font-medium">{{ lang.currentLang() === 'km' ? 'រកមើលពីកុំព្យូទ័ររបស់អ្នក' : 'browse from your computer' }}</span></p>
+        <p class="text-xs mt-3"
+          [class.text-slate-500]="theme.isDark()"
+          [class.text-slate-400]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'គាំទ្រ: រូបភាព, PDF, Word, Excel' : 'Supports: Images, PDF, Word, Excel' }}</p>
       </div>
 
       <!-- File Preview -->
-      <div *ngIf="selectedFile" class="border border-slate-200 rounded-2xl p-6 bg-slate-50">
+      <div *ngIf="selectedFile" @fadeIn
+        class="rounded-2xl p-5 border"
+        [class.bg-slate-700/50]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.bg-slate-50]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+      >
         <div class="flex items-start gap-5">
-          <!-- Preview Thumbnail -->
-          <div class="w-20 h-20 rounded-xl overflow-hidden bg-white border border-slate-200 flex items-center justify-center shrink-0">
-            <img *ngIf="selectedFilePreview" [src]="selectedFilePreview" alt="preview" class="w-full h-full object-cover">
-            <svg *ngIf="!selectedFilePreview" class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          <!-- Thumbnail -->
+          <div class="w-20 h-20 rounded-xl overflow-hidden flex items-center justify-center shrink-0 border"
+            [class.bg-slate-600]="theme.isDark()"
+            [class.border-slate-500]="theme.isDark()"
+            [class.bg-white]="!theme.isDark()"
+            [class.border-slate-200]="!theme.isDark()"
+          >
+            <img *ngIf="selectedFilePreview" [src]="selectedFilePreview" [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'" class="w-full h-full object-cover">
+            <svg *ngIf="!selectedFilePreview" class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
           </div>
-
-          <!-- File Info -->
+          <!-- Info -->
           <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-semibold text-slate-800 truncate">{{ selectedFile.name }}</h4>
-            <p class="text-xs text-slate-500 mt-1">{{ formatBytes(selectedFile.size) }} · {{ selectedFile.type || 'Unknown type' }}</p>
-            
+            <h4 class="text-sm font-semibold truncate"
+              [class.text-slate-200]="theme.isDark()"
+              [class.text-slate-800]="!theme.isDark()"
+            >{{ selectedFile.name }}</h4>
+            <p class="text-xs mt-1"
+              [class.text-slate-400]="theme.isDark()"
+              [class.text-slate-500]="!theme.isDark()"
+            >{{ formatBytes(selectedFile.size) }} &middot; {{ selectedFile.type || (lang.currentLang() === 'km' ? 'ប្រភេទមិនស្គាល់' : 'Unknown type') }}</p>
             <!-- Folder Input -->
             <div class="mt-3 flex items-center gap-2">
-              <label class="text-xs font-medium text-slate-600">Folder:</label>
-              <input 
-                type="text" 
-                [(ngModel)]="uploadFolder"
-                class="text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none w-40"
+              <label class="text-xs font-medium"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-600]="!theme.isDark()"
+              >{{ lang.currentLang() === 'km' ? 'ថតឯកសារ:' : 'Folder:' }}</label>
+              <input type="text" [(ngModel)]="uploadFolder"
+                class="text-xs px-3 py-1.5 rounded-lg outline-none w-40 transition-all border focus:ring-2 focus:border-transparent"
+                [class.bg-slate-600]="theme.isDark()"
+                [class.border-slate-500]="theme.isDark()"
+                [class.text-slate-200]="theme.isDark()"
+                [class.focus:ring-indigo-500]="true"
+                [class.bg-white]="!theme.isDark()"
+                [class.border-slate-200]="!theme.isDark()"
+                [class.text-slate-700]="!theme.isDark()"
                 placeholder="pos-general"
               >
             </div>
           </div>
-
           <!-- Actions -->
           <div class="flex items-center gap-2 shrink-0">
-            <button 
-              (click)="resetUploadState()"
-              [disabled]="uploading"
-              class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
-            >
-              Remove
-            </button>
-            <button 
-              (click)="uploadFile()"
-              [disabled]="uploading"
-              class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            <button (click)="resetUploadState()" [disabled]="uploading"
+              class="px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 border"
+              [class.bg-slate-600]="theme.isDark()"
+              [class.hover:bg-slate-500]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.border-slate-500]="theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.hover:bg-slate-50]="!theme.isDark()"
+              [class.text-slate-600]="!theme.isDark()"
+              [class.border-slate-300]="!theme.isDark()"
+            >{{ lang.currentLang() === 'km' ? 'លុបចេញ' : 'Remove' }}</button>
+            <button (click)="uploadFile()" [disabled]="uploading"
+              class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+              [class.bg-indigo-600]="!theme.isDark()"
+              [class.hover:bg-indigo-700]="!theme.isDark()"
+              [class.bg-indigo-500]="theme.isDark()"
+              [class.hover:bg-indigo-400]="theme.isDark()"
             >
               <div *ngIf="uploading" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              {{ uploading ? 'Uploading...' : 'Upload' }}
+              {{ lang.currentLang() === 'km' ? (uploading ? 'កំពុងផ្ទុក...' : 'ផ្ទុក') : (uploading ? 'Uploading...' : 'Upload') }}
             </button>
           </div>
         </div>
       </div>
 
       <!-- Upload Success -->
-      <div *ngIf="uploadSuccess" class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-600 text-sm flex items-center gap-3">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+      <div *ngIf="uploadSuccess" @fadeIn class="mt-4 rounded-xl p-4 text-sm flex items-center gap-3 border"
+        [class.bg-emerald-900/30]="theme.isDark()"
+        [class.border-emerald-700/40]="theme.isDark()"
+        [class.text-emerald-300]="theme.isDark()"
+        [class.bg-emerald-50]="!theme.isDark()"
+        [class.border-emerald-200]="!theme.isDark()"
+        [class.text-emerald-600]="!theme.isDark()"
+      >
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
         <span>{{ uploadSuccess }}</span>
       </div>
 
       <!-- Upload Error -->
-      <div *ngIf="uploadError" class="mt-4 bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-600 text-sm flex items-center gap-3">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <div *ngIf="uploadError" @fadeIn class="mt-4 rounded-xl p-4 text-sm flex items-center gap-3 border"
+        [class.bg-rose-900/30]="theme.isDark()"
+        [class.border-rose-700/40]="theme.isDark()"
+        [class.text-rose-300]="theme.isDark()"
+        [class.bg-rose-50]="!theme.isDark()"
+        [class.border-rose-200]="!theme.isDark()"
+        [class.text-rose-600]="!theme.isDark()"
+      >
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <span>{{ uploadError }}</span>
       </div>
     </div>
   </div>
 
-  <!-- Content -->
-  <div class="flex-1 p-6 overflow-auto">
-    
-    <div *ngIf="loading" class="flex justify-center items-center h-64">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+  <!-- Main Content -->
+  <div class="flex-1 p-4 sm:p-6 overflow-auto space-y-4 sm:space-y-6">
+
+    <!-- Search Bar -->
+    <div class="relative max-w-md">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+        [class.text-slate-500]="theme.isDark()"
+        [class.text-slate-400]="!theme.isDark()"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="text"
+        (input)="onSearch($event)"
+        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកតាម Public ID ឬទម្រង់...' : 'Search by public ID or format...'"
+        class="w-full pl-9 pr-4 py-2 rounded-xl text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500 border"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.text-slate-200]="theme.isDark()"
+        [class.placeholder-slate-400]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.text-slate-700]="!theme.isDark()"
+        [class.placeholder-slate-400]="!theme.isDark()"
+      />
     </div>
 
-    <div *ngIf="error && !loading" class="bg-rose-50 text-rose-600 p-4 rounded-xl border border-rose-200 flex items-center gap-3">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      {{ error }}
-    </div>
-
-    <div *ngIf="!loading && !error" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <table mat-table [dataSource]="resources" class="w-full">
-        <!-- Preview Column -->
-        <ng-container matColumnDef="preview">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Preview </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-3 border-b border-slate-100">
-            <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
-              <img *ngIf="element.resource_type === 'image'" [src]="element.secure_url" alt="preview" class="w-full h-full object-cover">
-              <svg *ngIf="element.resource_type !== 'image'" class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Public ID Column -->
-        <ng-container matColumnDef="public_id">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Public ID </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 font-medium text-slate-700"> 
-            {{element.public_id}} 
-          </td>
-        </ng-container>
-
-        <!-- Format Column -->
-        <ng-container matColumnDef="format">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Format </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100">
-            <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-md border border-slate-200 uppercase tracking-wider">
-              {{element.format}}
-            </span>
-          </td>
-        </ng-container>
-
-        <!-- Size Column -->
-        <ng-container matColumnDef="bytes">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Size </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 text-slate-600"> 
-            {{formatBytes(element.bytes)}} 
-          </td>
-        </ng-container>
-
-        <!-- Date Column -->
-        <ng-container matColumnDef="created_at">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Uploaded At </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100 text-slate-500 text-sm"> 
-            {{element.created_at | date:'medium'}} 
-          </td>
-        </ng-container>
-
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="text-slate-500 font-semibold text-sm bg-slate-50 py-4 px-6 border-b border-slate-200"> Actions </th>
-          <td mat-cell *matCellDef="let element" class="px-6 py-4 border-b border-slate-100">
-            <button
-              (click)="deleteResource(element)"
-              [disabled]="deleting"
-              class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rose-600 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 hover:border-rose-300 transition-colors disabled:opacity-50"
-              matTooltip="Delete this resource"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-              Delete
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50/50 transition-colors"></tr>
-      </table>
-
-      <!-- Empty State -->
-      <div *ngIf="resources.length === 0" class="p-12 text-center">
-        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-          <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+    <!-- KPI Stats -->
+    <div *ngIf="!loading && !error" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <!-- Total Files -->
+      <div @fadeIn
+        [class.bg-slate-800]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+            [class.bg-indigo-500/20]="theme.isDark()"
+            [class.bg-indigo-50]="!theme.isDark()"
+          >
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
         </div>
-        <h3 class="text-lg font-semibold text-slate-800">No files found</h3>
-        <p class="text-slate-500 mt-1 max-w-sm mx-auto">You haven't uploaded any files to Cloudinary yet. Upload a file to see it listed here.</p>
+        <p class="text-2xl font-black"
+          [class.text-slate-100]="theme.isDark()"
+          [class.text-slate-900]="!theme.isDark()"
+        >{{ totalFiles() }}</p>
+        <p class="text-sm mt-0.5"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-500]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'ឯកសារសរុប' : 'Total Files' }}</p>
+      </div>
+
+      <!-- Total Size -->
+      <div @fadeIn
+        [class.bg-slate-800]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+            [class.bg-emerald-500/20]="theme.isDark()"
+            [class.bg-emerald-50]="!theme.isDark()"
+          >
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7l8 4" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black"
+          [class.text-slate-100]="theme.isDark()"
+          [class.text-slate-900]="!theme.isDark()"
+        >{{ formatTotalSize(totalSize()) }}</p>
+        <p class="text-sm mt-0.5"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-500]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'ទំហំសរុប' : 'Total Size' }}</p>
+      </div>
+
+      <!-- Unique Formats -->
+      <div @fadeIn
+        [class.bg-slate-800]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+            [class.bg-violet-500/20]="theme.isDark()"
+            [class.bg-violet-50]="!theme.isDark()"
+          >
+            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black"
+          [class.text-slate-100]="theme.isDark()"
+          [class.text-slate-900]="!theme.isDark()"
+        >{{ uniqueFormats() }}</p>
+        <p class="text-sm mt-0.5"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-500]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'ទម្រង់ឯកសារ' : 'File Formats' }}</p>
+      </div>
+
+      <!-- Filtered Count -->
+      <div @fadeIn
+        [class.bg-slate-800]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+            [class.bg-amber-500/20]="theme.isDark()"
+            [class.bg-amber-50]="!theme.isDark()"
+          >
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black"
+          [class.text-slate-100]="theme.isDark()"
+          [class.text-slate-900]="!theme.isDark()"
+        >{{ filteredResources().length }}</p>
+        <p class="text-sm mt-0.5"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-500]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' 
+          ? (searchQuery() ? 'បានត្រង' : 'កំពុងបង្ហាញ') 
+          : (searchQuery() ? 'Filtered' : 'Showing') }}</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16 gap-4">
+      <div class="animate-spin rounded-full h-10 w-10 border-4 border-t-indigo-500"
+        [class.border-slate-600]="theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+      ></div>
+      <p class="text-sm font-medium"
+        [class.text-slate-400]="theme.isDark()"
+        [class.text-slate-500]="!theme.isDark()"
+      >{{ lang.currentLang() === 'km' ? 'កំពុងផ្ទុកធនធាន...' : 'Loading resources...' }}</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" @fadeIn
+      class="rounded-2xl p-8 text-center border"
+      [class.bg-rose-900/20]="theme.isDark()"
+      [class.border-rose-700/40]="theme.isDark()"
+      [class.bg-rose-50]="!theme.isDark()"
+      [class.border-rose-200]="!theme.isDark()"
+    >
+      <svg class="w-14 h-14 mx-auto mb-4 opacity-60"
+        [class.text-rose-400]="theme.isDark()"
+        [class.text-rose-400]="!theme.isDark()"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <p class="font-semibold mb-1"
+        [class.text-rose-300]="theme.isDark()"
+        [class.text-rose-700]="!theme.isDark()"
+      >{{ error }}</p>
+      <button (click)="loadResources()"
+        class="mt-3 text-sm font-semibold underline"
+        [class.text-indigo-400]="theme.isDark()"
+        [class.text-indigo-600]="!theme.isDark()"
+      >{{ lang.currentLang() === 'km' ? 'ព្យាយាមម្តងទៀត' : 'Try again' }}</button>
+    </div>
+
+    <!-- Table Card -->
+    <div *ngIf="!loading && !error" @fadeIn
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      class="rounded-2xl border shadow-sm overflow-hidden"
+    >
+      <!-- Table Header -->
+      <div class="px-5 py-4 border-b flex items-center justify-between"
+        [class.border-slate-700]="theme.isDark()"
+        [class.border-slate-100]="!theme.isDark()"
+      >
+        <h2 class="font-bold text-sm"
+          [class.text-slate-200]="theme.isDark()"
+          [class.text-slate-800]="!theme.isDark()"
+        >{{ lang.currentLang() === 'km' ? 'ធនធានទាំងអស់' : 'All Resources' }}</h2>
+        <span class="text-xs"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-400]="!theme.isDark()"
+        >{{ filteredResources().length }} {{ lang.currentLang() === 'km' ? 'ឯកសារ' : (filteredResources().length === 1 ? 'file' : 'files') }}</span>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              [class.bg-slate-700/50]="theme.isDark()"
+              [class.border-slate-700]="theme.isDark()"
+              [class.bg-slate-50]="!theme.isDark()"
+              [class.border-slate-200]="!theme.isDark()"
+              class="border-b"
+            >
+              <th class="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >{{ lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview' }}</th>
+              <th (click)="toggleSort('public_id')"
+                class="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >
+                Public ID
+                <span class="ml-1 text-[10px]"
+                  [class.text-indigo-400]="theme.isDark()"
+                  [class.text-indigo-600]="!theme.isDark()"
+                >{{ sortIndicator('public_id') }}</span>
+              </th>
+              <th (click)="toggleSort('format')"
+                class="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors hidden sm:table-cell"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >
+                {{ lang.currentLang() === 'km' ? 'ទម្រង់' : 'Format' }}
+                <span class="ml-1 text-[10px]"
+                  [class.text-indigo-400]="theme.isDark()"
+                  [class.text-indigo-600]="!theme.isDark()"
+                >{{ sortIndicator('format') }}</span>
+              </th>
+              <th (click)="toggleSort('bytes')"
+                class="px-4 py-3 text-right font-semibold text-xs uppercase tracking-wider cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors hidden md:table-cell"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >
+                {{ lang.currentLang() === 'km' ? 'ទំហំ' : 'Size' }}
+                <span class="ml-1 text-[10px]"
+                  [class.text-indigo-400]="theme.isDark()"
+                  [class.text-indigo-600]="!theme.isDark()"
+                >{{ sortIndicator('bytes') }}</span>
+              </th>
+              <th (click)="toggleSort('created_at')"
+                class="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors hidden lg:table-cell"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >
+                {{ lang.currentLang() === 'km' ? 'បានផ្ទុកឡើងនៅ' : 'Uploaded At' }}
+                <span class="ml-1 text-[10px]"
+                  [class.text-indigo-400]="theme.isDark()"
+                  [class.text-indigo-600]="!theme.isDark()"
+                >{{ sortIndicator('created_at') }}</span>
+              </th>
+              <th class="px-4 py-3 text-right font-semibold text-xs uppercase tracking-wider"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-500]="!theme.isDark()"
+              >{{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}</th>
+            </tr>
+          </thead>
+          <tbody [@listAnimation]="filteredResources().length"
+            class="divide-y"
+            [class.divide-slate-700/50]="theme.isDark()"
+            [class.divide-slate-100]="!theme.isDark()"
+          >
+          <tr *ngFor="let resource of paginatedResources(); trackBy: trackByPublicId" @fadeIn
+            class="group transition-colors"
+            [class.hover:bg-slate-700/30]="theme.isDark()"
+            [class.hover:bg-slate-50]="!theme.isDark()"
+          >
+              <!-- Preview -->
+              <td class="px-4 py-3">
+                <div class="w-11 h-11 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer group/preview border"
+                  [class.bg-slate-700]="theme.isDark()"
+                  [class.border-slate-600]="theme.isDark()"
+                  [class.bg-slate-100]="!theme.isDark()"
+                  [class.border-slate-200]="!theme.isDark()"
+                  (click)="resource.resource_type === 'image' ? openPreview(resource.secure_url) : null"
+                  [title]="resource.resource_type === 'image' ? (lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលជាមុន' : 'Click to preview') : ''"
+                >
+                  <img *ngIf="resource.resource_type === 'image'" [src]="resource.secure_url" [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+                    class="w-full h-full object-cover group-hover/preview:scale-110 transition-transform duration-200"
+                  >
+                  <svg *ngIf="resource.resource_type !== 'image'" class="w-6 h-6"
+                    [class.text-slate-400]="theme.isDark()"
+                    [class.text-slate-400]="!theme.isDark()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </td>
+              <!-- Public ID -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs max-w-[160px] sm:max-w-[220px] truncate"
+                    [class.text-slate-200]="theme.isDark()"
+                    [class.text-slate-700]="!theme.isDark()"
+                  >{{ resource.public_id }}</span>
+                  <button (click)="copyToClipboard(resource.public_id, 'Public ID')"
+                    class="shrink-0 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                    [class.hover:bg-slate-600]="theme.isDark()"
+                    [class.hover:bg-slate-100]="!theme.isDark()"
+                    [class.text-slate-400]="theme.isDark()"
+                    [class.text-slate-400]="!theme.isDark()"
+                    [title]="lang.currentLang() === 'km' ? 'ចម្លង Public ID' : 'Copy Public ID'"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+              <!-- Format -->
+              <td class="px-4 py-3 hidden sm:table-cell">
+                <span class="px-2.5 py-1 text-xs font-medium rounded-md uppercase tracking-wider border border-slate-200"
+                  [class.bg-slate-600]="theme.isDark()"
+                  [class.text-slate-200]="theme.isDark()"
+                  [class.bg-slate-100]="!theme.isDark()"
+                  [class.text-slate-600]="!theme.isDark()"
+                >{{ resource.format }}</span>
+              </td>
+              <!-- Size -->
+              <td class="px-4 py-3 text-right hidden md:table-cell"
+                [class.text-slate-300]="theme.isDark()"
+                [class.text-slate-600]="!theme.isDark()"
+              >{{ formatBytes(resource.bytes) }}</td>
+              <!-- Date -->
+              <td class="px-4 py-3 hidden lg:table-cell">
+                <span class="text-xs"
+                  [class.text-slate-400]="theme.isDark()"
+                  [class.text-slate-500]="!theme.isDark()"
+                >{{ resource.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </td>
+              <!-- Actions -->
+              <td class="px-4 py-3 text-right">
+                <div class="flex items-center justify-end gap-1">
+                  <!-- Copy URL -->
+                  <button (click)="copyToClipboard(resource.secure_url, 'URL')"
+                    [matTooltip]="lang.currentLang() === 'km' ? 'ចម្លង URL' : 'Copy URL'"
+                    class="p-1.5 rounded-lg transition-colors"
+                    [class.hover:bg-slate-600]="theme.isDark()"
+                    [class.hover:bg-indigo-50]="!theme.isDark()"
+                    [class.text-indigo-400]="theme.isDark()"
+                    [class.text-indigo-600]="!theme.isDark()"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </button>
+                  <!-- Preview -->
+                  <button *ngIf="resource.resource_type === 'image'" (click)="openPreview(resource.secure_url)"
+                    [matTooltip]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+                    class="p-1.5 rounded-lg transition-colors"
+                    [class.hover:bg-slate-600]="theme.isDark()"
+                    [class.hover:bg-sky-50]="!theme.isDark()"
+                    [class.text-sky-400]="theme.isDark()"
+                    [class.text-sky-600]="!theme.isDark()"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <!-- Delete -->
+                  <button (click)="deleteResource(resource)" [disabled]="deleting"
+                    [matTooltip]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+                    class="p-1.5 rounded-lg transition-colors disabled:opacity-50"
+                    [class.hover:bg-slate-600]="theme.isDark()"
+                    [class.hover:bg-rose-50]="!theme.isDark()"
+                    [class.text-rose-400]="theme.isDark()"
+                    [class.text-rose-600]="!theme.isDark()"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="paginatedResources().length === 0 && filteredResources().length > 0">
+              <td colspan="6" class="px-4 py-12 text-center">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 border"
+                  [class.bg-slate-700]="theme.isDark()"
+                  [class.border-slate-600]="theme.isDark()"
+                  [class.bg-slate-50]="!theme.isDark()"
+                  [class.border-slate-100]="!theme.isDark()"
+                >
+                  <svg class="w-7 h-7"
+                    [class.text-slate-500]="theme.isDark()"
+                    [class.text-slate-400]="!theme.isDark()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 class="text-base font-semibold"
+                  [class.text-slate-200]="theme.isDark()"
+                  [class.text-slate-800]="!theme.isDark()"
+                >{{ lang.currentLang() === 'km' ? 'គ្មានលទ្ធផលនៅទំព័រនេះទេ' : 'No results on this page' }}</h3>
+                <p class="text-sm mt-1"
+                  [class.text-slate-400]="theme.isDark()"
+                  [class.text-slate-500]="!theme.isDark()"
+                >{{ lang.currentLang() === 'km' ? 'សូមព្យាយាមទំព័រផ្សេង ឬកែប្រែទំហំទំព័រ។' : 'Try navigating to a different page or adjusting the page size.' }}</p>
+              </td>
+            </tr>
+
+            <!-- Empty State (no results at all) -->
+            <tr *ngIf="filteredResources().length === 0">
+              <td colspan="6" class="px-4 py-16 text-center">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border"
+                  [class.bg-slate-700]="theme.isDark()"
+                  [class.border-slate-600]="theme.isDark()"
+                  [class.bg-slate-50]="!theme.isDark()"
+                  [class.border-slate-100]="!theme.isDark()"
+                >
+                  <svg class="w-8 h-8"
+                    [class.text-slate-500]="theme.isDark()"
+                    [class.text-slate-400]="!theme.isDark()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold"
+                  [class.text-slate-200]="theme.isDark()"
+                  [class.text-slate-800]="!theme.isDark()"
+                >{{ lang.currentLang() === 'km' 
+                  ? (searchQuery() ? 'រកមិនឃើញឯកសារ' : 'រកមិនឃើញឯកសារ') 
+                  : (searchQuery() ? 'No matching files' : 'No files found') }}</h3>
+                <p class="text-sm mt-1 max-w-sm mx-auto"
+                  [class.text-slate-400]="theme.isDark()"
+                  [class.text-slate-500]="!theme.isDark()"
+                >
+                  {{ lang.currentLang() === 'km' 
+                    ? (searchQuery() ? 'សូមសាកល្បងពាក្យស្វែងរកផ្សេងទៀត។' : 'សូមផ្ទុកឯកសារដើម្បីមើលវានៅទីនេះ។') 
+                    : (searchQuery() ? 'Try a different search term.' : 'Upload a file to see it listed here.') }}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <app-pagination
+        [totalItems]="filteredResources().length"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
+        [currentPage]="currentPage()"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
+    </div>
+  </div>
+
+  <!-- Preview Lightbox -->
+  <div *ngIf="previewImage()" class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="closePreview()">
+    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+    <div @fadeIn class="relative max-w-4xl max-h-[90vh] w-full" (click)="$event.stopPropagation()">
+      <!-- Close button -->
+      <button (click)="closePreview()"
+        class="absolute -top-3 -right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors"
+        [class.bg-slate-600]="theme.isDark()"
+        [class.hover:bg-slate-500]="theme.isDark()"
+        [class.text-white]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.hover:bg-slate-100]="!theme.isDark()"
+        [class.text-slate-600]="!theme.isDark()"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <!-- Image -->
+      <img [src]="previewImage()" [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+        class="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+      >
+      <!-- Copy URL -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2">
+        <button (click)="copyToClipboard(previewImage()!, 'URL'); $event.stopPropagation()"
+          class="px-4 py-2 rounded-xl text-sm font-medium backdrop-blur-md transition-colors shadow-lg"
+          [class.bg-slate-800/80]="theme.isDark()"
+          [class.hover:bg-slate-700]="theme.isDark()"
+          [class.text-white]="theme.isDark()"
+          [class.bg-white/90]="!theme.isDark()"
+          [class.hover:bg-white]="!theme.isDark()"
+          [class.text-slate-700]="!theme.isDark()"
+        >
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            {{ lang.currentLang() === 'km' ? 'ចម្លង URL' : 'Copy URL' }}
+          </span>
+        </button>
       </div>
     </div>
   </div>

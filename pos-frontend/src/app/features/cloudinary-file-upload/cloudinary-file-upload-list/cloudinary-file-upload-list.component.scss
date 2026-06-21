@@ -1,0 +1,9 @@
+/* Custom scrollbar for the table container */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover {
+    scrollbar-color: #94a3b8 transparent;
+  }
+}
