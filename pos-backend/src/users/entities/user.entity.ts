@@ -35,6 +35,12 @@ export class User {
   @Column({ name: 'avatar_url', nullable: true, length: 500 })
   avatarUrl: string;
 
+  @Column({ name: 'reset_token', nullable: true })
+  resetToken: string;
+
+  @Column({ name: 'reset_token_expiry', type: 'timestamp', nullable: true })
+  resetTokenExpiry: Date;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

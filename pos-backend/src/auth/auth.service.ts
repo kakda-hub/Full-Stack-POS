@@ -60,4 +60,49 @@ export class AuthService {
   async getProfile(userId: number) {
     return this.usersService.findOne(userId);
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      // We return success even if user not found to prevent email enumeration
+      return { message: 'If that email exists, a reset link has been sent.' };
+    }
+
+    // Generate token
+    const crypto = require('crypto');
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Token expires in 1 hour
+    const tokenExpiry = new Date();
+    tokenExpiry.setHours(tokenExpiry.getHours() + 1);
+
+    await this.usersService.saveResetToken(user.id, hashedToken, tokenExpiry);
+
+    // Mock sending email
+    const resetLink = `http://localhost:4200/reset-password?token=${resetToken}`;
+    console.log(`\n\n[MOCK EMAIL] Password Reset Link for ${email}: \n${resetLink}\n\n`);
+
+    return { message: 'If that email exists, a reset link has been sent.' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const crypto = require('crypto');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await this.usersService.findByResetToken(hashedToken);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired password reset token');
+    }
+
+    if (new Date() > user.resetTokenExpiry) {
+      throw new UnauthorizedException('Password reset token has expired');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await this.usersService.clearResetTokenAndSetPassword(user.id, hashedNewPassword);
+
+    return { message: 'Password has been successfully reset' };
+  }
 }

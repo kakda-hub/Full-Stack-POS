@@ -108,4 +108,27 @@ export class UsersService {
     const { password, ...result } = saved;
     return result;
   }
+
+  // ---- Forgot Password Helpers ----
+
+  async saveResetToken(userId: number, token: string, expiry: Date): Promise<void> {
+    await this.userRepository.update(userId, {
+      resetToken: token,
+      resetTokenExpiry: expiry,
+    });
+  }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { resetToken: token },
+    });
+  }
+
+  async clearResetTokenAndSetPassword(userId: number, hashedNewPassword: string): Promise<void> {
+    await this.userRepository.update(userId, {
+      password: hashedNewPassword,
+      resetToken: null,
+      resetTokenExpiry: null,
+    });
+  }
 }
