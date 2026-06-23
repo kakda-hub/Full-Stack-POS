@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @ApiTags('Products')
 @ApiBearerAuth()
@@ -36,10 +37,15 @@ export class ProductsController {
 
   // GET /api/v1/products  [all roles]
   @Get()
-  @ApiOperation({ summary: 'Get all products' })
+  @ApiOperation({ summary: 'Get all products (paginated)' })
   @ApiQuery({ name: 'includeInactive', required: false, type: String })
-  findAll(@Query('includeInactive') includeInactive?: string) {
-    return this.productsService.findAll(includeInactive === 'true');
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  findAll(
+    @Query('includeInactive') includeInactive?: string,
+    @Query() pagination?: PaginationDto,
+  ) {
+    return this.productsService.findAll(includeInactive === 'true', pagination ?? {});
   }
 
   // GET /api/v1/products/barcode/:barcode  [all roles]

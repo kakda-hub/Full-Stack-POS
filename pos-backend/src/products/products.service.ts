@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto, AdjustStockDto } from './dto/product.dto';
+import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
+import { paginate } from '../common/helpers/pagination.helper';
 
 @Injectable()
 export class ProductsService {
@@ -27,9 +29,9 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  async findAll(includeInactive = false): Promise<Product[]> {
+  async findAll(includeInactive = false, pagination?: PaginationDto): Promise<PaginatedResult<Product>> {
     const where = includeInactive ? {} : { isActive: true };
-    return this.productRepository.find({
+    return paginate(this.productRepository, pagination ?? {}, {
       where,
       relations: ['category'],
       order: { name: 'ASC' },

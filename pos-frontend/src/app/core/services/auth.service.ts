@@ -15,7 +15,7 @@ export class AuthService {
   constructor(private router: Router, private http: HttpClient) { }
 
   login(username: string, password: string): Observable<boolean> {
-    return this.http.post<any>('http://localhost:3000/api/v1/auth/login', { email: username, password })
+    return this.http.post<any>('/api/v1/auth/login', { email: username, password })
       .pipe(
         map(response => {
           // Handle both wrapped (with interceptor) and unwrapped (@SkipIntercept) responses

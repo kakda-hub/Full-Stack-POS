@@ -7,6 +7,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Category } from "./entities/category.entity";
 import { CreateCategoryDto, UpdateCategoryDto } from "./dto/category.dto";
+import { PaginationDto, PaginatedResult } from "../common/dto/pagination.dto";
+import { paginate } from "../common/helpers/pagination.helper";
 
 @Injectable()
 export class CategoriesService {
@@ -26,8 +28,10 @@ export class CategoriesService {
     return this.categoryRepository.save(category);
   }
 
-  findAll(): Promise<Category[]> {
-    return this.categoryRepository.find({ order: { name: "ASC" } });
+  findAll(pagination?: PaginationDto): Promise<PaginatedResult<Category>> {
+    return paginate(this.categoryRepository, pagination ?? {}, {
+      order: { name: "ASC" },
+    });
   }
 
   async findOne(id: number): Promise<Category> {

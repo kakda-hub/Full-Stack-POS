@@ -12,7 +12,22 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // ─── Security ───────────────────────────────────────────────────────────────
-  app.use(helmet());
+  // Swagger UI injects inline <script> tags (customJsStr), so allow 'unsafe-inline'
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        fontSrc: ["'self'", 'https:', 'data:'],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+        objectSrc: ["'none'"],
+      },
+    },
+  }));
   app.enableCors({
     origin: process.env.FRONTEND_URL || '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -51,43 +66,63 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   // Inline JS that auto-authorizes Swagger UI after a successful login
+  // Uses a DOM MutationObserver to watch for response JSON containing
+  // "accessToken" in <pre> elements — works regardless of how Swagger UI
+  // makes HTTP requests (fetch, XHR, swagger-client, etc.).
   const autoAuthScript = `
 (function() {
-  // Wait for Swagger UI to be fully initialized (window.ui exposed)
-  var checkUI = setInterval(function() {
-    if (window.ui && window.ui.authActions) {
-      clearInterval(checkUI);
+  var authorized = false;
 
-      // Intercept fetch to catch login responses and auto-authorize
-      var origFetch = window.fetch;
-      window.fetch = function() {
-        var url = arguments[0];
-        return origFetch.apply(this, arguments).then(function(response) {
-          if (typeof url === 'string' && url.includes('/auth/login') && response.ok) {
-            response.clone().json().then(function(data) {
-              // Handle both wrapped (with interceptor) and unwrapped responses
-              var token = data.accessToken || (data.data && data.data.accessToken);
-              if (token) {
-                window.ui.authActions.authorize({
-                  bearer: {
-                    name: 'bearer',
-                    value: 'Bearer ' + token,
-                    schema: {
-                      type: 'http',
-                      scheme: 'bearer',
-                      bearerFormat: 'JWT'
-                    }
-                  }
-                });
-                console.log('[Swagger] ✅ Auto-authorized with JWT token');
-              }
-            }).catch(function() {});
-          }
-          return response;
+  function tryAuthorize(text) {
+    if (authorized) return true;
+    try {
+      var obj = JSON.parse(text);
+      var token = obj && (obj.accessToken || (obj.data && obj.data.accessToken));
+      if (token && window.ui && window.ui.authActions) {
+        // Swagger UI auto-prepends 'Bearer ' for http/bearer schemes
+        window.ui.authActions.authorize({
+          bearer: {
+            name: 'bearer',
+            value: token,
+            schema: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+          },
         });
-      };
+        authorized = true;
+        observer.disconnect();
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  var observer = new MutationObserver(function() {
+    if (authorized) return;
+    // Swagger UI renders response JSON in <pre> elements
+    var pres = document.querySelectorAll('pre');
+    for (var i = 0; i < pres.length; i++) {
+      var text = pres[i].textContent || '';
+      if (text.indexOf('accessToken') !== -1) {
+        if (tryAuthorize(text)) {
+          console.log('[Swagger] ✅ Auto-authorized via DOM observer');
+          return;
+        }
+      }
     }
-  }, 200);
+  });
+
+  function init() {
+    if (!window.ui || !window.ui.authActions) {
+      setTimeout(init, 300);
+      return;
+    }
+    observer.observe(document.body, { childList: true, subtree: true });
+    console.log('[Swagger] ✅ Auto-auth DOM observer active');
+  }
+  init();
 })();`;
 
   const swaggerCustomOptions: SwaggerCustomOptions = {

@@ -51,7 +51,7 @@ export class CategoryDetailComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', file);
 
-    this.http.post<any>('http://localhost:3000/api/v1/dynamicFileupload', formData).subscribe({
+    this.http.post<any>('/api/v1/dynamicFileupload', formData).subscribe({
       next: (res) => {
         if (res.data && res.data.data && res.data.data.length > 0) {
           this.form.patchValue({ imgUrl: res.data.data[0].fileUrl });

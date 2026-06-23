@@ -37,7 +37,7 @@ export interface CloudinaryApiResponse {
   providedIn: 'root'
 })
 export class CloudinaryService {
-  private apiUrl = 'http://localhost:3000/api/v1/cloudinary';
+  private apiUrl = '/api/v1/cloudinary';
 
   constructor(private http: HttpClient) {}
 

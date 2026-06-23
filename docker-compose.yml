@@ -13,6 +13,7 @@ services:
     volumes:
       - ./pos-frontend/src:/app/src
       - ./pos-frontend/angular.json:/app/angular.json
+      - ./pos-frontend/proxy.conf.js:/app/proxy.conf.js
       - ./pos-frontend/tsconfig.json:/app/tsconfig.json
       - ./pos-frontend/tsconfig.app.json:/app/tsconfig.app.json
       - ./pos-frontend/package.json:/app/package.json
@@ -22,6 +23,7 @@ services:
       - ./pos-frontend/src/assets:/app/src/assets
     environment:
       CHOKIDAR_USEPOLLING: '1'
+      PROXY_TARGET: http://backend:3000
     command: npx ng serve --host 0.0.0.0 --poll 2000
 
   backend:

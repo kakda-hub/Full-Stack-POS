@@ -35,7 +35,7 @@ export class UserService extends AbstractRest {
     formData.append('uploadBy', 'user-avatar');
 
     return this.httpClient
-      .post('http://localhost:3000/api/v1/dynamicFileupload', formData);
+      .post('/api/v1/dynamicFileupload', formData);
   }
 }
 

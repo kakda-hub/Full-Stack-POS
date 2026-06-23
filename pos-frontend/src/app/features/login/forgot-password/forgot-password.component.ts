@@ -31,7 +31,7 @@ export class ForgotPasswordComponent {
     this.successMessage = '';
     this.errorMessage = '';
 
-    this.http.post<{ message: string }>('http://localhost:3000/api/v1/auth/forgot-password', this.forgotForm.value)
+    this.http.post<{ message: string }>('/api/v1/auth/forgot-password', this.forgotForm.value)
       .subscribe({
         next: (res) => {
           this.successMessage = res.message;

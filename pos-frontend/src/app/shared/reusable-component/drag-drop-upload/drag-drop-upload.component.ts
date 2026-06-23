@@ -21,7 +21,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 export class DragDropUploadComponent implements ControlValueAccessor {
   @Input() label: string = 'Image';
   @Input() labelKm: string = 'រូបភាព';
-  @Input() uploadUrl: string = 'http://localhost:3000/api/v1/dynamicFileupload';
+  @Input() uploadUrl: string = '/api/v1/dynamicFileupload';
 
   value: string | null = null;
   isUploading = signal(false);

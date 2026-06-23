@@ -10,6 +10,8 @@ import { Sale, PaymentMethod } from './entities/sale.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
+import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
+import { paginateQuery } from '../common/helpers/pagination.helper';
 
 @Injectable()
 export class SalesService {
@@ -113,8 +115,8 @@ export class SalesService {
     }
   }
 
-  async findAll(userId?: number, role?: string): Promise<Sale[]> {
-    const query = this.saleRepository
+  async findAll(userId?: number, role?: string, pagination?: PaginationDto): Promise<PaginatedResult<Sale>> {
+    const queryBuilder = this.saleRepository
       .createQueryBuilder('sale')
       .leftJoinAndSelect('sale.items', 'items')
       .leftJoinAndSelect('items.product', 'product')
@@ -133,10 +135,10 @@ export class SalesService {
 
     // Cashiers can only see their own sales
     if (role === 'cashier') {
-      query.where('sale.userId = :userId', { userId });
+      queryBuilder.where('sale.userId = :userId', { userId });
     }
 
-    return query.getMany();
+    return paginateQuery(queryBuilder, pagination ?? {});
   }
 
   async findOne(id: number): Promise<Sale> {

@@ -13,19 +13,22 @@ export interface ApiResponse<T> {
   success: boolean;
   statusCode: number;
   data: T;
+  total?: number;
+  page?: number;
+  limit?: number;
   timestamp: string;
 }
 
 @Injectable()
 export class ResponseInterceptor<T>
-  implements NestInterceptor<T, ApiResponse<T>>
+  implements NestInterceptor<T, any>
 {
   constructor(private readonly reflector: Reflector) {}
 
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<ApiResponse<T>> {
+  ): Observable<any> {
     // Skip wrapping if route has @SkipIntercept() decorator
     const skipIntercept = this.reflector.get<boolean>(
       SKIP_INTERCEPT_KEY,
@@ -37,12 +40,48 @@ export class ResponseInterceptor<T>
     const statusCode = context.switchToHttp().getResponse().statusCode;
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        statusCode,
-        data,
-        timestamp: new Date().toISOString(),
-      })),
+      map((data: any) => {
+        // Check if data is a paginated result (has data array + total + page + limit)
+        const isPaginated =
+          data &&
+          typeof data === 'object' &&
+          !Array.isArray(data) &&
+          'data' in data &&
+          'total' in data &&
+          'page' in data &&
+          'limit' in data;
+
+        if (isPaginated) {
+          return {
+            success: true,
+            statusCode,
+            data: data.data,
+            total: data.total,
+            page: data.page,
+            limit: data.limit,
+            timestamp: new Date().toISOString(),
+          };
+        }
+
+        // Plain array: add total count
+        if (Array.isArray(data)) {
+          return {
+            success: true,
+            statusCode,
+            data,
+            total: data.length,
+            timestamp: new Date().toISOString(),
+          };
+        }
+
+        // Single object: no total
+        return {
+          success: true,
+          statusCode,
+          data,
+          timestamp: new Date().toISOString(),
+        };
+      }),
     );
   }
 }
