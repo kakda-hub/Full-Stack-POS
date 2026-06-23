@@ -1,0 +1,82 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <app-header-detail [id]="id"></app-header-detail>
+
+  <mat-dialog-content class="!pb-2">
+    <div class="flex flex-col gap-4">
+      <!-- Row 1: Title & Khmer Title -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-input-field
+          formControlName="title"
+          [placeholder]="lang.currentLang() === 'km' ? 'ចំណងជើង' : 'Title'"
+          [isRequired]="true"
+        ></app-input-field>
+
+        <app-input-field
+          formControlName="titleKm"
+          [placeholder]="lang.currentLang() === 'km' ? 'ចំណងជើងខ្មែរ' : 'Title (Khmer)'"
+        ></app-input-field>
+      </div>
+
+      <!-- Row 2: Icon & URL -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-input-field
+          formControlName="icon"
+          [placeholder]="lang.currentLang() === 'km' ? 'រូបតំណាង' : 'Icon'"
+        ></app-input-field>
+
+        <app-input-field
+          formControlName="url"
+          [placeholder]="lang.currentLang() === 'km' ? 'URL ទំព័រ' : 'Page URL'"
+        ></app-input-field>
+      </div>
+
+      <!-- Row 3: Type & Sort Order -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Type' }}</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="page">{{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }}</mat-option>
+            <mat-option value="menu">{{ lang.currentLang() === 'km' ? 'ម៉ឺនុយ' : 'Menu' }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <app-input-field
+          formControlName="sortOrder"
+          type="number"
+          [placeholder]="lang.currentLang() === 'km' ? 'លំដាប់' : 'Sort Order'"
+        ></app-input-field>
+      </div>
+
+      <!-- Row 4: Parent ID & Active -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <app-input-field
+          formControlName="parentId"
+          type="number"
+          [placeholder]="lang.currentLang() === 'km' ? 'ID មេ' : 'Parent ID'"
+        ></app-input-field>
+
+        <div class="flex items-center h-full pt-2">
+          <mat-slide-toggle formControlName="isActive" color="primary">
+            {{ lang.currentLang() === 'km' ? 'សកម្ម' : 'Active' }}
+          </mat-slide-toggle>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <app-textarea
+        formControlName="description"
+        [placeholder]="lang.currentLang() === 'km' ? 'ការពិពណ៌នា' : 'Description'"
+        [rows]="3"
+      ></app-textarea>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-4">
+    <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{
+      'button.cancel' | translate
+    }}</app-ui-button>
+    <app-ui-button [variant]="'primary'" [size]="'md'" type="submit" [loading]="isSaving()">{{
+      'button.save' | translate
+    }}</app-ui-button>
+  </mat-dialog-actions>
+</form>
