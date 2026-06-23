@@ -18,7 +18,8 @@ export class AuthService {
     return this.http.post<any>('http://localhost:3000/api/v1/auth/login', { email: username, password })
       .pipe(
         map(response => {
-          const data = response?.data;
+          // Handle both wrapped (with interceptor) and unwrapped (@SkipIntercept) responses
+          const data = response?.data ?? response;
           if (data && data.accessToken) {
             const user: User = {
               id: String(data.user.id),

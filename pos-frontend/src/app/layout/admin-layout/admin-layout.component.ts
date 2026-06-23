@@ -2,44 +2,18 @@ import { Component, signal } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
-
-interface NavItem {
-    label: string;
-    labelKm: string;
-    route: string;
-    icon: string;
-    subMenus?: NavItem[]; // optional nested sub-menu items
-}
+import { NavStateService, NavItem } from '../../core/services/nav-state.service';
+import { fadeIn } from '../../shared/animations/animations';
 
 @Component({
     selector: 'app-admin-layout',
     standalone: false,
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.scss',
+    animations: [fadeIn],
 })
 export class AdminLayoutComponent {
     isCollapsed = signal(false);
-
-    navItems: NavItem[] = [
-        { label: 'POS Sale', labelKm: 'លក់', route: '/sales', icon: 'sale' },
-        { label: 'Sales History', labelKm: 'ប្រវត្តិលក់', route: '/sales-history', icon: 'history' },
-        { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
-        { label: 'Report', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
-        { label: 'User', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },
-        { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
-        { label: 'Permission', labelKm: 'ការអនុញ្ញាត', route: '/permission', icon: 'permission' },
-        {
-            label: 'Setting',
-            labelKm: 'ការកំណត់',
-            route: '/settings',
-            icon: 'settings',
-            subMenus: [
-                { label: 'User Management', labelKm: 'ការគ្រប់គ្រងអ្នកប្រើ', route: '/user-management', icon: 'user' },
-                { label: 'User Role', labelKm: 'តួនាទីអ្នកប្រើ', route: '/user-role', icon: 'role' },
-                { label: 'Cloudinary File Upload', labelKm: 'ការផ្ទុកឯកសារ Cloudinary', route: '/cloudinary-file-upload', icon: 'cloudinary' },
-            ]
-        },
-    ];
 
     selectedMenu = signal<string>('');
 
@@ -47,10 +21,19 @@ export class AdminLayoutComponent {
         public auth: AuthService,
         public langService: LanguageService,
         public theme: ThemeService,
+        public navState: NavStateService,
     ) { }
+
+    get navItems(): NavItem[] {
+        return this.navState.navItems();
+    }
 
     toggleSubMenu(item: NavItem) {
         this.selectedMenu.update(current => current === item.route ? '' : item.route);
+    }
+
+    collapseAll() {
+        this.selectedMenu.set('');
     }
 
     toggleSidebar() {

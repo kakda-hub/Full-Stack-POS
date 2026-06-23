@@ -12,6 +12,7 @@ import { databaseConfig } from './config/database.config';
 import { UploadDynamicModule } from './upload-dynamic/upload-dynamic.module';
 import appConfig from './config/app.config';
 import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.module';
+import { ManagementModule } from './management/management.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.mo
     UploadModule,
     UploadDynamicModule,
     UploadCloudinaryModule,
+    ManagementModule,
   ],
 })
 export class AppModule { }

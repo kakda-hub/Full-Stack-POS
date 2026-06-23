@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule, SwaggerCustomOptions } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -38,7 +38,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // ─── Global Interceptors ────────────────────────────────────────────────────
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
   // ─── Swagger Documentation ──────────────────────────────────────────────────
   const swaggerConfig = new DocumentBuilder()
@@ -48,7 +49,58 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+
+  // Inline JS that auto-authorizes Swagger UI after a successful login
+  const autoAuthScript = `
+(function() {
+  // Wait for Swagger UI to be fully initialized (window.ui exposed)
+  var checkUI = setInterval(function() {
+    if (window.ui && window.ui.authActions) {
+      clearInterval(checkUI);
+
+      // Intercept fetch to catch login responses and auto-authorize
+      var origFetch = window.fetch;
+      window.fetch = function() {
+        var url = arguments[0];
+        return origFetch.apply(this, arguments).then(function(response) {
+          if (typeof url === 'string' && url.includes('/auth/login') && response.ok) {
+            response.clone().json().then(function(data) {
+              // Handle both wrapped (with interceptor) and unwrapped responses
+              var token = data.accessToken || (data.data && data.data.accessToken);
+              if (token) {
+                window.ui.authActions.authorize({
+                  bearer: {
+                    name: 'bearer',
+                    value: 'Bearer ' + token,
+                    schema: {
+                      type: 'http',
+                      scheme: 'bearer',
+                      bearerFormat: 'JWT'
+                    }
+                  }
+                });
+                console.log('[Swagger] ✅ Auto-authorized with JWT token');
+              }
+            }).catch(function() {});
+          }
+          return response;
+        });
+      };
+    }
+  }, 200);
+})();`;
+
+  const swaggerCustomOptions: SwaggerCustomOptions = {
+    customJsStr: autoAuthScript,
+    customSiteTitle: 'POS API Docs',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+    },
+  };
+
+  SwaggerModule.setup('api/docs', app, document, swaggerCustomOptions);
 
   // ─── Start ──────────────────────────────────────────────────────────────────
   const port = configService.get<number>('PORT', 3000);

@@ -8,16 +8,15 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { App } from './app';
 import { SharedModule } from './shared/shared.module';
 import { LayoutModule } from './layout/layout.module';
-import { AppRoutingModule } from './app-routing-module';
+import { AppRoutingModule } from './app-routing.module';
 import { AuthInterceptor } from './core/Interceptor/auth.interceptor';
-import { CloudinaryFileUploadListComponent } from './features/cloudinary-file-upload/cloudinary-file-upload-list/cloudinary-file-upload-list.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
 }
 
 @NgModule({
-  declarations: [App, ],
+  declarations: [App],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

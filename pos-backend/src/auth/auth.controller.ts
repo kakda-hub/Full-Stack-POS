@@ -5,6 +5,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { SkipIntercept } from '../common/decorators/skip-intercept.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Auth')
@@ -14,6 +15,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // POST /api/v1/auth/login
+  @SkipIntercept()
   @Post('login')
   @ApiOperation({ summary: 'Login and get JWT token' })
   login(@Body() loginDto: LoginDto) {

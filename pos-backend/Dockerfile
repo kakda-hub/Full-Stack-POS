@@ -1,5 +1,5 @@
 # ─── Stage 1: Build ─────────────────────────────
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
 
 WORKDIR /app
 COPY package*.json ./
@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 # ─── Stage 2: Production ───────────────────────
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 
 # Non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 USER appuser
 
 EXPOSE 3000
