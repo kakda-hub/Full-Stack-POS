@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -16,17 +16,18 @@ import { ManagementModule } from './management/management.module';
 
 @Module({
   imports: [
-    // ─── Config 
+    // ─── Global Config ────────────────────────────────────────────────────────
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig],
       envFilePath: '.env',
     }),
 
-    // ─── Database 
+    // ─── Database (TiDB Cloud via MySQL) ──────────────────────────────────────
     TypeOrmModule.forRootAsync({
-      useFactory: databaseConfig,
-      inject: [],
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => databaseConfig(configService),
+      inject: [ConfigService],
     }),
 
     // ─── Feature Modules
@@ -42,4 +43,4 @@ import { ManagementModule } from './management/management.module';
     ManagementModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

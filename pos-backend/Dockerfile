@@ -1,27 +1,45 @@
-# ─── Stage 1: Build ─────────────────────────────
-FROM node:18-slim AS builder
+# ═══════════════════════════════════════════════════════════════════
+#  STAGE 1: Install dependencies & build
+# ═══════════════════════════════════════════════════════════════════
+FROM node:20-alpine AS builder
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+
+# Copy package manifests first (layer caching)
+COPY package.json package-lock.json* ./
+
+# Install ALL dependencies (dev + prod)
+RUN npm ci
+
+# Copy source code
 COPY . .
+
+# Build the NestJS application
 RUN npm run build
 
-# ─── Stage 2: Production ───────────────────────
-FROM node:18-slim
+# ═══════════════════════════════════════════════════════════════════
+#  STAGE 2: Production runtime (minimal image)
+# ═══════════════════════════════════════════════════════════════════
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy only package.json and install prod deps
-COPY package*.json ./
-RUN npm install --omit=dev
+# Create non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy compiled files
+# Copy production dependencies only
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy compiled output from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Non-root user
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+# Switch to non-root user
 USER appuser
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/v1 || exit 1
+
 CMD ["node", "dist/main.js"]

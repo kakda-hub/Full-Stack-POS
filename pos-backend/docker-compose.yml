@@ -1,10 +1,10 @@
 version: '3.9'
 
 services:
-  # ─── MySQL Database ──────────────────────────────────────────────────────────
+  # ─── Local MySQL (available for local dev/testing; app connects to TiDB Cloud externally)
   mysql:
-    image: mysql:8.0
-    container_name: pos_mysql
+    image: mysql:8.4
+    container_name: pos_mysql_local
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -15,7 +15,7 @@ services:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro   # read-only is safer
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpassword"]
       interval: 10s
@@ -24,7 +24,7 @@ services:
     networks:
       - pos_network
 
-  # ─── NestJS API ──────────────────────────────────────────────────────────────
+  # ─── NestJS API (connects to TiDB Cloud externally) ──────────────────────────
   api:
     build:
       context: .
@@ -32,19 +32,17 @@ services:
       target: production
     container_name: pos_api
     restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
+    env_file:
+      - .env
     environment:
       PORT: 3000
-      NODE_ENV: development   
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: pos_user
-      DB_PASS: pos_password
-      DB_NAME: pos_db
-      JWT_SECRET: ${JWT_SECRET:-change-this-in-production-use-env-file}
-      JWT_EXPIRES_IN: 8h
+      NODE_ENV: ${NODE_ENV:-production}
+      # TiDB Cloud connection (override .env if needed via shell)
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-4000}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - '3000:3000'
     networks:

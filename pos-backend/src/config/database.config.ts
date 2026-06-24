@@ -1,33 +1,5 @@
-// import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-// import { User } from '../users/entities/user.entity';
-// import { Category } from '../categories/entities/category.entity';
-// import { Product } from '../products/entities/product.entity';
-// import { Sale } from '../sales/entities/sale.entity';
-// import { SaleItem } from '../sales/entities/sale-item.entity';
-
-// export const databaseConfig = (): TypeOrmModuleOptions => ({
-//   type: 'mysql',
-//   host: process.env.DB_HOST || 'mysql',
-//   port: parseInt(process.env.DB_PORT, 10) || 3306,
-//   username: process.env.DB_USER || 'root',
-//   password: process.env.DB_PASS || '',
-//   database: process.env.DB_NAME || 'pos_db',
-//   entities: [User, Category, Product, Sale, SaleItem],
-//   synchronize: process.env.NODE_ENV !== 'production',
-//   migrations: ['dist/migrations/**/*.js'],
-//   migrationsRun: process.env.NODE_ENV === 'production',
-//   logging: process.env.NODE_ENV === 'development',
-//   charset: 'utf8mb4',
-//   timezone: '+00:00',
-//   extra: {
-//     connectionLimit: 10,
-//   },
-//   // Retry config
-//   retryAttempts: 10,
-//   retryDelay: 3000, // 3 seconds
-// });
-
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 import { User } from '../users/entities/user.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Product } from '../products/entities/product.entity';
@@ -35,34 +7,56 @@ import { Sale } from '../sales/entities/sale.entity';
 import { SaleItem } from '../sales/entities/sale-item.entity';
 import { FileUpload } from '../upload/entities/upload.entity';
 
-export const databaseConfig = (): TypeOrmModuleOptions => ({
+/**
+ * Factory function for TypeORM configuration via ConfigService.
+ *
+ * TiDB Cloud requires:
+ *  - MySQL protocol (type: 'mysql')
+ *  - Port 4000 (TiDB Cloud Serverless default)
+ *  - Strict SSL: ssl: { rejectUnauthorized: true }
+ *
+ * Connection pooling is configured via the `extra.connectionLimit` option.
+ * Auto-retry ensures the app waits for the database to become available.
+ */
+export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'mysql',
   autoLoadEntities: true,
 
-  host: process.env.DB_HOST || 'localhost',
-
-  port: parseInt(process.env.DB_PORT, 10) || 3306,
-  username: process.env.DB_USER || 'root',
-
-  password: process.env.DB_PASSWORD || 'rootpassword',
-
-  database: process.env.DB_NAME || 'pos_db',
+  host: configService.get<string>('DB_HOST'),
+  port: configService.get<number>('DB_PORT', 4000),
+  username: configService.get<string>('DB_USER'),
+  password: configService.get<string>('DB_PASSWORD'),
+  database: configService.get<string>('DB_NAME'),
 
   entities: [User, Category, Product, Sale, SaleItem, FileUpload],
 
-  // synchronize: process.env.NODE_ENV !== 'production',
-  synchronize: true,
+  // Migrations are the source of truth — synchronize is disabled to prevent
+  // accidental schema drift. Run `npm run migration:run` to apply changes.
+  synchronize: false,
   migrations: ['dist/migrations/**/*.js'],
-  migrationsRun: process.env.NODE_ENV === 'production',
-  logging: process.env.NODE_ENV === 'development',
+  migrationsRun: true,
+  logging: configService.get<string>('NODE_ENV') === 'development',
 
   charset: 'utf8mb4',
   timezone: '+00:00',
+
+  /**
+   * SSL/TLS configuration.
+   *
+   * - TiDB Cloud (production): requires SSL with `rejectUnauthorized: true`.
+   *   Set DB_SSL=true (default) to enable.
+   * - Local MySQL (dev/testing): typically no SSL needed.
+   *   Set DB_SSL=false to disable.
+   */
+  ssl: configService.get<string>('DB_SSL', 'true') === 'true'
+    ? { rejectUnauthorized: true }
+    : false,
 
   extra: {
     connectionLimit: 10,
   },
 
+  // Retry connection up to 10 times with 3s delay
   retryAttempts: 10,
   retryDelay: 3000,
 });

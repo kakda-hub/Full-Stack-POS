@@ -20,6 +20,9 @@ export class Category {
   @Column({ length: 255, nullable: true })
   description: string;
 
+  @Column({ name: 'img_url', length: 500, nullable: true })
+  imgUrl: string;
+
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 }
