@@ -35,8 +35,9 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Type' }}</mat-label>
           <mat-select formControlName="type">
-            <mat-option value="page">{{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }}</mat-option>
-            <mat-option value="menu">{{ lang.currentLang() === 'km' ? 'ម៉ឺនុយ' : 'Menu' }}</mat-option>
+            <mat-option *ngFor="let type of types" [value]="type">
+              {{ type | titlecase }}
+            </mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -56,9 +57,9 @@
         ></app-input-field>
 
         <div class="flex items-center h-full pt-2">
-          <mat-slide-toggle formControlName="isActive" color="primary">
+          <mat-checkbox formControlName="isActive" color="primary">
             {{ lang.currentLang() === 'km' ? 'សកម្ម' : 'Active' }}
-          </mat-slide-toggle>
+          </mat-checkbox>
         </div>
       </div>
 

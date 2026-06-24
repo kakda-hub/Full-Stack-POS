@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
+import { DataResponse } from '../core/models/data-response';
+import { DynamicHttp } from './shared/dynamic-http.service';
+import { AbstractRest } from './shared/abstract-rest.service';
 
 export interface ManagementPage {
   id: number;
@@ -25,47 +26,18 @@ export interface ManagementPage {
 @Injectable({
   providedIn: 'root',
 })
-export class ManagementPageService {
-  private baseUrl = ApiEndpointEnum.MANAGEMENT;
-
-  constructor(private http: HttpClient) {}
-
-  /** Get all active pages sorted by sortOrder */
-  getAll(): Observable<ManagementPage[]> {
-    return this.http
-      .get<any>(`${this.baseUrl}`)
-      .pipe(map((res) => res?.data ?? res));
+export class ManagementPageService extends AbstractRest {
+  constructor(
+    protected http: DynamicHttp
+  ) {
+    super(http);
   }
 
-  /** Get a single page by ID */
-  getById(id: number): Observable<ManagementPage> {
-    return this.http
-      .get<any>(`${this.baseUrl}/${id}`)
-      .pipe(map((res) => res?.data ?? res));
+  getUrl(): string {
+    return ApiEndpointEnum.MANAGEMENT;
   }
 
-  /** Create a new page */
-  create(page: Partial<ManagementPage>): Observable<ManagementPage> {
-    return this.http
-      .post<any>(`${this.baseUrl}`, page)
-      .pipe(map((res) => res?.data ?? res));
+  override update(id: number, body: any): Observable<DataResponse> {
+    return this.http.patch<DataResponse>(`${this.getUrl()}/${id}`, body);
   }
-
-  /** Update a page by ID */
-  update(
-    id: number,
-    page: Partial<ManagementPage>,
-  ): Observable<ManagementPage> {
-    return this.http
-      .patch<any>(`${this.baseUrl}/${id}`, page)
-      .pipe(map((res) => res?.data ?? res));
-  }
-
-  /** Delete a page by ID */
-  delete(id: number): Observable<any> {
-    return this.http
-      .delete<any>(`${this.baseUrl}/${id}`)
-      .pipe(map((res) => res?.data ?? res));
-  }
-
 }

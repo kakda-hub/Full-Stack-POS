@@ -12,10 +12,12 @@ import { modalAnimation, backdropAnimation } from '../../../shared/animations/an
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [modalAnimation, backdropAnimation],
   templateUrl: './management-page-detail.component.html',
+  styleUrl: './management-page-detail.component.scss',
 })
 export class ManagementPageDetailComponent implements OnInit {
   form!: FormGroup;
   isSaving = signal(false);
+  types = ['menu', 'page'];
 
   get id(): number | undefined {
     return this.data?.page?.id;
@@ -57,9 +59,14 @@ export class ManagementPageDetailComponent implements OnInit {
     const page = this.data?.page || null;
     const id = page?.id;
 
+    // Create DTO doesn't accept isActive (DB defaults to true)
+    if (!id) {
+      delete payload.isActive;
+    }
+
     const request$ = id
       ? this.managementPageService.update(id, payload)
-      : this.managementPageService.create(payload);
+      : this.managementPageService.save(payload);
 
     request$.subscribe({
       next: (res) => {

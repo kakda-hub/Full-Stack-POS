@@ -1,8 +1,22 @@
 <div @pageTransition class="p-3 space-y-4">
   <app-breadcrumb></app-breadcrumb>
   
-  <div class="flex justify-between items-center">
-    <app-ui-button [variant]="'primary'" [size]="'md'" type="button">
+  <div class="flex items-center justify-between gap-4">
+    
+    <div class="relative flex-1 min-w-48">
+      <mat-form-field class="form-field w-full" subscriptSizing="dynamic">
+        <mat-label>{{ lang.currentLang() === 'km' ? 'ស្វែងរកទំព័រ...' : 'Search pages...' }}</mat-label>
+        <input #searchInput (input)="onSearch($event)" matInput [value]="searchQuery()">
+        <mat-icon matSuffix>search</mat-icon>
+        @if (searchQuery()) {
+          <button matSuffix mat-icon-button (click)="clearSearch(searchInput)" type="button" class="-mr-1">
+            <mat-icon class="text-gray-400 hover:text-gray-600">close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </div>
+
+    <app-ui-button [variant]="'primary'" [size]="'md'" type="button" (click)="onAddNew()">
       <span>{{ 'button.addNew' | translate }}</span>
     </app-ui-button>
   </div>
@@ -10,7 +24,7 @@
   <div class="hs-accordion-treeview-root" role="tree">
     <div class="hs-accordion-group" role="group">
       <!-- Initial call to the recursive template -->
-      <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: managementPageList, level: 1 }"></ng-container>
+      <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: filteredPageList, level: 1 }"></ng-container>
     </div>
   </div>
   
@@ -64,11 +78,15 @@
             <mat-icon class="text-gray-500">more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item>
+            <button mat-menu-item (click)="AddSubMenu(node)">
+              <mat-icon>add</mat-icon>
+              <span>Add SubMenu</span>
+            </button>
+            <button mat-menu-item (click)="onEdit(node)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item class="text-red-600">
+            <button mat-menu-item class="text-red-600" (click)="onDelete(node)">
               <mat-icon class="text-red-600">delete</mat-icon>
               <span>Delete</span>
             </button>
