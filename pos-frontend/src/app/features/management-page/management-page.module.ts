@@ -8,6 +8,7 @@ import { ReusableComponentModule } from '../../shared/reusable-component/reusabl
 import { ReactiveFormsModule } from '@angular/forms';
 import { ManagementPageListComponent } from './management-page-list/management-page-list.component';
 import { ManagementPageDetailComponent } from './management-page-detail/management-page-detail.component';
+import { LayoutModule } from "../../layout/layout.module";
 
 @NgModule({
   declarations: [ManagementPageListComponent, ManagementPageDetailComponent],
@@ -19,6 +20,7 @@ import { ManagementPageDetailComponent } from './management-page-detail/manageme
     MaterialModule,
     ReusableComponentModule,
     ReactiveFormsModule,
-  ],
+    LayoutModule
+],
 })
 export class ManagementPageModule {}

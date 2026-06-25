@@ -106,7 +106,7 @@ export class ManagementPageListComponent implements OnInit, OnDestroy {
   }
 
   selectNode(node: any) {
-    node.selected = !node.selected;
+    // node.selected = !node.selected;
   }
 
   private checkDialogQueryParams(): void {
