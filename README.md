@@ -110,4 +110,117 @@ All protected endpoints tested successfully with the JWT token:
 │ GET /api/v1/management-pages         │ ✅ 200 │
 │ GET /api/v1/users                    │ ✅ 200 │
 └──────────────────────────────────────┴────────┘
+
 All 11 protected endpoints return 200 OK (or appropriate data responses). The auto-auth is working correctly across the entire API — no 401 errors.
+
+
+Let me check what's available on your system to give you the most relevant setup instructions.
+Here's a complete setup guide to get the POS project running locally. You have Node.js v20.19.4, npm 10.8.2, and Docker installed, so you're all set.
+────────────────────────────────────────────────────────────────────────────────
+🚀 Setup Guide
+Option 1: Run Everything with Docker (Easiest)
+The root  docker-compose.yml  orchestrates all services — backend, frontend, MySQL, and MinIO (S3-compatible storage).
+Step 1: Create the backend  .env  file
+There's no  .env  file yet, so create one at  pos-backend/.env :
+// env
+# ─── App ─────────────────────────────────────────────────
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:4200
+ 
+# ─── JWT ─────────────────────────────────────────────────
+JWT_SECRET=your-super-secret-key-change-in-production
+JWT_EXPIRES_IN=8h
+ 
+# ─── Database (Local MySQL) ──────────────────────────────
+DB_HOST=db
+DB_PORT=3306
+DB_USER=pos_user
+DB_PASSWORD=pos_password
+DB_NAME=pos_db
+DB_SSL=false
+ 
+# ─── Cloudinary (optional - for image uploads) ───────────
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+ 
+# ─── MinIO (S3-compatible) ───────────────────────────────
+S3_ENDPOINT=http://minio:9000
+S3_REGION=us-east-1
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_BUCKET=pos-uploads
+Step 2: Start all services
+// bash
+docker compose up -d
+This starts:
+┌────────────────────┬─────────────────────┬───────────────────────────────────────────────────────────────┐
+│ Service            │ Container Name      │ URL                                                           │
+├────────────────────┼─────────────────────┼───────────────────────────────────────────────────────────────┤
+│ Frontend (Angular) │ projectpos-frontend │ http://localhost:4200                                         │
+│ Backend (NestJS)   │ projectpos-backend  │ http://localhost:3000                                         │
+│ MySQL              │ projectpos-mysql    │ port 3306                                                     │
+│ MinIO (S3)         │ projectpos-minio    │ http://localhost:9000 (API) / http://localhost:9001 (Console) │
+└────────────────────┴─────────────────────┴───────────────────────────────────────────────────────────────┘
+Step 3: Seed data is automatic
+The  init.sql  file runs automatically on MySQL startup, creating:
+- Users table with admin & cashier accounts
+- Categories table with 4 seed categories
+- Management pages for navigation
+Default login credentials:
+┌─────────┬─────────────────┬────────────┐
+│ Role    │ Email           │ Password   │
+├─────────┼─────────────────┼────────────┤
+│ Admin   │ admin@pos.com   │ admin123   │
+│ Cashier │ cashier@pos.com │ cashier123 │
+└─────────┴─────────────────┴────────────┘
+Step 4: Access the app
+- Frontend App: http://localhost:4200
+- Backend API: http://localhost:3000/api/v1
+- Swagger Docs: http://localhost:3000/api/docs
+- MinIO Console: http://localhost:9001 (login:  minioadmin  /  minioadmin )
+────────────────────────────────────────────────────────────────────────────────
+Option 2: Run Locally (Without Docker)
+If you prefer running services directly:
+Backend:
+// bash
+cd pos-backend
+npm install
+# Make sure MySQL is running locally (or use Docker just for MySQL)
+# Update .env: DB_HOST=localhost
+npm run start:dev
+Frontend:
+// bash
+cd pos-frontend
+npm install --legacy-peer-deps
+npm start
+# Serves at http://localhost:4200, proxies /api to http://localhost:3000
+MySQL only (Docker):
+// bash
+cd pos-backend
+docker compose up -d mysql
+# Then connect with .env settings: DB_HOST=localhost, DB_PORT=3306
+────────────────────────────────────────────────────────────────────────────────
+Key Details
+- Angular 21 with Tailwind CSS 3 + Angular Material
+- NestJS 10 + TypeORM + MySQL (supports TiDB Cloud too)
+- Swagger auto-authorizes — login via the  /api/docs  UI, and the token is automatically captured and set for subsequent requests
+- MinIO provides local S3-compatible storage (no Cloudinary account needed for basic file uploads)
+- If you want Cloudinary for image uploads, set the  CLOUDINARY_*  env vars with your credentials
+────────────────────────────────────────────────────────────────────────────────
+Useful Commands
+// bash
+# View logs
+docker compose logs -f backend
+docker compose logs -f frontend
+ 
+# Rebuild after dependency changes
+docker compose build --no-cache backend
+docker compose up -d
+ 
+# Stop everything
+docker compose down
+ 
+# Reset database (destroys volume)
+docker compose down -v && docker compose up -d
