@@ -134,7 +134,10 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
      *   Set DB_SSL=false to disable.
      */
     ssl: configService.get<string>('DB_SSL', 'true') === 'true'
-      ? { rejectUnauthorized: true }
+      ? { 
+          minVersion: 'TLSv1.2',
+          rejectUnauthorized: true 
+        }
       : false,
 
     extra: {
