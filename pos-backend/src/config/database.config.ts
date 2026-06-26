@@ -61,8 +61,8 @@ function logDbEnvDiagnostics(configService: ConfigService): void {
  */
 function resolveDbPassword(configService: ConfigService): string | undefined {
   const candidates = [
-    'DB_PASS',             // <-- checked first (Render uses this; DB_PASSWORD is a placeholder)
     'DB_PASSWORD',
+    'DB_PASS',             // fallback (alternative naming convention)
     'DATABASE_PASSWORD',
     'MYSQL_PASSWORD',
     'MYSQL_ROOT_PASSWORD',
