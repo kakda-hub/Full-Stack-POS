@@ -18,10 +18,10 @@ export class Product {
   @Column({ length: 150 })
   name: string;
 
-  @Column({ length: 150 })
+  @Column({ name: 'name_kh', length: 150 })
   nameKh: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ name: 'img_url', length: 255, nullable: true })
   imgUrl: string;
 
   @Column({ unique: true, length: 100 })

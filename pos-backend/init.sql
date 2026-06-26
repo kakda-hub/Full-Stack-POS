@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL,
   role ENUM('admin', 'cashier') NOT NULL DEFAULT 'cashier',
   is_active TINYINT NOT NULL DEFAULT 1,
+  avatar_url VARCHAR(500) DEFAULT NULL,
+  reset_token VARCHAR(255) DEFAULT NULL,
+  reset_token_expiry DATETIME DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE INDEX IDX_EMAIL (email)
@@ -48,6 +51,7 @@ CREATE TABLE IF NOT EXISTS categories (
   name VARCHAR(100) NOT NULL,
   name_kh VARCHAR(100) DEFAULT NULL,
   description VARCHAR(255) DEFAULT NULL,
+  img_url VARCHAR(500) DEFAULT NULL,
   is_active TINYINT NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -60,6 +64,76 @@ INSERT IGNORE INTO categories (id, name, name_kh, description) VALUES
   (3, 'Snacks', 'អាហារសម្រន់', 'Light snacks'),
   (4, 'Dairy', 'ផលិតផលទឹកដោះ', 'Dairy products')
 ON DUPLICATE KEY UPDATE id=id;
+
+-- ─── Products ──────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS products (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  name_kh VARCHAR(150) NOT NULL,
+  img_url VARCHAR(255) DEFAULT NULL,
+  barcode VARCHAR(100) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  stock INT NOT NULL DEFAULT 0,
+  category_id INT NOT NULL,
+  description TEXT DEFAULT NULL,
+  is_active TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE INDEX IDX_PRODUCT_BARCODE (barcode),
+  CONSTRAINT FK_products_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─── Sales ───────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS sales (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  discount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  tax DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  total DECIMAL(10,2) NOT NULL,
+  payment_method ENUM('cash', 'aba', 'card') NOT NULL DEFAULT 'cash',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_sales_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─── Sale Items ──────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS sale_items (
+  id INT NOT NULL AUTO_INCREMENT,
+  sale_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_sale_items_sale FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
+  CONSTRAINT FK_sale_items_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─── File Uploads ────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS file_uploads (
+  id INT NOT NULL AUTO_INCREMENT,
+  original_file_name VARCHAR(255) NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  file_path VARCHAR(255) NOT NULL,
+  file_url VARCHAR(255) NOT NULL,
+  file_extension VARCHAR(255) NOT NULL,
+  file_size BIGINT NOT NULL,
+  upload_by VARCHAR(255) DEFAULT NULL,
+  upload_type VARCHAR(255) DEFAULT 'file-upload-type-general',
+  destination_storage VARCHAR(255) DEFAULT 'MINIO',
+  width INT DEFAULT NULL,
+  height INT DEFAULT NULL,
+  description TEXT DEFAULT NULL,
+  is_deleted TINYINT NOT NULL DEFAULT 0,
+  group_id VARCHAR(255) DEFAULT NULL,
+  public_id VARCHAR(255) DEFAULT NULL,
+  upload_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Management Pages ────────────────────────────────────────────────────────
 
