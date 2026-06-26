@@ -18,6 +18,22 @@ import { FileUpload } from '../upload/entities/upload.entity';
  * Connection pooling is configured via the `extra.connectionLimit` option.
  * Auto-retry ensures the app waits for the database to become available.
  */
+
+/**
+ * Resolves the database password from multiple possible env var names.
+ * This provides flexibility across different deployment environments
+ * (Render, Railway, local .env, etc.) that may use different key names.
+ */
+function resolveDbPassword(configService: ConfigService): string | undefined {
+  const candidates = ['DB_PASSWORD', 'DATABASE_PASSWORD', 'MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD'];
+  for (const key of candidates) {
+    const value = configService.get<string>(key);
+    if (value) return value;
+  }
+  console.warn('[DB] No database password found via any env var (tried: %s)', candidates.join(', '));
+  return undefined;
+}
+
 export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'mysql',
   autoLoadEntities: true,
@@ -25,7 +41,7 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
   host: configService.get<string>('DB_HOST'),
   port: configService.get<number>('DB_PORT', 4000),
   username: configService.get<string>('DB_USER'),
-  password: configService.get<string>('DB_PASSWORD'),
+  password: resolveDbPassword(configService),
   database: configService.get<string>('DB_NAME'),
 
   entities: [User, Category, Product, Sale, SaleItem, FileUpload],

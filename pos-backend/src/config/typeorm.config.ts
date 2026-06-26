@@ -18,12 +18,26 @@ dotenv.config();
  * Run: npm run migration:run
  * Run: npm run migration:revert
  */
+
+/**
+ * Resolves the database password from multiple possible env var names.
+ */
+function resolveDbPassword(): string {
+  const candidates = ['DB_PASSWORD', 'DATABASE_PASSWORD', 'MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD'];
+  for (const key of candidates) {
+    const value = process.env[key];
+    if (value) return value;
+  }
+  console.warn('[DB] No database password found via any env var (tried: %s)', candidates.join(', '));
+  return '';
+}
+
 export default new DataSource({
   type: 'mysql',
   host: process.env.DB_HOST || 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
   port: parseInt(process.env.DB_PORT, 10) || 4000,
   username: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  password: resolveDbPassword(),
   database: process.env.DB_NAME || 'pos_db',
   entities: [User, Category, Product, Sale, SaleItem, FileUpload, ManagementPage],
   migrations: ['src/migrations/**/*.ts'],
