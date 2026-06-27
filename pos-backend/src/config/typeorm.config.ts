@@ -49,5 +49,7 @@ export default new DataSource({
   },
   extra: {
     connectionLimit: 5,
+    charset: 'utf8mb4',
+    initCommand: "SET NAMES utf8mb4",
   },
 });

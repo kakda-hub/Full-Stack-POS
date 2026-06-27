@@ -142,6 +142,8 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
 
     extra: {
       connectionLimit: 10,
+      charset: 'utf8mb4',
+      initCommand: "SET NAMES utf8mb4",
     },
 
     // Retry connection up to 10 times with 3s delay

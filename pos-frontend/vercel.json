@@ -1,11 +1,11 @@
 {
+  "buildCommand": "npm run build -- --configuration=production",
+  "outputDirectory": "dist/pos-system/browser",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/pos-system/browser",
-  "framework": null
+  ]
 }

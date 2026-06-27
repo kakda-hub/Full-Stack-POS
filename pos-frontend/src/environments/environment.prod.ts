@@ -8,5 +8,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://pos-backend.onrender.com', // ← Replace with your actual Render URL
+  apiUrl: 'https://full-stack-pos.onrender.com/api/v1',
 };
