@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build -- --configuration=production",
+  "buildCommand": "npm install -g @angular/cli && ng build --configuration=production",
   "outputDirectory": "dist/pos-system/browser",
-  "framework": null,
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/(.*)",
