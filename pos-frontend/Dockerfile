@@ -1,5 +1,5 @@
 # ─── Stage 1: Development (hot reload) ──────────────────────────
-FROM node:20-alpine as development
+FROM node:20-alpine AS development
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ EXPOSE 4200
 CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]
 
 # ─── Stage 2: Build for production ──────────────────────────────
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
