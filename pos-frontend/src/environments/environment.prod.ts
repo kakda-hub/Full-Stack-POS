@@ -8,5 +8,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://full-stack-pos.onrender.com/api/v1',
+  apiUrl: '', // Uses Vercel rewrites to proxy /api/v1/* to Render
 };

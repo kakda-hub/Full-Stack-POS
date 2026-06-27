@@ -26,5 +26,5 @@ Thumbs.db
 *.sln
 *.sw?
 
-# TypeORM
-migrations/
+# TypeORM compiled migration output (source migrations in src/migrations/ are tracked)
+dist/migrations/
