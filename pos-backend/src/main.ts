@@ -29,11 +29,16 @@ async function bootstrap() {
     },
   }));
   // ─── CORS ──────────────────────────────────────────────────────────────────
-  // Use `origin: true` to echo back the requesting origin. This allows any
-  // Vercel preview domain (e.g. project-xxx.vercel.app) to call the API.
-  // For stricter security, set FRONTEND_URL to an exact domain in production.
+  // Restrict origins to the production Vercel domain and all Vercel preview
+  // subdomains so preview deployments can call the API.
+  // Override via FRONTEND_URL env var for a single specific origin if needed.
   app.enableCors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: process.env.FRONTEND_URL
+      ? [process.env.FRONTEND_URL]
+      : [
+          'https://full-stack-ggqlc56hj-full-stack-pos.vercel.app',
+          /\.vercel\.app$/,
+        ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
