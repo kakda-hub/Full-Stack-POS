@@ -3,25 +3,41 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/c
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let requestUrl = request.url;
+
+    // If the request is a relative API call, prepend the backend host
+    if (requestUrl.startsWith('/api/')) {
+      let hostUrl = environment.apiUrl;
+      if (hostUrl && hostUrl.includes('/api/v1')) {
+        hostUrl = hostUrl.split('/api/v1')[0];
+      }
+      
+      if (hostUrl) {
+        requestUrl = `${hostUrl.replace(/\/$/, '')}${requestUrl}`;
+      }
+    }
+
     // Get token from AuthService
     const token = this.authService.getToken();
 
-    // If token exists, clone the request and add Authorization header
+    // Clone the request and add Authorization header and updated URL
+    let clonedRequest = request.clone({ url: requestUrl });
+    
     if (token) {
-      const clonedRequest = request.clone({
+      clonedRequest = clonedRequest.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         }
       });
-      return next.handle(clonedRequest);
     }
 
-    // If no token, continue with the original request
-    return next.handle(request);
+    return next.handle(clonedRequest);
   }
 }
