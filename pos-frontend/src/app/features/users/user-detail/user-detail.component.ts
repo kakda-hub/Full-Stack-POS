@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserService } from '../../../services/user.service';
+import { LanguageService } from '../../../core/services/language.service';
 import { AlertService } from '../../../core/services/alert.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -13,6 +15,7 @@ import { AlertService } from '../../../core/services/alert.service';
 })
 export class UserDetailComponent implements OnInit {
   form !: FormGroup;
+  isUploading = signal(false);
   roles: any[] = [
     { value: 'admin', viewValue: 'Admin' },
     { value: 'cashier', viewValue: 'Cashier' },
@@ -20,7 +23,6 @@ export class UserDetailComponent implements OnInit {
 
   // Avatar state
   avatarPreview: string | null = null;
-  selectedAvatarFile: File | null = null;
 
   get id(): number | undefined {
     return this.data?.user?.id;
@@ -35,9 +37,11 @@ export class UserDetailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
+    public lang: LanguageService,
     public dialogRef: MatDialogRef<UserDetailComponent>,
     private userService: UserService,
     private alertService: AlertService,
+    private cloudinaryService: CloudinaryService,
     @Inject(MAT_DIALOG_DATA) public data: { user?: any } | null,
   ) {
   }
@@ -67,13 +71,37 @@ export class UserDetailComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     const file = input.files[0];
-    this.selectedAvatarFile = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.avatarPreview = reader.result as string;
-      this.cdr.markForCheck();
-    };
-    reader.readAsDataURL(file);
+
+    this.isUploading.set(true);
+
+    this.cloudinaryService.uploadFile(file).subscribe({
+      next: (res) => {
+        // Extract fileUrl from the nested response envelope
+        const fileUrl =
+          res?.data?.data?.fileUrl ||          // { data: { data: { fileUrl } } }
+          res?.data?.data?.[0]?.fileUrl ||      // { data: { data: [{ fileUrl }] } }
+          res?.data?.fileUrl;                    // { data: { fileUrl } }
+
+        if (fileUrl) {
+          this.avatarPreview = fileUrl;
+          this.alertService.success(
+            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
+            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+          );
+        }
+        this.isUploading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Upload failed', err);
+        this.alertService.error(
+          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Avatar upload failed',
+          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error'
+        );
+        this.isUploading.set(false);
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   onSubmit() {
@@ -86,23 +114,12 @@ export class UserDetailComponent implements OnInit {
       delete payload.password;
     }
 
-    if (this.selectedAvatarFile) {
-      this.userService.uploadAvatar(this.selectedAvatarFile).subscribe({
-        next: (res: any) => {
-          const fileUrl = res?.data?.[0]?.fileUrl;
-          if (fileUrl) {
-            payload.avatarUrl = fileUrl;
-          }
-          this.saveOrUpdateUser(payload);
-        },
-        error: (err) => {
-          console.error('Failed to upload avatar', err);
-          this.alertService.error('Failed to upload avatar');
-        }
-      });
-    } else {
-      this.saveOrUpdateUser(payload);
+    // Use the Cloudinary-uploaded avatar URL if available
+    if (this.avatarPreview && this.avatarPreview !== this.data?.user?.avatarUrl) {
+      payload.avatarUrl = this.avatarPreview;
     }
+
+    this.saveOrUpdateUser(payload);
   }
 
   private saveOrUpdateUser(payload: any) {

@@ -10,14 +10,20 @@
           <img
             [src]="currentAvatar"
             class="w-24 h-24 rounded-full object-cover border-4 border-indigo-100 shadow-md"
+            [class.opacity-50]="isUploading()"
             alt="Avatar"
           />
+          @if (isUploading()) {
+            <div class="absolute inset-0 rounded-full flex items-center justify-center">
+              <span class="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></span>
+            </div>
+          }
           <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <mat-icon class="text-white" style="font-size:28px;width:28px;height:28px;">camera_alt</mat-icon>
           </div>
         </div>
         <span class="text-xs text-slate-400">{{ 'label.clickToChangeAvatar' | translate }}</span>
-        <input #avatarInput type="file" accept="image/*" class="hidden" (change)="onAvatarSelected($event)" />
+        <input #avatarInput type="file" accept="image/*" class="hidden" (change)="onAvatarSelected($event)" [disabled]="isUploading()" />
       </div>
 
       <app-input-field

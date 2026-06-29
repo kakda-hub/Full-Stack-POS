@@ -13,9 +13,11 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AlertService } from '../../../core/services/alert.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 import { ProductService } from '../../../services/product.service';
 import { CategoriesService } from '../../../services/categories.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -43,6 +45,8 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public lang: LanguageService,
+    private cloudinaryService: CloudinaryService,
+    private alertService: AlertService,
     private categoryService: CategoriesService,
     private productService: ProductService,
     public theme: ThemeService,
@@ -96,20 +100,30 @@ export class ProductDetailComponent implements OnInit {
     if (!file) return;
 
     this.isUploading.set(true);
-    const formData = new FormData();
-    formData.append('file', file);
 
-    this.http.post<any>('/api/v1/dynamicFileupload', formData).subscribe({
+    this.cloudinaryService.uploadFile(file).subscribe({
       next: (res) => {
-        if (res?.data?.fileUrl) {
-          this.form.patchValue({ imgUrl: res.data.fileUrl });
-        } else if (res?.data?.data?.[0]?.fileUrl) {
-          this.form.patchValue({ imgUrl: res.data.data[0].fileUrl });
+        // Extract fileUrl from the nested response envelope
+        const fileUrl =
+          res?.data?.data?.fileUrl ||          // { data: { data: { fileUrl } } }
+          res?.data?.data?.[0]?.fileUrl ||      // { data: { data: [{ fileUrl }] } }
+          res?.data?.fileUrl;                    // { data: { fileUrl } }
+
+        if (fileUrl) {
+          this.form.patchValue({ imgUrl: fileUrl });
+          this.alertService.success(
+            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Image uploaded successfully',
+            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+          );
         }
         this.isUploading.set(false);
       },
       error: (err) => {
         console.error('Upload failed', err);
+        this.alertService.error(
+          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Image upload failed',
+          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error'
+        );
         this.isUploading.set(false);
       },
     });

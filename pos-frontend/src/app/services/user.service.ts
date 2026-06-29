@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AbstractRest } from './shared/abstract-rest.service';
 import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
 import { DynamicHttp } from './shared/dynamic-http.service';
@@ -11,7 +10,7 @@ import { DataResponse } from '../core/models/data-response';
 })
 export class UserService extends AbstractRest {
 
-  constructor(protected http: DynamicHttp, private httpClient: HttpClient) {
+  constructor(protected http: DynamicHttp) {
     super(http);
   }
 
@@ -26,16 +25,6 @@ export class UserService extends AbstractRest {
     return this.http.patch<DataResponse>(`${this.getUrl()}/${id}`, body);
   }
 
-  /**
-   * Upload avatar using /dynamicFileupload and return the response containing fileUrl
-   */
-  uploadAvatar(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('uploadBy', 'user-avatar');
 
-    return this.httpClient
-      .post('/api/v1/dynamicFileupload', formData);
-  }
 }
 
