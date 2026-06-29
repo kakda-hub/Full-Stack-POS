@@ -34,7 +34,7 @@ async function bootstrap() {
   // Override via FRONTEND_URL env var for a single specific origin if needed.
   app.enableCors({
     origin: process.env.FRONTEND_URL
-      ? [process.env.FRONTEND_URL]
+      ? [process.env.FRONTEND_URL, /\.vercel\.app$/]
       : [
           'https://full-stack-ggqlc56hj-full-stack-pos.vercel.app',
           /\.vercel\.app$/,
