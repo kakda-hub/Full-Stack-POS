@@ -15,6 +15,12 @@ export class AuthInterceptor implements HttpInterceptor {
     // If the request is a relative API call, prepend the backend host
     if (requestUrl.startsWith('/api/')) {
       let hostUrl = environment.apiUrl;
+      
+      // Fallback for Vercel deployment if environment.prod.ts is not applied
+      if (!hostUrl && window.location.hostname !== 'localhost') {
+        hostUrl = 'https://full-stack-pos.onrender.com/api/v1';
+      }
+
       if (hostUrl && hostUrl.includes('/api/v1')) {
         hostUrl = hostUrl.split('/api/v1')[0];
       }
