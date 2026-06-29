@@ -1,99 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { randomUUID } from 'crypto';
 import * as path from 'path';
-import * as sharp from 'sharp';
 import { FileUpload } from './entities/upload.entity';
 import { ConfigService } from '@nestjs/config';
+import { v2 as cloudinary } from 'cloudinary';
+import { UploadApiResponse } from 'cloudinary';
+import * as streamifier from 'streamifier';
 
 @Injectable()
 export class UploadService {
-  private s3Client: S3Client;
-  private bucketName: string;
-
   constructor(
     @InjectRepository(FileUpload)
     private readonly uploadRepository: Repository<FileUpload>,
     private configService: ConfigService,
   ) {
-    this.s3Client = new S3Client({
-      endpoint: this.configService.get<string>('S3_ENDPOINT'),
-      region: this.configService.get<string>('S3_REGION', 'us-east-1'),
-      credentials: {
-        accessKeyId: this.configService.get<string>('S3_ACCESS_KEY'),
-        secretAccessKey: this.configService.get<string>('S3_SECRET_KEY'),
-      },
-      forcePathStyle: true, // Required for Minio
+    cloudinary.config({
+      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME') || 'djltk2q3n',
+      api_key: this.configService.get<string>('CLOUDINARY_API_KEY') || '672462659274597',
+      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET') || 'WVTkBmRHVkoWrxnf1MYn6B-JNyA',
     });
-    this.bucketName = this.configService.get<string>('S3_BUCKET');
   }
 
   async uploadFile(file: Express.Multer.File, user: string = 'admin'): Promise<FileUpload> {
-    const fileExtension = path.extname(file.originalname).substring(1).toLowerCase();
-    const fileName = `${randomUUID()}.${fileExtension}`;
+    return new Promise((resolve, reject) => {
+      const upload = cloudinary.uploader.upload_stream(
+        {
+          folder: 'pos-general',
+          resource_type: 'auto'
+        },
+        async (error, result: UploadApiResponse) => {
+          if (error) {
+            console.error('Cloudinary Upload Error Details:', error);
+            return reject(error);
+          }
 
-    // Generate date-based path: document/general/YYYY/MM/DD
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const filePath = `document/general/${year}/${month}/${day}`;
+          // Save metadata to DB
+          const fileUpload = this.uploadRepository.create({
+            originalFileName: file.originalname,
+            fileName: `${result.public_id}.${result.format}`,
+            filePath: result.folder,
+            fileUrl: result.secure_url,
+            fileExtension: result.format,
+            fileSize: file.size,
+            uploadBy: user,
+            destinationStorage: 'CLOUDINARY',
+            width: result.width,
+            height: result.height,
+          });
 
-    const fullPath = `${filePath}/${fileName}`;
-
-    // Upload to S3/Minio
-    try {
-      await this.s3Client.send(
-        new PutObjectCommand({
-          Bucket: this.bucketName,
-          Key: fullPath,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }),
+          try {
+            const savedFile = await this.uploadRepository.save(fileUpload);
+            resolve(savedFile);
+          } catch (dbError) {
+            console.error('Database Save Error:', dbError);
+            reject(dbError);
+          }
+        },
       );
-    } catch (error) {
-      console.error('S3 Upload Error Details:', {
-        message: error.message,
-        code: error.code,
-        endpoint: this.configService.get('S3_ENDPOINT'),
-        bucket: this.bucketName,
-      });
-      throw error;
-    }
 
-    const baseUrl = this.configService.get<string>('S3_PUBLIC_URL') || this.configService.get<string>('S3_ENDPOINT');
-    const fileUrl = `${baseUrl}/${this.bucketName}/${fullPath}`;
-
-    let width = null;
-    let height = null;
-
-    if (file.mimetype.startsWith('image/')) {
-      try {
-        const metadata = await sharp(file.buffer).metadata();
-        width = metadata.width;
-        height = metadata.height;
-      } catch (e) {
-        console.error('Error getting image metadata:', e);
-      }
-    }
-
-    // Save metadata to DB
-    const fileUpload = this.uploadRepository.create({
-      originalFileName: file.originalname,
-      fileName: fileName,
-      filePath: filePath,
-      fileUrl: fileUrl,
-      fileExtension: fileExtension,
-      fileSize: file.size,
-      uploadBy: user,
-      destinationStorage: 'MINIO',
-      width,
-      height,
+      streamifier.createReadStream(file.buffer).pipe(upload);
     });
-
-    return this.uploadRepository.save(fileUpload);
   }
 
   formatResponse(file: FileUpload) {
