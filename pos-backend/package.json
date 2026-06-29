@@ -17,7 +17,10 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run typeorm -- migration:generate -d src/config/typeorm.config.ts",
     "migration:run": "npm run typeorm -- migration:run -d src/config/typeorm.config.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/config/typeorm.config.ts"
+    "migration:revert": "npm run typeorm -- migration:revert -d src/config/typeorm.config.ts",
+    "seed:products": "ts-node -r tsconfig-paths/register src/seed/seed-products.ts",
+    "seed:sales": "ts-node -r tsconfig-paths/register src/seed/seed-sales.ts",
+    "seed:all": "npm run seed:products && npm run seed:sales"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1035.0",

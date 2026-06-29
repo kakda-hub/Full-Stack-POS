@@ -95,7 +95,7 @@
     </div>
   </div>
 
-  <!-- Skeleton panels (same as before) -->
+  <!-- Skeleton panels -->
   <div *ngIf="isLoading()" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
     <div class="rounded-2xl border p-5" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()">
       <app-skeleton variant="text" width="160px" height="16px" class="block mb-4"></app-skeleton>
@@ -103,92 +103,206 @@
     </div>
     <div class="rounded-2xl border p-5" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()">
       <app-skeleton variant="text" width="160px" height="16px" class="block mb-4"></app-skeleton>
-      <div *ngFor="let i of [1,2,3,4]" class="mb-2"><app-skeleton variant="list-item"></app-skeleton></div>
+      <div *ngFor="let i of [1,2]" class="mb-3"><app-skeleton variant="list-item"></app-skeleton></div>
+    </div>
+    <div class="rounded-2xl border p-5" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()">
+      <app-skeleton variant="text" width="160px" height="16px" class="block mb-4"></app-skeleton>
+      <div *ngFor="let i of [1,2,3]" class="mb-3"><app-skeleton variant="list-item"></app-skeleton></div>
+    </div>
+    <div class="rounded-2xl border p-5" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()">
+      <app-skeleton variant="text" width="160px" height="16px" class="block mb-4"></app-skeleton>
+      <div *ngFor="let i of [1,2]" class="mb-2"><app-skeleton variant="list-item"></app-skeleton></div>
     </div>
   </div>
 
+  <!-- Row 1: Daily Revenue + Top Products -->
   <div *ngIf="!isLoading()" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-    <!-- Payment Breakdown -->
-        <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
-          <h2 class="font-bold text-slate-800 mb-4">
-            {{ lang.currentLang() === 'km' ? 'ការបែងចែកការទូទាត់' : 'Payment Breakdown' }}
-          </h2>
-          <div *ngIf="paymentEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
-            {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No transactions today' }}
+    <!-- Daily Revenue Chart -->
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
+          {{ lang.currentLang() === 'km' ? 'ចំណូលប្រចាំថ្ងៃ' : 'Daily Revenue' }}
+        </h2>
+        <span class="text-xs text-slate-400" *ngIf="dailyRevenueEntries().length > 0">
+          {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}: ${{ dailyRevenue().reduce((s, e) => s + e.revenue, 0).toFixed(2) }}
+        </span>
+      </div>
+      <div *ngIf="dailyRevenueEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
+        {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range' }}
+      </div>
+      <div *ngIf="dailyRevenueEntries().length > 0" class="flex items-end gap-1 sm:gap-2 h-48 overflow-x-auto pb-8 relative">
+        <div *ngFor="let entry of dailyRevenueEntries()" class="flex-1 flex flex-col items-center min-w-[36px] group">
+          <!-- Tooltip -->
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity mb-1 text-xs bg-slate-800 text-white px-2 py-1 rounded-lg whitespace-nowrap z-10 shadow-lg">
+            ${{ entry.revenue.toFixed(0) }} ({{ entry.totalSales }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'sales' }})
           </div>
-          <div class="space-y-3">
-            <div *ngFor="let entry of paymentEntries()" class="flex items-center gap-3">
-              <div class="text-2xl">{{ getPaymentIcon(entry.method) }}</div>
-              <div class="flex-1">
-                <div class="flex justify-between text-sm mb-1">
-                  <span class="font-semibold capitalize text-slate-700">{{ entry.method }}</span>
-                  <span class="text-slate-500">{{ entry.count }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'txns' }}</span>
-                </div>
-                <div [class.bg-slate-700]="theme.isDark()" [class.bg-slate-100]="!theme.isDark()" class="h-2 rounded-full overflow-hidden">
-                  <div [style.width.%]="entry.pct"
-                    [class]="getBarColor(entry.method) + ' h-full rounded-full transition-all duration-500'"></div>
-                </div>
-                <div class="text-right mt-0.5 text-sm font-bold text-slate-700">${{ entry.amount.toFixed(2) }}</div>
-              </div>
+          <!-- Bar -->
+          <div class="w-full flex-1 flex items-end justify-center">
+            <div
+              [style.height.%]="entry.pct"
+              [class.bg-indigo-500]="!theme.isDark()"
+              [class.bg-indigo-400]="theme.isDark()"
+              class="w-3/4 rounded-t-md transition-all duration-500 min-h-[4px] hover:opacity-80 cursor-pointer">
             </div>
           </div>
+          <!-- Date label -->
+          <span class="text-[10px] text-slate-400 mt-1 absolute bottom-0 truncate max-w-full text-center">
+            {{ formatDateLabel(entry.date) }}
+          </span>
         </div>
+      </div>
+    </div>
 
-        <!-- Recent Transactions -->
-        <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
-          <h2 class="font-bold text-slate-800 mb-4">
-            {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការថ្មីៗ' : 'Recent Transactions' }}
-          </h2>
-          <div *ngIf="sales().length === 0" class="text-center py-8 text-slate-400 text-sm">
-            {{ lang.currentLang() === 'km' ? 'គ្មានប្រតិបត្តិការ' : 'No transactions today' }}
+    <!-- Top Products -->
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
+          {{ lang.currentLang() === 'km' ? 'ផលិតផលលក់ដាច់' : 'Top Products' }}
+        </h2>
+        <span class="text-xs text-slate-400">{{ lang.currentLang() === 'km' ? 'លក់ដាច់' : 'Best sellers' }}</span>
+      </div>
+      <div *ngIf="topProductEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
+        {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range' }}
+      </div>
+      <div class="space-y-3">
+        <div *ngFor="let entry of topProductEntries(); let i = index" class="flex items-center gap-3">
+          <!-- Rank badge -->
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+            [class]="i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-100 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-50 text-slate-400'">
+            {{ i + 1 }}
           </div>
-          <div [@listAnimation]="sales().length" class="space-y-2">
-            <div *ngFor="let txn of sales().slice(0, 8); trackBy: trackById"
-              @fadeIn [class.hover:bg-slate-700]="theme.isDark()" [class.hover:bg-slate-50]="!theme.isDark()" class="flex items-center gap-3 p-3 rounded-xl transition-colors">
-              <div class="text-lg">{{ getPaymentIcon(txn.paymentMethod) }}</div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-slate-800 truncate">{{ txn.id }}</p>
-                <p class="text-xs text-slate-400">{{ txn.createdAt | date:'HH:mm' }} · {{ txn.user?.name || 'Unknown' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="font-bold text-indigo-600">${{ txn.total.toFixed(2) }}</p>
-                <p class="text-xs text-slate-400 capitalize">{{ txn.paymentMethod }}</p>
-              </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-semibold text-slate-700 truncate">{{ entry.productName }}</span>
+              <span class="text-slate-500 ml-2 shrink-0">{{ entry.totalQuantitySold }} {{ lang.currentLang() === 'km' ? 'ដុំ' : 'pcs' }}</span>
             </div>
+            <div [class.bg-slate-700]="theme.isDark()" [class.bg-slate-100]="!theme.isDark()" class="h-2 rounded-full overflow-hidden">
+              <div [style.width.%]="entry.pct" class="h-full rounded-full transition-all duration-500"
+                [class]="i === 0 ? 'bg-amber-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-orange-400' : 'bg-indigo-300'"></div>
+            </div>
+            <div class="text-right mt-0.5 text-xs text-slate-500">${{ entry.totalRevenue.toFixed(2) }}</div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Payment Breakdown + Sales by Cashier -->
+  <div *ngIf="!isLoading()" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+    <!-- Payment Breakdown -->
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
+      <h2 class="font-bold mb-4" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
+        {{ lang.currentLang() === 'km' ? 'ការបែងចែកការទូទាត់' : 'Payment Breakdown' }}
+      </h2>
+      <div *ngIf="paymentEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
+        {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No transactions' }}
+      </div>
+      <div class="space-y-3">
+        <div *ngFor="let entry of paymentEntries()" class="flex items-center gap-3">
+          <div class="text-2xl">{{ getPaymentIcon(entry.method) }}</div>
+          <div class="flex-1">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-semibold capitalize text-slate-700">{{ entry.method }}</span>
+              <span class="text-slate-500">{{ entry.count }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'txns' }}</span>
+            </div>
+            <div [class.bg-slate-700]="theme.isDark()" [class.bg-slate-100]="!theme.isDark()" class="h-2 rounded-full overflow-hidden">
+              <div [style.width.%]="entry.pct"
+                [class]="getBarColor(entry.method) + ' h-full rounded-full transition-all duration-500'"></div>
+            </div>
+            <div class="text-right mt-0.5 text-sm font-bold text-slate-700">${{ entry.amount.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales by Cashier -->
+    <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
+          {{ lang.currentLang() === 'km' ? 'ការលក់តាមអ្នកគិតលុយ' : 'Sales by Cashier' }}
+        </h2>
+      </div>
+      <div *ngIf="cashierEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
+        {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range' }}
+      </div>
+      <div class="space-y-3">
+        <div *ngFor="let entry of cashierEntries(); let i = index" class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base font-bold shrink-0"
+            [class]="i === 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'">
+            {{ entry.cashierName.charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-semibold text-slate-700">{{ entry.cashierName }}</span>
+              <span class="text-slate-500">{{ entry.totalSales }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'sales' }}</span>
+            </div>
+            <div [class.bg-slate-700]="theme.isDark()" [class.bg-slate-100]="!theme.isDark()" class="h-2.5 rounded-full overflow-hidden">
+              <div [style.width.%]="entry.pct" class="h-full rounded-full transition-all duration-500 bg-indigo-500"></div>
+            </div>
+            <div class="text-right mt-0.5 text-sm font-bold text-slate-700">${{ entry.totalRevenue.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm" *ngIf="!isLoading()">
+    <h2 class="font-bold mb-4" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
+      {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការថ្មីៗ' : 'Recent Transactions' }}
+    </h2>
+    <div *ngIf="sales().length === 0" class="text-center py-8 text-slate-400 text-sm">
+      {{ lang.currentLang() === 'km' ? 'គ្មានប្រតិបត្តិការ' : 'No transactions today' }}
+    </div>
+    <div [@listAnimation]="sales().length" class="space-y-2">
+      <div *ngFor="let txn of sales().slice(0, 8); trackBy: trackById"
+        @fadeIn [class.hover:bg-slate-700]="theme.isDark()" [class.hover:bg-slate-50]="!theme.isDark()" class="flex items-center gap-3 p-3 rounded-xl transition-colors">
+        <div class="text-lg">{{ getPaymentIcon(txn.paymentMethod) }}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-800 truncate">{{ txn.id }}</p>
+          <p class="text-xs text-slate-400">{{ txn.createdAt | date:'HH:mm' }} · {{ txn.user?.name || 'Unknown' }}</p>
+        </div>
+        <div class="text-right">
+          <p class="font-bold text-indigo-600">${{ txn.total.toFixed(2) }}</p>
+          <p class="text-xs text-slate-400 capitalize">{{ txn.paymentMethod }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
       <!-- All Transactions Table -->
-      <div @fadeIn class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-100">
-          <h2 class="font-bold text-slate-800">{{ lang.currentLang() === 'km' ? 'ប្រវត្តិប្រតិបត្តិការ' : 'Transaction History' }}</h2>
+      <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b" [class.border-slate-700]="theme.isDark()" [class.border-slate-100]="!theme.isDark()">
+          <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ប្រវត្តិប្រតិបត្តិការ' : 'Transaction History' }}</h2>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
-            <thead class="bg-slate-50 border-b border-slate-100">
+            <thead [class.bg-slate-700]="theme.isDark()" [class.bg-slate-50]="!theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.border-slate-100]="!theme.isDark()" class="border-b">
               <tr>
-                <th class="px-4 py-3 text-left font-semibold text-slate-600">ID</th>
-                <th class="px-4 py-3 text-left font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'ម៉ោង' : 'Time' }}</th>
-                <th class="px-4 py-3 text-left font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'អ្នកលក់' : 'Cashier' }}</th>
-                <th class="px-4 py-3 text-left font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
-                <th class="px-4 py-3 text-left font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
-                <th class="px-4 py-3 text-right font-semibold text-slate-600">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+                <th class="px-4 py-3 text-left font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">ID</th>
+                <th class="px-4 py-3 text-left font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'ម៉ោង' : 'Time' }}</th>
+                <th class="px-4 py-3 text-left font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'អ្នកលក់' : 'Cashier' }}</th>
+                <th class="px-4 py-3 text-left font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
+                <th class="px-4 py-3 text-left font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
+                <th class="px-4 py-3 text-right font-semibold" [class.text-slate-300]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-50">
-              <tr *ngFor="let txn of sales().slice(0, 20); trackBy: trackById" class="hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3 font-mono text-xs text-slate-600">{{ txn.id }}</td>
-                <td class="px-4 py-3 text-slate-600">{{ txn.createdAt | date:'dd/MM HH:mm' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ txn.user?.name || 'Unknown' }}</td>
+            <tbody [class.divide-slate-700]="theme.isDark()" [class.divide-slate-50]="!theme.isDark()" class="divide-y">
+              <tr *ngFor="let txn of sales().slice(0, 20); trackBy: trackById"
+                [class.hover:bg-slate-700]="theme.isDark()"
+                [class.hover:bg-slate-50]="!theme.isDark()"
+                class="transition-colors">
+                <td class="px-4 py-3 font-mono text-xs" [class.text-slate-400]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ txn.id }}</td>
+                <td class="px-4 py-3" [class.text-slate-400]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ txn.createdAt | date:'dd/MM HH:mm' }}</td>
+                <td class="px-4 py-3" [class.text-slate-300]="theme.isDark()" [class.text-slate-700]="!theme.isDark()">{{ txn.user?.name || 'Unknown' }}</td>
                 <td class="px-4 py-3">
                   <span class="capitalize text-xs font-semibold px-2 py-1 rounded-lg"
                     [class]="getPaymentBadge(txn.paymentMethod)">
                     {{ getPaymentIcon(txn.paymentMethod) }} {{ txn.paymentMethod }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-slate-600">{{ txn.items.length }}</td>
-                <td class="px-4 py-3 text-right font-bold text-indigo-700">${{ txn.total.toFixed(2) }}</td>
+                <td class="px-4 py-3" [class.text-slate-400]="theme.isDark()" [class.text-slate-600]="!theme.isDark()">{{ txn.items.length }}</td>
+                <td class="px-4 py-3 text-right font-bold" [class.text-indigo-400]="theme.isDark()" [class.text-indigo-700]="!theme.isDark()">${{ txn.total.toFixed(2) }}</td>
               </tr>
               <tr *ngIf="sales().length === 0">
                 <td colspan="6" class="px-4 py-12 text-center text-slate-400 text-sm">

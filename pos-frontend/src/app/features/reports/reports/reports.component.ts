@@ -3,7 +3,14 @@ import { fadeIn, listAnimation, pageTransition } from '../../../shared/animation
 import { LanguageService } from '../../../core/services/language.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { ReportService, ReportSummary, PaymentSummaryEntry } from '../../../services/report.service';
+import {
+  ReportService,
+  ReportSummary,
+  PaymentSummaryEntry,
+  DailyRevenueEntry,
+  TopProductEntry,
+  SalesByCashierEntry,
+} from '../../../services/report.service';
 import { SaleService } from '../../../services/sale.service';
 
 type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
@@ -40,6 +47,9 @@ export class ReportsComponent implements OnInit {
   // API data
   summary = signal<ReportSummary | null>(null);
   paymentSummary = signal<PaymentSummaryEntry[]>([]);
+  dailyRevenue = signal<DailyRevenueEntry[]>([]);
+  topProducts = signal<TopProductEntry[]>([]);
+  salesByCashier = signal<SalesByCashierEntry[]>([]);
   sales = signal<SaleItem[]>([]);
 
   // Computed date range strings
@@ -81,8 +91,53 @@ export class ReportsComponent implements OnInit {
     }));
   });
 
+  // Computed daily revenue entries for bar chart
+  dailyRevenueEntries = computed(() => {
+    const entries = this.dailyRevenue();
+    const maxRev = Math.max(...entries.map((e) => e.revenue), 1);
+    return entries.map((e) => ({
+      date: e.date,
+      revenue: e.revenue,
+      totalSales: e.totalSales,
+      pct: (e.revenue / maxRev) * 100,
+    }));
+  });
+
+  // Computed top product entries w/ percentage for bars
+  topProductEntries = computed(() => {
+    const entries = this.topProducts();
+    const maxQty = Math.max(...entries.map((e) => e.totalQuantitySold), 1);
+    return entries.map((e) => ({
+      productId: e.productId,
+      productName: e.productName,
+      barcode: e.barcode,
+      totalQuantitySold: e.totalQuantitySold,
+      totalRevenue: e.totalRevenue,
+      pct: (e.totalQuantitySold / maxQty) * 100,
+    }));
+  });
+
+  // Computed cashier entries w/ percentage
+  cashierEntries = computed(() => {
+    const entries = this.salesByCashier();
+    const maxRev = Math.max(...entries.map((e) => e.totalRevenue), 1);
+    return entries.map((e) => ({
+      userId: e.userId,
+      cashierName: e.cashierName,
+      totalSales: e.totalSales,
+      totalRevenue: e.totalRevenue,
+      pct: (e.totalRevenue / maxRev) * 100,
+    }));
+  });
+
   // Low stock count from summary
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
+
+  // Helper: format date label (DD/MM)
+  formatDateLabel(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00');
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
 
   constructor(
     public reportService: ReportService,
@@ -120,6 +175,21 @@ export class ReportsComponent implements OnInit {
     this.reportService.getPaymentSummary(from, to).subscribe({
       next: (res) => this.paymentSummary.set(res),
       error: () => this.paymentSummary.set([]),
+    });
+
+    this.reportService.getDailyRevenue(from, to).subscribe({
+      next: (res) => this.dailyRevenue.set(res),
+      error: () => this.dailyRevenue.set([]),
+    });
+
+    this.reportService.getTopProducts(5, from, to).subscribe({
+      next: (res) => this.topProducts.set(res),
+      error: () => this.topProducts.set([]),
+    });
+
+    this.reportService.getSalesByCashier(from, to).subscribe({
+      next: (res) => this.salesByCashier.set(res),
+      error: () => this.salesByCashier.set([]),
     });
 
     this.saleService.getAllSales().subscribe({

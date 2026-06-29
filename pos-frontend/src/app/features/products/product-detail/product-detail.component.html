@@ -3,6 +3,32 @@
 
   <mat-dialog-content class="!pb-2">
     <div class="flex flex-col gap-4">
+      <!-- Server error banner -->
+      @if (serverError()) {
+        <div
+          class="flex items-start gap-3 p-3 rounded-xl border border-rose-200 dark:border-rose-800/40"
+          [class.bg-rose-50]="!theme.isDark()"
+          [class.bg-rose-900/20]="theme.isDark()"
+          role="alert"
+        >
+          <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div class="flex-1 text-sm text-rose-700 dark:text-rose-300 font-medium whitespace-pre-line">
+            {{ serverError() }}
+          </div>
+          <button
+            type="button"
+            (click)="serverError.set(null)"
+            class="text-rose-400 hover:text-rose-600 transition-colors flex-shrink-0"
+            aria-label="Dismiss error"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      }
       <!-- Image upload -->
       <div class="flex justify-center">
         <div
@@ -110,7 +136,11 @@
               </mat-option>
             }
           </mat-select>
-          <mat-error>{{ 'validate.required' | translate }}</mat-error>
+          @if (form.get('categoryId')?.invalid && form.get('categoryId')?.touched) {
+            <mat-error>
+              {{ 'label.category' | translate }} {{ 'validate.required' | translate }}
+            </mat-error>
+          }
         </mat-form-field>
       </div>
 

@@ -1,13 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
+  Inject,
   OnInit,
+  inject,
+  DestroyRef,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { MatDialogRef } from '@angular/material/dialog';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
@@ -23,13 +26,19 @@ import { CategoriesService } from '../../../services/categories.service';
   styleUrl: './product-detail.component.scss',
 })
 export class ProductDetailComponent implements OnInit {
-  @Input() product: any | null = null;
-
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
+  /** Banner-level server error (e.g., network failure, unexpected error) */
+  serverError = signal<string | null>(null);
 
   categories: any[] = [];
+
+  private destroyRef = inject(DestroyRef);
+
+  get product(): any | null {
+    return this.data?.product ?? null;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -39,23 +48,38 @@ export class ProductDetailComponent implements OnInit {
     public theme: ThemeService,
     private http: HttpClient,
     private dialogRef: MatDialogRef<ProductDetailComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { product?: any } | null,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
     this.getAllCategories();
+
+    // Auto-clear server-side field errors when the user edits the field
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        Object.keys(this.form.controls).forEach(key => {
+          const control = this.form.get(key);
+          if (control?.errors?.['serverError'] && control.dirty) {
+            const { serverError, ...rest } = control.errors;
+            control.setErrors(Object.keys(rest).length ? rest : null);
+          }
+        });
+      });
   }
 
   private initForm() {
+    const product = this.product;
     this.form = this.fb.group({
-      name: [this.product?.name || '', [Validators.required]],
-      nameKh: [this.product?.nameKh || this.product?.nameKm || ''],
-      price: [this.product?.price || 0, [Validators.required, Validators.min(0)]],
-      stock: [this.product?.stock || 0, [Validators.required, Validators.min(0)]],
-      barcode: [this.product?.barcode || ''],
-      categoryId: [this.product?.categoryId || 1, [Validators.required]],
-      imgUrl: [this.product?.imgUrl || ''],
-      description: [this.product?.description || ''],
+      name: [product?.name || '', [Validators.required, Validators.minLength(2)]],
+      nameKh: [product?.nameKh || product?.nameKm || ''],
+      price: [product?.price || '', [Validators.required, Validators.min(0.01), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      stock: [product?.stock || '', [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
+      barcode: [product?.barcode || '', [Validators.required]],
+      categoryId: [Number(product?.categoryId ?? product?.category) || '', [Validators.required]],
+      imgUrl: [product?.imgUrl || ''],
+      description: [product?.description || ''],
     });
   }
 
@@ -91,6 +115,55 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  /** Clear all server-side errors on the form */
+  private clearServerErrors(): void {
+    this.serverError.set(null);
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control?.errors?.['serverError']) {
+        const { serverError, ...rest } = control.errors;
+        control.setErrors(Object.keys(rest).length ? rest : null);
+      }
+    });
+  }
+
+  /** Map HTTP error to form field errors or banner error */
+  private handleServerError(err: HttpErrorResponse): void {
+    this.clearServerErrors();
+
+    if (err.status === 409) {
+      // Conflict — e.g., duplicate barcode
+      const msg = err.error?.message || err.message || '';
+      if (msg.toLowerCase().includes('barcode')) {
+        this.form.get('barcode')?.setErrors({ serverError: msg });
+        this.form.get('barcode')?.markAsTouched();
+      } else {
+        this.serverError.set(msg);
+      }
+      return;
+    }
+
+    if (err.status === 400 && Array.isArray(err.error?.message)) {
+      // Validation error from NestJS ValidationPipe
+      const fieldMessages = err.error.message as string[];
+      fieldMessages.forEach(msg => {
+        // Try to match field name from message like "name must be..."
+        const matched = msg.match(/^(\w+)\s/);
+        if (matched && this.form.get(matched[1])) {
+          this.form.get(matched[1])?.setErrors({ serverError: msg });
+        } else {
+          // General validation message
+          this.serverError.update(prev => prev ? `${prev}\n${msg}` : msg);
+        }
+      });
+      return;
+    }
+
+    // Network or unexpected error
+    const msg = err.error?.message || err.message || 'An unexpected error occurred';
+    this.serverError.set(msg);
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -98,10 +171,12 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.isSaving.set(true);
+    this.serverError.set(null);
     const payload = this.form.value;
 
-    const request$ = this.product?.id
-      ? this.productService.updateProduct(this.product.id, payload)
+    const product = this.product;
+    const request$ = product?.id
+      ? this.productService.updateProduct(product.id, payload)
       : this.productService.createProduct(payload);
 
     request$.subscribe({
@@ -109,9 +184,10 @@ export class ProductDetailComponent implements OnInit {
         this.isSaving.set(false);
         this.dialogRef.close(res);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Failed to save product', err);
         this.isSaving.set(false);
+        this.handleServerError(err);
       },
     });
   }

@@ -10,6 +10,20 @@
   />
 
   @if (inputControl.invalid && inputControl.touched) {
-    <mat-error> {{ placeholder }} {{ "validate.required" | translate }}</mat-error>
+    <mat-error>
+      @if (inputControl.errors?.['required']) {
+        {{ placeholder }} {{ 'validate.required' | translate }}
+      } @else if (inputControl.errors?.['minlength']) {
+        {{ 'validate.minLength' | translate: { min: inputControl.errors?.['minlength'].requiredLength } }}
+      } @else if (inputControl.errors?.['min']) {
+        {{ placeholder }} {{ 'validate.min' | translate: { min: inputControl.errors?.['min'].min } }}
+      } @else if (inputControl.errors?.['max']) {
+        {{ placeholder }} {{ 'validate.max' | translate: { max: inputControl.errors?.['max'].max } }}
+      } @else if (inputControl.errors?.['pattern']) {
+        {{ 'validate.invalidFormat' | translate }}
+      } @else {
+        {{ errorMessage }}
+      }
+    </mat-error>
   }
 </mat-form-field>

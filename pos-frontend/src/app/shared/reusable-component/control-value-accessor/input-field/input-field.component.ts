@@ -69,6 +69,10 @@ export class InputFieldComponent implements ControlValueAccessor, OnInit {
       if (control.errors['required']) return `${this.placeholder} is required`;
       if (control.errors['email']) return `Invalid email format`;
       if (control.errors['minlength']) return `Min ${control.errors['minlength'].requiredLength} characters required`;
+      if (control.errors['min']) return `${this.placeholder} must be at least ${control.errors['min'].min}`;
+      if (control.errors['max']) return `${this.placeholder} must be at most ${control.errors['max'].max}`;
+      if (control.errors['pattern']) return `Invalid ${this.placeholder} format`;
+      if (control.errors['serverError']) return control.errors['serverError'];
     }
     return '';
   }

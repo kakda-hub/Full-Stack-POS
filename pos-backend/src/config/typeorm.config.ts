@@ -44,9 +44,12 @@ export default new DataSource({
   synchronize: false,
   logging: true,
   charset: 'utf8mb4',
-  ssl: {
-    rejectUnauthorized: true,
-  },
+  ssl: process.env.DB_SSL === 'false'
+    ? false
+    : {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true,
+      },
   extra: {
     connectionLimit: 5,
     charset: 'utf8mb4',

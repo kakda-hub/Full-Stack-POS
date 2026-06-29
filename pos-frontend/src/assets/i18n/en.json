@@ -130,7 +130,16 @@
     "save": "Save"
   },
   "validate": {
-    "required": "is required"
+    "required": "is required",
+    "minLength": "Min {{min}} characters required",
+    "invalidFormat": "Invalid format",
+    "min": "Must be at least {{min}}",
+    "max": "Must be at most {{max}}"
+  },
+  "error": {
+    "barcodeExists": "Barcode already exists",
+    "saveFailed": "Failed to save product",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "label": {
     "name": "Name",
