@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as path from 'path';
 import { FileUpload } from './entities/upload.entity';
-import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import * as streamifier from 'streamifier';
@@ -13,14 +11,7 @@ export class UploadService {
   constructor(
     @InjectRepository(FileUpload)
     private readonly uploadRepository: Repository<FileUpload>,
-    private configService: ConfigService,
-  ) {
-    cloudinary.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME') || 'djltk2q3n',
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY') || '672462659274597',
-      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET') || 'WVTkBmRHVkoWrxnf1MYn6B-JNyA',
-    });
-  }
+  ) {}
 
   async uploadFile(file: Express.Multer.File, user: string = 'admin'): Promise<FileUpload> {
     return new Promise((resolve, reject) => {
