@@ -146,7 +146,7 @@
           *ngFor="let product of productService.filteredProducts(); trackBy: trackById"
           @fadeIn
           (click)="addToCart(product)"
-          [disabled]="product.stock === 0"
+          [disabled]="effectiveStock(product) <= 0"
           [class.bg-slate-800]="theme.isDark()"
           [class.border-slate-700]="theme.isDark()"
           [class.bg-white]="!theme.isDark()"
@@ -163,14 +163,15 @@
             >+1</span>
           }
           <!-- Low-stock badge -->
-          @if (product.stock > 0 && product.stock <= 5) {
+          @let avail = effectiveStock(product);
+          @if (avail > 0 && avail <= 5) {
             <span
               class="absolute -top-2 -right-2 z-10 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
             >
-              {{ product.stock }}
+              {{ avail }}
               {{ langService.currentLang() === 'km' ? 'នៅសល់' : 'left' }}
             </span>
-          } @else if (product.stock === 0) {
+          } @else if (avail <= 0) {
             <span
               class="absolute -top-2 -right-2 z-10 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
             >
@@ -180,7 +181,7 @@
           <img
             [src]="product.imgUrl || getProductPhoto(product.category)"
             [alt]="product.name"
-            [class.opacity-40]="product.stock === 0"
+            [class.opacity-40]="avail <= 0"
             class="w-full h-20 rounded-xl mb-3 object-cover"
           />
           <div class="space-y-1">
@@ -190,7 +191,7 @@
               }}
             </p>
             <p class="text-indigo-600 font-bold text-sm">${{ product.price.toFixed(2) }}</p>
-            @if (product.stock === 0) {
+            @if (avail <= 0) {
               <p class="text-[10px] text-rose-500 uppercase font-bold tracking-wider">
                 {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
               </p>
@@ -202,7 +203,7 @@
                 [class.font-bold]="lastAddedId() === product.id"
                 [class.text-slate-400]="lastAddedId() !== product.id"
               >
-                {{ product.stock }}
+                {{ avail }}
                 {{ langService.currentLang() === 'km' ? 'ក្នុងស្តុក' : 'in stock' }}
               </p>
             }
@@ -329,9 +330,10 @@
             <span class="w-6 text-center text-sm font-bold" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
-              class="w-7 h-7 rounded-lg border bg-white flex items-center justify-center text-slate-600"
-              [title]="langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity'"
-              [attr.aria-label]="langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity'"
+              [disabled]="item.quantity >= item.product.stock"
+              class="w-7 h-7 rounded-lg border bg-white flex items-center justify-center text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
+              [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
+              [attr.aria-label]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
             >
               +
             </button>

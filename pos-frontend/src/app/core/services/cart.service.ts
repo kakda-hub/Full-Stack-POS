@@ -26,7 +26,17 @@ export class CartService {
 
   itemCount = computed(() => this._items().reduce((sum, i) => sum + i.quantity, 0));
 
+  /** Returns the total quantity of a product already in the cart */
+  quantityInCart(productId: string): number {
+    const item = this._items().find(i => i.product.id === productId);
+    return item ? item.quantity : 0;
+  }
+
   addItem(product: Product): void {
+    // Check that we won't exceed available stock
+    const inCart = this.quantityInCart(product.id);
+    if (inCart >= product.stock) return;
+
     this._items.update(items => {
       const existing = items.find(i => i.product.id === product.id);
       if (existing) {
@@ -44,14 +54,19 @@ export class CartService {
     this._items.update(items => items.filter(i => i.product.id !== productId));
   }
 
-  updateQuantity(productId: string, quantity: number): void {
+  updateQuantity(productId: string, quantity: number): boolean {
     if (quantity <= 0) {
       this.removeItem(productId);
-      return;
+      return true;
     }
+    // Clamp quantity to available stock
+    const item = this._items().find(i => i.product.id === productId);
+    if (!item) return false;
+    const clamped = Math.min(quantity, item.product.stock);
     this._items.update(items =>
-      items.map(i => i.product.id === productId ? { ...i, quantity } : i)
+      items.map(i => i.product.id === productId ? { ...i, quantity: clamped } : i)
     );
+    return clamped === quantity;
   }
 
   updateItemDiscount(productId: string, discount: number): void {

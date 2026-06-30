@@ -125,8 +125,15 @@ export class SalesComponent implements OnInit {
     }
   }
 
+  /** Compute remaining stock after deducting cart quantities */
+  effectiveStock(product: Product): number {
+    const inCart = this.cart.items().find(i => i.product.id === product.id);
+    const qtyInCart = inCart ? inCart.quantity : 0;
+    return product.stock - qtyInCart;
+  }
+
   addToCart(product: Product): void {
-    if (product.stock === 0) {
+    if (this.effectiveStock(product) <= 0) {
       this.alertService.error('Out of stock');
       // Shake animation on out-of-stock click
       this.shakingProductId.set(product.id);
