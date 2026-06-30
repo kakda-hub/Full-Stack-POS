@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { LanguageService } from '../../core/services/language.service';
@@ -14,10 +14,16 @@ import { counterAnimation } from '../../shared/animations/animations';
   styleUrl: './cashier-layout.component.scss',
 })
 export class CashierLayoutComponent {
+  avatarError = signal(false);
+
   constructor(
     public auth: AuthService,
     public langService: LanguageService,
     public cart: CartService,
     public theme: ThemeService,
   ) { }
+
+  onAvatarError() {
+    this.avatarError.set(true);
+  }
 }

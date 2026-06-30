@@ -14,6 +14,7 @@ import { fadeIn } from '../../shared/animations/animations';
 })
 export class AdminLayoutComponent {
     isCollapsed = signal(false);
+    avatarError = signal(false);
 
     selectedMenu = signal<string>('');
 
@@ -34,6 +35,10 @@ export class AdminLayoutComponent {
 
     collapseAll() {
         this.selectedMenu.set('');
+    }
+
+    onAvatarError() {
+        this.avatarError.set(true);
     }
 
     toggleSidebar() {

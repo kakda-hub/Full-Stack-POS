@@ -97,14 +97,29 @@
         [class.text-slate-600]="!theme.isDark()"
       >
         <div
-          class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs"
-          [class.bg-indigo-700]="theme.isDark()"
-          [class.text-indigo-200]="theme.isDark()"
-          [class.bg-indigo-100]="!theme.isDark()"
-          [class.text-indigo-700]="!theme.isDark()"
+          class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ring-2 transition-all duration-300"
+          [class.ring-indigo-400/30]="theme.isDark()"
+          [class.ring-indigo-500/20]="!theme.isDark()"
         >
-          <!-- {{ auth.currentUser()?.name?.charAt(0) }} -->
-          <img class="w-full h-full object-cover" [src]="auth.currentUser()?.avatarUrl" onerror="this.src='https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'" alt="" />
+          @if (auth.currentUser()?.avatarUrl && !avatarError()) {
+            <img
+              class="w-full h-full object-cover"
+              [src]="auth.currentUser()?.avatarUrl"
+              alt=""
+              (error)="onAvatarError()"
+            />
+          } @else {
+            <div
+              class="w-full h-full flex items-center justify-center font-bold text-xs"
+              [class.bg-indigo-700]="theme.isDark()"
+              [class.text-indigo-200]="theme.isDark()"
+              [class.bg-indigo-100]="!theme.isDark()"
+              [class.text-indigo-700]="!theme.isDark()"
+              [attr.aria-label]="(auth.currentUser()?.name || 'User') + ' avatar'"
+            >
+              {{ (auth.currentUser()?.name || 'U').charAt(0).toUpperCase() }}
+            </div>
+          }
         </div>
         <span class="hidden sm:inline font-medium">{{ auth.currentUser()?.name }}</span>
       </div>

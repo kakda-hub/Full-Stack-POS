@@ -23,15 +23,30 @@ export class UserDetailComponent implements OnInit {
 
   // Avatar state
   avatarPreview: string | null = null;
+  avatarError = false;
 
   get id(): number | undefined {
     return this.data?.user?.id;
   }
 
   get currentAvatar(): string {
+    if (this.avatarError) return '';
     return this.avatarPreview
       || this.data?.user?.avatarUrl
-      || 'https://cdn-icons-png.flaticon.com/512/219/219988.png';
+      || '';
+  }
+
+  get hasAvatar(): boolean {
+    return !!(this.avatarPreview || this.data?.user?.avatarUrl);
+  }
+
+  get initials(): string {
+    const name = this.data?.user?.name || '';
+    return name ? name.charAt(0).toUpperCase() : '';
+  }
+
+  get showInitials(): boolean {
+    return !!this.initials;
   }
 
   constructor(
@@ -72,6 +87,7 @@ export class UserDetailComponent implements OnInit {
     if (!input.files?.length) return;
     const file = input.files[0];
 
+    this.avatarError = false;
     this.isUploading.set(true);
 
     this.cloudinaryService.uploadFile(file).subscribe({
