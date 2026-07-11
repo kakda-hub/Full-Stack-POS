@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full-Stack POS System — Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/dracula.css" id="theme" />
+  <style>
+    /* ── Base ── */
+    .reveal {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #e2e8f0;
+    }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Inter', system-ui, sans-serif;
+      text-transform: none;
+      letter-spacing: -0.02em;
+    }
+    .reveal h1 { font-size: 3.2em; font-weight: 900; }
+    .reveal h2 { font-size: 2.2em; font-weight: 800; color: #a5b4fc; }
+    .reveal h3 { font-size: 1.4em; font-weight: 700; color: #c4b5fd; }
+    .reveal h4 { font-size: 1.1em; font-weight: 600; color: #99f6e4; }
+
+    .reveal p, .reveal li { font-size: 0.45em; line-height: 1.6; }
+    .reveal li { margin-bottom: 0.3em; }
+    .reveal pre { font-size: 0.4em; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .reveal code { font-family: 'JetBrains Mono', monospace; }
+    .reveal .slides section { padding: 20px; }
+
+    /* ── Utility classes ── */
+    .text-gradient {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #67e8f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .text-indigo { color: #818cf8; }
+    .text-emerald { color: #34d399; }
+    .text-amber { color: #fbbf24; }
+    .text-rose { color: #fb7185; }
+    .text-slate { color: #94a3b8; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15em 0.7em;
+      border-radius: 999px;
+      font-size: 0.35em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .badge-admin { background: rgba(129,140,248,0.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,0.3); }
+    .badge-cashier { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+    .badge-tech { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+
+    .flex-row { display: flex; gap: 1.5em; align-items: flex-start; justify-content: center; }
+    .flex-col { display: flex; flex-direction: column; gap: 0.6em; }
+    .flex-1 { flex: 1; }
+    .w-full { width: 100%; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .mt-1 { margin-top: 0.5em; }
+    .mt-2 { margin-top: 1em; }
+    .mb-1 { margin-bottom: 0.5em; }
+    .mb-2 { margin-bottom: 1em; }
+    .gap-1 { gap: 0.4em; }
+    .gap-2 { gap: 0.8em; }
+
+    /* ── Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.8em;
+      margin-top: 0.6em;
+    }
+    .card {
+      background: rgba(30,41,59,0.6);
+      border: 1px solid rgba(148,163,184,0.1);
+      border-radius: 16px;
+      padding: 1em 1.2em;
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .card .icon { font-size: 1.8em; margin-bottom: 0.3em; }
+    .card h4 { margin: 0 0 0.2em; font-size: 0.5em; }
+    .card p { margin: 0; font-size: 0.38em; color: #94a3b8; }
+
+    /* ── Architecture diagram ── */
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1em;
+      margin: 1em 0;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      background: rgba(30,41,59,0.8);
+      border: 2px solid rgba(129,140,248,0.3);
+      border-radius: 16px;
+      padding: 0.8em 1.2em;
+      text-align: center;
+      min-width: 140px;
+      position: relative;
+    }
+    .arch-box .arch-label { font-size: 0.7em; font-weight: 700; }
+    .arch-box .arch-desc { font-size: 0.35em; color: #94a3b8; margin-top: 0.2em; }
+    .arch-arrow {
+      font-size: 1.5em;
+      color: #818cf8;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 0.6em;
+    }
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.38em;
+    }
+    .table-wrap th {
+      background: rgba(129,140,248,0.1);
+      padding: 0.5em 0.8em;
+      text-align: left;
+      font-weight: 700;
+      color: #a5b4fc;
+      border-bottom: 2px solid rgba(129,140,248,0.2);
+    }
+    .table-wrap td {
+      padding: 0.4em 0.8em;
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+    }
+    .table-wrap tr:hover td { background: rgba(129,140,248,0.05); }
+    .check { color: #34d399; font-weight: 700; }
+    .cross { color: #fb7185; }
+
+    /* ── Fragments ── */
+    .reveal .slides section .fragment {
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+    .reveal .slides section .fragment.visible {
+      opacity: 1;
+    }
+
+    /* ── Slide backgrounds ── */
+    .slide-title {
+      background: radial-gradient(ellipse at center top, rgba(129,140,248,0.15), transparent 60%);
+    }
+    .slide-section {
+      background: radial-gradient(ellipse at left center, rgba(129,140,248,0.08), transparent 50%);
+    }
+
+    /* ── Code blocks ── */
+    .reveal pre code {
+      max-height: none;
+      padding: 0.8em 1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 1 — TITLE                                     -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-title" data-background-gradient="linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a)">
+        <div style="margin-top: -1em;">
+          <div style="font-size: 4em; margin-bottom: 0.2em;">🏪</div>
+          <h1 class="text-gradient" style="font-size: 3.6em;">Full-Stack POS System</h1>
+          <p style="font-size: 0.65em; color: #94a3b8; margin-top: 0.5em;">
+            A Production-Ready Point of Sale Solution
+          </p>
+          <div style="display: flex; gap: 0.5em; justify-content: center; margin-top: 1.2em;">
+            <span class="badge badge-tech">NestJS 10</span>
+            <span class="badge badge-tech">Angular 21</span>
+            <span class="badge badge-tech">TypeScript</span>
+            <span class="badge badge-tech">MySQL / TiDB</span>
+            <span class="badge badge-tech">Docker</span>
+          </div>
+          <p style="font-size: 0.35em; color: #64748b; margin-top: 1.5em;">
+            Built with ❤️ for modern retail businesses
+          </p>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 2 — OVERVIEW                                  -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>📖 System Overview</h2>
+        <p style="color: #94a3b8; max-width: 70%; margin: 0.5em auto;">
+          A complete POS platform designed for retail businesses with bilingual support (Khmer/English),
+          real-time inventory, multi-payment processing, and comprehensive business analytics.
+        </p>
+        <div class="card-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 85%; margin: 1em auto;">
+          <div class="card">
+            <div class="icon">🛒</div>
+            <h4>Point of Sale</h4>
+            <p>Fast checkout with barcode scanning, cart management, and multi-payment support</p>
+          </div>
+          <div class="card">
+            <div class="icon">📊</div>
+            <h4>Analytics</h4>
+            <p>Dashboard with KPIs, revenue charts, top products, and cashier performance metrics</p>
+          </div>
+          <div class="card">
+            <div class="icon">🌐</div>
+            <h4>Bilingual</h4>
+            <p>Full English &amp; Khmer (ភាសាខ្មែរ) with real-time switching</p>
+          </div>
+          <div class="card">
+            <div class="icon">📦</div>
+            <h4>Inventory</h4>
+            <p>Real-time stock tracking with low-stock alerts and barcode lookups</p>
+          </div>
+          <div class="card">
+            <div class="icon">💳</div>
+            <h4>Multi-Payment</h4>
+            <p>Cash (with change), ABA scan-to-pay, Credit/Debit Card</p>
+          </div>
+          <div class="card">
+            <div class="icon">🛡️</div>
+            <h4>Role-Based Access</h4>
+            <p>Granular Admin &amp; Cashier permissions with JWT authentication</p>
+          </div>
+        </div>
+
+        <div class="flex-row" style="margin-top: 1em; gap: 2em;">
+          <div>
+            <p style="font-size: 0.35em; color: #64748b;">🌐 Live Demo</p>
+            <p style="font-size: 0.45em;"><span class="text-indigo">Frontend:</span> pos-frontend.vercel.app</p>
+            <p style="font-size: 0.45em;"><span class="text-indigo">API:</span> full-stack-pos.onrender.com</p>
+          </div>
+          <div>
+            <p style="font-size: 0.35em; color: #64748b;">🔑 Default Credentials</p>
+            <p style="font-size: 0.4em;"><span class="badge badge-admin" style="font-size:0.8em;">Admin</span> admin@pos.com / admin123</p>
+            <p style="font-size: 0.4em;"><span class="badge badge-cashier" style="font-size:0.8em;">Cashier</span> cashier@pos.com / cashier123</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 3 — TECH STACK                                -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🛠️ Tech Stack</h2>
+        <div class="flex-row" style="gap: 2em; margin-top: 0.8em;">
+          <!-- Backend -->
+          <div class="card" style="flex: 1; max-width: 400px; min-width: 280px;">
+            <h3 style="font-size: 0.7em; margin-bottom: 0.5em;">⚙️ Backend (NestJS)</h3>
+            <div style="font-size: 0.4em; line-height: 1.8; text-align: left;">
+              <div>◈ <strong>NestJS 10</strong> — Application framework (Node.js)</div>
+              <div>◈ <strong>TypeORM 0.3</strong> — ORM with MySQL driver</div>
+              <div>◈ <strong>MySQL 8.4 / TiDB Cloud</strong> — Database</div>
+              <div>◈ <strong>Passport + JWT</strong> — Authentication</div>
+              <div>◈ <strong>bcryptjs</strong> — Password hashing</div>
+              <div>◈ <strong>class-validator</strong> — DTO validation</div>
+              <div>◈ <strong>Swagger / OpenAPI</strong> — API docs</div>
+              <div>◈ <strong>Cloudinary / Sharp</strong> — Image processing</div>
+              <div>◈ <strong>Helmet</strong> — Security headers</div>
+            </div>
+          </div>
+          <!-- Frontend -->
+          <div class="card" style="flex: 1; max-width: 400px; min-width: 280px;">
+            <h3 style="font-size: 0.7em; margin-bottom: 0.5em;">🎨 Frontend (Angular)</h3>
+            <div style="font-size: 0.4em; line-height: 1.8; text-align: left;">
+              <div>◈ <strong>Angular 21</strong> — Modern SPA framework</div>
+              <div>◈ <strong>Angular Material</strong> — UI components</div>
+              <div>◈ <strong>Tailwind CSS 3</strong> — Utility-first styling</div>
+              <div>◈ <strong>@ngx-translate</strong> — i18n (Khmer/English)</div>
+              <div>◈ <strong>Angular Signals</strong> — Reactive state</div>
+              <div>◈ <strong>Angular Animations</strong> — Transitions</div>
+            </div>
+          </div>
+          <!-- Infrastructure -->
+          <div class="card" style="flex: 1; max-width: 400px; min-width: 280px;">
+            <h3 style="font-size: 0.7em; margin-bottom: 0.5em;">☁️ Infrastructure</h3>
+            <div style="font-size: 0.4em; line-height: 1.8; text-align: left;">
+              <div>◈ <strong>Docker &amp; Docker Compose</strong> — Containerization</div>
+              <div>◈ <strong>Render</strong> — Backend hosting (Docker)</div>
+              <div>◈ <strong>Vercel</strong> — Frontend hosting</div>
+              <div>◈ <strong>TiDB Cloud</strong> — MySQL-compatible DB</div>
+              <div>◈ <strong>Cloudinary</strong> — Image CDN &amp; storage</div>
+              <div>◈ <strong>MinIO</strong> — S3-compatible local storage</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 4 — SYSTEM ARCHITECTURE                       -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🏗️ System Architecture</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Client → Server → Database flow with separation of concerns</p>
+
+        <div class="arch-diagram" style="margin-top: 1em;">
+          <div class="arch-box" style="border-color: rgba(52,211,153,0.4);">
+            <div class="arch-label" style="color: #34d399;">🌐 Browser</div>
+            <div class="arch-desc">Angular SPA<br/>Vercel CDN</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: rgba(129,140,248,0.4);">
+            <div class="arch-label" style="color: #818cf8;">⚙️ NestJS API</div>
+            <div class="arch-desc">RESTful endpoints<br/>Render (Docker)</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: rgba(251,191,36,0.4);">
+            <div class="arch-label" style="color: #fbbf24;">🗄️ Database</div>
+            <div class="arch-desc">MySQL / TiDB Cloud<br/>TypeORM ORM</div>
+          </div>
+        </div>
+
+        <div class="arch-diagram">
+          <div class="arch-box" style="border-color: rgba(244,114,182,0.4); min-width: 160px;">
+            <div class="arch-label" style="color: #f472b6;">🖼️ Cloudinary</div>
+            <div class="arch-desc">Image hosting &amp; CDN</div>
+          </div>
+          <div class="arch-arrow" style="font-size: 1em; color: #94a3b8;">⬆ Upload</div>
+          <div class="arch-box" style="border-color: rgba(129,140,248,0.4); min-width: 160px;">
+            <div class="arch-label" style="color: #818cf8;">🔗 API Gateway</div>
+            <div class="arch-desc">JWT Auth, Guards<br/>CORS, Rate Limiting</div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="max-width: 80%; margin: 1em auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Layer</th><th>Technology</th><th>Responsibility</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Presentation</td><td>Angular + Tailwind</td><td>UI rendering, state management, i18n</td></tr>
+              <tr><td>API Gateway</td><td>NestJS</td><td>Routing, guards, interceptors, validation</td></tr>
+              <tr><td>Business Logic</td><td>NestJS Services</td><td>Sales, inventory, reports, auth</td></tr>
+              <tr><td>Data Access</td><td>TypeORM Repositories</td><td>CRUD operations, migrations</td></tr>
+              <tr><td>Storage</td><td>MySQL / TiDB</td><td>Relational data persistence</td></tr>
+              <tr><td>Media</td><td>Cloudinary / MinIO</td><td>Image upload &amp; CDN delivery</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 5 — KEY FEATURES — CASHIER                    -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🛒 Cashier Features</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Streamlined POS interface for fast, error-free checkout</p>
+
+        <div class="card-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 85%; margin: 0.5em auto;">
+          <div class="card">
+            <div class="icon">🔍</div>
+            <h4>Product Grid &amp; Search</h4>
+            <p>Responsive grid with category filter tabs; real-time text search and barcode scanner support</p>
+          </div>
+          <div class="card">
+            <div class="icon">🛍️</div>
+            <h4>Shopping Cart</h4>
+            <p>Sidebar cart with quantity controls, remove buttons, discount &amp; tax inputs, animated totals</p>
+          </div>
+          <div class="card">
+            <div class="icon">💵</div>
+            <h4>Multi-Payment Checkout</h4>
+            <p>Cash (with change calculation &amp; quick-amount buttons), ABA QR scan, or Card payment</p>
+          </div>
+          <div class="card">
+            <div class="icon">🧾</div>
+            <h4>Thermal Receipt Printing</h4>
+            <p>80mm thermal-printer-optimized receipts with item details, totals, payment info, and change</p>
+          </div>
+          <div class="card">
+            <div class="icon">📉</div>
+            <h4>Real-Time Stock Updates</h4>
+            <p>Effective stock calculation deducting cart quantities; low-stock badges and out-of-stock indicators</p>
+          </div>
+          <div class="card">
+            <div class="icon">📱</div>
+            <h4>Responsive &amp; Mobile</h4>
+            <p>Adaptive layout with collapsible cart sidebar on mobile; dark/light theme support</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.5em;">
+          <pre style="display: inline-block; text-align: left; font-size: 0.3em;"><code class="language-json">POST /api/v1/sales  ← Create a sale
+{
+  "items": [{ "productId": 1, "quantity": 2 }],
+  "paymentMethod": "cash",
+  "discount": 1.00,
+  "tax": 0.50
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 6 — KEY FEATURES — ADMIN                      -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>📋 Admin Features</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Full suite of management tools for store operations</p>
+
+        <div class="card-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 90%; margin: 0.5em auto;">
+          <div class="card">
+            <div class="icon">📦</div>
+            <h4>Products CRUD</h4>
+            <p>Full product management with image upload, barcodes, categories, and stock tracking</p>
+          </div>
+          <div class="card">
+            <div class="icon">📁</div>
+            <h4>Categories</h4>
+            <p>Organize products with bilingual names and images</p>
+          </div>
+          <div class="card">
+            <div class="icon">📊</div>
+            <h4>Reports Dashboard</h4>
+            <p>Revenue KPIs, daily bar charts, top products, payment breakdown, cashier performance</p>
+          </div>
+          <div class="card">
+            <div class="icon">📜</div>
+            <h4>Sales History</h4>
+            <p>Searchable, filterable transaction history with detail modals and receipt re-printing</p>
+          </div>
+          <div class="card">
+            <div class="icon">👥</div>
+            <h4>User Management</h4>
+            <p>Create, edit, and manage users with role assignment and avatar uploads</p>
+          </div>
+          <div class="card">
+            <div class="icon">🔐</div>
+            <h4>Roles &amp; Permissions</h4>
+            <p>Granular permission control; assign Admin/Cashier roles with instant updates</p>
+          </div>
+          <div class="card">
+            <div class="icon">🗂️</div>
+            <h4>Dynamic Navigation</h4>
+            <p>Tree-based menu builder to customize the sidebar navigation structure</p>
+          </div>
+          <div class="card">
+            <div class="icon">🖼️</div>
+            <h4>Cloudinary Uploads</h4>
+            <p>Centralized file management with Cloudinary for product/category/avatar images</p>
+          </div>
+          <div class="card">
+            <div class="icon">🌓</div>
+            <h4>Dark / Light Theme</h4>
+            <p>Persistent theme toggle with smooth transitions across all views</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 7 — UI WALKTHROUGH                            -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🎨 User Interface</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Two distinct layouts optimized for each role's workflow</p>
+
+        <div class="flex-row" style="gap: 2em; margin-top: 0.8em;">
+          <!-- Cashier Layout -->
+          <div class="card" style="flex: 1; text-align: left; padding: 1em 1.5em; max-width: 480px;">
+            <h3 style="font-size: 0.65em; margin-bottom: 0.3em;">👤 Cashier Layout</h3>
+            <div style="font-size: 0.38em; line-height: 1.7; font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.2); padding: 0.8em; border-radius: 8px;">
+┌─────────────────────────────────────┐
+│ KhmerPOS [3]    🌙  🇰🇭  Admin  🚪 │
+├──────────────────┬──────────────────┤
+│ 🔍 Search...      │  ← Your Cart    │
+│ [All] [Food]      │  Coke  ×2 $3.00 │
+│                   │  Rice  ×1 $3.00 │
+│ ┌──┐ ┌──┐ ┌──┐   │                 │
+│ │🍱│ │🥤│ │🍿│  │  Subtotal $6.00 │
+│ └──┘ └──┘ └──┘   │  TOTAL    $6.00 │
+│                   │                 │
+│                   │ [ Checkout ✅ ] │
+└───────────────────┴──────────────────┘
+            </div>
+            <p style="font-size: 0.35em; color: #94a3b8; margin-top: 0.3em;">
+              Left: Product grid | Right: Cart sidebar | Barcode &amp; keyboard shortcuts
+            </p>
+          </div>
+
+          <!-- Admin Layout -->
+          <div class="card" style="flex: 1; text-align: left; padding: 1em 1.5em; max-width: 480px;">
+            <h3 style="font-size: 0.65em; margin-bottom: 0.3em;">👑 Admin Layout</h3>
+            <div style="font-size: 0.38em; line-height: 1.7; font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.2); padding: 0.8em; border-radius: 8px;">
+┌─────────────────────────────────────┐
+│ ┌──────────────┐  Product List     │
+│ │ SystemPOS    │                   │
+│ │ ──────────── │  Search....       │
+│ │ 📦 Products  │  [All] [Food]     │
+│ │ 📊 Reports   │                   │
+│ │ 👥 Users     │  # Image Name     │
+│ │ 📁 Categories│  1  🖼️  Coke $1.50│
+│ │ 🔐 Perms     │  2  🖼️  Rice $3.00│
+│ │ 📜 Sales Hist│                   │
+│ │ ⚙️ Settings ▾│  [+ Add New]      │
+│ └──────────────┘                   │
+└─────────────────────────────────────┘
+            </div>
+            <p style="font-size: 0.35em; color: #94a3b8; margin-top: 0.3em;">
+              Collapsible sidebar | All management tools | Search &amp; pagination
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 8 — API REFERENCE                             -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>📡 API Reference</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">RESTful API at <code style="font-size: 0.9em;">/api/v1</code> with consistent JSON envelope responses</p>
+
+        <div class="table-wrap" style="max-width: 90%; margin: 0.8em auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span style="color:#34d399;font-weight:700;">POST</span></td>
+                <td><code>/auth/login</code></td>
+                <td><span class="cross">✗</span></td>
+                <td>Login → returns JWT + user profile</td>
+              </tr>
+              <tr>
+                <td><span style="color:#34d399;font-weight:700;">POST</span></td>
+                <td><code>/sales</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Create sale (validates &amp; deducts stock)</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/products</code></td>
+                <td><span class="check">✓</span></td>
+                <td>List products (paginated, filterable)</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/products/barcode/:code</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Barcode lookup</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/reports/summary</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Dashboard KPIs + low-stock alerts</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/reports/top-products</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Best-selling products</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/reports/daily-revenue</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Revenue grouped by day</td>
+              </tr>
+              <tr>
+                <td><span style="color:#fbbf24;font-weight:700;">GET</span></td>
+                <td><code>/reports/sales-by-cashier</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Performance per cashier</td>
+              </tr>
+              <tr>
+                <td><span style="color:#818cf8;font-weight:700;">PATCH</span></td>
+                <td><code>/products/:id</code></td>
+                <td><span class="check">✓</span></td>
+                <td>Update product (admin only)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex-row" style="gap: 1em; margin-top: 0.5em;">
+          <pre style="font-size: 0.3em; flex: 1; max-width: 450px;"><code class="language-json">// Standard response envelope
+{
+  "success": true,
+  "statusCode": 200,
+  "data": { ... },
+  "timestamp": "2026-06-15T14:30:00.000Z"
+}</code></pre>
+          <pre style="font-size: 0.3em; flex: 1; max-width: 450px;"><code class="language-json">// Login response
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "user": {
+    "id": 1, "name": "System Admin",
+    "email": "admin@pos.com", "role": "admin"
+  }
+}</code></pre>
+        </div>
+
+        <p style="font-size: 0.35em; color: #64748b; margin-top: 0.5em;">
+          📘 Full Swagger docs at <code style="font-size: 1em;">/api/docs</code> — Auto-authorization included!
+        </p>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 9 — DATABASE SCHEMA                           -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🗄️ Database Schema</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">8 core entities with relationships modeled via TypeORM</p>
+
+        <div class="flex-row" style="gap: 1.5em; margin-top: 0.5em; flex-wrap: wrap; justify-content: center;">
+          <div style="text-align: left; font-size: 0.35em; line-height: 1.5;">
+            <div style="background: rgba(129,140,248,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #818cf8;">
+              <strong style="color: #a5b4fc;">users</strong><br/>
+              id, name, email (unique), password (hashed),<br/>
+              role (admin/cashier), is_active, avatar_url,<br/>
+              reset_token, reset_token_expiry, created_at
+            </div>
+            <div style="background: rgba(52,211,153,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #34d399;">
+              <strong style="color: #34d399;">products</strong><br/>
+              id, name, name_kh, img_url, barcode (unique),<br/>
+              price, stock, category_id → categories,<br/>
+              description, is_active, low_stock_threshold
+            </div>
+            <div style="background: rgba(251,191,36,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #fbbf24;">
+              <strong style="color: #fbbf24;">sales</strong><br/>
+              id, user_id → users, subtotal, discount, tax,<br/>
+              total, payment_method (cash/aba/card), created_at
+            </div>
+          </div>
+          <div style="text-align: left; font-size: 0.35em; line-height: 1.5;">
+            <div style="background: rgba(244,114,182,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #f472b6;">
+              <strong style="color: #f472b6;">sale_items</strong><br/>
+              id, sale_id → sales, product_id → products,<br/>
+              quantity, price (snapshot), discount (per-item)
+            </div>
+            <div style="background: rgba(129,140,248,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #818cf8;">
+              <strong style="color: #a5b4fc;">categories</strong><br/>
+              id, name, name_kh, description, img_url, is_active
+            </div>
+            <div style="background: rgba(129,140,248,0.1); padding: 0.5em 0.8em; border-radius: 8px; margin-bottom: 0.3em; border-left: 3px solid #818cf8;">
+              <strong style="color: #a5b4fc;">management_pages</strong><br/>
+              id, title, title_km, icon, type (menu/link),<br/>
+              url, permissions, badge, sort_order, parent_id
+            </div>
+            <div style="background: rgba(129,140,248,0.1); padding: 0.5em 0.8em; border-radius: 8px; border-left: 3px solid #818cf8;">
+              <strong style="color: #a5b4fc;">file_uploads</strong><br/>
+              id, original_file_name, file_url,<br/>
+              file_extension, file_size, upload_type, destination_storage
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.35em; color: #64748b; margin-top: 0.6em;">
+          🔗 Relationships: products → categories (M:1), sales → users (M:1), sale_items → sales/products (M:1)
+        </p>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 10 — PERMISSIONS MATRIX                       -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🛡️ Role-Based Permissions</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Clear separation of duties between Admin and Cashier roles</p>
+
+        <div class="table-wrap" style="max-width: 75%; margin: 0.8em auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Module / Feature</th>
+                <th style="text-align:center;">👑 Admin</th>
+                <th style="text-align:center;">👤 Cashier</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>🔑 Login &amp; Profile</td><td class="check" style="text-align:center;">✅</td><td class="check" style="text-align:center;">✅</td></tr>
+              <tr><td>🛒 Create Sales</td><td class="check" style="text-align:center;">✅</td><td class="check" style="text-align:center;">✅</td></tr>
+              <tr><td>📋 View All Sales</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>📦 View Products</td><td class="check" style="text-align:center;">✅</td><td class="check" style="text-align:center;">✅</td></tr>
+              <tr><td>✏️ Create/Edit Products</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>📁 View Categories</td><td class="check" style="text-align:center;">✅</td><td class="check" style="text-align:center;">✅</td></tr>
+              <tr><td>✏️ Create/Edit Categories</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>👥 Manage Users</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>🔐 Manage Roles &amp; Permissions</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>📊 Reports &amp; Analytics</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>🗂️ Management Pages</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+              <tr><td>🖼️ File Uploads</td><td class="check" style="text-align:center;">✅</td><td class="cross" style="text-align:center;">❌</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex-row" style="gap: 2em; margin-top: 0.5em;">
+          <div class="card" style="padding: 0.6em 1.2em; min-width: 200px;">
+            <h4 style="font-size: 0.55em; color: #818cf8;">👑 Admin</h4>
+            <p style="font-size: 0.38em;">Full system access — product CRUD, user management, reports, settings, all sales data</p>
+          </div>
+          <div class="card" style="padding: 0.6em 1.2em; min-width: 200px;">
+            <h4 style="font-size: 0.55em; color: #34d399;">👤 Cashier</h4>
+            <p style="font-size: 0.38em;">Focused POS access — create sales, view products &amp; categories, view own transactions only</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 11 — DEPLOYMENT                               -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-section">
+        <h2>🚀 Deployment</h2>
+        <p style="color: #94a3b8; font-size: 0.45em;">Production-ready infrastructure with Docker, Render, and Vercel</p>
+
+        <div class="arch-diagram" style="margin-top: 0.8em;">
+          <div class="arch-box" style="border-color: rgba(52,211,153,0.4); min-width: 160px;">
+            <div class="arch-label" style="color: #34d399;">▲ Vercel</div>
+            <div class="arch-desc">Angular SPA<br/>Edge CDN</div>
+          </div>
+          <div class="arch-arrow">◄►</div>
+          <div class="arch-box" style="border-color: rgba(129,140,248,0.4); min-width: 160px;">
+            <div class="arch-label" style="color: #818cf8;">⚡ Render</div>
+            <div class="arch-desc">NestJS (Docker)<br/>Auto-deploy from Git</div>
+          </div>
+          <div class="arch-arrow">◄►</div>
+          <div class="arch-box" style="border-color: rgba(251,191,36,0.4); min-width: 160px;">
+            <div class="arch-label" style="color: #fbbf24;">☁️ TiDB Cloud</div>
+            <div class="arch-desc">MySQL-compatible<br/>SSL, auto-backup</div>
+          </div>
+        </div>
+
+        <div class="flex-row" style="gap: 1.5em; margin-top: 1em;">
+          <div style="text-align: left; font-size: 0.4em; background: rgba(0,0,0,0.2); padding: 0.6em 1em; border-radius: 12px;">
+            <p style="color: #a5b4fc; font-weight: 700; margin-bottom: 0.3em;">📦 Docker Compose (Local)</p>
+            <pre style="font-size: 0.85em; background: none; box-shadow: none; margin: 0;"><code>services:
+  backend:  # NestJS API
+  frontend: # Angular + Nginx
+  mysql:    # Database
+  minio:    # S3 storage</code></pre>
+          </div>
+          <div style="text-align: left; font-size: 0.4em; background: rgba(0,0,0,0.2); padding: 0.6em 1em; border-radius: 12px;">
+            <p style="color: #a5b4fc; font-weight: 700; margin-bottom: 0.3em;">🔧 Key Environment Variables</p>
+            <pre style="font-size: 0.85em; background: none; box-shadow: none; margin: 0;"><code>DB_HOST, DB_USER, DB_PASSWORD
+JWT_SECRET (32+ chars)
+FRONTEND_URL (CORS)
+CLOUDINARY_* keys</code></pre>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.8em; font-size: 0.4em;">
+          <span class="badge badge-tech" style="font-size: 0.9em;">🏗️ Multi-stage Docker builds</span>
+          <span class="badge badge-tech" style="font-size: 0.9em;">🔒 SSL-enabled DB connections</span>
+          <span class="badge badge-tech" style="font-size: 0.9em;">📁 Init SQL with seed data</span>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 12 — DEMO & LIVEDEMO                          -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-title" data-background-gradient="linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a)">
+        <div>
+          <h2 style="font-size: 2.5em;">🔗 Live Demo</h2>
+          <p style="font-size: 0.55em; color: #94a3b8;">Try it yourself — no installation needed!</p>
+
+          <div class="card" style="max-width: 500px; margin: 1em auto; padding: 1em 1.5em;">
+            <div style="display: flex; flex-direction: column; gap: 0.6em; text-align: left; font-size: 0.45em;">
+              <div><span style="color: #34d399;">🌐</span> <strong>Frontend:</strong> <a href="https://pos-frontend.vercel.app" target="_blank" style="color: #818cf8;">pos-frontend.vercel.app</a></div>
+              <div><span style="color: #818cf8;">⚙️</span> <strong>Backend API:</strong> <a href="https://full-stack-pos.onrender.com/api/v1" target="_blank" style="color: #818cf8;">full-stack-pos.onrender.com</a></div>
+              <div><span style="color: #fbbf24;">📘</span> <strong>Swagger Docs:</strong> <a href="https://full-stack-pos.onrender.com/api/docs" target="_blank" style="color: #818cf8;">/api/docs</a></div>
+            </div>
+            <hr style="border-color: rgba(148,163,184,0.2); margin: 0.8em 0;" />
+            <div style="display: flex; flex-direction: column; gap: 0.4em; text-align: left; font-size: 0.4em;">
+              <div><span class="badge badge-admin" style="font-size:0.8em;">Admin</span> admin@pos.com / admin123</div>
+              <div><span class="badge badge-cashier" style="font-size:0.8em;">Cashier</span> cashier@pos.com / cashier123</div>
+            </div>
+          </div>
+
+          <p style="font-size: 0.35em; color: #64748b; margin-top: 1.5em;">Quick demo buttons auto-fill credentials on the login screen</p>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- SLIDE 13 — THANK YOU                                -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <section class="slide-title" data-background-gradient="linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a)">
+        <div>
+          <div style="font-size: 4em; margin-bottom: 0.3em;">🙏</div>
+          <h1 class="text-gradient" style="font-size: 3em;">Thank You!</h1>
+          <p style="font-size: 0.6em; color: #94a3b8; margin-top: 0.5em;">
+            Full-Stack POS System — Built with ❤️
+          </p>
+          <div style="display: flex; gap: 0.5em; justify-content: center; margin-top: 1em; flex-wrap: wrap;">
+            <span class="badge badge-tech">NestJS 10</span>
+            <span class="badge badge-tech">Angular 21</span>
+            <span class="badge badge-tech">TypeScript</span>
+            <span class="badge badge-tech">MySQL / TiDB</span>
+            <span class="badge badge-tech">Docker</span>
+            <span class="badge badge-tech">Tailwind CSS</span>
+          </div>
+
+          <div style="margin-top: 1.5em; font-size: 0.35em; color: #64748b;">
+            <p>Questions?</p>
+            <p style="margin-top: 0.5em;">
+              <span style="color: #818cf8;">📖 User Guide:</span> <code style="font-size:1em;">.vscode/document/Full-Stack POS System User Guide.md</code>
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- .slides -->
+  </div><!-- .reveal -->
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 800,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+      controls: true,
+      controlsTutorial: true,
+      controlsLayout: 'bottom-right',
+      controlsBackArrows: 'visible',
+      progress: true,
+      slideNumber: true,
+      hash: true,
+      keyboard: true,
+      overview: true,
+      center: true,
+      touch: true,
+      loop: false,
+      rtl: false,
+      shuffle: false,
+      fragments: true,
+      embedded: false,
+      help: true,
+      showNotes: false,
+      autoPlayMedia: null,
+      preloadIframes: null,
+      autoSlide: 0,
+      autoSlideStoppable: true,
+      defaultTiming: 120,
+      mouseWheel: false,
+      hideInactiveCursor: true,
+      hideCursorTime: 3000,
+      hideAddressBar: true,
+      previewLinks: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade',
+      viewDistance: 3,
+      parallaxBackgroundImage: '',
+      parallaxBackgroundSize: '',
+      parallaxBackgroundHorizontal: null,
+      parallaxBackgroundVertical: null,
+      display: 'block',
+      plugins: [RevealHighlight, RevealNotes],
+    });
+
+    // Keyboard shortcut: press 'f' for fullscreen
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
+        document.documentElement.requestFullscreen?.();
+      }
+    });
+  </script>
+</body>
+</html>

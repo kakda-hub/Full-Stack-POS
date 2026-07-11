@@ -204,7 +204,7 @@ docker compose up -d
 | 🌐 Frontend | `projectpos-frontend` | http://localhost:4200 |
 | ⚙️ Backend API | `projectpos-backend` | http://localhost:3000 |
 | 🗄️ MySQL | `projectpos-mysql` | Port 3306 |
-| 🗃️ MinIO | `projectpos-minio` | http://localhost:9001 (Console) |
+| 🗃️ MinIO | `projectpos-minio` | http://localhost:9090 (Console) |
 
 ### Step 3: Access the App
 

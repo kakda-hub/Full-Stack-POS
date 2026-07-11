@@ -13,7 +13,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-
   "dependencies": {
     "@angular/animations": "^21.2.7",
     "@angular/cdk": "^21.2.5",
@@ -38,7 +37,7 @@
   "devDependencies": {
     "@angular/build": "^21.2.5",
     "@angular/cli": "^21.2.5",
-    "@angular/compiler-cli": "^21.2.0",
+    "@angular/compiler-cli": "^21.0.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",

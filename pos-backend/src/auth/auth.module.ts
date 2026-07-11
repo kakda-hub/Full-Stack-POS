@@ -19,7 +19,8 @@ import { UsersModule } from '../users/users.module';
           process.env.JWT_SECRET ||
           'fallback-secret',
         signOptions: {
-          expiresIn: configService.get<string>('app.jwt.expiresIn', '8h'),
+          expiresIn:
+            configService.get<string>('app.jwt.expiresIn', '8h') as any,
         },
       }),
       inject: [ConfigService],
