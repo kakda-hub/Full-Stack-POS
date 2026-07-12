@@ -1,45 +1,35 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail [id]="id"></app-header-detail>
 
-  <mat-dialog-content class="!pb-2">
-    <div class="flex flex-col gap-4">
+  <mat-dialog-content class="dialog-content">
+    <div class="form-body">
       <!-- Image upload -->
-      <div class="flex justify-center">
+      <div class="upload-wrapper">
         <div
-          class="relative w-44 h-44 rounded-2xl border-2 border-dashed transition-all overflow-hidden group cursor-pointer"
-          [class.bg-slate-700]="theme.isDark()"
-          [class.border-slate-600]="theme.isDark()"
-          [class.hover:border-indigo-500]="theme.isDark()"
-          [class.bg-slate-50]="!theme.isDark()"
-          [class.border-slate-300]="!theme.isDark()"
-          [class.hover:border-indigo-400]="!theme.isDark()"
+          class="upload-container group"
           (click)="fileInput.click()"
         >
           @if (form.get('imgUrl')?.value) {
             <img
               [src]="form.get('imgUrl')?.value"
-              class="w-full h-full object-cover"
+              class="upload-image"
               (error)="form.patchValue({ imgUrl: '' })"
             />
-            <div
-              class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <span class="text-white text-sm font-semibold">{{
+            <div class="upload-overlay">
+              <span class="upload-overlay-text">{{
                 lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
               }}</span>
             </div>
           } @else {
-            <div class="flex flex-col items-center justify-center w-full h-full">
+            <div class="upload-empty-state">
               @if (isUploading()) {
-                <span
-                  class="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"
-                ></span>
-                <span class="mt-2 text-xs text-slate-400">{{
+                <span class="upload-spinner"></span>
+                <span class="mt-2 upload-muted text-xs">{{
                   lang.currentLang() === 'km' ? 'កំពុងបង្ហោះ...' : 'Uploading...'
                 }}</span>
               } @else {
                 <svg
-                  class="w-10 h-10 mb-2 text-slate-400"
+                  class="upload-icon upload-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -51,7 +41,7 @@
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <p class="text-xs text-slate-400">
+                <p class="upload-click-text upload-muted">
                   {{ lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើសរូបភាព' : 'Click to upload' }}
                 </p>
               }
@@ -60,7 +50,7 @@
           <input
             #fileInput
             type="file"
-            class="hidden"
+            class="file-input-hidden"
             accept="image/*"
             (change)="onFileSelected($event)"
             [disabled]="isUploading()"
@@ -69,7 +59,7 @@
       </div>
 
       <!-- Form fields -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-grid">
         <app-input-field
           formControlName="name"
           [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
@@ -90,7 +80,7 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-4">
+  <mat-dialog-actions align="end" class="dialog-actions">
     <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{
       'button.cancel' | translate
     }}</app-ui-button>

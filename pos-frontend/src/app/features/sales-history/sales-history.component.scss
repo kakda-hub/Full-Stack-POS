@@ -1,0 +1,301 @@
+/* ==========================================================
+   Sales History Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
+/* ─── Page wrapper ─── */
+.page-wrapper {
+  @apply p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6;
+}
+
+/* ─── Header ─── */
+.page-header {
+  @apply flex items-center justify-between;
+}
+
+/* ─── Search input ─── */
+.search-wrapper {
+  @apply relative max-w-md;
+}
+
+.search-icon {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none;
+}
+
+.search-input {
+  @apply w-full pl-9 pr-8 py-2 rounded-lg border text-sm transition-colors;
+  @apply bg-white border-slate-200 text-slate-700 placeholder-slate-400;
+  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200;
+}
+
+.search-clear-btn {
+  @apply absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-600 transition-colors;
+  @apply hover:bg-slate-100;
+  @apply dark:hover:bg-slate-600;
+}
+
+/* ─── Filter bar ─── */
+.filters-bar {
+  @apply flex flex-col sm:flex-row items-start sm:items-center gap-3;
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+.quick-filter-btn {
+  @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all;
+  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600;
+
+  &--active {
+    @apply bg-indigo-600 text-white shadow-sm;
+  }
+}
+
+/* ─── Date inputs ─── */
+.date-input-wrapper {
+  @apply relative;
+}
+
+.date-input-icon {
+  @apply absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none;
+}
+
+.date-input {
+  @apply pl-8 pr-3 py-1.5 rounded-lg border text-xs font-medium transition-colors;
+  @apply bg-white border-slate-200 text-slate-700;
+  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200;
+}
+
+.date-clear-btn {
+  @apply px-2 py-1.5 rounded-lg text-xs font-semibold text-rose-500 transition-colors;
+  @apply hover:bg-rose-50;
+  @apply dark:hover:bg-rose-900/20;
+}
+
+/* ─── Card (reusable container) ─── */
+.card {
+  @apply rounded-2xl border p-5 shadow-sm transition-shadow;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+
+  &--hoverable {
+    @apply hover:shadow-md;
+  }
+}
+
+/* ─── KPI section ─── */
+.kpi-grid {
+  @apply grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4;
+}
+
+.kpi-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center;
+}
+
+.kpi-value {
+  @apply text-2xl font-black text-slate-900 dark:text-white;
+}
+
+.kpi-label {
+  @apply text-sm text-slate-500 mt-0.5;
+}
+
+/* ─── Skeleton section ─── */
+.skeleton-section {
+  @apply rounded-2xl border p-5;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+/* ─── Table section ─── */
+.table-section {
+  @apply rounded-2xl border shadow-sm overflow-hidden;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.table-header-bar {
+  @apply px-5 py-4 border-b flex items-center justify-between;
+  @apply border-slate-100;
+  @apply dark:border-slate-700;
+}
+
+.table-title {
+  @apply font-bold text-slate-800 dark:text-slate-200;
+}
+
+.table-thead-row {
+  @apply border-b;
+  @apply bg-slate-50 border-slate-100;
+  @apply dark:bg-slate-700/50 dark:border-slate-700;
+}
+
+.th {
+  @apply px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300;
+}
+
+/* ─── Table row ─── */
+.table-row {
+  @apply transition-colors cursor-pointer;
+  @apply hover:bg-slate-50;
+  @apply dark:hover:bg-slate-700/30;
+}
+
+.td {
+  @apply px-4 py-3;
+}
+
+.td-mono {
+  @apply font-mono text-xs text-slate-500 dark:text-slate-400;
+}
+
+.td-cell-text {
+  @apply font-medium text-slate-700 dark:text-slate-300;
+}
+
+.td-cell-muted {
+  @apply text-xs text-slate-400 dark:text-slate-500;
+}
+
+.td-cell-primary {
+  @apply font-medium text-slate-600 dark:text-slate-400;
+}
+
+/* ─── Pagination ─── */
+.pagination-bar {
+  @apply px-5 py-3 border-t flex items-center justify-between;
+  @apply border-slate-100;
+  @apply dark:border-slate-700;
+}
+
+.pagination-info {
+  @apply text-xs text-slate-400 dark:text-slate-500;
+}
+
+.pagination-btn {
+  @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40;
+  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600;
+}
+
+/* ─── Modal ─── */
+.modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+.modal-overlay {
+  @apply absolute inset-0 bg-slate-900/60 backdrop-blur-sm;
+}
+
+.modal-content {
+  @apply relative rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto;
+  @apply bg-white;
+  @apply dark:bg-slate-800;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b flex items-center justify-between sticky top-0 z-10;
+  @apply bg-white border-slate-100;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.modal-close-btn {
+  @apply p-1.5 rounded-lg transition-colors text-slate-400;
+  @apply hover:bg-slate-100;
+  @apply dark:hover:bg-slate-700;
+}
+
+.modal-title {
+  @apply text-lg font-bold;
+  @apply text-slate-800 dark:text-slate-200;
+}
+
+/* ─── Modal info labels ─── */
+.info-label {
+  @apply text-xs font-semibold uppercase tracking-wider;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.info-value {
+  @apply font-bold mt-0.5;
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+/* ─── Items table ─── */
+.items-table-wrapper {
+  @apply overflow-hidden rounded-xl border;
+  @apply border-slate-200 dark:border-slate-700;
+}
+
+.items-thead {
+  @apply bg-slate-50 dark:bg-slate-700/50;
+}
+
+.items-th {
+  @apply px-3 py-2 text-left font-semibold text-xs;
+  @apply text-slate-600 dark:text-slate-300;
+}
+
+.items-cell {
+  @apply px-3 py-2 text-xs text-slate-400 dark:text-slate-500;
+}
+
+.items-cell-text {
+  @apply px-3 py-2 font-medium text-slate-700 dark:text-slate-300;
+}
+
+.items-cell-center {
+  @apply px-3 py-2 text-center text-slate-600 dark:text-slate-400;
+}
+
+.items-cell-right {
+  @apply px-3 py-2 text-right text-slate-600 dark:text-slate-400;
+}
+
+/* ─── Totals section ─── */
+.totals-section {
+  @apply rounded-xl p-4 space-y-2;
+  @apply bg-slate-50;
+  @apply dark:bg-slate-700/50;
+}
+
+.total-row {
+  @apply flex justify-between text-sm;
+}
+
+.total-label {
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.total-value {
+  @apply font-semibold text-slate-700 dark:text-slate-300;
+}
+
+.total-divider {
+  @apply pt-2 border-t;
+  @apply border-slate-200 dark:border-slate-600;
+}
+
+.total-final-label {
+  @apply font-black text-slate-800 dark:text-slate-200;
+}
+
+/* ─── Modal action buttons ─── */
+.modal-action-btn {
+  @apply flex-1 py-3 rounded-xl font-bold transition-colors text-sm;
+}
+
+.modal-action-btn--print {
+  @apply bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center gap-2;
+}
+
+.modal-action-btn--close {
+  @apply bg-slate-100 text-slate-700 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600;
+}
+
+/* ─── Empty state ─── */
+.empty-state-cell {
+  @apply px-4 py-12 text-center;
+  @apply text-slate-400 dark:text-slate-500;
+}

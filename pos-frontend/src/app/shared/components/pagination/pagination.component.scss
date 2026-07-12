@@ -1,0 +1,51 @@
+/* ─── Pagination bar ─── */
+.pag-bar {
+  @apply flex items-center justify-end px-4 py-2 text-sm;
+  @apply bg-white dark:bg-slate-900 transition-colors duration-200;
+}
+
+.pag-label {
+  @apply text-slate-500 dark:text-slate-400 mr-4;
+}
+
+.pag-size-btn {
+  @apply flex items-center gap-4 px-3 py-1.5 border rounded-lg transition-all duration-200;
+  @apply border-slate-200 bg-white text-slate-900;
+  @apply hover:border-indigo-500;
+  @apply dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-indigo-400;
+}
+
+.pag-size-btn-icon {
+  @apply w-4 h-4 text-indigo-600 transition-transform duration-200;
+}
+
+.pag-dropdown {
+  @apply absolute bottom-full left-0 mb-2 w-full min-w-[70px] rounded-lg shadow-xl z-50 overflow-hidden;
+  @apply bg-white border border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.pag-dropdown-item {
+  @apply w-full text-left px-4 py-2 transition-colors duration-150;
+  @apply hover:bg-slate-50 text-slate-700;
+  @apply dark:hover:bg-slate-700 dark:text-slate-200;
+}
+
+.pag-dropdown-item--active {
+  @apply bg-slate-100 dark:bg-slate-700 font-bold;
+}
+
+.pag-range {
+  @apply mr-8 text-slate-600 dark:text-slate-400;
+}
+
+.pag-nav-btn {
+  @apply p-2 rounded-lg transition-all duration-200;
+  @apply text-slate-400 hover:bg-slate-50 hover:text-indigo-600;
+  @apply disabled:opacity-30 disabled:cursor-not-allowed;
+  @apply dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-indigo-400;
+}
+
+.pag-nav-icon {
+  @apply w-5 h-5;
+}

@@ -8,17 +8,17 @@
 
       <!-- Role stats -->
       <div class="grid grid-cols-3 gap-2 sm:gap-4">
-        <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-4 shadow-sm text-center">
-          <div class="text-3xl font-black text-slate-900">{{ users().length }}</div>
-          <div class="text-sm text-slate-500 mt-1">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើទាំងអស់' : 'Total Users' }}</div>
+        <div @fadeIn class="stat-card">
+          <div class="stat-value">{{ users().length }}</div>
+          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើទាំងអស់' : 'Total Users' }}</div>
         </div>
-        <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-4 shadow-sm text-center">
-          <div class="text-3xl font-black text-indigo-600">{{ users().filter(u => u.role === 'admin').length }}</div>
-          <div class="text-sm text-slate-500 mt-1">{{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admins' }}</div>
+        <div @fadeIn class="stat-card">
+          <div class="stat-value--indigo">{{ users().filter(u => u.role === 'admin').length }}</div>
+          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admins' }}</div>
         </div>
-        <div @fadeIn [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-4 shadow-sm text-center">
-          <div class="text-3xl font-black text-emerald-600">{{ users().filter(u => u.role === 'cashier').length }}</div>
-          <div class="text-sm text-slate-500 mt-1">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</div>
+        <div @fadeIn class="stat-card">
+          <div class="stat-value--emerald">{{ users().filter(u => u.role === 'cashier').length }}</div>
+          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</div>
         </div>
       </div>
 
@@ -29,8 +29,7 @@
 
       <!-- Users grid -->
       <div *ngIf="!isLoading()" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-        <div *ngFor="let user of users()" @fadeIn
-          [class.bg-slate-800]="theme.isDark()" [class.border-slate-700]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow">
+        <div *ngFor="let user of users()" @fadeIn class="user-card">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
               @if (user.avatarUrl) {
@@ -44,7 +43,7 @@
                 </div>
               }
               <div>
-                <p class="font-bold text-slate-900 dark:text-white">{{ user.name }}</p>
+                <p class="user-name">{{ user.name }}</p>
                 <p class="text-xs text-slate-400">@{{ user.username }}</p>
               </div>
             </div>

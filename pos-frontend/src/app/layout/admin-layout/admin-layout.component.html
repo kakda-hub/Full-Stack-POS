@@ -1,26 +1,14 @@
-<div
-  class="h-screen flex overflow-hidden font-sans relative transition-colors duration-500"
-  [class.bg-slate-950]="theme.isDark()"
-  [class.bg-[#F8FAFC]]="!theme.isDark()"
->
+<div class="layout-root">
   <!-- Sidebar -->
   <aside
     [class.w-64]="!isCollapsed()"
     [class.w-20]="isCollapsed()"
-    [class.bg-[#0B1120]]="theme.isDark()"
-    [class.bg-white]="!theme.isDark()"
-    class="hidden md:flex flex-col transition-all duration-300 ease-in-out relative z-40 border-r"
-    [class.border-slate-800]="theme.isDark()"
-    [class.border-slate-200]="!theme.isDark()"
-    [class.text-slate-300]="theme.isDark()"
-    [class.text-slate-600]="!theme.isDark()"
+    class="sidebar"
   >
     <!-- Toggle Button -->
     <button
       (click)="toggleSidebar()"
-      class="flex absolute -right-3 top-10 w-6 h-6 bg-indigo-100 rounded-full border-2 items-center justify-center text-indigo-900 hover:bg-indigo-300 transition-all shadow-lg z-50 transform hover:scale-110 active:scale-95"
-      [class.border-[#0B1120]]="theme.isDark()"
-      [class.border-white]="!theme.isDark()"
+      class="sidebar-toggle"
       [class.rotate-180]="isCollapsed()"
       [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
       [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
@@ -44,22 +32,14 @@
     <!-- Header -->
     <div class="p-6 h-24 flex items-center mb-2">
       <div class="flex items-center gap-3 overflow-hidden">
-        <div
-          class="w-11 h-11"
-        >
+        <div class="w-11 h-11">
           <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
         </div>
         <div *ngIf="!isCollapsed()" class="flex flex-col">
-          <div
-            class="font-black text-2xl tracking-tight whitespace-nowrap transition-colors leading-tight"
-            [class.text-white]="theme.isDark()"
-            [class.text-slate-900]="!theme.isDark()"
-          >
+          <div class="brand-title">
             System<span class="text-indigo-600">POS</span>
           </div>
-          <div
-            class="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-black mt-0.5 opacity-80"
-          >
+          <div class="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-black mt-0.5 opacity-80">
             Smart Solutions
           </div>
         </div>
@@ -94,31 +74,24 @@
           >
             <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
               <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
-                <!-- Sale Icon -->
                 <svg *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
-                <!-- Product Icon -->
                 <svg *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
                 </svg>
-                <!-- Report Icon -->
                 <svg *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
                 </svg>
-                <!-- User Icon -->
                 <svg *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
-                <!-- Category Icon -->
                 <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
                 </svg>
-                <!-- Permission Icon -->
                 <svg *ngIf="item.icon === 'permission'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
                 </svg>
-                <!-- History Icon -->
                 <svg *ngIf="item.icon === 'history'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
@@ -139,7 +112,6 @@
           >
             <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
               <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
-                <!-- Settings Icon -->
                 <svg *ngIf="item.icon === 'settings'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
                 </svg>
@@ -158,7 +130,7 @@
             </svg>
           </button>
 
-          <!-- Submenu Content — now INSIDE the parent container -->
+          <!-- Submenu Content -->
           <div
             *ngIf="item.subMenus && selectedMenu() === item.route && !isCollapsed()"
             @fadeIn
@@ -168,7 +140,7 @@
               *ngFor="let sub of item.subMenus"
               [routerLink]="sub.route"
               routerLinkActive="active-sub-link"
-              class="flex items-center py-2 px-3 text-[13px] text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 rounded-lg transition-all group/sub"
+              class="submenu-item group/sub"
             >
               <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-3 group-[.active-sub-link]/sub:bg-indigo-500 transition-colors"></div>
               <span class="font-medium">
@@ -181,34 +153,15 @@
     </nav>
 
     <!-- Footer -->
-    <div
-      class="p-4 space-y-3 border-t transition-colors"
-      [class.bg-slate-900/50]="theme.isDark()"
-      [class.bg-slate-50]="!theme.isDark()"
-      [class.border-slate-800]="theme.isDark()"
-      [class.border-slate-100]="!theme.isDark()"
-    >
+    <div class="sidebar-footer">
       <!-- Dark Mode Toggle -->
       <button
         (click)="theme.toggle()"
-        class="w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2"
-        [class.bg-slate-800/40]="theme.isDark()"
-        [class.hover:bg-slate-800]="theme.isDark()"
-        [class.border-slate-700/50]="theme.isDark()"
-        [class.text-slate-400]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.hover:bg-slate-50]="!theme.isDark()"
-        [class.border-slate-200]="!theme.isDark()"
-        [class.text-slate-600]="!theme.isDark()"
+        class="footer-btn"
         [title]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
         [attr.aria-label]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
       >
-        <div
-          class="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors"
-          [class.bg-indigo-600]="theme.isDark()"
-          [class.bg-indigo-500]="!theme.isDark()"
-        >
-          <!-- Moon icon (dark mode active) -->
+        <div class="footer-btn-icon">
           <svg
             *ngIf="theme.isDark()"
             class="w-4 h-4 text-white"
@@ -219,7 +172,6 @@
           >
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
-          <!-- Sun icon (light mode active) -->
           <svg
             *ngIf="!theme.isDark()"
             class="w-4 h-4 text-white"
@@ -240,38 +192,20 @@
           </svg>
         </div>
         <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
-          {{
-            theme.isDark()
-              ? langService.currentLang() === 'km'
-                ? 'ពន្លឺ'
-                : 'Light'
-              : langService.currentLang() === 'km'
-                ? 'ងងឹត'
-                : 'Dark'
-          }}
+          {{ theme.isDark()
+            ? (langService.currentLang() === 'km' ? 'ពន្លឺ' : 'Light')
+            : (langService.currentLang() === 'km' ? 'ងងឹត' : 'Dark') }}
         </span>
       </button>
 
       <!-- Language Toggle -->
       <button
         (click)="langService.toggle()"
-        class="w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2"
-        [class.bg-slate-800/40]="theme.isDark()"
-        [class.hover:bg-slate-800]="theme.isDark()"
-        [class.border-slate-700/50]="theme.isDark()"
-        [class.text-slate-400]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.hover:bg-slate-50]="!theme.isDark()"
-        [class.border-slate-200]="!theme.isDark()"
-        [class.text-slate-600]="!theme.isDark()"
+        class="footer-btn"
         [title]="langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'"
-        [attr.aria-label]="
-          langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'
-        "
+        [attr.aria-label]="langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'"
       >
-        <div
-          class="w-7 h-7 rounded-md bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold"
-        >
+        <div class="w-7 h-7 rounded-md bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold">
           {{ langService.currentLang() === 'en' ? 'KH' : 'EN' }}
         </div>
         <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
@@ -280,14 +214,7 @@
       </button>
 
       <!-- User Profile -->
-      <div
-        class="flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300 hover:shadow-lg"
-        [class.bg-slate-800/40]="theme.isDark()"
-        [class.border-slate-700/50]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.border-slate-200/80]="!theme.isDark()"
-        [class.hover:border-indigo-500/30]="!theme.isDark()"
-      >
+      <div class="user-profile-card">
         <div *ngIf="!isCollapsed()" class="relative flex-shrink-0 group">
           <div class="w-10 h-10">
             @if (auth.currentUser()?.avatarUrl && !avatarError()) {
@@ -306,19 +233,10 @@
               </div>
             }
           </div>
-          <!-- Status Indicator -->
-          <div
-            class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-[2.5px] border-[#0B1120] rounded-full shadow-sm shadow-emerald-500/30"
-            [class.border-[#0B1120]]="theme.isDark()"
-            [class.border-white]="!theme.isDark()"
-          ></div>
+          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 status-dot-border rounded-full shadow-sm shadow-emerald-500/30"></div>
         </div>
         <div *ngIf="!isCollapsed()" class="min-w-0 flex-1">
-          <div
-            class="text-sm font-bold truncate transition-colors leading-tight"
-            [class.text-white]="theme.isDark()"
-            [class.text-slate-900]="!theme.isDark()"
-          >
+          <div class="user-name">
             {{ auth.currentUser()?.name }}
           </div>
           <div class="text-indigo-500 text-[10px] font-black uppercase tracking-wider mt-0.5">
@@ -353,25 +271,14 @@
   <app-alert-host></app-alert-host>
 
   <!-- Main content -->
-  <main
-    class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar-light pb-24 md:pb-6 transition-all duration-500"
-    [class.bg-slate-950]="theme.isDark()"
-    [class.bg-[#F8FAFC]]="!theme.isDark()"
-  >
-    <!-- max-w-7xl -->
+  <main class="main-content">
     <div class="mx-auto">
       <router-outlet></router-outlet>
     </div>
   </main>
 
-  <!-- Mobile Bottom Navigation (visible < md) -->
-  <nav
-    class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around px-4 border-t z-50 transition-all backdrop-blur-lg"
-    [class.bg-slate-900/80]="theme.isDark()"
-    [class.border-slate-800]="theme.isDark()"
-    [class.bg-white/80]="!theme.isDark()"
-    [class.border-slate-200]="!theme.isDark()"
-  >
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav">
     <a
       *ngFor="let item of navItems"
       [routerLink]="item.route"
@@ -380,70 +287,24 @@
       [routerLinkActiveOptions]="{ exact: item.route === '/' }"
     >
       <div class="z-10 transition-transform duration-300 transform group-active:scale-90">
-        <svg
-          class="w-6 h-6"
-          *ngIf="item.icon === 'sale'"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-          <path d="M3 6h18" />
-          <path d="M16 10a4 4 0 0 1-8 0" />
+        <svg class="w-6 h-6" *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
         </svg>
-        <svg
-          class="w-6 h-6"
-          *ngIf="item.icon === 'product'"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
-          />
-          <path d="m3.27 6.96 8.73 5.05 8.73-5.05" />
-          <path d="M12 22.08V12" />
+        <svg class="w-6 h-6" *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+          <path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
         </svg>
-        <svg
-          class="w-6 h-6"
-          *ngIf="item.icon === 'report'"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M3 3v18h18" />
-          <path d="m19 9-5 5-4-4-3 3" />
+        <svg class="w-6 h-6" *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
         </svg>
-        <svg
-          class="w-6 h-6"
-          *ngIf="item.icon === 'history'"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg class="w-6 h-6" *ngIf="item.icon === 'history'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        <svg
-          class="w-6 h-6"
-          *ngIf="item.icon === 'user'"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
+        <svg class="w-6 h-6" *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
         </svg>
       </div>
-      <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{
-        langService.currentLang() === 'km' ? item.labelKm : item.label
-      }}</span>
-      
-      <!-- Active indicator dot -->
+      <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
       <div class="active-dot absolute -bottom-1 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all"></div>
     </a>
   </nav>

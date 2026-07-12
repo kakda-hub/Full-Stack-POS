@@ -152,9 +152,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   getStockClass(p: Product): string {
-    if (p.stock === 0) return 'font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-lg';
-    if (p.stock <= (p.lowStockThreshold || 10)) return 'font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg';
-    return 'font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg';
+    if (p.stock === 0) return 'stock-badge--out';
+    if (p.stock <= (p.lowStockThreshold || 10)) return 'stock-badge--low';
+    return 'stock-badge--ok';
   }
 
   getCategoryName(categoryId: string): string {

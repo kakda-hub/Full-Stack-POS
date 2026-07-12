@@ -4,18 +4,29 @@
   max-height: 98vh;
   border-radius: 10px;
   transition: all 0.3s ease-in-out;
+
   .mat-dialog-container {
     overflow: hidden !important;
     border-radius: 10px;
     padding: unset !important;
   }
+
   .mat-dialog-actions {
     padding-right: 6px;
     padding-bottom: 18px !important;
   }
+
   @media screen and (max-width: 960px) {
     width: 100vw;
     max-height: 100vh;
+  }
+}
+
+html.dark .responsive-dialog {
+  background-color: #1e293b !important;
+
+  .mat-mdc-dialog-surface {
+    background-color: #1e293b !important;
   }
 }
 
@@ -23,17 +34,28 @@
   border-radius: 10px;
   background-color: white !important;
   transition: all 0.3s ease-in-out;
+
   .mat-dialog-container {
     overflow: hidden !important;
     border-radius: 10px;
     padding: unset !important;
   }
+
   .mat-dialog-actions {
     padding-right: 6px;
     padding-bottom: 18px !important;
   }
+
   @media screen and (max-width: 960px) {
     width: 100vw;
+  }
+}
+
+html.dark .small-dialog {
+  background-color: #1e293b !important;
+
+  .mat-mdc-dialog-surface {
+    background-color: #1e293b !important;
   }
 }
 
@@ -44,16 +66,27 @@
   max-width: unset !important;
   max-height: 98vh;
   transition: all 0.3s ease-in-out;
+
   .mat-dialog-container {
     overflow: hidden !important;
     border-radius: 10px;
     padding: 0px 5px 8px 0px;
   }
+
   .mat-dialog-actions {
     padding-right: 6px;
     padding-bottom: 18px !important;
   }
+
   @media screen and (max-width: 960px) {
     width: 100vw;
+  }
+}
+
+html.dark .medium-dialog {
+  background-color: #1e293b !important;
+
+  .mat-mdc-dialog-surface {
+    background-color: #1e293b !important;
   }
 }

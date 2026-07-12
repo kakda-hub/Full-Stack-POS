@@ -1,0 +1,120 @@
+/* ─── Reports page wrapper ─── */
+.rpt-wrapper {
+  @apply p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6;
+}
+
+/* ─── Card (reusable) ─── */
+.rpt-card {
+  @apply rounded-2xl border p-5 shadow-sm bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+
+  &--hoverable {
+    @apply hover:shadow-md transition-shadow;
+  }
+}
+
+/* ─── Filter bar ─── */
+.rpt-filter-bar {
+  @apply rounded-2xl border p-4 shadow-sm flex flex-wrap items-center gap-3;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.rpt-preset-btn {
+  @apply px-4 py-1.5 rounded-lg text-sm font-semibold transition-all;
+  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600;
+
+  &--active {
+    @apply bg-indigo-600 text-white shadow-sm;
+  }
+}
+
+/* ─── KPI section ─── */
+.rpt-kpi-grid {
+  @apply grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4;
+}
+
+.rpt-kpi-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center;
+}
+
+.rpt-kpi-value {
+  @apply text-2xl font-black text-slate-900 dark:text-white;
+}
+
+.rpt-kpi-label {
+  @apply text-sm text-slate-500 mt-0.5;
+}
+
+.rpt-kpi-badge {
+  @apply text-xs font-semibold px-2 py-0.5 rounded-full;
+}
+
+/* ─── Chart title ─── */
+.rpt-chart-title {
+  @apply font-bold text-slate-800 dark:text-slate-100;
+}
+
+/* ─── Progress bar ─── */
+.rpt-progress-track {
+  @apply h-2 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700;
+}
+
+.rpt-progress-fill {
+  @apply h-full rounded-full transition-all duration-500;
+}
+
+/* ─── Skeleton panel ─── */
+.rpt-skeleton-panel {
+  @apply rounded-2xl border p-5 bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+}
+
+/* ─── Table section ─── */
+.rpt-table-section {
+  @apply rounded-2xl border shadow-sm overflow-hidden bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+}
+
+.rpt-table-header {
+  @apply px-5 py-4 border-b border-slate-100 dark:border-slate-700;
+}
+
+.rpt-thead {
+  @apply border-b bg-slate-50 border-slate-100 dark:bg-slate-700 dark:border-slate-700;
+}
+
+.rpt-th {
+  @apply px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300;
+}
+
+/* ─── Row ─── */
+.rpt-row-hover {
+  @apply transition-colors hover:bg-slate-50 dark:hover:bg-slate-700;
+}
+
+/* ─── Text helpers ─── */
+.rpt-text-primary {
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+.rpt-text-muted {
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.rpt-text-price {
+  @apply text-right font-bold text-indigo-700 dark:text-indigo-400;
+}
+
+.rpt-text-mono {
+  @apply font-mono text-xs text-slate-600 dark:text-slate-400;
+}
+
+/* ─── Transaction row ─── */
+.rpt-txn-row {
+  @apply flex items-center gap-3 p-3 rounded-xl transition-colors;
+  @apply hover:bg-slate-50 dark:hover:bg-slate-700;
+}
+
+/* ─── Rank badge ─── */
+.rpt-rank {
+  @apply w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold;
+}

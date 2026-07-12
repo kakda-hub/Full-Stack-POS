@@ -13,7 +13,39 @@
   }
 }
 
-// ─── User Cards ──────────────────────────────────────────────────────────────
+/* ─── Section header ─── */
+.section-title {
+  @apply text-xl sm:text-2xl font-black tracking-tight transition-colors text-slate-900 dark:text-white;
+}
+
+.section-subtitle {
+  @apply text-xs font-medium mt-0.5 transition-colors text-slate-500 dark:text-slate-400;
+}
+
+.section-heading {
+  @apply text-base font-bold transition-colors text-slate-900 dark:text-white;
+}
+
+/* ─── Stat card ─── */
+.stat-card {
+  @apply rounded-xl p-4 sm:p-5 transition-all duration-300 border;
+  @apply bg-white border-slate-200/80;
+  @apply dark:bg-slate-900/60 dark:border-slate-800;
+}
+
+.stat-value {
+  @apply text-2xl font-black mt-0.5 text-slate-900 dark:text-white;
+}
+
+.stat-value--violet {
+  @apply text-violet-600 dark:text-violet-400;
+}
+
+.stat-value--emerald {
+  @apply text-emerald-600 dark:text-emerald-400;
+}
+
+/* ─── User Cards (preserved) ─── */
 .user-card {
   @apply rounded-xl p-4 sm:p-5 transition-all duration-300;
 
@@ -34,13 +66,26 @@
   }
 }
 
-// ─── Role Select ─────────────────────────────────────────────────────────────
+/* ─── User name ─── */
+.user-name-text {
+  @apply text-sm font-bold truncate transition-colors text-slate-900 dark:text-white;
+}
+
+/* ─── Status dot border ─── */
+.status-dot-border {
+  @apply border-[2.5px] border-white dark:border-slate-900;
+}
+
+/* ─── Role Select (preserved + dark) ─── */
 .role-select {
   padding-right: 1.75rem !important;
 
   &:focus {
     @apply outline-none ring-2 ring-indigo-500/40;
   }
+
+  @apply bg-white border-slate-200 text-slate-900;
+  @apply dark:bg-slate-800/60 dark:border-slate-600 dark:text-white;
 
   &.role-select-admin {
     @apply bg-violet-500/10 border-violet-500/30 text-violet-600;
@@ -51,4 +96,42 @@
     @apply bg-emerald-500/10 border-emerald-500/30 text-emerald-600;
     @apply dark:bg-emerald-500/20 dark:border-emerald-500/40 dark:text-emerald-400;
   }
+}
+
+/* ─── Chevron icon ─── */
+.chevron-icon {
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+/* ─── Status badge ─── */
+.status-badge {
+  @apply text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg;
+}
+
+.status-badge--active {
+  @apply bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400;
+}
+
+.status-badge--inactive {
+  @apply bg-slate-500/10 text-slate-400;
+}
+
+/* ─── Skeleton card ─── */
+.skeleton-card {
+  @apply rounded-xl p-5 border;
+  @apply bg-white border-slate-200/80;
+  @apply dark:bg-slate-900/60 dark:border-slate-800;
+}
+
+/* ─── Empty state icon ─── */
+.empty-icon-box {
+  @apply w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-500/10 flex items-center justify-center;
+}
+
+.empty-icon {
+  @apply w-8 h-8 text-slate-400;
+}
+
+.empty-text {
+  @apply text-sm font-medium text-slate-400;
 }

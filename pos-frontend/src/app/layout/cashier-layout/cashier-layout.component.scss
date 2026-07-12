@@ -1,4 +1,10 @@
-/* Cart count badge */
+/* ==========================================================
+   Cashier Layout Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
+/* ─── Cart count badge (preserved) ─── */
 .cart-count-badge {
   display: inline-flex;
   align-items: center;
@@ -12,4 +18,57 @@
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
+}
+
+/* ─── Layout containers ─── */
+.cashier-layout {
+  @apply h-screen flex flex-col bg-slate-50 dark:bg-slate-900;
+}
+
+.cashier-header {
+  @apply border-b px-4 py-3 flex items-center justify-between shadow-sm z-10;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+/* ─── Brand ─── */
+.brand-text {
+  @apply font-bold text-lg flex items-center gap-2 text-slate-800 dark:text-white;
+}
+
+/* ─── Theme toggle button ─── */
+.theme-toggle-btn {
+  @apply p-2 rounded-lg transition-colors;
+  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600;
+}
+
+/* ─── Language toggle ─── */
+.lang-toggle {
+  @apply px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5;
+  @apply bg-slate-100 text-slate-700 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600;
+}
+
+/* ─── User info text ─── */
+.user-info-text {
+  @apply flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300;
+}
+
+/* ─── Avatar ring ─── */
+.avatar-ring {
+  @apply ring-2 transition-all duration-300;
+  @apply ring-indigo-500/20;
+  @apply dark:ring-indigo-400/30;
+}
+
+/* ─── Avatar fallback background ─── */
+.avatar-fallback {
+  @apply bg-indigo-100 text-indigo-700 dark:bg-indigo-700 dark:text-indigo-200;
+}
+
+/* ─── Logout button ─── */
+.logout-btn {
+  @apply p-2 rounded-lg transition-colors;
+  @apply text-slate-400 hover:text-rose-400 hover:bg-rose-500/10;
 }

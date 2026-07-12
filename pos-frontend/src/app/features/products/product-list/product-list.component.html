@@ -1,6 +1,6 @@
-<div @pageTransition class="p-3 space-y-4">
+<div @pageTransition class="product-list-wrapper">
   <!-- Header -->
-  <div class="flex items-center justify-between">
+  <div class="header-row">
     <app-breadcrumb></app-breadcrumb>
     <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="onAdd()">
       <span>{{ 'button.addNew' | translate }}</span>
@@ -11,18 +11,9 @@
   <div
     *ngIf="productService.lowStockProducts().length > 0"
     @fadeIn
-    [class.bg-amber-900\/20]="theme.isDark()"
-    [class.border-amber-700\/40]="theme.isDark()"
-    [class.bg-amber-50]="!theme.isDark()"
-    [class.border-amber-200]="!theme.isDark()"
-    class="border rounded-xl p-4 flex items-center gap-3"
+    class="low-stock-alert"
   >
-    <svg
-      class="w-5 h-5 text-amber-600 flex-shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg class="low-stock-alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -30,24 +21,19 @@
         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
       />
     </svg>
-    <p class="text-sm text-amber-800 font-medium">
+    <p class="low-stock-alert-text">
       {{ productService.lowStockProducts().length }}
       {{ lang.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}:
-      <span *ngFor="let p of productService.lowStockProducts(); let last = last" class="font-bold">
+      <span *ngFor="let p of productService.lowStockProducts(); let last = last" class="low-stock-alert-names">
         {{ p.name }}{{ !last ? ', ' : '' }}
       </span>
     </p>
   </div>
 
   <!-- Filters -->
-  <div class="flex gap-2 sm:gap-3 flex-wrap">
-    <div id="search" class="relative flex-1 min-w-48">
-      <svg
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+  <div class="filters-bar">
+    <div id="search" class="search-wrapper">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -60,22 +46,17 @@
         type="text"
         (input)="onSearch($event)"
         [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកផលិតផល...' : 'Search products...'"
-        [class.bg-slate-700]="theme.isDark()"
-        [class.border-slate-600]="theme.isDark()"
-        [class.text-slate-100]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.border-slate-200]="!theme.isDark()"
-        class="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        class="search-input"
       />
     </div>
-    <div class="flex gap-2 flex-wrap">
+    <div class="category-filters">
       <button
         *ngFor="let cat of productService.categories()"
         (click)="productService.setCategory(cat.id)"
         [class]="
           cat.id === productService.selectedCategory()
-            ? 'px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold transition-all'
-            : 'px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium transition-all'
+            ? 'category-btn category-btn--active'
+            : 'category-btn'
         "
       >
         {{ lang.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
@@ -84,46 +65,33 @@
   </div>
 
   <!-- Skeleton loading state -->
-  <div
-    *ngIf="isLoading()"
-    class="rounded-2xl border overflow-hidden"
-    [class.bg-white]="!theme.isDark()"
-    [class.border-slate-200]="!theme.isDark()"
-    [class.bg-slate-800]="theme.isDark()"
-    [class.border-slate-700]="theme.isDark()"
-  >
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead
-          [class.bg-slate-50]="!theme.isDark()"
-          [class.bg-slate-900]="theme.isDark()"
-          class="border-b"
-          [class.border-slate-200]="!theme.isDark()"
-          [class.border-slate-700]="theme.isDark()"
-        >
+  <div *ngIf="isLoading()" class="skeleton-section">
+    <div class="skeleton-table-wrapper">
+      <table class="skeleton-table">
+        <thead class="skeleton-thead">
           <tr>
-            <th class="px-4 py-3 text-left">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="20px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-left">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="20px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-left">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="60px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-left">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="55px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-left">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="65px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-right">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="40px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-right">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="40px" height="12px"></app-skeleton>
             </th>
-            <th class="px-4 py-3 text-right">
+            <th class="skeleton-th">
               <app-skeleton variant="text" width="55px" height="12px"></app-skeleton>
             </th>
           </tr>
@@ -136,52 +104,40 @@
   </div>
 
   <!-- Table -->
-  <div
-    [class.bg-slate-800]="theme.isDark()"
-    [class.border-slate-700]="theme.isDark()"
-    [class.bg-white]="!theme.isDark()"
-    [class.border-slate-200]="!theme.isDark()"
-    class="rounded-2xl border overflow-hidden shadow-sm"
-  >
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead
-          [class.bg-slate-900]="theme.isDark()"
-          [class.border-slate-700]="theme.isDark()"
-          [class.bg-slate-50]="!theme.isDark()"
-          [class.border-slate-200]="!theme.isDark()"
-          class="border-b"
-        >
+  <div class="table-container">
+    <div class="table-overflow">
+      <table class="table">
+        <thead class="table-thead">
           <tr>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+            <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'ល.រ' : 'No.' }}
             </th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+            <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}
             </th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+            <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name' }}
             </th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+            <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }}
             </th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">
+            <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}
             </th>
-            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+            <th class="th th--right">
               {{ lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price' }}
             </th>
-            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+            <th class="th th--right">
               {{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }}
             </th>
-            <th class="px-4 py-3 text-right font-semibold text-slate-600">
+            <th class="th th--right">
               {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
             </th>
           </tr>
         </thead>
         <tbody
           [@listAnimation]="productService.filteredProducts().length"
-          class="divide-y divide-slate-100"
+          class="table-tbody"
         >
           <tr
             *ngFor="
@@ -190,35 +146,20 @@
               trackBy: trackById
             "
             @fadeIn
-            [class.hover:bg-slate-700]="theme.isDark()"
-            [class.hover:bg-slate-50]="!theme.isDark()"
-            class="transition-colors group"
+            class="table-row"
           >
-            <td class="px-4 py-3">
-              {{ i + 1 }}
-            </td>
-            <td class="px-4 py-3">
+            <td class="td">{{ i + 1 }}</td>
+            <td class="td">
               @if (product.imgUrl) {
                 <img
                   [src]="product.imgUrl"
                   alt="Product image"
-                  class="w-12 h-12 object-cover rounded-lg"
+                  class="product-img"
                   (error)="product.imgUrl = ''"
                 />
               } @else {
-                <div
-                  class="w-12 h-12 rounded-lg flex items-center justify-center"
-                  [class.bg-slate-700]="theme.isDark()"
-                  [class.bg-slate-100]="!theme.isDark()"
-                >
-                  <svg
-                    class="w-6 h-6"
-                    [class.text-slate-500]="theme.isDark()"
-                    [class.text-slate-400]="!theme.isDark()"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                <div class="img-placeholder">
+                  <svg class="img-placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -229,37 +170,31 @@
                 </div>
               }
             </td>
-            <td class="px-4 py-3">
-              <div class="font-semibold text-slate-900">{{ product.name }}</div>
-              <div *ngIf="product.nameKm" class="text-xs text-slate-400">{{ product.nameKm }}</div>
+            <td class="td">
+              <div class="product-name">{{ product.name }}</div>
+              <div *ngIf="product.nameKm" class="product-name-km">{{ product.nameKm }}</div>
             </td>
-            <td class="px-4 py-3">
-              <span
-                [class.bg-slate-700]="theme.isDark()"
-                [class.text-slate-300]="theme.isDark()"
-                [class.bg-slate-100]="!theme.isDark()"
-                class="font-mono text-xs px-2 py-1 rounded-lg"
-                >{{ product.barcode }}</span
-              >
+            <td class="td">
+              <span class="barcode-badge">{{ product.barcode }}</span>
             </td>
-            <td class="px-4 py-3">
-              <span class="capitalize text-slate-600">{{ getCategoryName(product.category) }}</span>
+            <td class="td">
+              <span class="category-name-cell">{{ getCategoryName(product.category) }}</span>
             </td>
-            <td class="px-4 py-3 text-right font-bold text-indigo-600">
+            <td class="td td--right price-cell">
               ${{ product.price.toFixed(2) }}
             </td>
-            <td class="px-4 py-3 text-right">
+            <td class="td td--right">
               <span [class]="getStockClass(product)">{{ product.stock }}</span>
             </td>
-            <td class="px-4 py-3 text-right">
-              <div class="flex items-center justify-end gap-2">
+            <td class="td td--right">
+              <div class="actions-cell">
                 <button
                   type="button"
                   aria-label="Edit product"
                   (click)="openEdit(product)"
-                  class="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors"
+                  class="action-btn action-btn--edit"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -272,9 +207,9 @@
                   type="button"
                   aria-label="Delete product"
                   (click)="deleteProduct(product)"
-                  class="p-1.5 rounded-lg hover:bg-rose-50 text-rose-600 transition-colors"
+                  class="action-btn action-btn--delete"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -287,13 +222,8 @@
             </td>
           </tr>
           <tr *ngIf="productService.filteredProducts().length === 0">
-            <td colspan="6" class="px-4 py-16 text-center text-slate-400">
-              <svg
-                class="w-12 h-12 mx-auto mb-3 opacity-30"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+            <td colspan="6" class="empty-state-cell">
+              <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -301,7 +231,7 @@
                   d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
                 />
               </svg>
-              <p class="text-sm">
+              <p class="empty-state-text">
                 {{ lang.currentLang() === 'km' ? 'គ្មានផលិតផល' : 'No products found' }}
               </p>
             </td>

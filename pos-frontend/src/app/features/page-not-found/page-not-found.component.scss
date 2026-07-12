@@ -1,0 +1,47 @@
+/* ==========================================================
+   Page Not Found Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
+/* ─── Layout ─── */
+.not-found-layout {
+  @apply flex flex-col min-h-[80vh] items-center justify-center space-y-8 text-center p-4;
+}
+
+/* ─── Graphic icon ─── */
+.not-found-icon-wrapper {
+  @apply w-40 h-40;
+}
+
+.not-found-icon-stroke {
+  @apply stroke-current text-slate-400 dark:text-slate-500;
+}
+
+/* ─── Text section ─── */
+.not-found-404 {
+  @apply text-lg font-medium text-slate-500 uppercase tracking-[0.3em] animate-pulse;
+}
+
+.not-found-title {
+  @apply text-3xl font-bold mt-1 text-slate-900 dark:text-white;
+}
+
+.not-found-subtitle {
+  @apply text-sm text-slate-500 mt-2 dark:text-slate-400;
+}
+
+/* ─── Buttons ─── */
+.not-found-btn {
+  @apply px-4 py-2 rounded-lg text-xs font-medium border transition-all;
+}
+
+.not-found-btn--back {
+  @apply bg-slate-900 border-slate-900 text-white;
+  @apply dark:bg-indigo-600 dark:border-indigo-600;
+}
+
+.not-found-btn--home {
+  @apply bg-slate-100 border-slate-900 text-slate-900;
+  @apply dark:bg-indigo-600/10 dark:border-indigo-600 dark:text-indigo-600;
+}

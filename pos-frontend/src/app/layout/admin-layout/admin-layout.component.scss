@@ -1,3 +1,10 @@
+/* ==========================================================
+   Admin Layout Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
+/* ─── Custom scrollbar style ─── */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
@@ -25,27 +32,25 @@
   border: 2px solid transparent;
   background-clip: content-box;
 }
-.dark .custom-scrollbar-light::-webkit-scrollbar-thumb {
+:host-context(.dark) .custom-scrollbar-light::-webkit-scrollbar-thumb {
   background: #1e293b;
   background-clip: content-box;
 }
 
+/* ─── Navigation item ─── */
 .nav-item {
   @apply flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-200 relative;
-  
-  // Dark theme (default or via parent class)
-  .dark & {
+  @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100/50;
+
+  :host-context(html.dark) & {
     @apply text-slate-400 hover:text-white hover:bg-white/[0.03];
   }
-  
-  // Light theme fallback/specifics
-  @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100/50;
 }
 
 .active-link {
   @apply bg-indigo-500/10 text-indigo-600 font-semibold shadow-[inset_0_0_20px_rgba(99,102,241,0.05)];
-  
-  .dark & {
+
+  :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400;
   }
 }
@@ -56,12 +61,13 @@
 
 .active-link svg {
   @apply text-indigo-600;
-  
-  .dark & {
+
+  :host-context(html.dark) & {
     @apply text-indigo-400;
   }
 }
 
+/* ─── Mobile nav ─── */
 .mobile-nav-active {
   @apply text-indigo-500 !important;
   transform: translateY(-4px);
@@ -79,9 +85,87 @@
 
 .active-sub-link {
   @apply bg-indigo-50/80 text-indigo-600 font-bold !important;
-  
-  .dark & {
+
+  :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400 !important;
   }
 }
 
+/* ─── Layout containers ─── */
+.layout-root {
+  @apply h-screen flex overflow-hidden font-sans relative transition-colors duration-500;
+  @apply bg-[#F8FAFC] dark:bg-slate-950;
+}
+
+.sidebar {
+  @apply hidden md:flex flex-col transition-all duration-300 ease-in-out relative z-40 border-r;
+  @apply bg-white border-slate-200 text-slate-600;
+  @apply dark:bg-[#0B1120] dark:border-slate-800 dark:text-slate-300;
+}
+
+.main-content {
+  @apply flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar-light pb-24 md:pb-6 transition-all duration-500;
+  @apply bg-[#F8FAFC] dark:bg-slate-950;
+}
+
+/* ─── Sidebar toggle button ─── */
+.sidebar-toggle {
+  @apply flex absolute -right-3 top-10 w-6 h-6 bg-indigo-100 rounded-full border-2 items-center justify-center text-indigo-900 hover:bg-indigo-300 transition-all shadow-lg z-50 transform hover:scale-110 active:scale-95;
+  @apply border-white dark:border-[#0B1120];
+}
+
+/* ─── Brand title ─── */
+.brand-title {
+  @apply font-black text-2xl tracking-tight whitespace-nowrap transition-colors leading-tight;
+  @apply text-slate-900 dark:text-white;
+}
+
+/* ─── Sidebar footer ─── */
+.sidebar-footer {
+  @apply p-4 space-y-3 border-t transition-colors;
+  @apply bg-slate-50 border-slate-100;
+  @apply dark:bg-slate-900/50 dark:border-slate-800;
+}
+
+/* ─── Theme/lang toggle button ─── */
+.footer-btn {
+  @apply w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2;
+  @apply bg-white border-slate-200 text-slate-600 hover:bg-slate-50;
+  @apply dark:bg-slate-800/40 dark:border-slate-700/50 dark:text-slate-400 dark:hover:bg-slate-800;
+}
+
+.footer-btn-icon {
+  @apply w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors;
+  @apply bg-indigo-500 dark:bg-indigo-600;
+}
+
+/* ─── User profile card ─── */
+.user-profile-card {
+  @apply flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300 hover:shadow-lg;
+  @apply bg-white border-slate-200/80 hover:border-indigo-500/30;
+  @apply dark:bg-slate-800/40 dark:border-slate-700/50;
+}
+
+.user-name {
+  @apply text-sm font-bold truncate transition-colors leading-tight;
+  @apply text-slate-900 dark:text-white;
+}
+
+.status-dot-border {
+  @apply border-[2.5px] rounded-full;
+  @apply border-white dark:border-[#0B1120];
+}
+
+/* ─── Mobile bottom nav ─── */
+.mobile-bottom-nav {
+  @apply md:hidden fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around px-4 border-t z-50 transition-all backdrop-blur-lg;
+  @apply bg-white/80 border-slate-200;
+  @apply dark:bg-slate-900/80 dark:border-slate-800;
+}
+
+/* ─── Submenu item ─── */
+.submenu-item {
+  @apply flex items-center py-2 px-3 text-[13px] rounded-lg transition-all;
+  @apply text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50;
+  @apply dark:hover:bg-indigo-900/20;
+}

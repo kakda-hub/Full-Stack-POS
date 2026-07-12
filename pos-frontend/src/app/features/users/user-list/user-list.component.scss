@@ -1,3 +1,87 @@
+/* ==========================================================
+   User List Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
 .btn {
   @apply flex flex-row w-full justify-center items-center text-xs font-semibold py-2 rounded-lg transition-colors;
+}
+
+/* ─── Card ─── */
+.stat-card {
+  @apply rounded-2xl border p-4 shadow-sm text-center;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.stat-value {
+  @apply text-3xl font-black text-slate-900 dark:text-white;
+}
+
+.stat-value--indigo {
+  @apply text-3xl font-black text-indigo-600;
+}
+
+.stat-value--emerald {
+  @apply text-3xl font-black text-emerald-600;
+}
+
+.stat-label {
+  @apply text-sm text-slate-500 mt-1;
+}
+
+/* ─── User card ─── */
+.user-card {
+  @apply rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow;
+  @apply bg-white border-slate-200;
+  @apply dark:bg-slate-800 dark:border-slate-700;
+}
+
+.user-name {
+  @apply font-bold text-slate-900 dark:text-white;
+}
+
+.role-badge {
+  @apply text-xs font-bold px-2.5 py-1 rounded-lg capitalize;
+}
+
+.role-badge--admin {
+  @apply bg-indigo-50 text-indigo-700;
+}
+
+.role-badge--cashier {
+  @apply bg-emerald-50 text-emerald-700;
+}
+
+.status-dot {
+  @apply w-2.5 h-2.5 rounded-full;
+}
+
+.status-dot--active {
+  @apply bg-emerald-400;
+}
+
+.status-dot--inactive {
+  @apply bg-slate-300;
+}
+
+.status-text {
+  @apply text-xs font-semibold capitalize;
+}
+
+.status-text--active {
+  @apply text-emerald-600;
+}
+
+.status-text--inactive {
+  @apply text-slate-400;
+}
+
+.field-label {
+  @apply text-sm text-slate-500;
+}
+
+.field-value {
+  @apply text-xs text-slate-600;
 }

@@ -1,14 +1,15 @@
+/* ==========================================================
+   Product Detail Component Styles
+   Extracted from inline Tailwind classes using @apply
+   Dark mode via Tailwind's `dark:` variant prefix
+   ========================================================== */
+
 :host {
   display: block;
 }
 
 .mat-mdc-dialog-content {
   --mat-dialog-content-padding: 0 24px;
-}
-
-/* Upload area hover effect */
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
 }
 
 /* Form field styling */
@@ -31,4 +32,99 @@ input[type="file"]:focus-visible + label {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
   border-radius: 16px;
+}
+
+/* ─── Dialog content padding ─── */
+.dialog-content {
+  padding-bottom: 0.5rem !important;
+}
+
+/* ─── Form body ─── */
+.form-body {
+  @apply flex flex-col gap-4;
+}
+
+/* ─── Error banner ─── */
+.error-banner {
+  @apply flex items-start gap-3 p-3 rounded-xl border;
+  @apply border-rose-200 bg-rose-50 dark:border-rose-800/40 dark:bg-rose-900/20;
+}
+
+.error-banner-icon {
+  @apply w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5;
+}
+
+.error-banner-text {
+  @apply flex-1 text-sm text-rose-700 dark:text-rose-300 font-medium whitespace-pre-line;
+}
+
+.error-dismiss-btn {
+  @apply text-rose-400 hover:text-rose-600 transition-colors flex-shrink-0;
+}
+
+.error-dismiss-icon {
+  @apply w-4 h-4;
+}
+
+/* ─── Upload image area ─── */
+.upload-wrapper {
+  @apply flex justify-center;
+}
+
+.upload-container {
+  @apply relative w-44 h-44 rounded-2xl border-2 border-dashed transition-all;
+  @apply overflow-hidden cursor-pointer;
+  @apply bg-slate-50 border-slate-300 hover:border-indigo-400;
+  @apply dark:bg-slate-700 dark:border-slate-600 dark:hover:border-indigo-500;
+}
+
+.upload-image {
+  @apply w-full h-full object-cover;
+}
+
+.upload-overlay {
+  @apply absolute inset-0 bg-black/50 flex items-center justify-center;
+  @apply opacity-0 group-hover:opacity-100 transition-opacity;
+}
+
+.upload-overlay-text {
+  @apply text-white text-sm font-semibold;
+}
+
+.upload-empty-state {
+  @apply flex flex-col items-center justify-center w-full h-full;
+}
+
+.upload-spinner {
+  @apply w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin;
+}
+
+.upload-spinner-text {
+  @apply mt-2 text-xs;
+}
+
+.upload-icon {
+  @apply w-10 h-10 mb-2;
+}
+
+.upload-click-text {
+  @apply text-xs;
+}
+
+.upload-muted {
+  @apply text-slate-400;
+}
+
+.file-input-hidden {
+  @apply hidden;
+}
+
+/* ─── Form grid ─── */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* ─── Dialog actions ─── */
+.dialog-actions {
+  @apply w-full gap-3 px-6 pb-4;
 }

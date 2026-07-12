@@ -8,18 +8,10 @@
   <div class="flex items-center gap-3 mb-6">
     <div class="w-1 h-7 rounded-full bg-gradient-to-b from-indigo-500 to-violet-600"></div>
     <div>
-      <h1
-        class="text-xl sm:text-2xl font-black tracking-tight transition-colors"
-        [class.text-white]="theme.isDark()"
-        [class.text-slate-900]="!theme.isDark()"
-      >
+      <h1 class="section-title">
         {{ lang.currentLang() === 'km' ? 'តួនាទីអ្នកប្រើ' : 'User Roles' }}
       </h1>
-      <p
-        class="text-xs font-medium mt-0.5 transition-colors"
-        [class.text-slate-400]="theme.isDark()"
-        [class.text-slate-500]="!theme.isDark()"
-      >
+      <p class="section-subtitle">
         {{ lang.currentLang() === 'km' ? 'គ្រប់គ្រង និងកំណត់តួនាទីអ្នកប្រើប្រាស់' : 'Manage and assign user roles & permissions' }}
       </p>
     </div>
@@ -28,13 +20,7 @@
   <!-- Role Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-8">
     <!-- Total -->
-    <div
-      class="rounded-xl p-4 sm:p-5 transition-all duration-300 border"
-      [class.bg-slate-900/60]="theme.isDark()"
-      [class.border-slate-800]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-200/80]="!theme.isDark()"
-    >
+    <div class="stat-card">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,19 +29,13 @@
         </div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើទាំងអស់' : 'Total Users' }}</p>
-          <p class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{{ users().length }}</p>
+          <p class="stat-value">{{ users().length }}</p>
         </div>
       </div>
     </div>
 
     <!-- Admins -->
-    <div
-      class="rounded-xl p-4 sm:p-5 transition-all duration-300 border"
-      [class.bg-slate-900/60]="theme.isDark()"
-      [class.border-slate-800]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-200/80]="!theme.isDark()"
-    >
+    <div class="stat-card">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400 flex items-center justify-center">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -64,19 +44,13 @@
         </div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admins' }}</p>
-          <p class="text-2xl font-black text-violet-600 dark:text-violet-400 mt-0.5">{{ admins.length }}</p>
+          <p class="stat-value--violet">{{ admins.length }}</p>
         </div>
       </div>
     </div>
 
     <!-- Cashiers -->
-    <div
-      class="rounded-xl p-4 sm:p-5 transition-all duration-300 border"
-      [class.bg-slate-900/60]="theme.isDark()"
-      [class.border-slate-800]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-200/80]="!theme.isDark()"
-    >
+    <div class="stat-card">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400 flex items-center justify-center">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -85,7 +59,7 @@
         </div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</p>
-          <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">{{ cashiers.length }}</p>
+          <p class="stat-value--emerald text-2xl font-black mt-0.5">{{ cashiers.length }}</p>
         </div>
       </div>
     </div>
@@ -94,13 +68,7 @@
   <!-- Loading State -->
   <div *ngIf="isLoading()" class="space-y-4">
     <div *ngFor="let i of [1,2,3]" class="animate-pulse">
-      <div
-        class="rounded-xl p-5 border"
-        [class.bg-slate-900/60]="theme.isDark()"
-        [class.border-slate-800]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.border-slate-200/80]="!theme.isDark()"
-      >
+      <div class="skeleton-card">
         <div class="flex items-center gap-4">
           <div class="w-11 h-11 rounded-xl bg-slate-700/50 dark:bg-slate-700 bg-slate-200"></div>
           <div class="flex-1 space-y-2">
@@ -119,11 +87,7 @@
     <div *ngIf="admins.length > 0">
       <div class="flex items-center gap-2 mb-4">
         <div class="w-2.5 h-2.5 rounded-full bg-violet-500"></div>
-        <h2
-          class="text-base font-bold transition-colors"
-          [class.text-white]="theme.isDark()"
-          [class.text-slate-900]="!theme.isDark()"
-        >
+        <h2 class="section-heading">
           {{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Administrators' }}
         </h2>
         <span
@@ -156,22 +120,16 @@
                 </div>
               }
               <div
-                class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[2.5px] shadow-sm"
+                class="status-dot-border absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full shadow-sm"
                 [class.bg-emerald-500]="user.status === 'active'"
                 [class.shadow-emerald-500/30]="user.status === 'active'"
                 [class.bg-slate-400]="user.status !== 'active'"
-                [class.border-slate-900]="theme.isDark()"
-                [class.border-white]="!theme.isDark()"
               ></div>
             </div>
 
             <!-- Info -->
             <div class="min-w-0 flex-1">
-              <p
-                class="text-sm font-bold truncate transition-colors"
-                [class.text-white]="theme.isDark()"
-                [class.text-slate-900]="!theme.isDark()"
-              >
+              <p class="user-name-text">
                 {{ user.name }}
               </p>
               <p class="text-xs text-slate-400 truncate mt-0.5">{{ user.email }}</p>
@@ -187,12 +145,6 @@
                   [class.role-select-admin]="user.role === 'admin'"
                   [class.role-select-cashier]="user.role === 'cashier'"
                   [class.opacity-60]="updatingUserId() === user.id"
-                  [class.bg-slate-800/60]="theme.isDark()"
-                  [class.border-slate-600]="theme.isDark()"
-                  [class.text-white]="theme.isDark()"
-                  [class.bg-white]="!theme.isDark()"
-                  [class.border-slate-200]="!theme.isDark()"
-                  [class.text-slate-900]="!theme.isDark()"
                 >
                   <option value="admin" [selected]="user.role === 'admin'">
                     {{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admin' }}
@@ -206,10 +158,7 @@
                   <div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
                 <!-- Chevron icon -->
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-                  [class.text-slate-400]="theme.isDark()"
-                  [class.text-slate-500]="!theme.isDark()"
-                >
+                <div class="chevron-icon pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="m6 9 6 6 6-6" />
                   </svg>
@@ -220,13 +169,9 @@
             <!-- Status badge mobile -->
             <div class="hidden sm:flex flex-shrink-0">
               <span
-                class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg"
-                [class.bg-emerald-500/10]="user.status === 'active'"
-                [class.text-emerald-500]="user.status === 'active'"
-                [class.dark:bg-emerald-500/20]="user.status === 'active'"
-                [class.dark:text-emerald-400]="user.status === 'active'"
-                [class.bg-slate-500/10]="user.status !== 'active'"
-                [class.text-slate-400]="user.status !== 'active'"
+                class="status-badge"
+                [class.status-badge--active]="user.status === 'active'"
+                [class.status-badge--inactive]="user.status !== 'active'"
               >
                 {{ user.status === 'active' ? (lang.currentLang() === 'km' ? 'សកម្ម' : 'Active') : (lang.currentLang() === 'km' ? 'អសកម្ម' : 'Inactive') }}
               </span>
@@ -240,11 +185,7 @@
     <div *ngIf="cashiers.length > 0">
       <div class="flex items-center gap-2 mb-4">
         <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-        <h2
-          class="text-base font-bold transition-colors"
-          [class.text-white]="theme.isDark()"
-          [class.text-slate-900]="!theme.isDark()"
-        >
+        <h2 class="section-heading">
           {{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}
         </h2>
         <span
@@ -277,22 +218,16 @@
                 </div>
               }
               <div
-                class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[2.5px] shadow-sm"
+                class="status-dot-border absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full shadow-sm"
                 [class.bg-emerald-500]="user.status === 'active'"
                 [class.shadow-emerald-500/30]="user.status === 'active'"
                 [class.bg-slate-400]="user.status !== 'active'"
-                [class.border-slate-900]="theme.isDark()"
-                [class.border-white]="!theme.isDark()"
               ></div>
             </div>
 
             <!-- Info -->
             <div class="min-w-0 flex-1">
-              <p
-                class="text-sm font-bold truncate transition-colors"
-                [class.text-white]="theme.isDark()"
-                [class.text-slate-900]="!theme.isDark()"
-              >
+              <p class="user-name-text">
                 {{ user.name }}
               </p>
               <p class="text-xs text-slate-400 truncate mt-0.5">{{ user.email }}</p>
@@ -308,12 +243,6 @@
                   [class.role-select-admin]="user.role === 'admin'"
                   [class.role-select-cashier]="user.role === 'cashier'"
                   [class.opacity-60]="updatingUserId() === user.id"
-                  [class.bg-slate-800/60]="theme.isDark()"
-                  [class.border-slate-600]="theme.isDark()"
-                  [class.text-white]="theme.isDark()"
-                  [class.bg-white]="!theme.isDark()"
-                  [class.border-slate-200]="!theme.isDark()"
-                  [class.text-slate-900]="!theme.isDark()"
                 >
                   <option value="admin" [selected]="user.role === 'admin'">
                     {{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admin' }}
@@ -327,10 +256,7 @@
                   <div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
                 <!-- Chevron icon -->
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-                  [class.text-slate-400]="theme.isDark()"
-                  [class.text-slate-500]="!theme.isDark()"
-                >
+                <div class="chevron-icon pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="m6 9 6 6 6-6" />
                   </svg>
@@ -341,13 +267,9 @@
             <!-- Status badge mobile -->
             <div class="hidden sm:flex flex-shrink-0">
               <span
-                class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg"
-                [class.bg-emerald-500/10]="user.status === 'active'"
-                [class.text-emerald-500]="user.status === 'active'"
-                [class.dark:bg-emerald-500/20]="user.status === 'active'"
-                [class.dark:text-emerald-400]="user.status === 'active'"
-                [class.bg-slate-500/10]="user.status !== 'active'"
-                [class.text-slate-400]="user.status !== 'active'"
+                class="status-badge"
+                [class.status-badge--active]="user.status === 'active'"
+                [class.status-badge--inactive]="user.status !== 'active'"
               >
                 {{ user.status === 'active' ? (lang.currentLang() === 'km' ? 'សកម្ម' : 'Active') : (lang.currentLang() === 'km' ? 'អសកម្ម' : 'Inactive') }}
               </span>
