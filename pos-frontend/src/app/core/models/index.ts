@@ -54,3 +54,47 @@ export interface Category {
   nameKm?: string;
   icon?: string;
 }
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  taxId?: string;
+  isActive: boolean;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PurchaseOrderItem {
+  id: number;
+  productId: number;
+  product?: Product;
+  quantity: number;
+  receivedQuantity: number;
+  unitCost: number;
+  total: number;
+}
+
+export interface PurchaseOrder {
+  id: number;
+  orderNumber: string;
+  supplierId: number;
+  supplier?: Supplier;
+  status: 'draft' | 'ordered' | 'partially_received' | 'received' | 'cancelled';
+  subtotal: number;
+  discount: number;
+  shippingCost: number;
+  total: number;
+  notes?: string;
+  orderedBy: number;
+  orderedByUser?: any;
+  receivedBy?: number;
+  receivedAt?: string;
+  items: PurchaseOrderItem[];
+  createdAt: string;
+  updatedAt: string;
+}

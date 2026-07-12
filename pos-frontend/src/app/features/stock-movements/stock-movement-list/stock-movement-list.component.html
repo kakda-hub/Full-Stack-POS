@@ -1,0 +1,184 @@
+<div @pageTransition class="flex flex-col gap-y-5 p-3">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <app-breadcrumb></app-breadcrumb>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <svg class="stat-icon stat-icon--movements" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="stat-label">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</span>
+      </div>
+      <span class="stat-value">{{ filteredMovements().length }}</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <svg class="stat-icon stat-icon--in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+        </svg>
+        <span class="stat-label">{{ lang.currentLang() === 'km' ? 'ចូល' : 'Stock In' }}</span>
+      </div>
+      <span class="stat-value stat-value--in">+{{ totalIn() }}</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <svg class="stat-icon stat-icon--out" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+        </svg>
+        <span class="stat-label">{{ lang.currentLang() === 'km' ? 'ចេញ' : 'Stock Out' }}</span>
+      </div>
+      <span class="stat-value stat-value--out">-{{ totalOut() }}</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <svg class="stat-icon stat-icon--balance" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span class="stat-label">{{ lang.currentLang() === 'km' ? 'សមតុល្យ' : 'Net' }}</span>
+      </div>
+      <span class="stat-value" [class.text-emerald-600]="totalIn() - totalOut() >= 0" [class.text-red-600]="totalIn() - totalOut() < 0">
+        {{ totalIn() - totalOut() >= 0 ? '+' : '' }}{{ totalIn() - totalOut() }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <!-- Search -->
+    <div class="search-wrapper">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        #searchInput
+        aria-label="Search"
+        type="text"
+        (input)="onSearch(searchInput.value)"
+        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកតាមផលិតផល...' : 'Search by product...'"
+        class="search-input"
+      />
+    </div>
+
+    <!-- Product filter -->
+    <div class="filter-group">
+      <mat-form-field appearance="outline" class="filter-select" subscriptSizing="dynamic">
+        <mat-label>{{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Product' }}</mat-label>
+        <mat-select (selectionChange)="onProductFilter($event.value)" [value]="null">
+          <mat-option [value]="null">{{ lang.currentLang() === 'km' ? 'ទាំងអស់' : 'All Products' }}</mat-option>
+          @for (p of products; track p.id) {
+            <mat-option [value]="p.id">
+              {{ lang.currentLang() === 'km' && p.nameKh ? p.nameKh : p.name }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Type filter -->
+      <mat-form-field appearance="outline" class="filter-select" subscriptSizing="dynamic">
+        <mat-label>{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Type' }}</mat-label>
+        <mat-select (selectionChange)="onTypeFilter($event.value)" [value]="''">
+          <mat-option value="">{{ lang.currentLang() === 'km' ? 'គ្រប់ប្រភេទ' : 'All Types' }}</mat-option>
+          @for (type of movementTypes; track type) {
+            <mat-option [value]="type">
+              {{ lang.currentLang() === 'km' ? MovementService.getTypeLabelKm(type) : MovementService.getTypeLabel(type) }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div *ngIf="isLoading()" class="space-y-3">
+    @for (i of [1,2,3,4,5]; track i) {
+      <div class="skeleton-movement-row">
+        <div class="skeleton-movement-line">
+          <app-skeleton variant="text" width="120px" height="14px"></app-skeleton>
+          <app-skeleton variant="text" width="60px" height="14px"></app-skeleton>
+        </div>
+        <div class="skeleton-movement-line">
+          <app-skeleton variant="text" width="200px" height="12px"></app-skeleton>
+          <app-skeleton variant="text" width="40px" height="20px"></app-skeleton>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Timeline -->
+  <div *ngIf="!isLoading()" class="timeline-wrapper">
+    @if (paginatedMovements().length === 0) {
+      <div class="empty-state">
+        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <p class="empty-state-text">
+          {{ lang.currentLang() === 'km' ? 'គ្មានប្រវត្តិចលនាស្តុក' : 'No stock movement history' }}
+        </p>
+      </div>
+    }
+
+    <!-- Movement cards -->
+    <div class="timeline">
+      @for (movement of paginatedMovements(); track movement.id; let i = $index) {
+        <div @fadeIn class="movement-card">
+          <!-- Timeline dot -->
+          <div class="timeline-dot-wrapper">
+            <div class="timeline-dot" [class]="MovementService.getTypeClass(movement.type)"></div>
+            <div *ngIf="i < paginatedMovements().length - 1" class="timeline-line"></div>
+          </div>
+
+          <!-- Card content -->
+          <div class="movement-content" [class]="MovementService.getTypeClass(movement.type)">
+            <div class="movement-header">
+              <div class="movement-info">
+                <span class="movement-product">{{ getProductName(movement.productId) }}</span>                <span class="movement-type-badge" [class]="MovementService.getTypeClass(movement.type)">
+                    {{ lang.currentLang() === 'km' ? MovementService.getTypeLabelKm(movement.type) : MovementService.getTypeLabel(movement.type) }}
+                </span>
+              </div>
+              <span class="movement-qty" [class]="getQuantityClass(movement.quantity)">
+                {{ getQuantitySign(movement.quantity) }}{{ movement.quantity }}
+              </span>
+            </div>
+            <div class="movement-meta">
+              <span class="movement-date">{{ formatDate(movement.createdAt) }}</span>
+              @if (movement.note) {
+                <span class="movement-note">— {{ movement.note }}</span>
+              }
+              @if (movement.performedByUser) {
+                <span class="movement-user">
+                  {{ lang.currentLang() === 'km' ? 'ដោយ' : 'by' }} {{ movement.performedByUser.name || movement.performedByUser.email }}
+                </span>
+              }
+            </div>
+            @if (movement.costPrice || movement.price) {
+              <div class="movement-prices">
+                @if (movement.costPrice) {
+                  <span class="movement-price-label">
+                    {{ lang.currentLang() === 'km' ? 'ថ្លៃដើម' : 'Cost' }}: ${{ formatPrice(movement.costPrice) }}
+                  </span>
+                }
+                @if (movement.price) {
+                  <span class="movement-price-label">
+                    {{ lang.currentLang() === 'km' ? 'តម្លៃលក់' : 'Price' }}: ${{ formatPrice(movement.price) }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [totalItems]="filteredMovements().length"
+      [pageSize]="pageSize()"
+      [currentPage]="pageIndex() + 1"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
+  </div>
+</div>

@@ -13,6 +13,10 @@ import { UploadDynamicModule } from './upload-dynamic/upload-dynamic.module';
 import appConfig from './config/app.config';
 import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.module';
 import { ManagementModule } from './management/management.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
+import { StockMovementsModule } from './stock-movements/stock-movements.module';
+import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
+import { ReturnsModule } from './returns/returns.module';
 
 @Module({
   imports: [
@@ -41,6 +45,10 @@ import { ManagementModule } from './management/management.module';
     UploadDynamicModule,
     UploadCloudinaryModule,
     ManagementModule,
+    SuppliersModule,
+    StockMovementsModule,
+    PurchaseOrdersModule,
+    ReturnsModule,
   ],
 })
 export class AppModule {}

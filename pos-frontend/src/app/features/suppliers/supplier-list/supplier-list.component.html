@@ -1,0 +1,29 @@
+<div @pageTransition class="flex flex-col gap-y-4 p-3">
+  <div class="flex items-center justify-between">
+    <app-breadcrumb></app-breadcrumb>
+
+    <div class="flex items-center gap-4">
+      <mat-form-field class="form-field" subscriptSizing="dynamic">
+        <mat-label>{{ lang.currentLang() === 'km' ? 'ស្វែងរកអ្នកផ្គត់ផ្គង់...' : 'Search suppliers...' }}</mat-label>
+        <input (input)="onSearch($event)" matInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <app-ui-button [variant]="'primary'" [size]="'md'" (click)="openDialog()">
+        <span>{{ 'button.addNew' | translate }}</span>
+      </app-ui-button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <app-dynamic-table
+    [columns]="columns"
+    [rows]="paginatedSuppliers()"
+    [totalCount]="filteredSuppliers().length"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize()"
+    [isLoading]="isLoading()"
+    (onEdit)="openEdit($event)"
+    (onDelete)="deleteSupplier($event)"
+    (pageChange)="onPageChange($event)"
+  ></app-dynamic-table>
+</div>

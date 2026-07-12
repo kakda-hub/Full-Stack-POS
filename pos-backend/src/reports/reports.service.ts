@@ -11,7 +11,7 @@ export class ReportsService {
   ) {}
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // DAILY REVENUE  –  SUM(total) + COUNT(id) grouped by date
+  // DAILY REVENUE  –  SUM(total) + COUNT(id) + profit grouped by date
   // ─────────────────────────────────────────────────────────────────────────────
   async getDailyRevenue(query: DateRangeDto) {
     const qb = this.dataSource
@@ -49,7 +49,7 @@ export class ReportsService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // TOP PRODUCTS  –  SUM(quantity) per product, ordered DESC, limited
+  // TOP PRODUCTS  –  SUM(quantity) + revenue + profit per product
   // ─────────────────────────────────────────────────────────────────────────────
   async getTopProducts(query: TopProductsDto & DateRangeDto) {
     const limit = query.limit ?? 5;
@@ -59,8 +59,10 @@ export class ReportsService {
       .select('p.id', 'productId')
       .addSelect('p.name', 'productName')
       .addSelect('p.barcode', 'barcode')
+      .addSelect('p.cost_price', 'costPrice')
       .addSelect('SUM(si.quantity)', 'totalQuantitySold')
       .addSelect('SUM(si.quantity * si.price)', 'totalRevenue')
+      .addSelect('SUM(si.quantity * (si.price - COALESCE(p.cost_price, 0)))', 'totalProfit')
       .from('sale_items', 'si')
       .innerJoin('products', 'p', 'p.id = si.product_id')
       .innerJoin('sales', 's', 's.id = si.sale_id');
@@ -82,8 +84,13 @@ export class ReportsService {
       productId: r.productId,
       productName: r.productName,
       barcode: r.barcode,
+      costPrice: parseFloat(r.costPrice ?? '0'),
       totalQuantitySold: parseInt(r.totalQuantitySold, 10),
       totalRevenue: parseFloat(r.totalRevenue ?? '0'),
+      totalProfit: parseFloat(r.totalProfit ?? '0'),
+      profitMargin: parseFloat(r.totalRevenue ?? '0') > 0
+        ? (parseFloat(r.totalProfit ?? '0') / parseFloat(r.totalRevenue ?? '0')) * 100
+        : 0,
     }));
   }
 
@@ -122,7 +129,7 @@ export class ReportsService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // SUMMARY DASHBOARD  –  Single overview card
+  // SUMMARY DASHBOARD  –  Overview card with profit tracking
   // ─────────────────────────────────────────────────────────────────────────────
   async getSummary(query: DateRangeDto) {
     const qb = this.dataSource
@@ -146,6 +153,21 @@ export class ReportsService {
 
     const [summary] = await qb.getRawMany();
 
+    // Profit calculation: aggregate cost of goods sold
+    const profitRow = await this.dataSource
+      .createQueryBuilder()
+      .select('COALESCE(SUM(si.quantity * COALESCE(p.cost_price, 0)), 0)', 'totalCost')
+      .from('sale_items', 'si')
+      .innerJoin('products', 'p', 'p.id = si.product_id')
+      .innerJoin('sales', 's', 's.id = si.sale_id')
+      .where('s.created_at >= :from', { from: `${query.from || '1970-01-01'} 00:00:00` })
+      .andWhere('s.created_at <= :to', { to: `${query.to || '2099-12-31'} 23:59:59` })
+      .getRawOne();
+
+    const totalRevenue = parseFloat(summary?.totalRevenue ?? '0');
+    const totalCost = parseFloat(profitRow?.totalCost ?? '0');
+    const grossProfit = totalRevenue - totalCost;
+
     // Low-stock products (stock <= 10)
     const lowStockProducts = await this.dataSource
       .createQueryBuilder()
@@ -153,6 +175,7 @@ export class ReportsService {
       .addSelect('p.name', 'name')
       .addSelect('p.stock', 'stock')
       .addSelect('p.barcode', 'barcode')
+      .addSelect('p.cost_price', 'costPrice')
       .from('products', 'p')
       .where('p.stock <= 10')
       .andWhere('p.is_active = 1')
@@ -161,9 +184,11 @@ export class ReportsService {
 
     return {
       totalSales: parseInt(summary?.totalSales ?? '0', 10),
-      totalRevenue: parseFloat(summary?.totalRevenue ?? '0'),
+      totalRevenue,
       totalDiscount: parseFloat(summary?.totalDiscount ?? '0'),
       averageOrderValue: parseFloat(summary?.averageOrderValue ?? '0'),
+      grossProfit,
+      grossMargin: totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0,
       lowStockProducts,
     };
   }

@@ -81,6 +81,24 @@ const routes: Routes = [
         path: 'management-page',
         loadChildren: () => import('./features/management-page/management-page.module').then((m) => m.ManagementPageModule),
         data: { breadcrumb: 'Management Page', labelKh: 'គ្រប់គ្រង់ទំព័រ' }
+      },
+      {
+        path: 'suppliers',
+        loadChildren: () =>
+          import('./features/suppliers/suppliers.module').then((m) => m.SuppliersModule),
+        data: { breadcrumb: 'Suppliers', labelKh: 'អ្នកផ្គត់ផ្គង់' }
+      },
+      {
+        path: 'purchase-orders',
+        loadChildren: () =>
+          import('./features/purchase-orders/purchase-orders.module').then((m) => m.PurchaseOrdersModule),
+        data: { breadcrumb: 'Purchase Orders', labelKh: 'បញ្ជាទិញ' }
+      },
+      {
+        path: 'stock-movements',
+        loadChildren: () =>
+          import('./features/stock-movements/stock-movements.module').then((m) => m.StockMovementsModule),
+        data: { breadcrumb: 'Stock Movements', labelKh: 'ចលនាស្តុក' }
       }
     ],
   },

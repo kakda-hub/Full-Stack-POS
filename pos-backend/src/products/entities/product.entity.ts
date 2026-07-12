@@ -30,6 +30,10 @@ export class Product {
   @Column({ type: "decimal", precision: 10, scale: 2 })
   price: number;
 
+  /** Cost price (from supplier) for profit tracking */
+  @Column({ name: "cost_price", type: "decimal", precision: 10, scale: 2, nullable: true })
+  costPrice: number;
+
   @Column({ type: "int", default: 0 })
   stock: number;
 

@@ -1,0 +1,107 @@
+<div @pageTransition class="flex flex-col gap-y-4 p-3">
+  <div class="flex items-center justify-between">
+    <app-breadcrumb></app-breadcrumb>
+
+    <div class="flex items-center gap-4">
+      <mat-form-field class="form-field" subscriptSizing="dynamic">
+        <mat-label>{{ lang.currentLang() === 'km' ? 'ស្វែងរកបញ្ជាទិញ...' : 'Search POs...' }}</mat-label>
+        <input (input)="onSearch($event)" matInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <app-ui-button [variant]="'primary'" [size]="'md'" (click)="onAdd()">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>{{ 'button.addNew' | translate }}</span>
+      </app-ui-button>
+    </div>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading()" class="grid grid-cols-1 gap-4">
+    <app-skeleton *ngFor="let i of [1,2,3,4]" variant="kpi-card"></app-skeleton>
+  </div>
+
+  <!-- PO Cards (mobile-friendly view) -->
+  <div *ngIf="!isLoading()" class="grid grid-cols-1 gap-4">
+    <!-- PO Card -->
+    <div
+      *ngFor="let po of paginatedPOs(); trackBy: trackById"
+      @fadeIn
+      class="po-card"
+      (click)="openView(po)"
+    >
+      <div class="po-card-header">
+        <div class="po-card-order-info">
+          <span class="po-card-order-number">{{ po.orderNumber }}</span>
+          <span [class]="'status-badge ' + getStatusClass(po.status)">
+            {{ getStatusLabel(po.status) }}
+          </span>
+        </div>
+        <div class="po-card-actions">
+          <!-- Receive button -->
+          <button
+            *ngIf="canReceive(po.status)"
+            type="button"
+            class="po-action-btn po-action-btn--receive"
+            (click)="receivePO(po, $event)"
+            [title]="lang.currentLang() === 'km' ? 'ទទួល' : 'Receive'"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          <!-- Cancel button -->
+          <button
+            *ngIf="canCancel(po.status)"
+            type="button"
+            class="po-action-btn po-action-btn--cancel"
+            (click)="cancelPO(po, $event)"
+            [title]="lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel'"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="po-card-body">
+        <div class="po-card-detail">
+          <span class="po-card-label">{{ lang.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Supplier' }}:</span>
+          <span class="po-card-value">{{ po.supplier?.name || 'N/A' }}</span>
+        </div>
+        <div class="po-card-detail">
+          <span class="po-card-label">{{ lang.currentLang() === 'km' ? 'ចំនួនទឹកប្រាក់' : 'Total' }}:</span>
+          <span class="po-card-value po-card-value--price">${{ po.total?.toFixed(2) }}</span>
+        </div>
+        <div class="po-card-detail">
+          <span class="po-card-label">{{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}:</span>
+          <span class="po-card-value">{{ po.createdAt | date: 'mediumDate' }}</span>
+        </div>
+        <div class="po-card-detail" *ngIf="po.items?.length">
+          <span class="po-card-label">{{ lang.currentLang() === 'km' ? 'ធាតុ' : 'Items' }}:</span>
+          <span class="po-card-value">{{ po.items.length }} {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'products' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="paginatedPOs().length === 0" class="empty-state">
+      <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+      <p class="empty-state-text">
+        {{ lang.currentLang() === 'km' ? 'គ្មានបញ្ជាទិញ' : 'No purchase orders found' }}
+      </p>
+    </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [totalItems]="filteredPOs().length"
+      [pageSize]="pageSize()"
+      [currentPage]="pageIndex() + 1"
+      (pageChange)="pageIndex.set($event - 1)"
+    ></app-pagination>
+  </div>
+</div>

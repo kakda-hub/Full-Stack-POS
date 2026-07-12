@@ -42,6 +42,12 @@ export class CreateProductDto {
   @IsPositive()
   price: number;
 
+  @ApiPropertyOptional({ example: 0.8, description: 'Cost price from supplier' })
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  @IsOptional()
+  costPrice?: number;
+
   @ApiProperty({ example: 100 })
   @IsInt()
   @Min(0)
@@ -86,6 +92,12 @@ export class UpdateProductDto {
   @IsPositive()
   @IsOptional()
   price?: number;
+
+  @ApiPropertyOptional({ description: 'Cost price from supplier' })
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  @IsOptional()
+  costPrice?: number;
 
   @ApiPropertyOptional()
   @IsInt()
