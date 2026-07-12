@@ -1,22 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { ProductsModule } from './products/products.module';
-import { CategoriesModule } from './categories/categories.module';
-import { SalesModule } from './sales/sales.module';
-import { ReportsModule } from './reports/reports.module';
-import { UploadModule } from './upload/upload.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { ProductsModule } from './modules/products/products.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { SalesModule } from './modules/sales/sales.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { databaseConfig } from './config/database.config';
-import { UploadDynamicModule } from './upload-dynamic/upload-dynamic.module';
+import { UploadDynamicModule } from './modules/upload-dynamic/upload-dynamic.module';
 import appConfig from './config/app.config';
-import { UploadCloudinaryModule } from './upload-cloudinary/upload-cloudinary.module';
-import { ManagementModule } from './management/management.module';
-import { SuppliersModule } from './suppliers/suppliers.module';
-import { StockMovementsModule } from './stock-movements/stock-movements.module';
-import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
-import { ReturnsModule } from './returns/returns.module';
+import { UploadCloudinaryModule } from './modules/upload-cloudinary/upload-cloudinary.module';
+import { ManagementModule } from './modules/management/management.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { StockMovementsModule } from './modules/stock-movements/stock-movements.module';
+import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
+import { ReturnsModule } from './modules/returns/returns.module';
 
 @Module({
   imports: [

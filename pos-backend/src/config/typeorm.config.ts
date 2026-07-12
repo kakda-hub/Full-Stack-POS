@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
-import { User } from '../users/entities/user.entity';
-import { Category } from '../categories/entities/category.entity';
-import { Product } from '../products/entities/product.entity';
-import { Sale } from '../sales/entities/sale.entity';
-import { SaleItem } from '../sales/entities/sale-item.entity';
-import { FileUpload } from '../upload/entities/upload.entity';
-import { ManagementPage } from '../management/entities/management-page.entity';
+import { User } from '../modules/users/entities/user.entity';
+import { Category } from '../modules/categories/entities/category.entity';
+import { Product } from '../modules/products/entities/product.entity';
+import { Sale } from '../modules/sales/entities/sale.entity';
+import { SaleItem } from '../modules/sales/entities/sale-item.entity';
+import { FileUpload } from '../modules/upload/entities/upload.entity';
+import { ManagementPage } from '../modules/management/entities/management-page.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -40,7 +40,7 @@ export default new DataSource({
   password: resolveDbPassword(),
   database: process.env.DB_NAME || 'pos_db',
   entities: [User, Category, Product, Sale, SaleItem, FileUpload, ManagementPage],
-  migrations: ['src/migrations/**/*.ts'],
+  migrations: ['src/database/migrations/**/*.ts'],
   synchronize: false,
   logging: true,
   charset: 'utf8mb4',

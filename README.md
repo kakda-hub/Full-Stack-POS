@@ -98,26 +98,35 @@ Full-Stack POS is a complete Point of Sale system built for modern retail busine
 Full-Stack-POS/
 ├── pos-backend/                          # NestJS backend API
 │   ├── src/
-│   │   ├── auth/                         # JWT login, profile, password reset
-│   │   ├── users/                        # User CRUD (admin only)
-│   │   ├── products/                     # Product catalog, barcode lookup
-│   │   ├── categories/                   # Product categories
-│   │   ├── sales/                        # Transaction-safe POS sales
-│   │   ├── reports/                      # Business intelligence reports
-│   │   ├── management/                   # Dynamic navigation management
-│   │   ├── upload/                       # File upload (MinIO/S3)
-│   │   ├── upload-cloudinary/            # Cloudinary image upload
-│   │   ├── upload-dynamic/               # Dynamic storage selection
+│   │   ├── modules/
+│   │   │   ├── auth/                     # JWT login, profile, password reset
+│   │   │   ├── users/                    # User CRUD (admin only)
+│   │   │   ├── products/                 # Product catalog, barcode lookup
+│   │   │   ├── categories/               # Product categories
+│   │   │   ├── sales/                    # Transaction-safe POS sales
+│   │   │   ├── reports/                  # Business intelligence reports
+│   │   │   ├── management/               # Dynamic navigation management
+│   │   │   ├── upload/                   # File upload (MinIO/S3)
+│   │   │   ├── upload-cloudinary/        # Cloudinary image upload
+│   │   │   ├── upload-dynamic/           # Dynamic storage selection
+│   │   │   ├── suppliers/                # Supplier management
+│   │   │   ├── purchase-orders/          # Purchase order management
+│   │   │   ├── stock-movements/          # Stock movement tracking
+│   │   │   └── returns/                  # Product returns management
 │   │   ├── common/                       # Guards, decorators, filters
 │   │   │   ├── guards/                   # JwtAuthGuard, RolesGuard
 │   │   │   ├── decorators/               # @Roles(), @CurrentUser()
 │   │   │   ├── filters/                  # HttpExceptionFilter
 │   │   │   └── interceptors/             # ResponseInterceptor
 │   │   ├── config/                       # DB, app, TypeORM CLI config
+│   │   ├── database/
+│   │   │   ├── migrations/               # Database migration files
+│   │   │   └── seeders/                  # Seed scripts (products, sales)
 │   │   └── main.ts                       # Bootstrap entry point
 │   ├── Dockerfile                        # Multi-stage production build
 │   ├── docker-compose.yml                # Local MySQL + API services
 │   ├── init.sql                          # Schema + seed data
+│   ├── reset-migration.js                # Migration reset utility
 │   └── package.json
 │
 ├── pos-frontend/                         # Angular frontend application
@@ -131,14 +140,20 @@ Full-Stack-POS/
 │   │   │   ├── users/                    # User management
 │   │   │   ├── user-management/          # Role/permission config
 │   │   │   ├── user-role/                # User role assignments
+│   │   │   ├── permissions/              # Permission management
 │   │   │   ├── login/                    # Authentication screen
 │   │   │   ├── management-page/          # Dynamic page management
 │   │   │   ├── cloudinary-file-upload/   # File upload UI
+│   │   │   ├── suppliers/                # Supplier management
+│   │   │   ├── purchase-orders/          # Purchase order management
+│   │   │   ├── stock-movements/          # Stock movement tracking
 │   │   │   └── page-not-found/           # 404 page
+│   │   ├── core/                         # Guards, interceptors, services
 │   │   ├── layout/                       # Admin & Cashier layouts
 │   │   ├── services/                     # HTTP services, auth, data
 │   │   ├── shared/                       # Components, pipes, animations
-│   │   └── enums/                        # API endpoint constants
+│   │   ├── enums/                        # API endpoint constants
+│   │   └── app-routing.module.ts         # Route configuration
 │   ├── assets/i18n/                      # en.json, km.json translations
 │   ├── Dockerfile                        # Multi-stage nginx build
 │   ├── nginx.conf                        # Production nginx config
@@ -409,7 +424,9 @@ All reports accept optional `from` and `to` query params (`YYYY-MM-DD`).
 
 ### 📄 Management Pages `[admin]`
 
-GET `/management-pages` — List dynamic navigation pages
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/management-pages` | List dynamic navigation pages |
 
 ### 🖼️ File Uploads
 
@@ -418,6 +435,40 @@ GET `/management-pages` — List dynamic navigation pages
 | `/upload` | MinIO/S3 | General file upload |
 | `/upload-cloudinary` | Cloudinary | Cloudinary image upload |
 | `/upload-dynamic` | Configurable | Dynamic storage selection |
+
+### 🏭 Suppliers `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/suppliers` | Create supplier |
+| GET | `/suppliers` | List all suppliers |
+| GET | `/suppliers/:id` | Get supplier by ID |
+| PATCH | `/suppliers/:id` | Update supplier |
+| DELETE | `/suppliers/:id` | Delete supplier |
+
+### 📦 Purchase Orders `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/purchase-orders` | Create purchase order |
+| GET | `/purchase-orders` | List all purchase orders |
+| GET | `/purchase-orders/:id` | Get purchase order by ID |
+| PATCH | `/purchase-orders/:id/status` | Update PO status |
+
+### 🔄 Stock Movements `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stock-movements` | List stock movements (filterable by product, type, date) |
+| POST | `/stock-movements` | Record a stock movement (adjustment/in/out) |
+
+### ↩️ Returns `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/returns` | Create a return |
+| GET | `/returns` | List all returns |
+| GET | `/returns/:id` | Get return by ID |
 
 ### Swagger Auto-Authorization
 
@@ -445,8 +496,13 @@ The Swagger UI at `/api/docs` includes **auto-authorization**: after a successfu
 - **Sales History** — Full transaction history with search and filters
 - **Users** — User management with role assignments
 - **User Roles** — Role and permission configuration
+- **Permissions** — Granular permission management
+- **User Management** — Comprehensive user administration
 - **Management Pages** — Dynamic navigation page management
 - **File Uploads** — Cloudinary integration for image storage
+- **Suppliers** — Supplier directory and contact management
+- **Purchase Orders** — Create and track purchase orders by supplier
+- **Stock Movements** — Track inventory adjustments and movements
 
 ### Shared Features
 
@@ -488,16 +544,39 @@ created_at                                destination_storage
                                           public_id (Cloudinary)
                                           created_at
 
-management_pages
-────────────────
+management_pages     suppliers             purchase_orders
+────────────────     ──────────            ───────────────
+id (PK)             id (PK)               id (PK)
+title / title_km    name                  supplier_id → suppliers.id
+icon, type, url     contact_person        reference_number (unique)
+permissions, badge   email                 status (pending/approved/received/cancelled)
+sort_order          phone                 order_date
+is_active           address               expected_delivery
+parent_id (self-ref)  is_active           subtotal
+description         created_at            tax
+created_at / updated_at                    total
+                                          notes
+                                          created_at
+
+purchase_order_items  stock_movements       returns
+───────────────────  ───────────────       ───────
+id (PK)             id (PK)               id (PK)
+purchase_order_id    product_id → products  sale_id → sales.id
+product_id → products  quantity_change      user_id → users.id
+quantity             type (in/out/adjustment)  reason
+unit_cost            reference_type        status (pending/approved/rejected)
+total                reference_id          refund_amount
+                    notes                 created_at
+                    created_at
+
+return_items
+────────────
 id (PK)
-title / title_km
-icon, type, url
-permissions, badge
-sort_order
-is_active
-parent_id (self-ref)
-created_at / updated_at
+return_id → returns.id
+product_id → products
+quantity
+unit_price (snapshot)
+subtotal
 ```
 
 ---
@@ -518,6 +597,12 @@ created_at / updated_at
 | Sales (read all) | ✅ | ❌ |
 | Reports | ✅ | ❌ |
 | Management Pages | ✅ | ❌ |
+| Suppliers | ✅ | ❌ |
+| Purchase Orders | ✅ | ❌ |
+| Stock Movements | ✅ | ❌ |
+| Returns | ✅ | ❌ |
+| Permissions | ✅ | ❌ |
+| File Uploads | ✅ | ❌ |
 
 ---
 

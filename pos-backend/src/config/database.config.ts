@@ -1,11 +1,11 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../users/entities/user.entity';
-import { Category } from '../categories/entities/category.entity';
-import { Product } from '../products/entities/product.entity';
-import { Sale } from '../sales/entities/sale.entity';
-import { SaleItem } from '../sales/entities/sale-item.entity';
-import { FileUpload } from '../upload/entities/upload.entity';
+import { User } from '../modules/users/entities/user.entity';
+import { Category } from '../modules/categories/entities/category.entity';
+import { Product } from '../modules/products/entities/product.entity';
+import { Sale } from '../modules/sales/entities/sale.entity';
+import { SaleItem } from '../modules/sales/entities/sale-item.entity';
+import { FileUpload } from '../modules/upload/entities/upload.entity';
 
 /**
  * Factory function for TypeORM configuration via ConfigService.
@@ -118,7 +118,7 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
     // Migrations are the source of truth — synchronize is disabled to prevent
     // accidental schema drift. Run `npm run migration:run` to apply changes.
     synchronize: false,
-    migrations: ['dist/migrations/**/*.js'],
+    migrations: ['dist/database/migrations/**/*.js'],
     migrationsRun: true,
     logging: configService.get<string>('NODE_ENV') === 'development',
 
