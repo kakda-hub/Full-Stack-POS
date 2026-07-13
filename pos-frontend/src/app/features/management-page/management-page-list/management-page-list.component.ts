@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { ManagementPage, ManagementPageService } from '../../../services/management-page.service';
+import { ManagementPage, ManagementPageService } from '../../../core/services/api/management-page.service';
 import { ManagementPageDetailComponent } from '../management-page-detail/management-page-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 

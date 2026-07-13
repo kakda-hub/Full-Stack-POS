@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { AlertService } from '../../core/services/alert.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../core/services/api/user.service';
 
 interface UserRoleItem {
   id: number;

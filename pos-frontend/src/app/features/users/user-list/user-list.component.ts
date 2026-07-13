@@ -6,8 +6,8 @@ import { fadeIn, pageTransition } from '../../../shared/animations/animations';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { UserService } from '../../../services/user.service';
-import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { UserService } from '../../../core/services/api/user.service';
+import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 
 
 @Component({

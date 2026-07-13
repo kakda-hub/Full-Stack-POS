@@ -15,9 +15,9 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
-import { ProductService } from '../../../services/product.service';
-import { CategoriesService } from '../../../services/categories.service';
-import { CloudinaryService } from '../../../services/cloudinary.service';
+import { ProductService } from '../../../core/services/api/product.service';
+import { CategoriesService } from '../../../core/services/api/categories.service';
+import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
 
 @Component({
   selector: 'app-product-detail',

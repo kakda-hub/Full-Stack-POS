@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UserService } from '../../../services/user.service';
+import { UserService } from '../../../core/services/api/user.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { AlertService } from '../../../core/services/alert.service';
-import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
 
 @Component({
   selector: 'app-user-detail',

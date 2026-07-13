@@ -10,8 +10,8 @@ import {
   DailyRevenueEntry,
   TopProductEntry,
   SalesByCashierEntry,
-} from '../../../services/report.service';
-import { SaleService } from '../../../services/sale.service';
+} from '../../../core/services/api/report.service';
+import { SaleService } from '../../../core/services/api/sale.service';
 
 type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
 

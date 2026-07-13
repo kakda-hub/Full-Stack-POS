@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { backdropAnimation, fadeIn, modalAnimation, pageTransition } from '../../shared/animations/animations';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { SaleService } from '../../services/sale.service';
+import { SaleService } from '../../core/services/api/sale.service';
 
 interface SaleItemDisplay {
   productName: string;

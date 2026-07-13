@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Product, Category } from '../models';
-import { ApiEndpointEnum } from '../../enums/api-endpoint-enum';
+import { ApiEndpointEnum } from '../models/enums/api-endpoint-enum';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 

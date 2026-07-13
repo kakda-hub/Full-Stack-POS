@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AbstractRest } from './shared/abstract-rest.service';
-import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
-import { DynamicHttp } from './shared/dynamic-http.service';
-import { DataResponse } from '../core/models/data-response';
+import { AbstractRest } from '../shared/abstract-rest.service';
+import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { DynamicHttp } from '../shared/dynamic-http.service';
+import { DataResponse } from '../../models/data-response';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends AbstractRest {
+export class SupplierService extends AbstractRest {
 
   constructor(protected http: DynamicHttp) {
     super(http);
   }
 
-  getUrl(): string {
-    return ApiEndpointEnum.USERS;
+  override getUrl(): string {
+    return ApiEndpointEnum.SUPPLIERS;
   }
 
   /**
@@ -25,6 +25,4 @@ export class UserService extends AbstractRest {
     return this.http.patch<DataResponse>(`${this.getUrl()}/${id}`, body);
   }
 
-
 }
-

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, computed } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { CloudinaryService, CloudinaryResource } from '../../../services/cloudinary.service';
+import { CloudinaryService, CloudinaryResource } from '../../../core/services/api/cloudinary.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';

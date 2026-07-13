@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlertService } from '../../../core/services/alert.service';
-import { SupplierService } from '../../../services/supplier.service';
+import { SupplierService } from '../../../core/services/api/supplier.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({

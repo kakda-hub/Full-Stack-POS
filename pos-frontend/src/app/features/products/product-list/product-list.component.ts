@@ -5,10 +5,10 @@ import { Product } from '../../../core/models';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { ProductService as CoreProductService } from '../../../core/services/product.service';
-import { ProductService as ApiProductService } from '../../../services/product.service';
+import { ProductService as ApiProductService } from '../../../core/services/api/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
-import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 

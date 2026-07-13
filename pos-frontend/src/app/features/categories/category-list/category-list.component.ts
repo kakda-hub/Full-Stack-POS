@@ -3,11 +3,11 @@ import { fadeIn, listAnimation, pageTransition } from '../../../shared/animation
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
-import { CategoriesService } from '../../../services/categories.service';
+import { CategoriesService } from '../../../core/services/api/categories.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '../../../shared/components/dynamic-table/dynamic-table.component';
-import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
+import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 import { CategoryDetailComponent } from '../category-detail/category-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';

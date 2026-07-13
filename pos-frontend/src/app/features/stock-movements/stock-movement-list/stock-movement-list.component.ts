@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { LanguageService } from '../../../core/services/language.service';
-import { StockMovementService } from '../../../services/stock-movement.service';
-import { ProductService } from '../../../services/product.service';
+import { StockMovementService } from '../../../core/services/api/stock-movement.service';
+import { ProductService } from '../../../core/services/api/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
