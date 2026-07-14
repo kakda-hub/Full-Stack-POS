@@ -180,63 +180,127 @@
       </span>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="table-thead-row">
-            <th class="th">#</th>
-            <th class="th">{{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}</th>
-            <th class="th">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</th>
-            <th class="th hidden md:table-cell">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
-            <th class="th">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
-            <th class="th text-right">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
-          <tr *ngFor="let sale of paginatedSales; trackBy: trackById" @fadeIn
-            (click)="openDetail(sale)"
-            class="table-row"
-            [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
-          >
-            <td class="td-mono">#{{ sale.id }}</td>
-            <td class="td">
-              <div class="flex flex-col">
-                <span class="td-cell-text">{{ sale.date | date:'dd/MM/yyyy' }}</span>
-                <span class="td-cell-muted">{{ sale.date | date:'HH:mm' }}</span>
-              </div>
-            </td>
-            <td class="td">
-              <span class="td-cell-text">{{ sale.cashierName }}</span>
-            </td>
-            <td class="td hidden md:table-cell">
-              <div class="flex flex-col">
-                <span class="td-cell-primary">{{ sale.itemsList }}</span>
-                <span class="td-cell-muted">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
-              </div>
-            </td>
-            <td class="td">
-              <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-lg capitalize inline-flex items-center gap-1 ' + getPaymentBadge(sale.paymentMethod)">
-                <span>{{ getPaymentIcon(sale.paymentMethod) }}</span>
-                <span>{{ sale.paymentMethod }}</span>
-              </span>
-            </td>
-            <td class="td text-right">
-              <span class="font-bold text-indigo-600">${{ sale.total.toFixed(2) }}</span>
-            </td>
-          </tr>
-          <tr *ngIf="filteredSales().length === 0">
-            <td colspan="6" class="empty-state-cell">
-              <svg class="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-              </svg>
-              <p class="text-sm font-medium">{{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}</p>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- ===== DESKTOP: Table ===== -->
+    <div class="sh-desktop-table">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="table-thead-row">
+              <th class="th">#</th>
+              <th class="th">{{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}</th>
+              <th class="th">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</th>
+              <th class="th hidden md:table-cell">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
+              <th class="th">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
+              <th class="th text-right">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+            <tr *ngFor="let sale of paginatedSales; trackBy: trackById" @fadeIn
+              (click)="openDetail(sale)"
+              class="table-row"
+              [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
+            >
+              <td class="td-mono">#{{ sale.id }}</td>
+              <td class="td">
+                <div class="flex flex-col">
+                  <span class="td-cell-text">{{ sale.date | date:'dd/MM/yyyy' }}</span>
+                  <span class="td-cell-muted">{{ sale.date | date:'HH:mm' }}</span>
+                </div>
+              </td>
+              <td class="td">
+                <span class="td-cell-text">{{ sale.cashierName }}</span>
+              </td>
+              <td class="td hidden md:table-cell">
+                <div class="flex flex-col">
+                  <span class="td-cell-primary">{{ sale.itemsList }}</span>
+                  <span class="td-cell-muted">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
+                </div>
+              </td>
+              <td class="td">
+                <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-lg capitalize inline-flex items-center gap-1 ' + getPaymentBadge(sale.paymentMethod)">
+                  <span>{{ getPaymentIcon(sale.paymentMethod) }}</span>
+                  <span>{{ sale.paymentMethod }}</span>
+                </span>
+              </td>
+              <td class="td text-right">
+                <span class="font-bold text-indigo-600">${{ sale.total.toFixed(2) }}</span>
+              </td>
+            </tr>
+            <!-- Empty state (desktop) -->
+            <tr *ngIf="filteredSales().length === 0">
+              <td colspan="6" class="empty-state-cell">
+                <svg class="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <p class="text-sm font-medium" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
+                  {{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- ===== MOBILE: Sale Cards ===== -->
+    <div class="sh-mobile-cards">
+      <div
+        *ngFor="let sale of paginatedSales; trackBy: trackById"
+        @fadeIn
+        (click)="openDetail(sale)"
+        class="sh-card"
+        [class.sh-card--dark]="theme.isDark()"
+        [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
+      >
+        <!-- Card header: ID + status badge -->
+        <div class="sh-card-header">
+          <div class="sh-card-header-left">
+            <span class="sh-card-id">#{{ sale.id }}</span>
+            <span class="sh-card-date">
+              {{ sale.date | date:'dd/MM/yyyy' }}
+              <span class="sh-card-time">{{ sale.date | date:'HH:mm' }}</span>
+            </span>
+          </div>
+          <span [class]="'badge ' + getPaymentBadge(sale.paymentMethod)">
+            <span>{{ getPaymentIcon(sale.paymentMethod) }}</span>
+            <span>{{ sale.paymentMethod }}</span>
+          </span>
+        </div>
+
+        <!-- Card body -->
+        <div class="sh-card-body">
+          <div class="sh-card-field">
+            <span class="sh-card-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</span>
+            <span class="sh-card-value">{{ sale.cashierName }}</span>
+          </div>
+          <div class="sh-card-field">
+            <span class="sh-card-label">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</span>
+            <span class="sh-card-items">
+              <span class="sh-card-items-text">{{ sale.itemsList || '—' }}</span>
+              <span class="sh-card-items-count">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card footer: total -->
+        <div class="sh-card-footer">
+          <span class="sh-card-total-label">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</span>
+          <span class="sh-card-total">${{ sale.total.toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <!-- Empty state (mobile) -->
+      <div *ngIf="filteredSales().length === 0" class="sh-cards-empty">
+        <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        <p class="text-sm font-medium text-slate-400">
+          {{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Pagination (shared) -->
     <div *ngIf="filteredSales().length > pageSize" class="pagination-bar">
       <span class="pagination-info">
         {{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }} {{ currentPage() }}/{{ totalPages }}

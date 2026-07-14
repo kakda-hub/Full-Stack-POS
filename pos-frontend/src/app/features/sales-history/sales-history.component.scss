@@ -299,3 +299,123 @@
   @apply px-4 py-12 text-center;
   @apply text-slate-400 dark:text-slate-500;
 }
+
+/* ===============================================
+   RESPONSIVE CARD LAYOUT (mobile)
+   =============================================== */
+
+/* Hide desktop table on mobile */
+.sh-desktop-table {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+/* Cards container – hidden on desktop */
+.sh-mobile-cards {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    @apply p-3 space-y-3;
+  }
+}
+
+/* Individual card */
+.sh-card {
+  @apply rounded-xl border p-4 transition-all duration-200 cursor-pointer;
+  @apply bg-white border-slate-200 shadow-sm;
+
+  &:active {
+    @apply shadow-md border-indigo-200;
+  }
+
+  &--dark {
+    @apply bg-slate-800 border-slate-700;
+
+    &:active {
+      @apply border-indigo-500/30 shadow-md;
+    }
+  }
+}
+
+/* Card header: ID + date (left) | payment badge (right) */
+.sh-card-header {
+  @apply flex items-center justify-between mb-3 pb-3 border-b;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.sh-card-header-left {
+  @apply flex flex-col gap-0.5;
+}
+
+.sh-card-id {
+  @apply text-base font-bold;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.sh-card-date {
+  @apply text-xs;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.sh-card-time {
+  @apply ml-1.5;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* Card body */
+.sh-card-body {
+  @apply space-y-2;
+}
+
+.sh-card-field {
+  @apply flex items-start justify-between gap-2;
+}
+
+.sh-card-label {
+  @apply text-xs font-semibold uppercase tracking-wider flex-shrink-0;
+  @apply text-slate-400 dark:text-slate-500;
+  min-width: 56px;
+}
+
+.sh-card-value {
+  @apply text-sm font-medium text-right;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.sh-card-items {
+  @apply text-right flex flex-col items-end gap-0.5 max-w-[70%];
+}
+
+.sh-card-items-text {
+  @apply text-xs leading-snug text-right;
+  @apply text-slate-600 dark:text-slate-400;
+  word-break: break-word;
+}
+
+.sh-card-items-count {
+  @apply text-xs;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* Card footer: total */
+.sh-card-footer {
+  @apply mt-3 pt-3 border-t flex items-center justify-between;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.sh-card-total-label {
+  @apply text-sm font-semibold uppercase tracking-wider;
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.sh-card-total {
+  @apply text-lg font-black;
+  @apply text-indigo-600 dark:text-indigo-400;
+}
+
+/* Empty state */
+.sh-cards-empty {
+  @apply px-4 py-16 text-center;
+}

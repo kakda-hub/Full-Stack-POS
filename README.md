@@ -37,6 +37,32 @@
 
 Full-Stack POS is a complete Point of Sale system built for modern retail businesses. It features Khmer/English bilingual support, role-based access for admin and cashier roles, multi-payment methods (Cash, ABA scan-to-pay, Card), real-time inventory tracking, business intelligence reports, thermal printer-optimized receipts, and barcode scanning.
 
+### ✨ Key Features
+
+**Payment Integration**  
+Engineered a flexible multi-payment system supporting Cash (with automated change calculation), Card processing, and ABA scan-to-pay QR code infrastructure.
+
+**Bilingual Support**  
+Full internationalization with real-time language switching between Khmer and English across all interfaces, with no page reload required. Language preference persists across sessions.
+
+**Role-Based Access Control**  
+Comprehensive RBAC system with admin and cashier roles, featuring granular permission management, user role assignments, and dynamic navigation based on user privileges.
+
+**Advanced Inventory Management**  
+Real-time stock tracking with automated deduction on sales, low-stock alerts, purchase order workflow, stock movement history, and product returns processing.
+
+**Business Intelligence Dashboard**  
+Rich reporting suite with revenue analytics, top-selling products identification, payment method breakdowns, cashier performance metrics, and customizable date range filters.
+
+**Thermal Receipt System**  
+80mm thermal printer-optimized receipts with complete transaction details, formatted for standard POS hardware.
+
+**Barcode Integration**  
+Native barcode scanning support for rapid product lookup and checkout, with unique barcode validation and duplicate prevention.
+
+**Supply Chain Management**  
+Complete supplier directory, purchase order lifecycle management, and stock movement tracking for comprehensive inventory control.
+
 ### Live Demo
 
 | Service | URL |

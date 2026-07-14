@@ -118,3 +118,94 @@
 .rpt-rank {
   @apply w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold;
 }
+
+/* ===============================================
+   RESPONSIVE CARD LAYOUT (mobile) for transactions
+   =============================================== */
+
+/* Hide desktop table on mobile */
+.rpt-desktop-table {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+/* Cards container – hidden on desktop */
+.rpt-mobile-cards {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    @apply p-3 space-y-3;
+  }
+}
+
+/* Individual transaction card */
+.rpt-txn-card {
+  @apply rounded-xl border p-4 transition-all duration-200;
+  @apply bg-white border-slate-200 shadow-sm;
+
+  &:active {
+    @apply shadow-md border-indigo-200;
+  }
+
+  &--dark {
+    @apply bg-slate-800 border-slate-700;
+
+    &:active {
+      @apply border-indigo-500/30 shadow-md;
+    }
+  }
+}
+
+.rpt-txn-card-header {
+  @apply flex items-center justify-between mb-3 pb-3 border-b;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.rpt-txn-card-header-left {
+  @apply flex flex-col gap-0.5;
+}
+
+.rpt-txn-card-id {
+  @apply text-base font-bold;
+}
+
+.rpt-txn-card-date {
+  @apply text-xs;
+}
+
+.rpt-txn-card-body {
+  @apply space-y-2;
+}
+
+.rpt-txn-card-field {
+  @apply flex items-center justify-between gap-2;
+}
+
+.rpt-txn-card-label {
+  @apply text-xs font-semibold uppercase tracking-wider;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.rpt-txn-card-value {
+  @apply text-sm font-medium text-right;
+}
+
+.rpt-txn-card-footer {
+  @apply mt-3 pt-3 border-t flex items-center justify-between;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.rpt-txn-card-total-label {
+  @apply text-sm font-semibold uppercase tracking-wider;
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.rpt-txn-card-total {
+  @apply text-lg font-black;
+}
+
+.rpt-cards-empty {
+  @apply px-4 py-16 text-center;
+}

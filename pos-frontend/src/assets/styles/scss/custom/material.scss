@@ -9,12 +9,12 @@
     // 1. set height of box (small)
     container-height: 42px,
     
-    // 2. set Font Battambang and size 12px
-    container-text-font: 'Battambang',
+    // 2. set Khmer font and size 12px
+    container-text-font: 'Hanuman',
     container-text-size: 12px,
 
-    // set Font Battambang for label
-    filled-label-text-font: 'Battambang',
+    // set Khmer font for label
+    filled-label-text-font: 'Hanuman',
     filled-label-text-size: 12px,
     
     // set Padding for top and bottom (Important for Fill)
@@ -26,14 +26,14 @@
     filled-active-indicator-height: 1px, // height of line below
   ));
 
-  // set placeholder for Battambang font
+  // set placeholder for Khmer font
   input.mat-mdc-input-element::placeholder {
     font-size: 12px !important;
-    font-family: 'Battambang' !important;
+    font-family: 'Hanuman', 'Siemreap' !important;
     opacity: 0.6;
   }
 
-  // set icon size for Battambang font
+  // set icon size for Khmer font
   .mat-icon {
     font-size: 18px !important;
     width: 18px !important;

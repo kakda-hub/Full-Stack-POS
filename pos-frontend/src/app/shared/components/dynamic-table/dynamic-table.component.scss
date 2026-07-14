@@ -83,3 +83,152 @@
 .dt-desc-cell {
   @apply text-xs max-w-xs truncate text-slate-500;
 }
+
+/* ===============================================
+   RESPONSIVE CARD LAYOUT (mobile)
+   =============================================== */
+
+/* Hide the scrollable table on mobile, show cards */
+.dt-table-scroll {
+  @apply overflow-x-auto;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+/* Cards container – hidden on desktop */
+.dt-cards {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    @apply p-3 space-y-3;
+  }
+}
+
+/* Individual card */
+.dt-card {
+  @apply rounded-xl border p-4 transition-all duration-200;
+  @apply bg-white border-slate-200 shadow-sm;
+
+  /* Hover/Tap feedback */
+  &:active {
+    @apply shadow-md border-indigo-200;
+  }
+
+  &--dark {
+    @apply bg-slate-800 border-slate-700;
+
+    &:active {
+      @apply border-indigo-500/30 shadow-md;
+    }
+  }
+}
+
+/* Card header row: number + title (left) | image (right) */
+.dt-card-header {
+  @apply flex items-center justify-between mb-3 pb-3 border-b;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.dt-card-header-left {
+  @apply flex flex-col gap-0.5 min-w-0 flex-1 mr-3;
+}
+
+.dt-card-number {
+  @apply text-xs font-mono font-bold;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.dt-card-title {
+  @apply text-base font-bold truncate;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.dt-card-header-right {
+  @apply flex-shrink-0;
+}
+
+.dt-card-img {
+  @apply w-12 h-12 object-cover rounded-xl border;
+  @apply border-slate-200 bg-white shadow-sm dark:border-slate-600;
+}
+
+.dt-card-avatar {
+  @apply w-12 h-12 flex items-center justify-center rounded-xl border font-bold text-base;
+  @apply bg-indigo-50 border-indigo-100 text-indigo-500;
+  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300;
+}
+
+/* Card body: stacked label-value pairs */
+.dt-card-body {
+  @apply space-y-2.5;
+}
+
+.dt-card-field {
+  @apply flex items-center justify-between gap-2;
+}
+
+.dt-card-label {
+  @apply text-xs font-semibold uppercase tracking-wider flex-shrink-0;
+  @apply text-slate-400 dark:text-slate-500;
+  min-width: 70px;
+}
+
+.dt-card-value {
+  @apply text-sm font-medium text-right leading-snug;
+  @apply text-slate-800 dark:text-slate-100;
+  word-break: break-word;
+  max-width: 65%;
+
+  &--badge {
+    @apply text-right;
+  }
+}
+
+.dt-card-value-sub {
+  @apply block text-xs mt-0.5;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* Badge inside card */
+.dt-card-badge {
+  @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+  @apply bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300;
+}
+
+/* Description inside card */
+.dt-card-desc {
+  @apply text-xs line-clamp-2;
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+/* Card action buttons */
+.dt-card-actions {
+  @apply mt-3 pt-3 border-t flex justify-end gap-3;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.dt-card-action-btn {
+  @apply flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200;
+
+  &--edit {
+    @apply text-indigo-600 hover:bg-indigo-50 hover:shadow-sm;
+    @apply dark:text-indigo-400 dark:hover:bg-indigo-500/15;
+  }
+
+  &--delete {
+    @apply text-rose-600 hover:bg-rose-50 hover:shadow-sm;
+    @apply dark:text-rose-400 dark:hover:bg-rose-500/15;
+  }
+}
+
+.dt-card-action-label {
+  @apply hidden sm:inline;
+}
+
+/* Empty state in cards */
+.dt-cards-empty {
+  @apply px-4 py-16 text-center;
+}

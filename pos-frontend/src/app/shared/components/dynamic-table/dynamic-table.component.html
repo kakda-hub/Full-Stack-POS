@@ -55,7 +55,8 @@
   [class.bg-slate-800]="theme.isDark()"
   [class.border-slate-700]="theme.isDark()"
 >
-  <div class="overflow-x-auto">
+  <!-- ===== DESKTOP: Table ===== -->
+  <div class="dt-table-scroll">
     <table class="w-full text-sm">
 
       <!-- Header -->
@@ -239,7 +240,7 @@
           </td>
         </tr>
 
-        <!-- Empty state -->
+        <!-- Empty state (desktop) -->
         <tr *ngIf="rows.length === 0">
           <td [attr.colspan]="columns.length + 3" class="px-4 py-16 text-center">
             <svg
@@ -262,15 +263,121 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- Paginator -->
-    <app-pagination
-      [totalItems]="totalCount"
-      [pageSize]="pageSize"
-      [currentPage]="pageIndex + 1"
-      [pageSizeOptions]="pageSizeOptions"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)"
-    ></app-pagination>
   </div>
+
+  <!-- ===== MOBILE: Card Layout ===== -->
+  <div class="dt-cards">
+    <div
+      *ngFor="let row of rows; let i = index; trackBy: trackById"
+      @fadeIn
+      class="dt-card"
+      [class.dt-card--dark]="theme.isDark()"
+    >
+      <!-- Card header: number + image -->
+      <div class="dt-card-header">
+        <div class="dt-card-header-left">
+          <span class="dt-card-number">#{{ rowNumber(i) }}</span>
+          <span class="dt-card-title">{{ row.name || cellValue(row, columns[0]) || '-' }}</span>
+        </div>
+        <div class="dt-card-header-right">
+          <img
+            *ngIf="row.imgUrl || row.icon"
+            [src]="row.imgUrl || row.icon"
+            [alt]="row.name"
+            class="dt-card-img"
+          />
+          <div
+            *ngIf="!row.imgUrl && !row.icon"
+            class="dt-card-avatar"
+          >
+            {{ (row.name?.[0] || '?').toUpperCase() }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Card body: dynamic fields -->
+      <div class="dt-card-body">
+        <div *ngFor="let col of columns" class="dt-card-field">
+          <span class="dt-card-label">{{ colLabel(col) }}</span>
+          <span
+            class="dt-card-value"
+            [class.dt-card-value--badge]="col.type === 'badge'"
+          >
+            <ng-container *ngIf="col.type !== 'badge' && col.type !== 'description'">
+              {{ cellValue(row, col) }}
+              <span *ngIf="col.type === 'subtext' && subValue(row, col)" class="dt-card-value-sub">
+                {{ subValue(row, col) }}
+              </span>
+            </ng-container>
+            <span
+              *ngIf="col.type === 'badge'"
+              class="dt-card-badge"
+            >{{ cellValue(row, col) }}</span>
+            <span
+              *ngIf="col.type === 'description'"
+              class="dt-card-desc"
+            >{{ cellValue(row, col) }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Card actions -->
+      <div class="dt-card-actions">
+        <button
+          type="button"
+          (click)="onEdit.emit(row)"
+          class="dt-card-action-btn dt-card-action-btn--edit"
+          [title]="lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit'"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span class="dt-card-action-label">{{ lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit' }}</span>
+        </button>
+        <button
+          type="button"
+          (click)="onDelete.emit(row)"
+          class="dt-card-action-btn dt-card-action-btn--delete"
+          [title]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span class="dt-card-action-label">{{ lang.currentLang() === 'km' ? 'លុប' : 'Delete' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state (mobile) -->
+    <div *ngIf="rows.length === 0" class="dt-cards-empty">
+      <svg
+        class="w-16 h-16 mx-auto mb-3 opacity-30"
+        [class.text-slate-400]="!theme.isDark()"
+        [class.text-slate-500]="theme.isDark()"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+      </svg>
+      <p
+        class="text-sm font-medium"
+        [class.text-slate-400]="!theme.isDark()"
+        [class.text-slate-500]="theme.isDark()"
+      >
+        {{ lang.currentLang() === 'km' ? 'រកមិនឃើញទិន្នន័យ' : 'No data found' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Paginator -->
+  <app-pagination
+    [totalItems]="totalCount"
+    [pageSize]="pageSize"
+    [currentPage]="pageIndex + 1"
+    [pageSizeOptions]="pageSizeOptions"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
 </div>

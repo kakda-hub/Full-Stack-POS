@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <!-- Table -->
+  <!-- ===== DESKTOP: Table ===== -->
   <div class="table-container">
     <div class="table-overflow">
       <table class="table">
@@ -222,7 +222,7 @@
             </td>
           </tr>
           <tr *ngIf="productService.filteredProducts().length === 0">
-            <td colspan="6" class="empty-state-cell">
+            <td colspan="8" class="empty-state-cell">
               <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -246,6 +246,98 @@
         (pageChange)="onPageChange($event)"
       >
       </app-pagination>
+    </div>
+
+    <!-- ===== MOBILE: Product Cards ===== -->
+    <div class="pl-mobile-cards">
+      <div
+        *ngFor="let product of productService.filteredProducts(); index as i; trackBy: trackById"
+        @fadeIn
+        class="pl-card"
+        [class.pl-card--dark]="theme.isDark()"
+      >
+        <!-- Card header: number + image -->
+        <div class="pl-card-header">
+          <div class="pl-card-header-left">
+            <span class="pl-card-number">#{{ i + 1 }}</span>
+            <span class="pl-card-title">{{ product.name }}</span>
+            <span *ngIf="product.nameKm" class="pl-card-title-km">{{ product.nameKm }}</span>
+            <span class="pl-card-price">${{ product.price.toFixed(2) }}</span>
+          </div>
+          <div class="pl-card-header-right">
+            @if (product.imgUrl) {
+              <img
+                [src]="product.imgUrl"
+                alt="Product image"
+                class="pl-card-img"
+                (error)="product.imgUrl = ''"
+              />
+            } @else {
+              <div class="pl-card-avatar">
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Card body: fields -->
+        <div class="pl-card-body">
+          <div class="pl-card-field">
+            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }}</span>
+            <span class="pl-card-barcode">{{ product.barcode }}</span>
+          </div>
+          <div class="pl-card-field">
+            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}</span>
+            <span class="pl-card-value">{{ getCategoryName(product.category) }}</span>
+          </div>
+          <div class="pl-card-field">
+            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }}</span>
+            <span [class]="'pl-card-stock ' + getStockClass(product)">{{ product.stock }}</span>
+          </div>
+        </div>
+
+        <!-- Card actions -->
+        <div class="pl-card-actions">
+          <button
+            type="button"
+            (click)="openEdit(product)"
+            class="pl-card-action-btn pl-card-action-btn--edit"
+            [attr.aria-label]="'Edit product'"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>{{ lang.currentLang() === 'km' ? 'កែ' : 'Edit' }}</span>
+          </button>
+          <button
+            type="button"
+            (click)="deleteProduct(product)"
+            class="pl-card-action-btn pl-card-action-btn--delete"
+            [attr.aria-label]="'Delete product'"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>{{ lang.currentLang() === 'km' ? 'លុប' : 'Delete' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty state (mobile) -->
+      <div *ngIf="productService.filteredProducts().length === 0" class="pl-cards-empty">
+        <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+        </svg>
+        <p class="text-sm font-medium text-slate-400">
+          {{ lang.currentLang() === 'km' ? 'គ្មានផលិតផល' : 'No products found' }}
+        </p>
+      </div>
     </div>
   </div>
 </div>

@@ -15,7 +15,7 @@
 
       <!-- Dropdown Menu -->
       <div *ngIf="isDropdownOpen"
-           class="absolute bottom-full left-0 mb-2 w-full min-w-[70px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+           class="absolute top-full left-0 mt-1 w-full min-w-[70px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
         <button *ngFor="let option of pageSizeOptions"
                 (click)="onPageSizeChange(option)"
                 class="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"

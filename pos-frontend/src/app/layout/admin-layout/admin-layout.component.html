@@ -63,7 +63,7 @@
 
       <div *ngFor="let item of navItems" class="space-y-1">
         <div class="relative flex flex-col">
-          <!-- Main Item (Link) -->
+          <!-- Main Item (Link) – for primary 4 items -->
           <a
             *ngIf="!item.subMenus"
             [routerLink]="item.route"
@@ -83,15 +83,6 @@
                 <svg *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
                 </svg>
-                <svg *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-                <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
-                </svg>
-                <svg *ngIf="item.icon === 'permission'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-                </svg>
                 <svg *ngIf="item.icon === 'history'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
@@ -103,17 +94,18 @@
             <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all"></div>
           </a>
 
-          <!-- Toggle for Submenu -->
+          <!-- Toggle for Submenu (Management) -->
           <button
-            *ngIf="item.subMenus"
+            *ngIf="item.subMenus && item.route !== '/more'"
             (click)="toggleSubMenu(item)"
             class="nav-item group w-full text-left"
+            [class.active-link]="isManagementActive()"
             [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
           >
             <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
               <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
-                <svg *ngIf="item.icon === 'settings'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+                <svg *ngIf="item.icon === 'management'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><line x1="10" y1="6.5" x2="14" y2="6.5" /><line x1="6.5" y1="10" x2="6.5" y2="14" /><line x1="17.5" y1="10" x2="17.5" y2="14" /><line x1="10" y1="17.5" x2="14" y2="17.5" />
                 </svg>
               </div>
             </div>
@@ -128,11 +120,36 @@
             >
               <path d="m6 9 6 6 6-6" />
             </svg>
+            <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all" [class.opacity-100]="isManagementActive()"></div>
           </button>
 
-          <!-- Submenu Content -->
+          <!-- More button (opens overlay) -->
+          <button
+            *ngIf="item.subMenus && item.route === '/more'"
+            (click)="openMoreOverlay()"
+            class="nav-item group w-full text-left"
+            [class.active-link]="isMoreActive()"
+            [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
+          >
+            <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+              <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
+                <!-- Three dots (more) icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+                  <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                  <circle cx="12" cy="19" r="1.5" fill="currentColor" />
+                </svg>
+              </div>
+            </div>
+            <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap flex-1">
+              {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
+            </span>
+            <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all" [class.opacity-100]="isMoreActive()"></div>
+          </button>
+
+          <!-- Submenu Content (for Management) -->
           <div
-            *ngIf="item.subMenus && selectedMenu() === item.route && !isCollapsed()"
+            *ngIf="item.subMenus && item.route !== '/more' && selectedMenu() === item.route && !isCollapsed()"
             @fadeIn
             class="ml-10 space-y-1 pt-1"
           >
@@ -279,33 +296,170 @@
 
   <!-- Mobile Bottom Navigation -->
   <nav class="mobile-bottom-nav">
-    <a
-      *ngFor="let item of navItems"
-      [routerLink]="item.route"
-      routerLinkActive="mobile-nav-active"
-      class="relative flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300"
-      [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-    >
-      <div class="z-10 transition-transform duration-300 transform group-active:scale-90">
-        <svg class="w-6 h-6" *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
-        </svg>
-        <svg class="w-6 h-6" *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-          <path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
-        </svg>
-        <svg class="w-6 h-6" *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
-        </svg>
-        <svg class="w-6 h-6" *ngIf="item.icon === 'history'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
-        <svg class="w-6 h-6" *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-        </svg>
-      </div>
-      <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
-      <div class="active-dot absolute -bottom-1 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all"></div>
-    </a>
+    <ng-container *ngFor="let item of navItems">
+      <!-- Primary 4 items: link -->
+      <a
+        *ngIf="item.route !== '/more'"
+        [routerLink]="item.route"
+        routerLinkActive="mobile-nav-active"
+        class="relative flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300"
+        [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+      >
+        <div class="z-10 transition-transform duration-300 transform group-active:scale-90">
+          <svg class="w-6 h-6" *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          <svg class="w-6 h-6" *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+            <path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
+          </svg>
+          <svg class="w-6 h-6" *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+          </svg>
+          <svg class="w-6 h-6" *ngIf="item.icon === 'history'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <svg class="w-6 h-6" *ngIf="item.icon === 'management'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><line x1="10" y1="6.5" x2="14" y2="6.5" /><line x1="6.5" y1="10" x2="6.5" y2="14" /><line x1="17.5" y1="10" x2="17.5" y2="14" /><line x1="10" y1="17.5" x2="14" y2="17.5" />
+          </svg>
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
+        <div class="active-dot absolute -bottom-1 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all" [class.opacity-100]="isManagementActive()" [class.scale-150]="isManagementActive()"></div>
+      </a>
+
+      <!-- More button: opens overlay -->
+      <button
+        *ngIf="item.route === '/more'"
+        (click)="openMoreOverlay()"
+        class="relative flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300"
+        [class.mobile-nav-active]="isMoreActive()"
+      >
+        <div class="z-10 transition-transform duration-300">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            <circle cx="12" cy="19" r="1.5" fill="currentColor" />
+          </svg>
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-wider mt-0.5 z-10">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
+        <div class="active-dot absolute -bottom-1 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all" [class.opacity-100]="isMoreActive()" [class.scale-150]="isMoreActive()"></div>
+      </button>
+    </ng-container>
   </nav>
+</div>
+
+<!-- ===================================================== -->
+<!-- MORE OVERLAY (full-screen)                            -->
+<!-- ===================================================== -->
+<div
+  *ngIf="showMoreOverlay()"
+  @fadeIn
+  class="more-overlay-backdrop"
+  (click)="closeMoreOverlay()"
+>
+  <div class="more-overlay-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="more-overlay-header">
+      <div class="more-overlay-header-left">
+        <div class="more-overlay-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            <circle cx="12" cy="19" r="1.5" fill="currentColor" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="more-overlay-title">{{ langService.currentLang() === 'km' ? 'ម៉ឺនុយបន្ថែម' : 'More Menu' }}</h2>
+          <p class="more-overlay-subtitle">{{ langService.currentLang() === 'km' ? 'ជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ' : 'Select a feature to navigate' }}</p>
+        </div>
+      </div>
+      <button
+        (click)="closeMoreOverlay()"
+        class="more-overlay-close-btn"
+        [attr.aria-label]="'Close menu'"
+        type="button"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Items grid -->
+    <div class="more-overlay-grid">
+      <ng-container *ngFor="let item of moreSubItems()">
+        <!-- Regular item (Users, Categories, Permission) -->
+        <button
+          *ngIf="!item.subMenus"
+          (click)="navigateTo(item)"
+          class="more-grid-item"
+          type="button"
+        >
+          <div class="more-grid-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <ng-container [ngSwitch]="item.icon">
+                <ng-container *ngSwitchCase="'user'">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'category'">
+                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'permission'">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+                </ng-container>
+              </ng-container>
+            </svg>
+          </div>
+          <div class="more-grid-item-text">
+            <span class="more-grid-item-label">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
+          </div>
+          <svg class="more-grid-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+
+        <!-- Expandable group (Settings) -->
+        <div
+          *ngIf="item.subMenus"
+          class="more-group-section"
+        >
+          <div class="more-group-header">
+            <div class="more-grid-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+              </svg>
+            </div>
+            <div class="more-grid-item-text">
+              <span class="more-grid-item-label">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
+              <span class="more-grid-item-count">{{ item.subMenus.length }} {{ langService.currentLang() === 'km' ? 'រឿង' : 'items' }}</span>
+            </div>
+          </div>
+          <div class="more-group-children">
+            <button
+              *ngFor="let child of item.subMenus"
+              (click)="navigateTo(child)"
+              class="more-group-child-btn"
+              type="button"
+            >
+              <div class="more-group-child-dot"></div>
+              <span>{{ langService.currentLang() === 'km' ? child.labelKm : child.label }}</span>
+              <svg class="more-grid-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Footer -->
+    <div class="more-overlay-footer">
+      <button (click)="closeMoreOverlay()" class="more-overlay-footer-btn" type="button">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        {{ langService.currentLang() === 'km' ? 'ត្រឡប់ក្រោយ' : 'Go Back' }}
+      </button>
+    </div>
+  </div>
 </div>

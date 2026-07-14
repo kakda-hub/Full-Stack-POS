@@ -231,3 +231,139 @@
     box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.12);
   }
 }
+
+/* ===============================================
+   RESPONSIVE CARD LAYOUT (mobile)
+   =============================================== */
+
+/* Hide the table/pagination on mobile */
+.table-overflow {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+/* Cards container – hidden on desktop */
+.pl-mobile-cards {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    @apply p-3 space-y-3;
+  }
+}
+
+/* Individual card */
+.pl-card {
+  @apply rounded-xl border p-4 transition-all duration-200;
+  @apply bg-white border-slate-200 shadow-sm;
+
+  &:active {
+    @apply shadow-md border-indigo-200;
+  }
+
+  &--dark {
+    @apply bg-slate-800 border-slate-700;
+
+    &:active {
+      @apply border-indigo-500/30 shadow-md;
+    }
+  }
+}
+
+/* Card header: title + price (left) | image (right) */
+.pl-card-header {
+  @apply flex items-start justify-between mb-3 pb-3 border-b;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.pl-card-header-left {
+  @apply flex flex-col gap-0.5 min-w-0 flex-1 mr-3;
+}
+
+.pl-card-number {
+  @apply text-xs font-mono font-bold;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.pl-card-title {
+  @apply text-base font-bold truncate;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.pl-card-title-km {
+  @apply text-xs;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.pl-card-price {
+  @apply text-lg font-black;
+  @apply text-indigo-600 dark:text-indigo-400;
+}
+
+.pl-card-header-right {
+  @apply flex-shrink-0;
+}
+
+.pl-card-img {
+  @apply w-14 h-14 object-cover rounded-xl border;
+  @apply border-slate-200 bg-white shadow-sm dark:border-slate-600;
+}
+
+.pl-card-avatar {
+  @apply w-14 h-14 flex items-center justify-center rounded-xl border;
+  @apply bg-slate-100 border-slate-200 dark:bg-slate-700 dark:border-slate-600;
+}
+
+/* Card body */
+.pl-card-body {
+  @apply space-y-2.5;
+}
+
+.pl-card-field {
+  @apply flex items-center justify-between gap-2;
+}
+
+.pl-card-label {
+  @apply text-xs font-semibold uppercase tracking-wider;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.pl-card-value {
+  @apply text-sm font-medium text-right;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.pl-card-barcode {
+  @apply font-mono text-xs px-2 py-1 rounded-lg;
+  @apply bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300;
+}
+
+.pl-card-stock {
+  @apply px-2.5 py-0.5 rounded-lg text-xs font-bold;
+}
+
+/* Card actions */
+.pl-card-actions {
+  @apply mt-3 pt-3 border-t flex justify-end gap-3;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.pl-card-action-btn {
+  @apply flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200;
+
+  &--edit {
+    @apply text-indigo-600 hover:bg-indigo-50 hover:shadow-sm;
+    @apply dark:text-indigo-400 dark:hover:bg-indigo-500/15;
+  }
+
+  &--delete {
+    @apply text-rose-600 hover:bg-rose-50 hover:shadow-sm;
+    @apply dark:text-rose-400 dark:hover:bg-rose-500/15;
+  }
+}
+
+/* Empty state */
+.pl-cards-empty {
+  @apply px-4 py-16 text-center;
+}

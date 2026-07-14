@@ -33,9 +33,7 @@ body {
 
 :root {
   --font-sans: 'Inter', system-ui, sans-serif;
-  font-family: 'Battambang', system-ui;
-  font-weight: 100;
-  font-style: normal;
+  --font-khmer: 'Hanuman', 'Siemreap', 'Battambang', system-ui;
   --scrollbar-thumb: #e2e8f0;
   --scrollbar-thumb-hover: #cbd5e1;
 }
@@ -119,8 +117,9 @@ html[lang='km'] {
 
 * {
   box-sizing: border-box;
-  font-family: 'Siemreap', sans-serif;
 }
+
+/* font-family is inherited, so html[lang='km'] cascades to all elements */
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
