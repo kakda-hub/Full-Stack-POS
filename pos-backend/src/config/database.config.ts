@@ -118,7 +118,7 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
     // Migrations are the source of truth — synchronize is disabled to prevent
     // accidental schema drift. Run `npm run migration:run` to apply changes.
     synchronize: false,
-    migrations: ['dist/database/migrations/**/*.js'],
+    migrations: ['dist/src/database/migrations/**/*.js'],
     migrationsRun: true,
     logging: configService.get<string>('NODE_ENV') === 'development',
 

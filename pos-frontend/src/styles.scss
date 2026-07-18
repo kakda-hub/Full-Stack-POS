@@ -29,11 +29,11 @@ body {
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Battambang:wght@400;700;900&family=Siemreap&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --font-sans: 'Inter', system-ui, sans-serif;
-  --font-khmer: 'Hanuman', 'Siemreap', 'Battambang', system-ui;
+  --font-khmer: 'Khmer OS Battambang', 'Hanuman', 'Siemreap', 'Battambang', system-ui;
   --scrollbar-thumb: #e2e8f0;
   --scrollbar-thumb-hover: #cbd5e1;
 }
@@ -113,6 +113,8 @@ html {
 
 html[lang='km'] {
   font-family: var(--font-khmer);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
