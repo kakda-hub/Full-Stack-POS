@@ -123,30 +123,6 @@
             <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all" [class.opacity-100]="isManagementActive()"></div>
           </button>
 
-          <!-- More button (opens overlay) -->
-          <button
-            *ngIf="item.subMenus && item.route === '/more'"
-            (click)="openMoreOverlay()"
-            class="nav-item group w-full text-left"
-            [class.active-link]="isMoreActive()"
-            [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
-          >
-            <div class="w-10 flex justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
-              <div class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity">
-                <!-- Three dots (more) icon -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="5" r="1.5" fill="currentColor" />
-                  <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-                  <circle cx="12" cy="19" r="1.5" fill="currentColor" />
-                </svg>
-              </div>
-            </div>
-            <span *ngIf="!isCollapsed()" class="text-[14px] font-medium whitespace-nowrap flex-1">
-              {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
-            </span>
-            <div class="active-accent absolute left-0 w-[5px] h-6 bg-indigo-500 rounded-r-full opacity-0 transition-all" [class.opacity-100]="isMoreActive()"></div>
-          </button>
-
           <!-- Submenu Content (for Management) -->
           <div
             *ngIf="item.subMenus && item.route !== '/more' && selectedMenu() === item.route && !isCollapsed()"

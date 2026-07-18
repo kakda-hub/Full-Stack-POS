@@ -146,8 +146,11 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
       initCommand: "SET NAMES utf8mb4",
     },
 
-    // Retry connection up to 10 times with 3s delay
-    retryAttempts: 10,
+    // Retry connection for up to ~90 seconds (30 attempts × 3s delay)
+    // This handles scenarios where MySQL restarts (20-40s) and the backend needs
+    // time to reconnect. It also covers initial container startup ordering even
+    // with Docker healthcheck-based depends_on.
+    retryAttempts: 30,
     retryDelay: 3000,
   };
 };
