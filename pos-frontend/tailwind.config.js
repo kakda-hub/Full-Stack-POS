@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        khmer: ['Hanuman', 'Inter', 'sans-serif'],
+        khmer: ['Khmer OS Battambang', 'Hanuman', 'Siemreap', 'Battambang', 'Inter', 'sans-serif'],
       },
     },
   },
