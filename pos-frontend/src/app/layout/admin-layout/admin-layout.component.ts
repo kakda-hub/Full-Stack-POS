@@ -5,14 +5,13 @@ import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { NavStateService, NavItem } from '../../core/services/nav-state.service';
-import { fadeIn } from '../../shared/animations/animations';
 
 @Component({
     selector: 'app-admin-layout',
     standalone: false,
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.scss',
-    animations: [fadeIn],
+    animations: [],
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
     isCollapsed = signal(false);
@@ -20,31 +19,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
     selectedMenu = signal<string>('');
 
-    /** Whether the 'More' full-screen overlay is visible */
-    showMoreOverlay = signal(false);
-
     /** Tracks the current URL so the computed can react to route changes */
     currentUrl = signal('');
 
     private routerSub: Subscription | null = null;
-
-    /** The 'More' nav item object containing all secondary nav items */
-    moreItem = computed(() => 
-        this.navItems.find(item => item.route === '/more')
-    );
-
-    /** The sub-items (Users, Categories, Permission) inside More */
-    moreSubItems = computed(() => this.moreItem()?.subMenus || []);
-
-    /** All More sub-routes (Users, Categories, Permission) */
-    moreSubRoutes = computed(() =>
-        this.moreSubItems().map(item => item.route)
-    );
-
-    /** Whether the current route is any of the More sub-pages */
-    isMoreActive = computed(() => 
-        this.moreSubRoutes().some(route => this.currentUrl().startsWith(route))
-    );
 
     /** The Management nav item */
     managementItem = computed(() =>
@@ -89,21 +67,6 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
     get navItems(): NavItem[] {
         return this.navState.navItems();
-    }
-
-    /** Toggle the full-screen More overlay */
-    openMoreOverlay() {
-        this.showMoreOverlay.set(true);
-    }
-
-    closeMoreOverlay() {
-        this.showMoreOverlay.set(false);
-    }
-
-    /** Navigate to a sub-item from the More overlay */
-    navigateTo(item: NavItem) {
-        this.showMoreOverlay.set(false);
-        this.router.navigate([item.route]);
     }
 
     toggleSubMenu(item: NavItem) {

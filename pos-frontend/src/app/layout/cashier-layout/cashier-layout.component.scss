@@ -1,10 +1,10 @@
 /* ==========================================================
-   Cashier Layout Component Styles
-   Extracted from inline Tailwind classes using @apply
+   Cashier Layout Component Styles – Premium Refresh
+   Glass-morphism header with refined interactions
    Dark mode via Tailwind's `dark:` variant prefix
    ========================================================== */
 
-/* ─── Cart count badge (preserved) ─── */
+/* ─── Cart count badge ─── */
 .cart-count-badge {
   display: inline-flex;
   align-items: center;
@@ -13,62 +13,83 @@
   height: 20px;
   padding: 0 6px;
   border-radius: 999px;
-  background: #6366f1;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
 }
 
 /* ─── Layout containers ─── */
 .cashier-layout {
-  @apply h-screen flex flex-col bg-slate-50 dark:bg-slate-900;
+  @apply h-screen flex flex-col;
+  @apply bg-slate-50 dark:bg-slate-950;
 }
 
+/* ─── Glass-header with premium feel ─── */
 .cashier-header {
-  @apply border-b px-4 py-3 flex items-center justify-between shadow-sm z-10;
-  @apply bg-white border-slate-200;
-  @apply dark:bg-slate-800 dark:border-slate-700;
+  @apply flex items-center justify-between z-10 relative;
+  @apply border-b px-4 py-3;
+  @apply bg-white/90 border-slate-200/70;
+  @apply dark:bg-slate-900/90 dark:border-slate-800/60;
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+
+  &::after {
+    content: '';
+    @apply absolute bottom-0 left-4 right-4 h-px;
+    @apply bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent;
+  }
 }
 
 /* ─── Brand ─── */
 .brand-text {
-  @apply font-bold text-lg flex items-center gap-2 text-slate-800 dark:text-white;
+  @apply font-bold text-lg flex items-center gap-2;
+  @apply text-slate-800 dark:text-white;
+  letter-spacing: -0.02em;
 }
 
 /* ─── Theme toggle button ─── */
 .theme-toggle-btn {
-  @apply p-2 rounded-lg transition-colors;
-  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
-  @apply dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600;
+  @apply p-2 rounded-xl transition-all duration-200;
+  @apply bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:shadow-sm hover:scale-105 active:scale-95;
+  @apply dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-700/80;
 }
 
 /* ─── Language toggle ─── */
 .lang-toggle {
-  @apply px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5;
-  @apply bg-slate-100 text-slate-700 hover:bg-slate-200;
-  @apply dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600;
+  @apply px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5;
+  @apply bg-slate-100/80 text-slate-700 hover:bg-slate-200/80 hover:shadow-sm active:scale-95;
+  @apply dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-700/80;
 }
 
 /* ─── User info text ─── */
 .user-info-text {
-  @apply flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300;
+  @apply flex items-center gap-2 text-sm;
+  @apply text-slate-600 dark:text-slate-300;
 }
 
-/* ─── Avatar ring ─── */
+/* ─── Avatar ring with hover glow ─── */
 .avatar-ring {
   @apply ring-2 transition-all duration-300;
   @apply ring-indigo-500/20;
   @apply dark:ring-indigo-400/30;
+
+  &:hover {
+    @apply ring-indigo-500/40 shadow-md shadow-indigo-500/10;
+    @apply dark:ring-indigo-400/50;
+  }
 }
 
 /* ─── Avatar fallback background ─── */
 .avatar-fallback {
-  @apply bg-indigo-100 text-indigo-700 dark:bg-indigo-700 dark:text-indigo-200;
+  @apply bg-gradient-to-br from-indigo-500 to-violet-600 text-white;
+  @apply dark:from-indigo-600 dark:to-violet-700;
 }
 
 /* ─── Logout button ─── */
 .logout-btn {
-  @apply p-2 rounded-lg transition-colors;
-  @apply text-slate-400 hover:text-rose-400 hover:bg-rose-500/10;
+  @apply p-2 rounded-xl transition-all duration-200;
+  @apply text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 hover:shadow-sm hover:scale-105 active:scale-95;
 }

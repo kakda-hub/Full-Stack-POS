@@ -31,17 +31,9 @@ export class NavStateService {
         { label: 'Cloudinary File Upload', labelKm: 'ការផ្ទុកឯកសារ Cloudinary', route: '/cloudinary-file-upload', icon: 'cloudinary' },
       ],
     },
-    {
-      label: 'More',
-      labelKm: 'ផ្សេងៗ',
-      route: '/more',
-      icon: 'more',
-      subMenus: [
-        { label: 'User', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },
-        { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
-        { label: 'Permission', labelKm: 'ការអនុញ្ញាត', route: '/permission', icon: 'permission' },
-      ],
-    },
+    { label: 'User', labelKm: 'អ្នកប្រើ', route: '/users', icon: 'user' },
+    { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
+    { label: 'Permission', labelKm: 'ការអនុញ្ញាត', route: '/permission', icon: 'permission' },
   ]);
 
   /**

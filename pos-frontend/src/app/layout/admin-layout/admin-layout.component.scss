@@ -1,6 +1,6 @@
 /* ==========================================================
    Admin Layout Component Styles
-   Extracted from inline Tailwind classes using @apply
+   Premium modern sidebar with glass-morphism, refined interactions
    Dark mode via Tailwind's `dark:` variant prefix
    ========================================================== */
 
@@ -21,7 +21,7 @@
 }
 
 .custom-scrollbar-light::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 .custom-scrollbar-light::-webkit-scrollbar-track {
   background: transparent;
@@ -31,10 +31,17 @@
   border-radius: 20px;
   border: 2px solid transparent;
   background-clip: content-box;
+  transition: background 0.3s;
 }
-:host-context(.dark) .custom-scrollbar-light::-webkit-scrollbar-thumb {
+:host-context(html.dark) .custom-scrollbar-light::-webkit-scrollbar-thumb {
   background: #1e293b;
   background-clip: content-box;
+}
+.custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+:host-context(html.dark) .custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
 /* ─── Navigation item ─── */
@@ -45,29 +52,69 @@
   :host-context(html.dark) & {
     @apply text-slate-400 hover:text-white hover:bg-white/[0.03];
   }
+
+  /* Staggered reveal on hover – icon subtle scale + glow */
+  &:hover .nav-item-icon {
+    @apply scale-110;
+    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.25));
+  }
+
+  &:hover .nav-item-label {
+    @apply translate-x-0.5;
+  }
 }
 
+/* ─── Active link state ─── */
 .active-link {
-  @apply bg-indigo-500/10 text-indigo-600 font-semibold shadow-[inset_0_0_20px_rgba(99,102,241,0.05)];
+  @apply bg-indigo-500/10 text-indigo-600 font-semibold relative;
+  box-shadow: inset 0 0 24px rgba(99, 102, 241, 0.06);
 
   :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400;
   }
-}
 
-.active-link .active-accent {
-  @apply opacity-100;
-}
+  .active-accent {
+    @apply opacity-100;
+  }
 
-.active-link svg {
-  @apply text-indigo-600;
+  svg {
+    @apply text-indigo-600 drop-shadow-[0_0_6px_rgba(99,102,241,0.3)];
 
-  :host-context(html.dark) & {
-    @apply text-indigo-400;
+    :host-context(html.dark) & {
+      @apply text-indigo-400;
+    }
+  }
+
+  .nav-item-label {
+    @apply font-bold;
+  }
+
+  &:hover {
+    @apply bg-gradient-to-r from-indigo-500/10 to-indigo-500/[0.06];
   }
 }
 
-/* ─── Mobile nav ─── */
+/* ─── Active accent bar ─── */
+.active-accent {
+  @apply absolute left-0 w-[5px] h-6 bg-gradient-to-b from-indigo-500 to-indigo-400 rounded-r-full opacity-0 transition-all duration-300;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+/* ─── Nav item icon wrapper ─── */
+.nav-item-icon {
+  @apply w-10 flex justify-center flex-shrink-0 transition-all duration-300;
+}
+
+.nav-item-icon-inner {
+  @apply w-5 h-5 opacity-70 group-hover:opacity-100 transition-all duration-300;
+}
+
+/* ─── Nav item label ─── */
+.nav-item-label {
+  @apply text-[14px] font-medium whitespace-nowrap transition-all duration-200;
+}
+
+/* ─── Mobile nav active ─── */
 .mobile-nav-active {
   @apply text-indigo-500 !important;
   transform: translateY(-4px);
@@ -84,7 +131,8 @@
 }
 
 .active-sub-link {
-  @apply bg-indigo-50/80 text-indigo-600 font-bold !important;
+  @apply bg-gradient-to-r from-indigo-50 to-indigo-50/50 text-indigo-600 font-bold !important;
+  box-shadow: inset 0 1px 3px rgba(99, 102, 241, 0.04);
 
   :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400 !important;
@@ -97,53 +145,121 @@
   @apply bg-[#F8FAFC] dark:bg-slate-950;
 }
 
+/* ─── Sidebar with subtle glass-morphism ─── */
 .sidebar {
-  @apply hidden md:flex flex-col transition-all duration-300 ease-in-out relative z-40 border-r;
-  @apply bg-white border-slate-200 text-slate-600;
-  @apply dark:bg-[#0B1120] dark:border-slate-800 dark:text-slate-300;
+  @apply hidden md:flex flex-col transition-all duration-300 ease-out relative z-40 border-r;
+  @apply bg-white/95 border-slate-200/80 text-slate-600;
+  @apply dark:bg-slate-950 dark:border-slate-800/80 dark:text-slate-300;
+
+  &::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(180deg, rgba(99,102,241,0.02) 0%, transparent 30%, transparent 70%, rgba(99,102,241,0.02) 100%);
+  }
 }
 
 .main-content {
   @apply flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar-light pb-24 md:pb-6 transition-all duration-500;
   @apply bg-[#F8FAFC] dark:bg-slate-950;
+  position: relative;
+
+  &::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent pointer-events-none;
+  }
 }
 
 /* ─── Sidebar toggle button ─── */
 .sidebar-toggle {
-  @apply flex absolute -right-3 top-10 w-6 h-6 bg-indigo-100 rounded-full border-2 items-center justify-center text-indigo-900 hover:bg-indigo-300 transition-all shadow-lg z-50 transform hover:scale-110 active:scale-95;
-  @apply border-white dark:border-[#0B1120];
+  @apply flex absolute -right-3 top-10 w-6 h-6 rounded-full border-2 items-center justify-center transition-all shadow-lg z-50;
+  @apply bg-gradient-to-br from-indigo-500 to-indigo-600 border-white text-white;
+  @apply dark:border-[#0B1120];
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+
+  &:hover {
+    @apply scale-110;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  }
+
+  &:active {
+    @apply scale-95;
+  }
+
+  svg {
+    filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+  }
 }
 
 /* ─── Brand title ─── */
 .brand-title {
   @apply font-black text-2xl tracking-tight whitespace-nowrap transition-colors leading-tight;
   @apply text-slate-900 dark:text-white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  :host-context(html.dark) & {
+    background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 /* ─── Sidebar footer ─── */
 .sidebar-footer {
-  @apply p-4 space-y-3 border-t transition-colors;
-  @apply bg-slate-50 border-slate-100;
-  @apply dark:bg-slate-900/50 dark:border-slate-800;
+  @apply p-4 space-y-3 border-t transition-all duration-300 relative;
+  @apply bg-gradient-to-t from-slate-50/80 to-transparent border-slate-100;
+  @apply dark:from-slate-900/60 dark:to-transparent dark:border-slate-800/60;
+
+  &::before {
+    content: '';
+    @apply absolute top-0 left-3 right-3 h-px;
+    @apply bg-gradient-to-r from-transparent via-slate-200 to-transparent;
+    @apply dark:via-slate-700/50;
+  }
 }
 
 /* ─── Theme/lang toggle button ─── */
 .footer-btn {
-  @apply w-full h-10 rounded-lg border text-xs flex items-center transition-all px-2;
-  @apply bg-white border-slate-200 text-slate-600 hover:bg-slate-50;
-  @apply dark:bg-slate-800/40 dark:border-slate-700/50 dark:text-slate-400 dark:hover:bg-slate-800;
+  @apply w-full h-10 rounded-xl border text-xs flex items-center transition-all px-2 relative overflow-hidden;
+  @apply bg-white/80 border-slate-200/60 text-slate-600;
+  @apply dark:bg-slate-800/40 dark:border-slate-700/40 dark:text-slate-400;
+
+  &:hover {
+    @apply bg-white border-indigo-200/60 text-indigo-600 shadow-sm;
+    @apply dark:bg-slate-800/60 dark:border-indigo-500/20 dark:text-indigo-400;
+  }
+
+  &:active {
+    @apply scale-[0.98];
+  }
 }
 
 .footer-btn-icon {
-  @apply w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors;
-  @apply bg-indigo-500 dark:bg-indigo-600;
+  @apply w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0;
+  @apply bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-sm shadow-indigo-500/20;
+  @apply dark:from-indigo-600 dark:to-indigo-700;
+  transition: all 0.3s ease;
+
+  .footer-btn:hover & {
+    @apply shadow-md shadow-indigo-500/30;
+    transform: scale(1.05);
+  }
 }
 
 /* ─── User profile card ─── */
 .user-profile-card {
-  @apply flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300 hover:shadow-lg;
-  @apply bg-white border-slate-200/80 hover:border-indigo-500/30;
-  @apply dark:bg-slate-800/40 dark:border-slate-700/50;
+  @apply flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300;
+  @apply bg-white/80 border-slate-200/60;
+  @apply dark:bg-slate-800/40 dark:border-slate-700/40;
+
+  &:hover {
+    @apply border-indigo-200/60 shadow-lg shadow-indigo-500/5;
+    @apply dark:border-indigo-500/20;
+    transform: translateY(-1px);
+  }
 }
 
 .user-name {
@@ -151,174 +267,61 @@
   @apply text-slate-900 dark:text-white;
 }
 
+.user-role-badge {
+  @apply text-[10px] font-black uppercase tracking-wider mt-0.5;
+  @apply bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-transparent;
+}
+
 .status-dot-border {
   @apply border-[2.5px] rounded-full;
   @apply border-white dark:border-[#0B1120];
+  animation: statusPulse 3s ease-in-out infinite;
 }
 
-/* ─── Mobile bottom nav ─── */
+/* ─── Mobile bottom nav (scrollable) ─── */
 .mobile-bottom-nav {
-  @apply md:hidden fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around px-4 border-t z-50 transition-all backdrop-blur-lg;
-  @apply bg-white/80 border-slate-200;
-  @apply dark:bg-slate-900/80 dark:border-slate-800;
+  @apply md:hidden fixed bottom-0 left-0 right-0 h-[68px] flex items-center px-3 pb-1 gap-1 border-t z-50 transition-all overflow-x-auto overflow-y-hidden;
+  @apply bg-white/90 border-slate-200/80;
+  @apply dark:bg-slate-900/90 dark:border-slate-800/80;
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  &::before {
+    content: '';
+    @apply absolute -top-px left-4 right-4 h-px;
+    @apply bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent;
+  }
+
+  & > a {
+    scroll-snap-align: start;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* ─── Submenu item ─── */
 .submenu-item {
-  @apply flex items-center py-2 px-3 text-[13px] rounded-lg transition-all;
-  @apply text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50;
-  @apply dark:hover:bg-indigo-900/20;
+  @apply flex items-center py-2 px-3 text-[13px] rounded-lg transition-all duration-200;
+  @apply text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/60;
+  @apply dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10;
+
+  &:hover {
+    @apply translate-x-0.5;
+  }
 }
 
 /* ==========================================================
-   MORE OVERLAY (full-screen)
+   Animations
    ========================================================== */
 
-.more-overlay-backdrop {
-  @apply fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6;
-  @apply bg-black/60 backdrop-blur-sm;
-  animation: overlayFadeIn 0.2s ease-out;
-}
-
-.more-overlay-panel {
-  @apply w-full max-w-lg max-h-[85vh] flex flex-col rounded-2xl border shadow-2xl overflow-hidden;
-  @apply bg-white border-slate-200;
-  @apply dark:bg-slate-900 dark:border-slate-700;
-  animation: panelSlideUp 0.25s ease-out;
-}
-
-.more-overlay-header {
-  @apply flex items-center justify-between px-5 py-4 border-b shrink-0;
-  @apply border-slate-100 dark:border-slate-700/80;
-}
-
-.more-overlay-header-left {
-  @apply flex items-center gap-3;
-}
-
-.more-overlay-icon-wrapper {
-  @apply w-10 h-10 rounded-xl flex items-center justify-center;
-  @apply bg-indigo-100 text-indigo-600;
-  @apply dark:bg-indigo-500/15 dark:text-indigo-400;
-}
-
-.more-overlay-title {
-  @apply text-lg font-black;
-  @apply text-slate-900 dark:text-white;
-}
-
-.more-overlay-subtitle {
-  @apply text-xs mt-0.5;
-  @apply text-slate-400 dark:text-slate-500;
-}
-
-.more-overlay-close-btn {
-  @apply w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200;
-  @apply text-slate-400 hover:text-slate-700 hover:bg-slate-100;
-  @apply dark:text-slate-500 dark:hover:text-white dark:hover:bg-slate-800;
-}
-
-/* ─── Items grid ─── */
-.more-overlay-grid {
-  @apply flex-1 overflow-y-auto px-3 py-3 space-y-1;
-}
-
-/* Individual grid item button */
-.more-grid-item {
-  @apply w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-left;
-  @apply hover:bg-indigo-50/70 active:scale-[0.98];
-  @apply dark:hover:bg-indigo-500/10;
-}
-
-.more-grid-item-icon {
-  @apply w-10 h-10 rounded-xl flex items-center justify-center shrink-0;
-  @apply bg-slate-100 text-slate-500;
-  @apply dark:bg-slate-800 dark:text-slate-400;
-
-  .more-grid-item:hover & {
-    @apply bg-indigo-100 text-indigo-600;
-    @apply dark:bg-indigo-500/20 dark:text-indigo-400;
-  }
-
-  svg {
-    @apply w-5 h-5;
-  }
-}
-
-.more-grid-item-text {
-  @apply flex-1 min-w-0;
-}
-
-.more-grid-item-label {
-  @apply text-sm font-bold;
-  @apply text-slate-800 dark:text-slate-200;
-}
-
-.more-grid-item-count {
-  @apply block text-[11px] font-medium mt-0.5;
-  @apply text-slate-400 dark:text-slate-500;
-}
-
-.more-grid-item-arrow {
-  @apply w-4 h-4 shrink-0;
-  @apply text-slate-300 dark:text-slate-600;
-
-  .more-grid-item:hover & {
-    @apply text-indigo-400;
-    @apply dark:text-indigo-500;
-  }
-}
-
-/* ─── Settings group section ─── */
-.more-group-section {
-  @apply rounded-xl border;
-  @apply border-slate-100 bg-slate-50/50;
-  @apply dark:border-slate-700/50 dark:bg-slate-800/30;
-}
-
-.more-group-header {
-  @apply flex items-center gap-3 px-4 py-3.5;
-}
-
-.more-group-children {
-  @apply pl-4 pr-3 pb-3 space-y-0.5;
-}
-
-.more-group-child-btn {
-  @apply w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-left;
-  @apply text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-white;
-  @apply dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-slate-800;
-}
-
-.more-group-child-dot {
-  @apply w-1.5 h-1.5 rounded-full shrink-0;
-  @apply bg-slate-300 dark:bg-slate-600;
-
-  .more-group-child-btn:hover & {
-    @apply bg-indigo-500;
-    @apply dark:bg-indigo-400;
-  }
-}
-
-/* ─── Footer ─── */
-.more-overlay-footer {
-  @apply px-5 py-3 border-t shrink-0;
-  @apply border-slate-100 dark:border-slate-700/80;
-}
-
-.more-overlay-footer-btn {
-  @apply w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200;
-  @apply text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/70;
-  @apply dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10;
-}
-
-/* ─── Animations ─── */
-@keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes panelSlideUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
