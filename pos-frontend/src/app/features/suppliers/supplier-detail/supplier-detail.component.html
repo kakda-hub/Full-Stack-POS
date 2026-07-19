@@ -1,9 +1,13 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <app-header-detail [id]="id"></app-header-detail>
+  <app-header-detail
+    [id]="id"
+    [iconType]="'supplier'"
+    [subtitle]="id ? (lang.currentLang() === 'km' ? 'កែប្រែព័ត៌មានអ្នកផ្គត់ផ្គង់' : 'Edit supplier details') : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកផ្គត់ផ្គង់ថ្មី' : 'Add a new supplier')"
+  ></app-header-detail>
 
-  <mat-dialog-content class="dialog-content">
-    <div class="form-body">
-      <div class="form-grid">
+  <mat-dialog-content class="px-3 !pb-2">
+    <div class="flex flex-col gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <app-input-field
           formControlName="name"
           [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកផ្គត់ផ្គង់' : 'Supplier Name'"
@@ -45,7 +49,7 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="dialog-actions">
+  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-5 pt-1">
     <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{
       'button.cancel' | translate
     }}</app-ui-button>

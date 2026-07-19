@@ -1,0 +1,33 @@
+/* ==========================================================
+   Dialog Header Component Styles
+   ========================================================== */
+
+.dialog-header {
+  @apply flex justify-between items-center px-5 py-3.5 border-b shrink-0 relative;
+  @apply border-slate-100 dark:border-slate-700/60;
+  @apply bg-gradient-to-r from-white to-slate-50/80;
+  @apply dark:from-slate-900 dark:to-slate-900/95;
+
+  &::after {
+    content: '';
+    @apply absolute bottom-0 left-5 right-5 h-px;
+    @apply bg-gradient-to-r from-transparent via-indigo-500/15 to-transparent;
+  }
+}
+
+.dialog-close-btn {
+  @apply w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200;
+  @apply text-slate-400 bg-transparent;
+  @apply dark:text-slate-500;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    @apply bg-rose-50 text-rose-500 scale-105 shadow-sm;
+    @apply dark:bg-rose-900/20 dark:text-rose-400;
+  }
+
+  &:active {
+    @apply scale-95;
+  }
+}

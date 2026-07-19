@@ -1,11 +1,15 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <app-header-detail [id]="id"></app-header-detail>
+  <app-header-detail
+    [id]="id"
+    [iconType]="'user'"
+    [subtitle]="id ? (lang.currentLang() === 'km' ? 'កែប្រែព័ត៌មានអ្នកប្រើ' : 'Edit user details') : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកប្រើថ្មី' : 'Add a new user')"
+  ></app-header-detail>
 
-  <mat-dialog-content>
-    <div class="flex flex-col gap-4 w-full">
+  <mat-dialog-content class="px-3">
+    <div class="flex flex-col gap-5 w-full">
 
       <!-- Avatar Upload -->
-      <div class="flex flex-col items-center gap-3 py-2">
+      <div class="flex flex-col items-center gap-3 pt-2 pb-1">
         <div class="relative group cursor-pointer" (click)="avatarInput.click()">
           <!-- Avatar ring glow -->
           <div class="absolute -inset-1 rounded-full bg-gradient-to-br from-indigo-400 via-violet-400 to-purple-500 opacity-60 group-hover:opacity-100 blur-[2px] transition-all duration-500 group-hover:duration-300"></div>
@@ -94,9 +98,9 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="w-full gap-3" >
-    <app-ui-button [variant]="'secondary'" [shape]="'outline'" [size]="'md'" mat-dialog-close type="button">{{'button.cancel' | translate}}</app-ui-button>
-    <app-ui-button [variant]="'primary'" [shape]="'outline'" [size]="'md'" type="submit">{{'button.save' | translate}}</app-ui-button>
+  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-5 pt-2">
+    <app-ui-button [variant]="'secondary'" [shape]="'solid'" [size]="'md'" mat-dialog-close type="button">{{'button.cancel' | translate}}</app-ui-button>
+    <app-ui-button [variant]="'primary'" [shape]="'solid'" [size]="'md'" type="submit">{{'button.save' | translate}}</app-ui-button>
   </mat-dialog-actions>
 </form>
 
