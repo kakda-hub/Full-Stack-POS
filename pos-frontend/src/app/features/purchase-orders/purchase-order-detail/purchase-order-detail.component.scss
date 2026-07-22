@@ -1,0 +1,55 @@
+/* ==========================================================
+   Purchase Order Detail Dialog Styles
+   ========================================================== */
+
+/* PO Detail Items Table */
+.po-items-table {
+  @apply border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden;
+}
+
+.po-items-header {
+  @apply grid grid-cols-12 gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700;
+}
+
+.po-items-header-cell {
+  @apply text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider;
+}
+
+.po-items-col-product { @apply col-span-5; }
+.po-items-col-qty { @apply col-span-2; }
+.po-items-col-cost { @apply col-span-3; }
+.po-items-col-total { @apply col-span-1 text-right; }
+.po-items-col-action { @apply col-span-1 text-right; }
+
+.po-items-row {
+  @apply grid grid-cols-12 gap-2 px-3 py-2 items-center border-b border-slate-100 dark:border-slate-700/50 last:border-b-0;
+}
+
+/* PO Totals */
+.po-totals {
+  @apply mt-4 space-y-1.5 px-1;
+}
+
+.po-total-row {
+  @apply flex items-center justify-between text-sm;
+}
+
+.po-total-label {
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.po-total-value {
+  @apply font-medium text-slate-700 dark:text-slate-300;
+}
+
+.po-total-row--grand {
+  @apply pt-2 mt-2 border-t border-slate-200 dark:border-slate-700;
+}
+
+.po-total-label--grand {
+  @apply text-sm font-semibold text-slate-700 dark:text-slate-300;
+}
+
+.po-total-value--grand {
+  @apply text-base font-bold text-blue-600 dark:text-blue-400;
+}

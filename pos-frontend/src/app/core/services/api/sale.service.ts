@@ -14,6 +14,8 @@ export interface CreateSaleDto {
   discount?: number;
   tax?: number;
   paymentMethod?: 'cash' | 'aba' | 'card';
+  customerId?: number;
+  pointsRedeemed?: number;
 }
 
 @Injectable({
@@ -36,9 +38,33 @@ export class SaleService {
   /**
    * Get all sales
    */
+  /** Convert numeric sale fields from strings to numbers */
+  private mapSale(sale: any): any {
+    if (!sale) return sale;
+    return {
+      ...sale,
+      subtotal: Number(sale.subtotal),
+      discount: Number(sale.discount),
+      tax: Number(sale.tax),
+      total: Number(sale.total),
+      pointsEarned: Number(sale.pointsEarned ?? 0),
+      pointsRedeemed: Number(sale.pointsRedeemed ?? 0),
+      loyaltyDiscount: Number(sale.loyaltyDiscount ?? 0),
+      cashReceived: sale.cashReceived != null ? Number(sale.cashReceived) : undefined,
+      change: sale.change != null ? Number(sale.change) : undefined,
+      items: (sale.items ?? []).map((item: any) => ({
+        ...item,
+        price: Number(item.price),
+      })),
+    };
+  }
+
   getAllSales(): Observable<any[]> {
     return this.http.get<any>(this.apiUrl).pipe(
-      map((res) => res?.data ?? res)
+      map((res) => {
+        const data = res?.data ?? res ?? [];
+        return data.map((s: any) => this.mapSale(s));
+      }),
     );
   }
 
@@ -47,7 +73,7 @@ export class SaleService {
    */
   getSaleById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map((res) => res?.data ?? res)
+      map((res) => this.mapSale(res?.data ?? res)),
     );
   }
 }

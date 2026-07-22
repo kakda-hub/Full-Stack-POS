@@ -15,6 +15,7 @@ import { modalAnimation, backdropAnimation } from '../../../shared/animations/an
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [modalAnimation, backdropAnimation],
   templateUrl: './purchase-order-detail.component.html',
+  styleUrl: './purchase-order-detail.component.scss',
 })
 export class PurchaseOrderDetailComponent implements OnInit {
   form!: FormGroup;

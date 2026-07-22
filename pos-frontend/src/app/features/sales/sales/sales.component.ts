@@ -1,7 +1,7 @@
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
 import { Subject, debounceTime } from 'rxjs';
-import { Transaction, Product, CartItem } from '../../../core/models';
+import { Transaction, Product, CartItem, QuickPickItem } from '../../../core/models';
 import { AlertService } from '../../../core/services/alert.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
@@ -9,6 +9,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { TransactionService } from '../../../core/services/transaction.service';
+import { QuickPickService } from '../../../core/services/api/quick-pick.service';
 import { fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition } from '../../../shared/animations/animations';
 
 // Sidebar specific animation
@@ -38,6 +39,9 @@ export class SalesComponent implements OnInit {
   lastAddedId = signal<string | null>(null);
   shakingProductId = signal<string | null>(null);
 
+  // Quick Pick items
+  quickPicks = signal<QuickPickItem[]>([]);
+
   // Price slide animation state
   showOldSubtotal = signal(false);
   showOldTotal = signal(false);
@@ -58,6 +62,7 @@ export class SalesComponent implements OnInit {
     public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
+    private quickPickService: QuickPickService,
   ) {
     // Initialize price tracking before the effect to prevent animation on first render
     this.prevSubtotalVal = this.cart.subtotal();
@@ -97,6 +102,12 @@ export class SalesComponent implements OnInit {
       this.productService.setSearch(q);
       this.cdr.markForCheck();
     });
+
+    // Load Quick Pick items
+    this.quickPickService.getAll().subscribe({
+      next: (items) => this.quickPicks.set(items),
+      error: () => this.quickPicks.set([]),
+    });
   }
 
   toggleCartSidebar(): void {
@@ -132,6 +143,24 @@ export class SalesComponent implements OnInit {
     return product.stock - qtyInCart;
   }
 
+  addQuickPick(item: QuickPickItem): void {
+    // Create a pseudo-product from quick pick item
+    const quickProduct: Product = {
+      id: `quick-${item.id}`,
+      name: item.label,
+      nameKm: item.labelKh,
+      price: item.price,
+      barcode: `QP-${item.id}`,
+      category: 'quick',
+      stock: 9999,
+      imgUrl: undefined,
+      lowStockThreshold: undefined,
+      expiryDate: undefined,
+    };
+    this.cart.addItem(quickProduct);
+    if (!this.isCartOpen()) this.isCartOpen.set(true);
+  }
+
   addToCart(product: Product): void {
     if (this.effectiveStock(product) <= 0) {
       this.alertService.error('Out of stock');
@@ -161,17 +190,31 @@ export class SalesComponent implements OnInit {
   }
 
   onPaymentComplete(data: any): void {
+    // Calculate effective total with loyalty discount
+    const loyaltyDisc = data.loyaltyDiscount || 0;
+    const effectiveTotal = this.cart.total() - loyaltyDisc;
+
     const txn = this.transactionService.saveTransaction(
       this.cart.items(),
       this.cart.subtotal(),
       this.cart.discountAmount(),
       this.cart.taxAmount(),
-      this.cart.total(),
+      Math.max(0, effectiveTotal),
       data.method,
       this.auth.currentUser()?.name || 'Cashier',
       data.cashReceived,
+      data.customerId,
+      data.customerName,
+      data.pointsEarned,
+      data.pointsRedeemed,
+      data.loyaltyDiscount,
     );
-    this.cart.items().forEach(item => this.productService.reduceStock(item.product.id, item.quantity));
+    // Reduce stock for real products only (skip quick-pick items with synthetic IDs)
+    this.cart.items().forEach(item => {
+      if (!item.product.id.startsWith('quick-')) {
+        this.productService.reduceStock(item.product.id, item.quantity);
+      }
+    });
     this.cart.clearCart();
     this.showPayment = false;
     this.lastTransaction = txn;

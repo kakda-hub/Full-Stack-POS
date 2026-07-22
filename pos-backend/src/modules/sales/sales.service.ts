@@ -10,6 +10,7 @@ import { Sale, PaymentMethod } from './entities/sale.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { StockMovement, StockMovementType } from '../stock-movements/entities/stock-movement.entity';
+import { Customer } from '../customers/entities/customer.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
 import { paginateQuery } from '../../common/helpers/pagination.helper';
@@ -28,6 +29,9 @@ export class SalesService {
 
     @InjectRepository(StockMovement)
     private readonly movementRepository: Repository<StockMovement>,
+
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
 
     @InjectDataSource()
     private readonly dataSource: DataSource,
@@ -71,18 +75,62 @@ export class SalesService {
 
       const discount = dto.discount ?? 0;
       const tax = dto.tax ?? 0;
-      const total = subtotal - discount + tax;
+
+      // ── Loyalty Points & Customer Logic ───────────────────────────────
+      let customer: Customer | null = null;
+      let loyaltyDiscount = 0;
+      let pointsRedeemed = 0;
+      let pointsEarned = 0;
+
+      // Fetch customer once if customerId is provided
+      if (dto.customerId) {
+        customer = await queryRunner.manager.findOne(Customer, {
+          where: { id: dto.customerId },
+        });
+      }
+
+      // Handle points redemption
+      if (customer && dto.pointsRedeemed && dto.pointsRedeemed > 0) {
+        const POINTS_PER_DOLLAR = 100;
+        const maxDiscount = Math.floor(dto.pointsRedeemed / POINTS_PER_DOLLAR);
+        loyaltyDiscount = Math.min(maxDiscount, subtotal - discount);
+        pointsRedeemed = loyaltyDiscount * POINTS_PER_DOLLAR;
+
+        if (customer.loyaltyPoints < pointsRedeemed) {
+          throw new BadRequestException(
+            `Insufficient loyalty points. Available: ${customer.loyaltyPoints}, Required: ${pointsRedeemed}`,
+          );
+        }
+      }
+
+      const total = subtotal - discount - loyaltyDiscount + tax;
 
       if (total < 0) {
         throw new BadRequestException('Sale total cannot be negative');
       }
 
+      // Award points and update customer stats
+      if (customer) {
+        if (pointsRedeemed > 0) {
+          customer.loyaltyPoints -= pointsRedeemed;
+        }
+        pointsEarned = Math.floor(total * customer.pointsPerDollar);
+        customer.loyaltyPoints += pointsEarned;
+        customer.totalSpent = Number(customer.totalSpent) + total;
+        customer.totalPurchases += 1;
+        await queryRunner.manager.save(Customer, customer);
+      }
+
       const sale = queryRunner.manager.create(Sale, {
         userId,
+        customerId: dto.customerId || null,
         subtotal,
         discount,
         tax,
         total,
+        pointsEarned,
+        pointsRedeemed,
+        loyaltyDiscount,
         paymentMethod: dto.paymentMethod ?? PaymentMethod.CASH,
       });
 

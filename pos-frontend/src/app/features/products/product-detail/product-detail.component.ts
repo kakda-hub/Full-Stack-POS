@@ -80,6 +80,8 @@ export class ProductDetailComponent implements OnInit {
       nameKh: [product?.nameKh || product?.nameKm || ''],
       price: [product?.price || '', [Validators.required, Validators.min(0.01), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
       stock: [product?.stock || '', [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
+      lowStockThreshold: [product?.lowStockThreshold || 10, [Validators.min(0), Validators.pattern(/^\d+$/)]],
+      expiryDate: [product?.expiryDate || ''],
       barcode: [product?.barcode || '', [Validators.required]],
       categoryId: [Number(product?.categoryId ?? product?.category) || '', [Validators.required]],
       imgUrl: [product?.imgUrl || ''],

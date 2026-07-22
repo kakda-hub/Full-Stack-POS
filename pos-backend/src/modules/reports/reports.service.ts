@@ -168,7 +168,7 @@ export class ReportsService {
     const totalCost = parseFloat(profitRow?.totalCost ?? '0');
     const grossProfit = totalRevenue - totalCost;
 
-    // Low-stock products (stock <= 10)
+    // Low-stock products (stock <= product-specific threshold, defaults to 10)
     const lowStockProducts = await this.dataSource
       .createQueryBuilder()
       .select('p.id', 'id')
@@ -176,8 +176,10 @@ export class ReportsService {
       .addSelect('p.stock', 'stock')
       .addSelect('p.barcode', 'barcode')
       .addSelect('p.cost_price', 'costPrice')
+      .addSelect('p.low_stock_threshold', 'lowStockThreshold')
+      .addSelect('p.expiry_date', 'expiryDate')
       .from('products', 'p')
-      .where('p.stock <= 10')
+      .where('p.stock <= COALESCE(p.low_stock_threshold, 10)')
       .andWhere('p.is_active = 1')
       .orderBy('p.stock', 'ASC')
       .getRawMany();

@@ -18,6 +18,9 @@ import { StockMovementsModule } from './modules/stock-movements/stock-movements.
 import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
 import { ReturnsModule } from './modules/returns/returns.module';
 import { HealthModule } from './modules/health/health.module';
+import { QuickPicksModule } from './modules/quick-picks/quick-picks.module';
+import { CustomersModule } from './modules/customers/customers.module';
+import { KhqrModule } from './modules/khqr/khqr.module';
 
 @Module({
   imports: [
@@ -50,6 +53,9 @@ import { HealthModule } from './modules/health/health.module';
     StockMovementsModule,
     PurchaseOrdersModule,
     ReturnsModule,
+    QuickPicksModule,
+    CustomersModule,
+    KhqrModule,
     HealthModule,
   ],
 })

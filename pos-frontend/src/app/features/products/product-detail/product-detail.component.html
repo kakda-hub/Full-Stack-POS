@@ -113,6 +113,19 @@
         ></app-input-field>
 
         <app-input-field
+          formControlName="lowStockThreshold"
+          [placeholder]="lang.currentLang() === 'km' ? 'កម្រិតស្តុកទាប' : 'Low Stock Threshold'"
+        >
+          <span prefix class="text-slate-400 text-xs mr-1">⚠</span>
+        </app-input-field>
+
+        <app-input-field
+          formControlName="expiryDate"
+          [placeholder]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទផុតកំណត់' : 'Expiry Date'"
+          type="date"
+        ></app-input-field>
+
+        <app-input-field
           formControlName="barcode"
           [placeholder]="lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode'"
           [isRequired]="true"

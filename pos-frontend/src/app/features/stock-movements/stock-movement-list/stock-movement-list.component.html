@@ -168,6 +168,15 @@
                 }
               </div>
             }
+            @if (movement.expiryDate) {
+              <div class="movement-expiry">
+                <span class="text-xs"
+                  [class.text-amber-600]="true"
+                  [class.font-medium]="true">
+                  📅 {{ lang.currentLang() === 'km' ? 'ផុតកំណត់' : 'Expiry' }}: {{ movement.expiryDate }}
+                </span>
+              </div>
+            }
           </div>
         </div>
       }

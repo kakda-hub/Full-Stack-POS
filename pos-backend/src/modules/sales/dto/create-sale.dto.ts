@@ -49,4 +49,16 @@ export class CreateSaleDto {
   @IsEnum(PaymentMethod)
   @IsOptional()
   paymentMethod?: PaymentMethod;
+
+  @ApiPropertyOptional({ description: 'Customer ID for loyalty tracking' })
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  customerId?: number;
+
+  @ApiPropertyOptional({ description: 'Points to redeem for discount (100 points = $1)' })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  pointsRedeemed?: number;
 }

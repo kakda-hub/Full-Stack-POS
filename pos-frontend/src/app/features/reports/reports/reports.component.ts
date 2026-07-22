@@ -133,9 +133,14 @@ export class ReportsComponent implements OnInit {
   // Low stock count from summary
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
 
-  // Helper: format date label (DD/MM)
-  formatDateLabel(dateStr: string): string {
+  // Near-expiry products
+  nearExpiryProducts = computed(() => this.productService.nearExpiryProducts());
+
+  // Helper: format date label (DD/MM), returns fallback for invalid dates
+  formatDateLabel(dateStr: string | null | undefined): string {
+    if (!dateStr) return '—';
     const d = new Date(dateStr + 'T00:00:00');
+    if (isNaN(d.getTime())) return '—';
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
   }
 
@@ -202,6 +207,18 @@ export class ReportsComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  getDaysUntilExpiry(expiryDate: string): number {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  getExpiryBadgeClass(days: number): string {
+    if (days <= 7) return 'bg-rose-50 text-rose-700';
+    if (days <= 14) return 'bg-amber-50 text-amber-700';
+    return 'bg-yellow-50 text-yellow-700';
   }
 
   getPaymentIcon(method: string): string {

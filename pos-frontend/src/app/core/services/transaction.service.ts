@@ -34,7 +34,12 @@ export class TransactionService {
     total: number,
     paymentMethod: 'cash' | 'aba' | 'card',
     cashier: string,
-    cashReceived?: number
+    cashReceived?: number,
+    customerId?: number,
+    customerName?: string,
+    pointsEarned?: number,
+    pointsRedeemed?: number,
+    loyaltyDiscount?: number,
   ): Transaction {
     const transaction: Transaction = {
       id: `TXN-${Date.now()}`,
@@ -47,6 +52,11 @@ export class TransactionService {
       cashReceived,
       change: cashReceived ? cashReceived - total : 0,
       cashier,
+      customerId,
+      customerName,
+      pointsEarned,
+      pointsRedeemed,
+      loyaltyDiscount,
       timestamp: new Date(),
     };
     this._transactions.update(txns => [transaction, ...txns]);

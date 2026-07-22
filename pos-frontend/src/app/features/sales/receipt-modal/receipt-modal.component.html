@@ -61,6 +61,12 @@
             >
             <span>{{ transaction.cashier }}</span>
           </div>
+          @if (transaction.customerName) {
+            <div class="flex justify-between text-indigo-600">
+              <span class="text-slate-500">{{ lang.currentLang() === 'km' ? 'អតិថិជន' : 'Customer' }}:</span>
+              <span class="font-semibold">{{ transaction.customerName }}</span>
+            </div>
+          }
         </div>
 
         <!-- Items -->
@@ -100,6 +106,22 @@
             <span class="text-indigo-700">\${{ transaction.total.toFixed(2) }}</span>
           </div>
         </div>
+
+        <!-- Loyalty -->
+        @if (transaction.loyaltyDiscount) {
+          <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
+            <div class="flex justify-between text-emerald-600">
+              <span>{{ lang.currentLang() === 'km' ? 'បញ្ចុះពិន្ទុ' : 'Loyalty Discount' }}</span>
+              <span>-\${{ transaction.loyaltyDiscount.toFixed(2) }}</span>
+            </div>
+            @if (transaction.pointsEarned) {
+              <div class="flex justify-between text-indigo-600">
+                <span>{{ lang.currentLang() === 'km' ? 'ពិន្ទុទទួលបាន' : 'Points Earned' }}</span>
+                <span class="font-bold">⭐ +{{ transaction.pointsEarned }}</span>
+              </div>
+            }
+          </div>
+        }
 
         <!-- Payment -->
         <div class="py-2 space-y-1 border-b border-dashed border-slate-300">

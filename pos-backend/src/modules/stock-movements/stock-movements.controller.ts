@@ -27,4 +27,10 @@ export class StockMovementsController {
   findByProduct(@Param('productId', ParseIntPipe) productId: number) {
     return this.movementsService.findByProduct(productId);
   }
+
+  @Get('near-expiry')
+  @ApiOperation({ summary: 'Get products with near-expiry stock (default: 30 days)' })
+  findNearExpiry(@Query('days') days?: number) {
+    return this.movementsService.findNearExpiryProducts(days ?? 30);
+  }
 }

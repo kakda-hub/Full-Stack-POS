@@ -34,6 +34,14 @@ export class Product {
   @Column({ name: "cost_price", type: "decimal", precision: 10, scale: 2, nullable: true })
   costPrice: number;
 
+  /** Minimum stock threshold before triggering low-stock alerts */
+  @Column({ name: "low_stock_threshold", type: "int", default: 10 })
+  lowStockThreshold: number;
+
+  /** Expiry date (for perishable goods) */
+  @Column({ name: "expiry_date", type: "date", nullable: true })
+  expiryDate: string;
+
   @Column({ type: "int", default: 0 })
   stock: number;
 

@@ -17,6 +17,7 @@ export interface Product {
   stock: number;
   imgUrl?: string;
   lowStockThreshold?: number;
+  expiryDate?: string;
   description?: string;
 }
 
@@ -37,6 +38,11 @@ export interface Transaction {
   cashReceived?: number;
   change?: number;
   cashier: string;
+  customerId?: number;
+  customerName?: string;
+  pointsEarned?: number;
+  pointsRedeemed?: number;
+  loyaltyDiscount?: number;
   timestamp: Date;
 }
 
@@ -53,6 +59,31 @@ export interface Category {
   name: string;
   nameKm?: string;
   icon?: string;
+}
+
+export interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  totalSpent: number;
+  totalPurchases: number;
+  loyaltyPoints: number;
+  pointsPerDollar: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuickPickItem {
+  id: number;
+  label: string;
+  labelKh?: string;
+  price: number;
+  icon?: string;
+  sortOrder: number;
+  isActive: boolean;
 }
 
 export interface Supplier {

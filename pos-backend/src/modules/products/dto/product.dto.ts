@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDateString,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -47,6 +48,17 @@ export class CreateProductDto {
   @Min(0)
   @IsOptional()
   costPrice?: number;
+
+  @ApiPropertyOptional({ example: 10, description: 'Low stock threshold for alerts' })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  lowStockThreshold?: number;
+
+  @ApiPropertyOptional({ description: 'Expiry date (for perishable goods, ISO format)' })
+  @IsDateString()
+  @IsOptional()
+  expiryDate?: string;
 
   @ApiProperty({ example: 100 })
   @IsInt()
@@ -98,6 +110,17 @@ export class UpdateProductDto {
   @Min(0)
   @IsOptional()
   costPrice?: number;
+
+  @ApiPropertyOptional({ description: 'Low stock threshold for alerts' })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  lowStockThreshold?: number;
+
+  @ApiPropertyOptional({ description: 'Expiry date (for perishable goods, ISO format)' })
+  @IsDateString()
+  @IsOptional()
+  expiryDate?: string;
 
   @ApiPropertyOptional()
   @IsInt()

@@ -19,6 +19,8 @@ describe('ProductsService', () => {
     price: 1.5,
     costPrice: 0.8,
     stock: 100,
+    lowStockThreshold: 10,
+    expiryDate: null,
     categoryId: 1,
     description: 'Carbonated soft drink',
     imgUrl: null,

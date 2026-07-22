@@ -42,6 +42,16 @@ export class ProductService {
     this._products().filter(p => p.stock <= (p.lowStockThreshold || 10))
   );
 
+  nearExpiryProducts = computed(() =>
+    this._products().filter(p => {
+      if (!p.expiryDate) return false;
+      const expiry = new Date(p.expiryDate);
+      const thirtyDays = new Date();
+      thirtyDays.setDate(thirtyDays.getDate() + 30);
+      return expiry <= thirtyDays && expiry >= new Date();
+    })
+  );
+
   constructor(private http: HttpClient) {
     this.loadProducts();
     this.loadCategories();
@@ -92,10 +102,11 @@ export class ProductService {
       nameKm: p.nameKh,
       price: Number(p.price),
       barcode: p.barcode,
-      category: String(p.categoryId), // Use category ID for filtering
+      category: String(p.categoryId),
       stock: p.stock,
       imgUrl: p.imgUrl,
-      lowStockThreshold: p.stock <= 10 ? 10 : undefined,
+      lowStockThreshold: p.lowStockThreshold !== undefined ? Number(p.lowStockThreshold) : undefined,
+      expiryDate: p.expiryDate || undefined,
       description: p.description,
     };
   }

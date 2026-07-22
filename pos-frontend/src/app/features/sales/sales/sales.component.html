@@ -85,6 +85,37 @@
       </div>
     </div>
 
+    <!-- Quick Pick Buttons (non-barcoded items) -->
+    @if (quickPicks().length > 0) {
+      <div class="mx-4 mt-3">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1">
+          {{ langService.currentLang() === 'km' ? 'ទំនិញគ្មានបាកូដ' : 'Quick Items' }}
+        </p>
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          @for (item of quickPicks(); track item.id) {
+            <button
+              (click)="addQuickPick(item)"
+              [class.bg-slate-800]="theme.isDark()"
+              [class.border-slate-700]="theme.isDark()"
+              [class.hover\:bg-slate-700]="theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.border-slate-200]="!theme.isDark()"
+              [class.hover\:bg-indigo-50]="!theme.isDark()"
+              [class.hover\:border-indigo-300]="!theme.isDark()"
+              class="flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-sm active:scale-95"
+              type="button"
+            >
+              @if (item.icon) {
+                <span class="text-lg">{{ item.icon }}</span>
+              }
+              <span>{{ langService.currentLang() === 'km' && item.labelKh ? item.labelKh : item.label }}</span>
+              <span class="text-indigo-600 font-bold">${{ item.price.toFixed(2) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Low-stock alert bar -->
     @if (productService.lowStockProducts().length > 0) {
       <div
@@ -93,7 +124,7 @@
         [class.border-amber-700\/40]="theme.isDark()"
         [class.bg-amber-50]="!theme.isDark()"
         [class.border-amber-200]="!theme.isDark()"
-        class="mx-4 mt-3 border rounded-xl p-3 flex items-center gap-3"
+        class="mx-4 mt-2 border rounded-xl p-3 flex items-center gap-3"
       >
         <svg
           class="w-5 h-5 text-amber-600 flex-shrink-0"
@@ -397,6 +428,7 @@
 <app-payment-modal
   *ngIf="showPayment"
   [total]="cart.total()"
+  [subtotal]="cart.subtotal()"
   (paid)="onPaymentComplete($event)"
   (cancel)="showPayment = false"
 ></app-payment-modal>

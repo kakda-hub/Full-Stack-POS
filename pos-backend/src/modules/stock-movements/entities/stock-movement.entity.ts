@@ -47,6 +47,10 @@ export class StockMovement {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   price: number; // Snapshot of selling price at time of movement
 
+  /** Expiry date of this batch (for perishable goods) */
+  @Column({ name: 'expiry_date', type: 'date', nullable: true })
+  expiryDate: string;
+
   @Column({ type: 'text', nullable: true })
   note: string;
 

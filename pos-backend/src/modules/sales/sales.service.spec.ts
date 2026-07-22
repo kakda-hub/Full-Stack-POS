@@ -4,6 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { Sale, PaymentMethod } from './entities/sale.entity';
+import { Customer } from '../customers/entities/customer.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { StockMovement } from '../stock-movements/entities/stock-movement.entity';
@@ -38,6 +39,8 @@ describe('SalesService', () => {
     price: 1.5,
     costPrice: 0.8,
     stock: 100,
+    lowStockThreshold: 10,
+    expiryDate: null,
     categoryId: 1,
     description: 'Carbonated soft drink',
     imgUrl: null,
@@ -56,6 +59,10 @@ describe('SalesService', () => {
     tax: 0,
     total: 3.0,
     paymentMethod: PaymentMethod.CASH,
+    customerId: null,
+    pointsEarned: 0,
+    pointsRedeemed: 0,
+    loyaltyDiscount: 0,
     createdAt: new Date(),
     items: [],
   };
@@ -109,6 +116,10 @@ describe('SalesService', () => {
           useValue: {
             create: jest.fn().mockReturnValue({}),
           },
+        },
+        {
+          provide: getRepositoryToken(Customer),
+          useValue: {},
         },
         {
           provide: getDataSourceToken(),

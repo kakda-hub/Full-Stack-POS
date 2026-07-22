@@ -8,12 +8,14 @@
     @modalAnimation
     [class.bg-slate-800]="theme.isDark()"
     [class.bg-white]="!theme.isDark()"
-    class="relative rounded-2xl shadow-2xl w-full max-w-md"
+    class="relative rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto"
   >
     <div
       [class.border-slate-700]="theme.isDark()"
       [class.border-slate-100]="!theme.isDark()"
-      class="px-6 py-4 border-b flex items-center justify-between"
+      class="px-6 py-4 border-b flex items-center justify-between sticky top-0 z-10"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
     >
       <h2 class="text-lg font-bold text-slate-800">
         {{ lang.currentLang() === 'km' ? 'ជ្រើសរើសការទូទាត់' : 'Choose Payment' }}
@@ -35,13 +37,147 @@
       </button>
     </div>
 
-    <div class="p-6 space-y-5">
+    <div class="p-6 space-y-4">
+      <!-- Customer Phone Search -->
+      <div>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+          {{ lang.currentLang() === 'km' ? 'អតិថិជន (ស្រេចចិត្ត)' : 'Customer (optional)' }}
+        </p>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <input
+              #phoneInput
+              type="tel"
+              [value]="customerPhone()"
+              (input)="onPhoneSearch(phoneInput.value)"
+              [placeholder]="lang.currentLang() === 'km' ? 'បញ្ចូលលេខទូរស័ព្ទ...' : 'Enter phone number...'"
+              class="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+            />
+          </div>
+          @if (customer()) {
+            <button
+              (click)="clearCustomer()"
+              class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-all text-sm"
+            >
+              {{ lang.currentLang() === 'km' ? 'សម្អាត' : 'Clear' }}
+            </button>
+          }
+        </div>
+
+        <!-- Searching indicator -->
+        @if (customerSearching()) {
+          <div class="mt-2 flex items-center gap-2 text-sm text-slate-400">
+            <span class="w-4 h-4 border-2 border-slate-300 border-t-indigo-500 rounded-full animate-spin"></span>
+            {{ lang.currentLang() === 'km' ? 'កំពុងស្វែងរក...' : 'Searching...' }}
+          </div>
+        }
+
+        <!-- Not found -->
+        @if (customerNotFound() && customerPhone().length >= 3) {
+          <div class="mt-2 text-sm text-amber-600 bg-amber-50 rounded-xl px-3 py-2">
+            {{ lang.currentLang() === 'km' ? 'រកមិនឃើញអតិថិជន' : 'Customer not found' }}
+          </div>
+        }
+
+        <!-- Search error -->
+        @if (customerSearchError()) {
+          <div class="mt-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
+            {{ lang.currentLang() === 'km' ? 'បរាជ័យក្នុងការស្វែងរក សូមព្យាយាមម្តងទៀត' : 'Search failed, please try again' }}
+          </div>
+        }
+
+        <!-- Customer found card -->
+        @if (customer(); as c) {
+          <div class="mt-2 bg-indigo-50 rounded-xl p-3 border border-indigo-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-bold text-slate-800 text-sm">{{ c.name }}</p>
+                <p class="text-xs text-slate-500">📞 {{ c.phone }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-black text-indigo-600">{{ c.loyaltyPoints }}</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-wider">
+                  {{ lang.currentLang() === 'km' ? 'ពិន្ទុ' : 'Points' }}
+                </p>
+              </div>
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-slate-500">
+              <span>{{ lang.currentLang() === 'km' ? 'បានចំណាយ' : 'Spent' }}: ${{ c.totalSpent.toFixed(2) }}</span>
+              <span>{{ lang.currentLang() === 'km' ? 'ការទិញ' : 'Purchases' }}: {{ c.totalPurchases }}</span>
+            </div>
+          </div>
+
+          <!-- Redeem points toggle -->
+          @if (c.loyaltyPoints >= 100) {
+            <div class="mt-2">
+              <button
+                (click)="toggleRedeem()"
+                class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all"
+              >
+                {{ showRedeemInput()
+                  ? (lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel')
+                  : (lang.currentLang() === 'km' ? 'ប្តូរពិន្ទុយកបញ្ចុះតម្លៃ' : 'Redeem points for discount')
+                }}
+              </button>
+
+              @if (showRedeemInput()) {
+                <div class="mt-2 bg-white rounded-xl p-3 border border-slate-200 space-y-2">
+                  <p class="text-xs font-semibold text-slate-600">
+                    {{ lang.currentLang() === 'km' ? 'ពិន្ទុដែលអាចប្តូរបាន' : 'Available' }}: {{ c.loyaltyPoints }} pts
+                    ({{ lang.currentLang() === 'km' ? '100 ពិន្ទុ = $1' : '100 pts = $1' }})
+                  </p>
+                  <div class="flex gap-2">
+                    <input
+                      type="number"
+                      [value]="pointsToRedeem()"
+                      #ptsInput
+                      (input)="setPointsToRedeem(ptsInput.value)"
+                      [max]="c.loyaltyPoints"
+                      step="100"
+                      class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:border-indigo-500"
+                      placeholder="0"
+                    />
+                    <button
+                      (click)="setPointsToRedeem(c.loyaltyPoints)"
+                      class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-600 transition-all"
+                    >
+                      {{ lang.currentLang() === 'km' ? 'អតិបរមា' : 'Max' }}
+                    </button>
+                  </div>
+                  @if (loyaltyDiscount() > 0) {
+                    <div class="bg-emerald-50 rounded-lg px-3 py-2 flex justify-between items-center">
+                      <span class="text-xs font-semibold text-emerald-700">
+                        {{ lang.currentLang() === 'km' ? 'បញ្ចុះតម្លៃ' : 'Discount' }}
+                      </span>
+                      <span class="text-lg font-black text-emerald-600">-${{ loyaltyDiscount().toFixed(2) }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
       <!-- Total display -->
       <div class="bg-indigo-50 rounded-2xl p-4 text-center">
         <p class="text-sm text-indigo-600 font-medium mb-1">
           {{ lang.currentLang() === 'km' ? 'ចំនួនទូទាត់' : 'Amount Due' }}
         </p>
-        <p class="text-4xl font-black text-indigo-700">${{ total.toFixed(2) }}</p>
+        <p class="text-4xl font-black text-indigo-700">${{ effectiveTotal().toFixed(2) }}</p>
+        @if (loyaltyDiscount() > 0) {
+          <p class="text-xs text-indigo-400 mt-1">
+            <s>${{ total.toFixed(2) }}</s>  ({{ lang.currentLang() === 'km' ? 'បញ្ចុះ' : 'saved' }} ${{ loyaltyDiscount().toFixed(2) }})
+          </p>
+        }
+        @if (customer()) {
+          <p class="text-xs text-indigo-400 mt-1">
+            ⭐ +{{ pointsEarned() }} {{ lang.currentLang() === 'km' ? 'ពិន្ទុនឹងទទួល' : 'points to earn' }}
+          </p>
+        }
       </div>
 
       <!-- Payment Method -->
@@ -52,7 +188,7 @@
         <div class="grid grid-cols-3 gap-3">
           <button
             *ngFor="let method of methods"
-            (click)="selectedMethod.set(method.id)"
+            (click)="onMethodChange(method.id)"
             [class]="
               selectedMethod() === method.id
                 ? 'flex flex-col items-center gap-2 p-3 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 transition-all'
@@ -77,7 +213,7 @@
           </label>
           <input
             type="number"
-            [min]="total"
+            [min]="effectiveTotal()"
             step="0.25"
             [(ngModel)]="cashReceived"
             (ngModelChange)="onCashChange()"
@@ -112,20 +248,76 @@
         </div>
       </div>
 
-      <!-- ABA/Card info -->
+      <!-- ABA: KHQR QR Code Display -->
+      <div *ngIf="selectedMethod() === 'aba'">
+        @if (qrLoading()) {
+          <div class="bg-slate-50 rounded-xl p-6 text-center">
+            <div class="w-8 h-8 border-2 border-slate-300 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-sm text-slate-500">
+              {{ lang.currentLang() === 'km' ? 'កំពុងបង្កើត QR...' : 'Generating QR Code...' }}
+            </p>
+          </div>
+        }
+
+        @if (qrError()) {
+          <div class="bg-rose-50 rounded-xl p-6 text-center">
+            <span class="text-3xl block mb-2">❌</span>
+            <p class="text-sm font-semibold text-rose-700">
+              {{ lang.currentLang() === 'km' ? 'មិនអាចបង្កើត QR បានទេ' : 'Failed to generate QR code' }}
+            </p>
+            <button
+              (click)="generateKhqr()"
+              class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-100 hover:bg-rose-200 px-4 py-2 rounded-lg transition-all"
+            >
+              {{ lang.currentLang() === 'km' ? 'ព្យាយាមម្តងទៀត' : 'Try Again' }}
+            </button>
+          </div>
+        }
+
+        @if (qrImage() && !qrLoading()) {
+          <div class="bg-white rounded-2xl p-4 border-2 border-indigo-100 shadow-sm text-center">
+            <div class="flex items-center justify-center mb-2">
+              <img [src]="qrImage()" alt="ABA KHQR" class="w-56 h-56" />
+            </div>
+            <p class="text-xs font-semibold text-indigo-600 mb-1">
+              {{ lang.currentLang() === 'km' ? 'ស្កែនដើម្បីបង់ប្រាក់' : 'Scan to pay with ABA Mobile' }}
+            </p>
+            <p class="text-2xl font-black text-slate-800">${{ effectiveTotal().toFixed(2) }}</p>
+          </div>
+        }
+
+        @if (!qrImage() && !qrLoading() && !qrError()) {
+          <div
+            class="bg-slate-50 rounded-xl p-6 text-center"
+          >
+            <span class="text-4xl block mb-2">📱</span>
+            <p class="text-sm text-slate-500">
+              {{
+                lang.currentLang() === 'km'
+                  ? 'ស្កែន QR ABA ដើម្បីបង់ប្រាក់'
+                  : 'Scan ABA QR Code to pay'
+              }}
+            </p>
+            <button
+              (click)="generateKhqr()"
+              class="mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-all"
+            >
+              {{ lang.currentLang() === 'km' ? 'បង្កើត QR' : 'Generate QR' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Card info -->
       <div
-        *ngIf="selectedMethod() !== 'cash'"
+        *ngIf="selectedMethod() === 'card'"
         class="bg-slate-50 rounded-xl p-4 text-center text-slate-500 text-sm"
       >
-        <span class="text-3xl block mb-2">{{ selectedMethod() === 'aba' ? '📱' : '💳' }}</span>
+        <span class="text-3xl block mb-2">💳</span>
         {{
           lang.currentLang() === 'km'
-            ? selectedMethod() === 'aba'
-              ? 'ស្កែន QR ABA'
-              : 'ដោះស្លាកកាត'
-            : selectedMethod() === 'aba'
-              ? 'Scan ABA QR Code'
-              : 'Swipe/tap card'
+            ? 'ដោះស្លាកកាត'
+            : 'Swipe/tap card'
         }}
       </div>
 

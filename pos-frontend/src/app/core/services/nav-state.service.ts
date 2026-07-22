@@ -17,6 +17,10 @@ export class NavStateService {
     { label: 'POS Sale', labelKm: 'លក់', route: '/sales', icon: 'sale' },
     { label: 'Sales History', labelKm: 'ប្រវត្តិលក់', route: '/sales-history', icon: 'history' },
     { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
+    { label: 'Quick Picks', labelKm: 'ទំនិញរហ័ស', route: '/quick-picks', icon: 'product' },
+    { label: 'Purchase Orders', labelKm: 'បញ្ជាទិញ', route: '/purchase-orders', icon: 'purchase-order' },
+    { label: 'Stock Movements', labelKm: 'ចលនាស្តុក', route: '/stock-movements', icon: 'stock-movement' },
+    { label: 'Suppliers', labelKm: 'អ្នកផ្គត់ផ្គង់', route: '/suppliers', icon: 'supplier' },
     { label: 'Report', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
     {
       label: 'Management',
@@ -24,7 +28,6 @@ export class NavStateService {
       route: '/settings',
       icon: 'management',
       subMenus: [
-        { label: 'Page Permission Mgmt', labelKm: 'ការគ្រប់គ្រងការអនុញ្ញាតទំព័រ', route: '/page-permission-management', icon: 'permission' },
         { label: 'Management Page', labelKm: 'គ្រប់គ្រង់ទំព័រ', route: '/management-page', icon: 'management' },
         { label: 'User Management', labelKm: 'ការគ្រប់គ្រងអ្នកប្រើ', route: '/user-management', icon: 'user' },
         { label: 'User Role', labelKm: 'តួនាទីអ្នកប្រើ', route: '/user-role', icon: 'role' },
