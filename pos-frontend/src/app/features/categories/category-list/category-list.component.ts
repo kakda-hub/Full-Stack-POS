@@ -18,6 +18,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './category-list.component.html',
+  styleUrl: './category-list.component.scss',
 })
 export class CategoryListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);

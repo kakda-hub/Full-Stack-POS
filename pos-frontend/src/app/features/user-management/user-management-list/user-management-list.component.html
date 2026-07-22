@@ -1,0 +1,186 @@
+<div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+  <!-- Header -->
+  <div class="header-row">
+    <app-breadcrumb></app-breadcrumb>
+    <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="editingItem = null; openDialog()">
+      <span>{{ 'button.addNew' | translate }}</span>
+    </app-ui-button>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-3 gap-2 sm:gap-4">
+    <div @fadeIn class="stat-card">
+      <div class="stat-value">{{ totalUsers() }}</div>
+      <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើទាំងអស់' : 'Total Users' }}</div>
+    </div>
+    <div @fadeIn class="stat-card">
+      <div class="stat-value--indigo">{{ adminCount() }}</div>
+      <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admins' }}</div>
+    </div>
+    <div @fadeIn class="stat-card">
+      <div class="stat-value--emerald">{{ cashierCount() }}</div>
+      <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</div>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="filters-bar">
+    <div class="search-wrapper">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        aria-label="Search"
+        type="text"
+        (input)="onSearch($event)"
+        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកអ្នកប្រើ...' : 'Search users...'"
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading()" class="space-y-3">
+    <div *ngFor="let i of [1,2,3,4]" class="skeleton-row">
+      <app-skeleton variant="table-row"></app-skeleton>
+    </div>
+  </div>
+
+  <!-- ===== DESKTOP: Table ===== -->
+  <div *ngIf="!isLoading()" class="table-container">
+    <div class="table-overflow">
+      <table class="table">
+        <thead class="table-thead">
+          <tr>
+            <th class="th th--left">{{ lang.currentLang() === 'km' ? 'ល.រ' : 'No.' }}</th>
+            <th class="th th--left">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើ' : 'User' }}</th>
+            <th class="th th--left">{{ lang.currentLang() === 'km' ? 'អ៊ីមែល' : 'Email' }}</th>
+            <th class="th th--left">{{ lang.currentLang() === 'km' ? 'តួនាទី' : 'Role' }}</th>
+            <th class="th th--left">{{ lang.currentLang() === 'km' ? 'ស្ថានភាព' : 'Status' }}</th>
+            <th class="th th--right">{{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}</th>
+          </tr>
+        </thead>
+        <tbody [@listAnimation]="paginatedItems().length" class="table-tbody">
+          <tr *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="table-row">
+            <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
+            <td class="td">
+              <div class="flex items-center gap-3">
+                @if (item.avatarUrl) {
+                  <img
+                    class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50"
+                    [src]="item.avatarUrl"
+                    [alt]="item.name"
+                  />
+                } @else {
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+                    <span class="text-xs font-bold text-white">{{ (item.name || '?').charAt(0).toUpperCase() }}</span>
+                  </div>
+                }
+                <div>
+                  <span class="font-semibold text-slate-800 dark:text-slate-100">{{ item.name }}</span>
+                  <div class="text-xs text-slate-400">@{{ item.username }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="td text-slate-600 dark:text-slate-300">{{ item.email }}</td>
+            <td class="td">
+              <span [class]="'text-xs font-bold px-2.5 py-1 rounded-lg capitalize ' + (item.role === 'admin' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300')">
+                {{ item.role }}
+              </span>
+            </td>
+            <td class="td">
+              <span [class]="'inline-flex items-center gap-1.5 text-xs font-semibold ' + (item.status === 'active' ? 'text-emerald-600' : 'text-slate-400')">
+                <span [class]="'w-2 h-2 rounded-full ' + (item.status === 'active' ? 'bg-emerald-400' : 'bg-slate-300')"></span>
+                {{ item.status }}
+              </span>
+            </td>
+            <td class="td td--right">
+              <div class="actions-cell">
+                <button type="button" aria-label="Edit" (click)="openEdit(item)" class="action-btn action-btn--edit">
+                  <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button type="button" aria-label="Delete" (click)="deleteItem(item)" class="action-btn action-btn--delete">
+                  <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="paginatedItems().length === 0">
+            <td colspan="6" class="empty-state-cell">
+              <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              <p class="empty-state-text">
+                {{ lang.currentLang() === 'km' ? 'គ្មានអ្នកប្រើ' : 'No users found' }}
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <app-pagination
+        [totalItems]="filteredItems().length"
+        [pageSize]="pageSize()"
+        [currentPage]="pageIndex() + 1"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
+    </div>
+
+    <!-- ===== MOBILE: Cards ===== -->
+    <div class="pl-mobile-cards">
+      <div *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
+        <div class="pl-card-header">
+          <div class="flex items-center gap-3">
+            @if (item.avatarUrl) {
+              <img class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50" [src]="item.avatarUrl" [alt]="item.name" />
+            } @else {
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+                <span class="text-sm font-bold text-white">{{ (item.name || '?').charAt(0).toUpperCase() }}</span>
+              </div>
+            }
+            <div>
+              <span class="pl-card-title">{{ item.name }}</span>
+              <div class="text-xs text-slate-400">@{{ item.username }}</div>
+            </div>
+          </div>
+          <span [class]="'w-2.5 h-2.5 rounded-full ' + (item.status === 'active' ? 'bg-emerald-400' : 'bg-slate-300')"></span>
+        </div>
+        <div class="pl-card-body">
+          <div class="pl-card-field">
+            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'អ៊ីមែល' : 'Email' }}</span>
+            <span class="pl-card-value">{{ item.email }}</span>
+          </div>
+          <div class="pl-card-field">
+            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'តួនាទី' : 'Role' }}</span>
+            <span [class]="'text-xs font-bold px-2.5 py-0.5 rounded-lg capitalize ' + (item.role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700')">
+              {{ item.role }}
+            </span>
+          </div>
+        </div>
+        <div class="pl-card-actions">
+          <button type="button" (click)="openEdit(item)" class="pl-card-action-btn pl-card-action-btn--edit">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>{{ lang.currentLang() === 'km' ? 'កែ' : 'Edit' }}</span>
+          </button>
+          <button type="button" (click)="deleteItem(item)" class="pl-card-action-btn pl-card-action-btn--delete">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>{{ lang.currentLang() === 'km' ? 'លុប' : 'Delete' }}</span>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="paginatedItems().length === 0" class="pl-cards-empty">
+        <p class="text-sm font-medium text-slate-400">
+          {{ lang.currentLang() === 'km' ? 'គ្មានអ្នកប្រើ' : 'No users found' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

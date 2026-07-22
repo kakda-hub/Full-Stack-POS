@@ -7,6 +7,7 @@ import { LanguageService } from '../../../core/services/language.service';
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.component.html',
+  styleUrl: './reset-password.component.scss',
   standalone: false
 })
 export class ResetPasswordComponent implements OnInit {

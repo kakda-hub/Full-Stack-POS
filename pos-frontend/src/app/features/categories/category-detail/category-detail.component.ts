@@ -14,6 +14,7 @@ import { CloudinaryService } from '../../../core/services/api/cloudinary.service
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [modalAnimation, backdropAnimation],
   templateUrl: './category-detail.component.html',
+  styleUrl: './category-detail.component.scss',
 })
 export class CategoryDetailComponent implements OnInit {
   form!: FormGroup;

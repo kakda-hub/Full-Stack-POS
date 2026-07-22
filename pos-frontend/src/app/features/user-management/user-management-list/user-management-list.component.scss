@@ -1,0 +1,235 @@
+/* ==========================================================
+   User Management List Component Styles
+   ========================================================== */
+
+:host {
+  display: block;
+}
+
+/* ─── Header row ─── */
+.header-row {
+  @apply flex items-center justify-between;
+}
+
+/* ─── Stats cards ─── */
+.stat-card {
+  @apply rounded-xl border p-4;
+  @apply bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+}
+
+.stat-value {
+  @apply text-2xl font-black text-slate-900 dark:text-white;
+}
+
+.stat-value--indigo {
+  @apply text-2xl font-black text-indigo-600 dark:text-indigo-400;
+}
+
+.stat-value--emerald {
+  @apply text-2xl font-black text-emerald-600 dark:text-emerald-400;
+}
+
+.stat-label {
+  @apply text-xs font-semibold uppercase tracking-wider mt-0.5;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* ─── Filter bar ─── */
+.filters-bar {
+  @apply flex gap-2 sm:gap-3 flex-wrap;
+}
+
+/* ─── Search input ─── */
+.search-wrapper {
+  @apply relative flex-1 min-w-48;
+}
+
+.search-icon {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400;
+}
+
+.search-input {
+  @apply w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm;
+  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+  @apply bg-white border-slate-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100;
+}
+
+/* ─── Skeleton loading ─── */
+.skeleton-row {
+  @apply rounded-2xl border overflow-hidden;
+  @apply bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+}
+
+/* ─── Table container ─── */
+.table-container {
+  @apply rounded-2xl border overflow-hidden shadow-sm;
+  @apply bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+}
+
+.table-overflow {
+  @apply overflow-x-auto;
+}
+
+.table {
+  @apply w-full text-sm;
+}
+
+/* ─── Table header ─── */
+.table-thead {
+  @apply border-b bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-700;
+}
+
+.th {
+  @apply px-4 py-3 font-semibold text-slate-600 dark:text-slate-300;
+
+  &--left  { @apply text-left; }
+  &--right { @apply text-right; }
+}
+
+/* ─── Table body ─── */
+.table-tbody {
+  @apply divide-y divide-slate-100 dark:divide-slate-700/60;
+}
+
+/* ─── Table row ─── */
+.table-row {
+  @apply transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/60;
+}
+
+.td {
+  @apply px-4 py-3;
+
+  &--right { @apply text-right; }
+}
+
+/* ─── Action buttons ─── */
+.actions-cell {
+  @apply flex items-center justify-end gap-2;
+}
+
+.action-btn {
+  @apply p-1.5 rounded-lg transition-colors duration-200;
+
+  &--edit {
+    @apply text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/15;
+  }
+
+  &--delete {
+    @apply text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/15;
+  }
+}
+
+.action-icon {
+  @apply w-5 h-5;
+}
+
+/* ─── Empty state ─── */
+.empty-state-cell {
+  @apply px-4 py-16 text-center;
+}
+
+.empty-state-icon {
+  @apply w-12 h-12 mx-auto mb-3 opacity-30 text-slate-400;
+}
+
+.empty-state-text {
+  @apply text-sm text-slate-400;
+}
+
+/* ─── Dark mode extra polish ─── */
+:host-context(html.dark) {
+  .action-btn--edit:hover {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+
+  .action-btn--delete:hover {
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.12);
+  }
+}
+
+/* ===============================================
+   RESPONSIVE CARD LAYOUT (mobile)
+   =============================================== */
+
+.table-overflow {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.pl-mobile-cards {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    @apply p-3 space-y-3;
+  }
+}
+
+.pl-card {
+  @apply rounded-xl border p-4 transition-all duration-200;
+  @apply bg-white border-slate-200 shadow-sm;
+
+  &:active {
+    @apply shadow-md border-indigo-200;
+  }
+
+  &--dark {
+    @apply bg-slate-800 border-slate-700;
+
+    &:active {
+      @apply border-indigo-500/30 shadow-md;
+    }
+  }
+}
+
+.pl-card-header {
+  @apply flex items-start justify-between mb-3 pb-3 border-b;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.pl-card-title {
+  @apply text-base font-bold truncate;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.pl-card-body {
+  @apply space-y-2.5;
+}
+
+.pl-card-field {
+  @apply flex items-center justify-between gap-2;
+}
+
+.pl-card-label {
+  @apply text-xs font-semibold uppercase tracking-wider;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.pl-card-value {
+  @apply text-sm font-medium text-right;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.pl-card-actions {
+  @apply mt-3 pt-3 border-t flex justify-end gap-3;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.pl-card-action-btn {
+  @apply flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200;
+
+  &--edit {
+    @apply text-indigo-600 hover:bg-indigo-50 hover:shadow-sm;
+    @apply dark:text-indigo-400 dark:hover:bg-indigo-500/15;
+  }
+
+  &--delete {
+    @apply text-rose-600 hover:bg-rose-50 hover:shadow-sm;
+    @apply dark:text-rose-400 dark:hover:bg-rose-500/15;
+  }
+}
+
+.pl-cards-empty {
+  @apply px-4 py-16 text-center;
+}

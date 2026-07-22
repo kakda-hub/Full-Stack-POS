@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UserManagementListComponent } from './user-management-list/user-management-list.component';
 
 const routes: Routes = [
-  // { path: '', component:  },
+  { path: '', component: UserManagementListComponent },
 ];
 
 @NgModule({

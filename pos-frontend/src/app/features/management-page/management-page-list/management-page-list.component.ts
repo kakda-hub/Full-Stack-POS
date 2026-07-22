@@ -15,6 +15,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './management-page-list.component.html',
+  styleUrl: './management-page-list.component.scss',
 })
 export class ManagementPageListComponent implements OnInit, OnDestroy {
   

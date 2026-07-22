@@ -1,0 +1,46 @@
+/* ==========================================================
+   User Management Detail Component Styles
+   ========================================================== */
+
+:host {
+  display: block;
+}
+
+.mat-mdc-dialog-content {
+  --mat-dialog-content-padding: 0 24px;
+}
+
+/* ─── Dialog content padding ─── */
+.dialog-content {
+  padding-bottom: 0.5rem !important;
+}
+
+/* ─── Form body ─── */
+.form-body {
+  @apply flex flex-col gap-4;
+}
+
+/* ─── Form grid ─── */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* ─── Dialog actions ─── */
+.dialog-actions {
+  @apply w-full gap-3 px-6 pb-5 pt-1;
+}
+
+/* ─── Mat form field styling ─── */
+::ng-deep {
+  .form-field-outline {
+    .mat-mdc-text-field-wrapper {
+      border-radius: 12px !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      min-height: 44px;
+    }
+  }
+}
