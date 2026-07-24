@@ -112,8 +112,8 @@ export class StockMovementListComponent implements OnInit, OnDestroy {
     this.pageIndex.set(0);
   }
 
-  onProductFilter(productId: number | null): void {
-    this.selectedProductId.set(productId);
+  onProductFilter(productId: string | null): void {
+    this.selectedProductId.set(productId ? Number(productId) : null);
     this.applyFilters();
   }
 

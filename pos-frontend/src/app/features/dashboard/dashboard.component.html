@@ -1,0 +1,329 @@
+<div @pageTransition class="dash-wrapper">
+  <!-- ════════════════════ HEADER ════════════════════ -->
+  <div class="dash-header" @fadeIn>
+    <div class="dash-header-left">
+      <div>
+        <h1 class="dash-greeting">{{ greeting() }}</h1>
+        <p class="dash-date">{{ todayLabel() }}</p>
+      </div>
+    </div>
+    <div class="dash-header-right">
+      <!-- Live Indicator -->
+      <div class="dash-live-indicator">
+        <span class="dash-live-dot" [class.dash-live-dot--paused]="!isPolling()"></span>
+        <span class="dash-live-text">
+          @if (isPolling()) {
+            {{ lang.currentLang() === 'km' ? 'ផ្សាយផ្ទាល់' : 'LIVE' }}
+          } @else {
+            {{ lang.currentLang() === 'km' ? 'ផ្អាក' : 'PAUSED' }}
+          }
+        </span>
+        @if (lastRefreshed(); as time) {
+          <span class="dash-live-time">{{ formatRefreshTime(time) }}</span>
+        }
+      </div>
+
+      <!-- Pause / Resume -->
+      <button
+        (click)="togglePolling()"
+        class="dash-btn-icon dash-btn-pause"
+        [class.dash-btn-pause--active]="!isPolling()"
+        [title]="isPolling()
+          ? (lang.currentLang() === 'km' ? 'ផ្អាកធ្វើឱ្យស្រស់' : 'Pause auto-refresh')
+          : (lang.currentLang() === 'km' ? 'បន្តធ្វើឱ្យស្រស់' : 'Resume auto-refresh')"
+        [attr.aria-label]="isPolling() ? 'Pause auto-refresh' : 'Resume auto-refresh'"
+      >
+        @if (isPolling()) {
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+          </svg>
+        } @else {
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        }
+      </button>
+
+      <!-- Manual Refresh -->
+      <button
+        (click)="refresh()"
+        class="dash-btn-icon"
+        [class.dash-spin]="isLoading()"
+        [title]="lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh'"
+        aria-label="Refresh data"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+        </svg>
+      </button>
+
+      <!-- Full Reports -->
+      <button
+        (click)="goTo('/reports')"
+        class="dash-btn-primary"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+        </svg>
+        <span>{{ lang.currentLang() === 'km' ? 'របាយការណ៍ពេញ' : 'Full Reports' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════ KPI SKELETONS ══════════════ -->
+  @if (isLoading()) {
+    <div class="dash-kpi-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <app-skeleton variant="kpi-card"></app-skeleton>
+      }
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
+      @for (i of [1,2,3]; track i) {
+        <div class="dash-card">
+          <app-skeleton variant="text" width="140px" height="16px" class="block mb-4"></app-skeleton>
+          @for (j of [1,2,3]; track j) {
+            <app-skeleton variant="list-item"></app-skeleton>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══════════════ KPI CARDS ══════════════ -->
+  @if (!isLoading()) {
+    <div class="dash-kpi-grid">
+      <!-- Revenue -->
+      <div @fadeIn class="dash-kpi-card dash-kpi-indigo">
+        <div class="dash-kpi-top">
+          <div class="dash-kpi-icon dash-kpi-icon-indigo">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span class="dash-kpi-badge dash-badge-indigo">{{ lang.currentLang() === 'km' ? 'ថ្ងៃនេះ' : 'Today' }}</span>
+        </div>
+        <p class="dash-kpi-value">${{ (summary()?.totalRevenue ?? 0).toFixed(2) }}</p>
+        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ចំណូលសរុប' : 'Total Revenue' }}</p>
+        <div class="dash-kpi-footer">
+          <span class="dash-kpi-stat">{{ summary()?.averageOrderValue ? '$' + summary()!.averageOrderValue!.toFixed(2) : '$0.00' }}</span>
+          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? 'មធ្យម/ប្រតិបត្តិការ' : 'Avg / Order' }}</span>
+        </div>
+      </div>
+
+      <!-- Transactions -->
+      <div @fadeIn class="dash-kpi-card dash-kpi-emerald">
+        <div class="dash-kpi-top">
+          <div class="dash-kpi-icon dash-kpi-icon-emerald">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+        <p class="dash-kpi-value">{{ summary()?.totalSales ?? 0 }}</p>
+        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'Transactions' }}</p>
+        <div class="dash-kpi-footer">
+          <span class="dash-kpi-stat">{{ recentEntries().length }}</span>
+          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការថ្មី' : 'Recent sales' }}</span>
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div @fadeIn class="dash-kpi-card dash-kpi-amber">
+        <div class="dash-kpi-top">
+          <div class="dash-kpi-icon dash-kpi-icon-amber">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+            </svg>
+          </div>
+        </div>
+        <p class="dash-kpi-value">{{ totalProducts() }}</p>
+        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Total Products' }}</p>
+        <div class="dash-kpi-footer">
+          <span class="dash-kpi-stat">{{ (summary()?.totalSales ?? 0) > 0 ? (summary()!.totalRevenue! / summary()!.totalSales!).toFixed(2) : '0.00' }}</span>
+          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? '$/ប្រតិបត្តិការ' : 'Revenue / Sale' }}</span>
+        </div>
+      </div>
+
+      <!-- Alerts (Low Stock + Near Expiry) -->
+      <div @fadeIn class="dash-kpi-card dash-kpi-rose">
+        <div class="dash-kpi-top">
+          <div class="dash-kpi-icon dash-kpi-icon-rose">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <span class="dash-kpi-badge dash-badge-rose">{{ lang.currentLang() === 'km' ? 'ត្រូវការការយកចិត្តទុកដាក់' : 'Needs attention' }}</span>
+        </div>
+        <div class="dash-alert-stack">
+          <div class="dash-alert-item">
+            <span class="dash-alert-value">{{ lowStockCount() }}</span>
+            <span class="dash-alert-label">{{ lang.currentLang() === 'km' ? 'ស្តុកទាប' : 'Low Stock' }}</span>
+          </div>
+          <div class="dash-alert-divider"></div>
+          <div class="dash-alert-item">
+            <span class="dash-alert-value">{{ nearExpiryCount() }}</span>
+            <span class="dash-alert-label">{{ lang.currentLang() === 'km' ? 'ជិតផុតកំណត់' : 'Near Expiry' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ ROW 2: Quick Actions + Recent Activity + Top Products ══════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
+      <!-- Quick Actions -->
+      <div @fadeIn class="dash-card">
+        <h2 class="dash-card-title">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          {{ lang.currentLang() === 'km' ? 'សកម្មភាពរហ័ស' : 'Quick Actions' }}
+        </h2>
+        <div class="dash-actions-grid">
+          <button (click)="goTo('/sales')" class="dash-action-btn dash-action-sale">
+            <div class="dash-action-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+            </div>
+            <div>
+              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'លក់ទំនិញ' : 'New Sale' }}</p>
+              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'បង្កើតការលក់ថ្មី' : 'Create a new transaction' }}</p>
+            </div>
+          </button>
+
+          <button (click)="goTo('/products')" class="dash-action-btn dash-action-product">
+            <div class="dash-action-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
+              </svg>
+            </div>
+            <div>
+              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'បន្ថែមផលិតផល' : 'Add Product' }}</p>
+              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'បន្ថែមទំនិញចូលស្តុក' : 'Add new items to inventory' }}</p>
+            </div>
+          </button>
+
+          <button (click)="goTo('/reports')" class="dash-action-btn dash-action-report">
+            <div class="dash-action-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+              </svg>
+            </div>
+            <div>
+              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'មើលរបាយការណ៍' : 'View Reports' }}</p>
+              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'វិភាគប្រតិបត្តិការ' : 'Analyze sales performance' }}</p>
+            </div>
+          </button>
+
+          <button (click)="goTo('/stock-movements')" class="dash-action-btn dash-action-stock">
+            <div class="dash-action-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" /><path d="M12 3v6" />
+              </svg>
+            </div>
+            <div>
+              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'គ្រប់គ្រងស្តុក' : 'Manage Stock' }}</p>
+              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'ពិនិត្យស្តុកទំនិញ' : 'Update inventory levels' }}</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div @fadeIn class="dash-card">
+        <div class="dash-card-header">
+          <h2 class="dash-card-title">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            {{ lang.currentLang() === 'km' ? 'សកម្មភាពថ្មី' : 'Recent Activity' }}
+          </h2>
+          <button
+            (click)="goTo('/sales-history')"
+            class="dash-text-link"
+          >
+            {{ lang.currentLang() === 'km' ? 'មើលទាំងអស់' : 'View all' }}
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+
+        @if (recentEntries().length === 0) {
+          <div class="dash-empty">
+            <svg class="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <p class="dash-empty-text">{{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការថ្ងៃនេះ' : 'No transactions today' }}</p>
+          </div>
+        }
+
+        <div class="dash-activity-list">
+          @for (sale of recentEntries(); track sale.id) {
+            <div @fadeIn class="dash-activity-item">
+              <div class="dash-activity-icon">{{ getPaymentIcon(sale.method) }}</div>
+              <div class="dash-activity-body">
+                <div class="dash-activity-top">
+                  <span class="dash-activity-id">#{{ sale.id }}</span>
+                  <span class="dash-activity-amount">${{ sale.total.toFixed(2) }}</span>
+                </div>
+                <div class="dash-activity-meta">
+                  <span class="dash-activity-time">{{ formatTime(sale.time) }}</span>
+                  <span class="dash-activity-dot">·</span>
+                  <span class="dash-activity-cashier">{{ sale.cashier }}</span>
+                  <span class="dash-activity-method dash-badge-light">{{ sale.method }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Top Selling Products -->
+      <div @fadeIn class="dash-card">
+        <h2 class="dash-card-title">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><path d="M7 7h.01" />
+          </svg>
+          {{ lang.currentLang() === 'km' ? 'ផលិតផលលក់ដាច់ជាងគេ' : 'Top Sellers' }}
+        </h2>
+
+        @if (topProductEntries().length === 0) {
+          <div class="dash-empty">
+            <svg class="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><path d="M7 7h.01" />
+            </svg>
+            <p class="dash-empty-text">{{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data available' }}</p>
+          </div>
+        }
+
+        <div class="dash-top-list">
+          @for (product of topProductEntries(); track product.name; let i = $index) {
+            <div class="dash-top-item">
+              <div
+                class="dash-top-rank"
+                [class]="i === 0 ? 'dash-rank-gold' : i === 1 ? 'dash-rank-silver' : i === 2 ? 'dash-rank-bronze' : 'dash-rank-default'"
+              >
+                {{ i + 1 }}
+              </div>
+              <div class="dash-top-info">
+                <div class="dash-top-name">{{ product.name }}</div>
+                <div class="dash-top-bar-track">
+                  <div
+                    class="dash-top-bar-fill"
+                    [style.width.%]="product.pct"
+                    [class]="i === 0 ? 'bg-amber-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-orange-400' : 'bg-indigo-300'"
+                  ></div>
+                </div>
+              </div>
+              <div class="dash-top-stats">
+                <span class="dash-top-qty">{{ product.qty }}</span>
+                <span class="dash-top-revenue">${{ product.revenue.toFixed(0) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

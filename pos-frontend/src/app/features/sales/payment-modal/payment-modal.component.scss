@@ -1,0 +1,87 @@
+/* ─── Payment Method Buttons: Hover Scale + Glow ─── */
+.payment-method-btn {
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease,
+    border-color 0.2s ease;
+  will-change: transform;
+
+  &:hover:not(.payment-method-active) {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:
+      0 8px 20px -6px rgba(99, 102, 241, 0.2);
+  }
+
+  &:active:not(.payment-method-active) {
+    transform: translateY(0) scale(0.97);
+  }
+}
+
+.payment-method-active {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px -4px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Quick Cash Buttons: Subtle Lift + Indigo Fill ─── */
+.quick-cash-btn {
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 20px -6px rgba(99, 102, 241, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+/* ─── Confirm Button: Glow Pulse ─── */
+.confirm-payment-btn {
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      0 12px 28px -8px rgba(5, 150, 105, 0.4),
+      0 4px 12px -2px rgba(5, 150, 105, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+/* ─── Customer Search Input: Focus Ring ─── */
+.customer-search-input {
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:focus {
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+}
+
+/* ─── Reduce motion accessibility ─── */
+@media (prefers-reduced-motion: reduce) {
+  .payment-method-btn,
+  .quick-cash-btn,
+  .confirm-payment-btn,
+  .customer-search-input {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
+}

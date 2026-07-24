@@ -27,6 +27,12 @@ const routes: Routes = [
     canActivate: [authGuard, adminGuard],
     children: [
       {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.module').then((m) => m.DashboardModule),
+        data: { breadcrumb: 'Dashboard', labelKh: 'ទិដ្ឋភាពទូទៅ' }
+      },
+      {
         path: 'products',
         loadChildren: () =>
           import('./features/products/products.module').then((m) => m.ProductsModule),
@@ -108,7 +114,7 @@ const routes: Routes = [
       }
     ],
   },
-  // { path: '**', redirectTo: 'sales' },
+  // { path: '**', redirectTo: 'dashboard' },
   { path: '**', redirectTo: 'page-not-found' }
 
 ];

@@ -1,6 +1,7 @@
 <div
   @pageTransition
   [class.bg-slate-900]="theme.isDark()"
+  [class.bg-slate-50]="!theme.isDark()"
   class="flex h-full overflow-hidden relative"
 >
   <!-- LEFT: Product Grid -->
@@ -11,14 +12,18 @@
       [class.border-slate-700]="theme.isDark()"
       [class.bg-white]="!theme.isDark()"
       [class.border-slate-200]="!theme.isDark()"
-      class="border-b px-4 py-3 space-y-3 shadow-sm"
+      class="border-b px-4 py-3 space-y-3 shadow-sm bg-white"
     >
       <div class="flex gap-3">
         <!-- Toggle Button (Inside Bar, only visible when cart is closed) -->
         <button
           *ngIf="!isCartOpen()"
           (click)="toggleCartSidebar()"
-          class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors"
+          [class.bg-indigo-900\/30]="theme.isDark()"
+          [class.hover\:bg-indigo-800\/40]="theme.isDark()"
+          [class.bg-indigo-50]="!theme.isDark()"
+          [class.hover\:bg-indigo-100]="!theme.isDark()"
+          class="p-2.5 rounded-xl text-indigo-600 transition-colors"
           [title]="langService.currentLang() === 'km' ? 'បើកកន្ត្រកទំនិញ' : 'Open Cart'"
           [attr.aria-label]="langService.currentLang() === 'km' ? 'បើកកន្ត្រកទំនិញ' : 'Open Cart'"
           type="button"
@@ -60,9 +65,9 @@
             [class.bg-slate-700]="theme.isDark()"
             [class.border-slate-600]="theme.isDark()"
             [class.text-slate-100]="theme.isDark()"
-            [class.bg-slate-50]="!theme.isDark()"
+            [class.bg-slate-100]="!theme.isDark()"
             [class.border-slate-200]="!theme.isDark()"
-            class="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            class="w-full pl-9 pr-4 py-2.5 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
           />
         </div>
       </div>
@@ -74,8 +79,10 @@
           (click)="productService.setCategory(cat.id)"
           [class]="
             cat.id === productService.selectedCategory()
-              ? 'px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold whitespace-nowrap shadow-sm'
-              : 'px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium whitespace-nowrap transition-all'
+              ? 'px-4 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-semibold whitespace-nowrap shadow-sm'
+              : theme.isDark()
+                ? 'px-4 py-1.5 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium whitespace-nowrap transition-all'
+                : 'px-4 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium whitespace-nowrap transition-all'
           "
           type="button"
           aria-label="Toggle category"
@@ -102,7 +109,7 @@
               [class.border-slate-200]="!theme.isDark()"
               [class.hover\:bg-indigo-50]="!theme.isDark()"
               [class.hover\:border-indigo-300]="!theme.isDark()"
-              class="flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-sm active:scale-95"
+              class="flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-sm active:scale-95 quick-pick-btn"
               type="button"
             >
               @if (item.icon) {
@@ -140,7 +147,7 @@
           />
         </svg>
         <div class="flex-1">
-          <p class="text-sm text-amber-800 font-medium">
+          <p [class.text-amber-300]="theme.isDark()" [class.text-amber-800]="!theme.isDark()" class="text-sm font-medium">
             {{ productService.lowStockProducts().length }}
             {{ langService.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}:
             @for (p of productService.lowStockProducts(); track p.id; let last = $last) {
@@ -164,14 +171,16 @@
       <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         <div
           *ngFor="let i of [1, 2, 3, 4, 8]"
-          class="h-40 bg-slate-100 animate-pulse rounded-2xl"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.bg-slate-100]="!theme.isDark()"
+          class="h-40 animate-pulse rounded-2xl"
         ></div>
       </div>
 
       <div
         *ngIf="!isLoadingProducts()"
         [@listAnimation]="productService.filteredProducts().length"
-        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3"
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
         <button
           *ngFor="let product of productService.filteredProducts(); trackBy: trackById"
@@ -182,8 +191,12 @@
           [class.border-slate-700]="theme.isDark()"
           [class.bg-white]="!theme.isDark()"
           [class.border-slate-200]="!theme.isDark()"
+          [class.ring-2]="isInCart(product)"
+          [class.ring-indigo-500]="isInCart(product)"
+          [class.bg-blue-900\/20]="isInCart(product) && theme.isDark()"
+          [class.bg-blue-50]="isInCart(product) && !theme.isDark()"
           [class.animate-shake]="shakingProductId() === product.id"
-          class="relative overflow-hidden rounded-2xl border p-3 text-left product-card-hover product-card-ripple active:scale-95 transition-all group"
+          class="relative overflow-hidden rounded-2xl border p-0 text-left shadow-sm product-card-hover product-card-ripple group"
         >
           <!-- Stock add animation indicator -->
           @if (lastAddedId() === product.id) {
@@ -209,26 +222,40 @@
               {{ langService.currentLang() === 'km' ? 'អស់' : 'Out' }}
             </span>
           }
-          <img
-            [src]="product.imgUrl || getProductPhoto(product.category)"
-            [alt]="product.name"
-            [class.opacity-40]="avail <= 0"
-            class="w-full h-20 rounded-xl mb-3 object-cover"
-          />
-          <div class="space-y-1">
-            <p class="text-xs font-semibold text-slate-800 leading-tight line-clamp-2">
+          <div class="relative mb-3">
+            <!-- Cart quantity badge (top-left) -->
+            @let qty = cartQuantity(product);
+            @if (qty > 0) {
+              <span
+                class="cart-qty-badge absolute top-2 left-2 z-10"
+                [@counterAnimation]="qty"
+              >
+                {{ qty }}
+              </span>
+            }
+            <img
+              [src]="product.imgUrl || getProductPhoto(product.category)"
+              [alt]="product.name"
+              [class.opacity-40]="avail <= 0"
+              class="w-full h-36 object-cover rounded-t-2xl transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <div class="space-y-1.5 px-3 pb-3.5">
+            <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1">
               {{
                 langService.currentLang() === 'km' ? product.nameKm || product.name : product.name
               }}
             </p>
-            <p class="text-indigo-600 font-bold text-sm">${{ product.price.toFixed(2) }}</p>
+            <p
+              [class.group-hover\:text-indigo-400]="theme.isDark()"
+              [class.group-hover\:text-indigo-800]="!theme.isDark()"
+              class="text-base font-bold text-indigo-600 transition-all duration-200 group-hover:scale-105 origin-left"
+            >${{ product.price.toFixed(2) }}</p>
             @if (avail <= 0) {
               <p class="text-[10px] text-rose-500 uppercase font-bold tracking-wider">
                 {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
               </p>
-            } @else {
-              <p
-                class="text-[10px] uppercase tracking-wider"
+            } @else {              <p [class.text-slate-400]="theme.isDark()" class="text-xs text-slate-500 font-medium uppercase tracking-wider"
                 [class.animate-stock-flash]="lastAddedId() === product.id"
                 [class.text-rose-500]="lastAddedId() === product.id"
                 [class.font-bold]="lastAddedId() === product.id"
@@ -244,14 +271,14 @@
     </div>
   </div>
 
-  <!-- RIGHT: Cart Sidebar -->
+  <!-- RIGHT: Cart Sidebar (Desktop) -->
   <div
     [@sidebarAnimation]="isCartOpen() ? 'open' : 'closed'"
     [class.bg-slate-800]="theme.isDark()"
     [class.border-slate-700]="theme.isDark()"
     [class.bg-white]="!theme.isDark()"
     [class.border-slate-200]="!theme.isDark()"
-    class="w-80 xl:w-96 border-l flex flex-col shadow-2xl z-20 overflow-hidden [@media(max-width:500px)]:absolute [@media(max-width:500px)]:right-0 [@media(max-width:500px)]:h-full"
+    class="hidden md:flex w-80 xl:w-96 border-l flex-col shadow-sm z-20 overflow-hidden"
   >
     <!-- Cart Header -->
     <div
@@ -264,7 +291,12 @@
           type="button"
           aria-label="Toggle cart"
           (click)="toggleCartSidebar()"
-          class="p-1 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+          [class.hover\:bg-slate-600]="theme.isDark()"
+          [class.text-slate-500]="theme.isDark()"
+          [class.hover\:text-slate-300]="theme.isDark()"
+          [class.hover\:bg-slate-100]="!theme.isDark()"
+          [class.hover\:text-slate-600]="!theme.isDark()"
+          class="p-1 rounded-lg transition-colors text-slate-400"
           [title]="langService.currentLang() === 'km' ? 'បិទកន្ត្រកទំនិញ' : 'Close Cart'"
           [attr.aria-label]="langService.currentLang() === 'km' ? 'បិទកន្ត្រកទំនិញ' : 'Close Cart'"
         >
@@ -277,7 +309,7 @@
             />
           </svg>
         </button>
-        <h2 class="font-bold text-slate-800">
+        <h2 [class.text-slate-100]="theme.isDark()" class="font-bold text-slate-800">
           {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}
         </h2>
       </div>
@@ -319,11 +351,13 @@
         *ngFor="let item of cart.items(); trackBy: trackByProductId"
         @cartItemAnimation
         [class.bg-slate-700]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
         [class.bg-slate-50]="!theme.isDark()"
-        class="rounded-xl p-3 border border-transparent hover:border-indigo-200 transition-all"
+        [class.border-slate-100]="!theme.isDark()"
+        class="rounded-lg p-3 border hover:border-indigo-200 transition-all"
       >
         <div class="flex justify-between gap-2 mb-2">
-          <p class="text-sm font-semibold text-slate-800 line-clamp-1">
+          <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1">
             {{
               langService.currentLang() === 'km'
                 ? item.product.nameKm || item.product.name
@@ -334,6 +368,7 @@
             type="button"
             aria-label="Remove item"
             (click)="cart.removeItem(item.product.id)"
+            [class.text-slate-400]="theme.isDark()"
             class="text-slate-300 hover:text-rose-500"
             [title]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
             [attr.aria-label]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
@@ -352,7 +387,12 @@
           <div class="flex items-center gap-2">
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
-              class="w-7 h-7 rounded-lg border bg-white flex items-center justify-center text-slate-600"
+              [class.border-slate-600]="theme.isDark()"
+              [class.bg-slate-600]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.text-slate-600]="!theme.isDark()"
+              class="w-7 h-7 rounded-lg border flex items-center justify-center"
               [title]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
               [attr.aria-label]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
             >
@@ -362,7 +402,12 @@
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
               [disabled]="item.quantity >= item.product.stock"
-              class="w-7 h-7 rounded-lg border bg-white flex items-center justify-center text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
+              [class.border-slate-600]="theme.isDark()"
+              [class.bg-slate-600]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.text-slate-600]="!theme.isDark()"
+              class="w-7 h-7 rounded-lg border flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
               [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
               [attr.aria-label]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
             >
@@ -384,22 +429,22 @@
       [class.border-slate-100]="!theme.isDark()"
       class="border-t p-4 space-y-4 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]"
     >
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between text-slate-500">
+      <div [class.border-slate-700]="theme.isDark()" class="space-y-2 text-sm border-t border-slate-100 pt-3">
+        <div [class.text-slate-400]="theme.isDark()" class="flex justify-between text-slate-500">
           <span>{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
           <div class="relative h-5 overflow-hidden text-right">
             @if (showOldSubtotal()) {
-              <span class="absolute inset-0 font-bold text-slate-700 flex items-center justify-end" @slideOut>
+              <span [class.text-slate-300]="theme.isDark()" class="absolute inset-0 font-bold text-slate-700 flex items-center justify-end" @slideOut>
                 ${{ prevSubtotalVal.toFixed(2) }}
               </span>
             }
-            <span class="font-bold text-slate-700" @slideIn>
+            <span [class.text-slate-300]="theme.isDark()" class="font-bold text-slate-700" @slideIn>
               ${{ cart.subtotal().toFixed(2) }}
             </span>
           </div>
         </div>
-        <div class="flex justify-between text-lg font-black text-slate-900 border-t pt-2">
-          <span>{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+        <div [class.border-slate-700]="theme.isDark()" class="flex justify-between text-lg font-extrabold text-slate-900 border-t border-slate-100 pt-3">
+          <span [class.text-slate-100]="theme.isDark()">{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
           <div class="relative h-6 overflow-hidden text-right">
             @if (showOldTotal()) {
               <span class="absolute inset-0 text-indigo-600 flex items-center justify-end" @slideOut>
@@ -416,12 +461,230 @@
       <button
         [disabled]="cart.items().length === 0"
         (click)="showPayment = true"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-100 active:scale-[0.98]"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+        [class.shadow-indigo-800\/30]="theme.isDark()"
+        [class.shadow-indigo-200]="!theme.isDark()"
       >
         {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
       </button>
     </div>
   </div>
+
+  <!-- MOBILE: Bottom Cart Peek Bar -->
+  @if (isMobile() && cart.items().length > 0) {
+    <div
+      [class.bg-slate-800]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+      (click)="toggleCartSidebar()"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t px-4 py-3 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] cursor-pointer active:scale-[0.99] transition-transform mobile-peek-bar safe-area-bottom"
+    >
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span
+            class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1"
+            [@counterAnimation]="cart.itemCount()"
+          >
+            {{ cart.itemCount() }}
+          </span>
+        </div>
+        <div class="text-sm">
+          <p [class.text-slate-100]="theme.isDark()" class="font-semibold text-slate-800">
+            {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Cart' }}
+          </p>
+          <p class="text-xs text-slate-400">
+            {{ cart.items().length }}
+            {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-lg font-extrabold text-indigo-600">${{ cart.total().toFixed(2) }}</span>
+        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+      </div>
+    </div>
+  }
+
+  <!-- MOBILE: Cart Drawer Backdrop -->
+  @if (isMobile() || isCartDrawerOpen()) {
+    <div
+      [@drawerBackdrop]="isCartDrawerOpen() ? 'open' : 'closed'"
+      class="md:hidden fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm"
+      (click)="closeCartDrawer()"
+    ></div>
+  }
+
+  <!-- MOBILE: Cart Bottom Drawer -->
+  @if (isMobile() || isCartDrawerOpen()) {
+    <div
+      [@drawerSlide]="isCartDrawerOpen() ? 'open' : 'closed'"
+      [class.bg-slate-800]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-40 rounded-t-2xl shadow-2xl flex flex-col overflow-hidden"
+      [class.h-\[70vh\]]="true"
+    >
+      <!-- Drawer Handle -->
+      <div class="flex justify-center pt-2 pb-1 flex-shrink-0">
+        <div [class.bg-slate-500]="theme.isDark()" class="w-10 h-1 rounded-full bg-slate-300"></div>
+      </div>
+
+      <!-- Drawer Header -->
+      <div
+        [class.border-slate-700]="theme.isDark()"
+        [class.border-slate-100]="!theme.isDark()"
+        class="px-4 pb-3 border-b flex items-center justify-between flex-shrink-0"
+      >
+        <div class="flex items-center gap-3">
+          <h2 [class.text-slate-100]="theme.isDark()" class="font-bold text-slate-800 text-base">
+            {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}
+          </h2>
+          @if (cart.items().length > 0) {
+            <span class="text-xs text-slate-400">
+              ({{ cart.items().length }}
+              {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }})
+            </span>
+          }
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            *ngIf="cart.items().length > 0"
+            (click)="clearCart()"
+            class="text-xs text-rose-500 font-bold hover:underline"
+          >
+            {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
+          </button>
+          <button
+            type="button"
+            (click)="closeCartDrawer()"
+            [class.hover\:bg-slate-600]="theme.isDark()"
+            [class.hover\:text-slate-300]="theme.isDark()"
+            [class.hover\:bg-slate-100]="!theme.isDark()"
+            [class.hover\:text-slate-600]="!theme.isDark()"
+            class="p-1.5 rounded-lg text-slate-400 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drawer Cart Items -->
+      <div class="flex-1 overflow-y-auto px-4 py-2 space-y-2">
+        <div
+          *ngIf="cart.items().length === 0"
+          class="flex flex-col items-center justify-center h-full text-slate-300"
+        >
+          <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <p class="text-sm font-medium">
+            {{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}
+          </p>
+        </div>
+
+        <div
+          *ngFor="let item of cart.items(); trackBy: trackByProductId"
+          [class.bg-slate-700]="theme.isDark()"
+          [class.border-slate-600]="theme.isDark()"
+          [class.bg-slate-50]="!theme.isDark()"
+          [class.border-slate-100]="!theme.isDark()"
+          class="rounded-lg p-3 border hover:border-indigo-200 transition-all"
+        >
+          <div class="flex justify-between gap-2 mb-2">
+            <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1">
+              {{
+                langService.currentLang() === 'km'
+                  ? item.product.nameKm || item.product.name
+                  : item.product.name
+              }}
+            </p>
+            <button
+              type="button"
+              (click)="cart.removeItem(item.product.id)"
+              [class.text-slate-500]="theme.isDark()"
+              class="text-slate-300 hover:text-rose-500 flex-shrink-0"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button
+                (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
+                [class.border-slate-600]="theme.isDark()"
+              [class.bg-slate-600]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.text-slate-600]="!theme.isDark()"
+              class="w-8 h-8 rounded-lg border flex items-center justify-center text-sm font-bold active:scale-90 transition-transform"
+              >
+                -
+              </button>
+              <span [class.text-slate-200]="theme.isDark()" class="w-7 text-center text-sm font-bold">{{ item.quantity }}</span>
+              <button
+                (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
+                [disabled]="item.quantity >= item.product.stock"
+                [class.border-slate-600]="theme.isDark()"
+                [class.bg-slate-600]="theme.isDark()"
+                [class.text-slate-200]="theme.isDark()"
+                [class.bg-white]="!theme.isDark()"
+                [class.text-slate-600]="!theme.isDark()"
+                class="w-8 h-8 rounded-lg border flex items-center justify-center text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-transform"
+              >
+                +
+              </button>
+            </div>
+            <p class="text-sm font-bold text-indigo-600">
+              ${{ (item.product.price * item.quantity).toFixed(2) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer Totals & Checkout -->
+      <div
+        [class.bg-slate-800]="theme.isDark()"
+        [class.border-slate-700]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.border-slate-100]="!theme.isDark()"
+        class="border-t p-4 space-y-3 flex-shrink-0 safe-area-bottom"
+      >
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-slate-500">
+            {{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}
+          </span>
+          <span [class.text-slate-300]="theme.isDark()" class="font-bold text-slate-700">${{ cart.subtotal().toFixed(2) }}</span>
+        </div>
+        <div class="flex justify-between items-center text-lg">
+          <span [class.text-slate-100]="theme.isDark()" class="font-extrabold text-slate-900">
+            {{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}
+          </span>
+          <span class="font-black text-indigo-600">${{ cart.total().toFixed(2) }}</span>
+        </div>
+        <button
+          [disabled]="cart.items().length === 0"
+          (click)="showPayment = true"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-base"
+        [class.shadow-indigo-800\/30]="theme.isDark()"
+        [class.shadow-indigo-200]="!theme.isDark()"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
+        </button>
+      </div>
+    </div>
+  }
 </div>
 
 <!-- Modals -->
@@ -429,6 +692,7 @@
   *ngIf="showPayment"
   [total]="cart.total()"
   [subtotal]="cart.subtotal()"
+  [processing]="isProcessingSale()"
   (paid)="onPaymentComplete($event)"
   (cancel)="showPayment = false"
 ></app-payment-modal>

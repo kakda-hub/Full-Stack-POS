@@ -5,17 +5,19 @@ import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { NavStateService, NavItem } from '../../core/services/nav-state.service';
+import { fadeIn } from '../../shared/animations/animations';
 
 @Component({
     selector: 'app-admin-layout',
     standalone: false,
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.scss',
-    animations: [],
+    animations: [fadeIn],
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
     isCollapsed = signal(false);
     avatarError = signal(false);
+    isMobileMenuOpen = signal(false);
 
     selectedMenu = signal<string>('');
 
@@ -83,5 +85,13 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
     toggleSidebar() {
         this.isCollapsed.update((val) => !val);
+    }
+
+    toggleMobileMenu() {
+        this.isMobileMenuOpen.update(v => !v);
+    }
+
+    closeMobileMenu() {
+        this.isMobileMenuOpen.set(false);
     }
 }

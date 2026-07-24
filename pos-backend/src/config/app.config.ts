@@ -9,12 +9,12 @@ export default registerAs('app', () => ({
   },
   // ABA KHQR Merchant Configuration
   khqr: {
-    merchantName: process.env.KHQR_MERCHANT_NAME || 'KhmerPOS Store',
+    merchantName: process.env.KHQR_MERCHANT_NAME || 'MiniMart Store',
     merchantCity: process.env.KHQR_MERCHANT_CITY || 'Phnom Penh',
     bankAccount: process.env.KHQR_BANK_ACCOUNT || 'demo@aba',
     currency: process.env.KHQR_CURRENCY || 'USD',
     storeLabel: process.env.KHQR_STORE_LABEL || 'Main Branch',
-    merchantId: process.env.KHQR_MERCHANT_ID || 'khmerpos001',
+    merchantId: process.env.KHQR_MERCHANT_ID || 'minimart001',
     acquiringBank: process.env.KHQR_ACQUIRING_BANK || 'ABA Bank',
   },
 }));

@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef, signal, computed } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 import { CloudinaryService, CloudinaryResource } from '../../../core/services/api/cloudinary.service';
 import { AlertService } from '../../../core/services/alert.service';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
@@ -124,7 +126,8 @@ export class CloudinaryFileUploadListComponent implements OnInit {
     public theme: ThemeService,
     public lang: LanguageService,
     private cloudinaryService: CloudinaryService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -270,13 +273,22 @@ export class CloudinaryFileUploadListComponent implements OnInit {
 
   // ----- Delete -----
   deleteResource(resource: CloudinaryResource) {
-    const message = this.lang.currentLang() === 'km'
-      ? `តើអ្នកប្រាកដថាចង់លុប "${resource.public_id}" មែនទេ?`
-      : `Are you sure you want to delete "${resource.public_id}"?`;
-    const confirmed = confirm(message);
-    if (!confirmed) return;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      disableClose: true,
+      data: {
+        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
+        message: this.lang.currentLang() === 'km'
+          ? `តើអ្នកប្រាកដថាចង់លុប "${resource.public_id}" មែនទេ?`
+          : `Are you sure you want to delete "${resource.public_id}"?`,
+        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
+        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+      },
+    });
 
-    this.deleting = true;
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+
+      this.deleting = true;
     this.cloudinaryService.deleteResource(resource.public_id).subscribe({
       next: (res) => {
         this.deleting = false;
@@ -293,6 +305,7 @@ export class CloudinaryFileUploadListComponent implements OnInit {
           || (this.lang.currentLang() === 'km' ? 'ការលុបធនធានបរាជ័យ។ សូមព្យាយាមម្តងទៀត។' : 'Failed to delete resource. Please try again.');
         this.alertService.error(errorMsg);
       }
+    });
     });
   }
 

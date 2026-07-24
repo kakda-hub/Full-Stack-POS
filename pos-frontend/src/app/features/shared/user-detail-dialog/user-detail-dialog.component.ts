@@ -1,20 +1,24 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UserService } from '../../../core/services/api/user.service';
 import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { AlertService } from '../../../core/services/alert.service';
+import { UserService } from '../../../core/services/api/user.service';
 import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
+import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({
-  selector: 'app-user-detail',
+  selector: 'app-user-detail-dialog',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './user-detail.component.html',
-  styleUrl: './user-detail.component.scss',
+  animations: [modalAnimation, backdropAnimation],
+  templateUrl: './user-detail-dialog.component.html',
+  styleUrl: './user-detail-dialog.component.scss',
 })
-export class UserDetailComponent implements OnInit {
-  form !: FormGroup;
+export class UserDetailDialogComponent implements OnInit {
+  form!: FormGroup;
+  isSaving = signal(false);
   isUploading = signal(false);
   roles: any[] = [
     { value: 'admin', viewValue: 'Admin' },
@@ -31,9 +35,7 @@ export class UserDetailComponent implements OnInit {
 
   get currentAvatar(): string {
     if (this.avatarError) return '';
-    return this.avatarPreview
-      || this.data?.user?.avatarUrl
-      || '';
+    return this.avatarPreview || this.data?.user?.avatarUrl || '';
   }
 
   get hasAvatar(): boolean {
@@ -51,31 +53,27 @@ export class UserDetailComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef,
     public lang: LanguageService,
-    public dialogRef: MatDialogRef<UserDetailComponent>,
-    private userService: UserService,
     private alertService: AlertService,
+    private userService: UserService,
     private cloudinaryService: CloudinaryService,
+    public theme: ThemeService,
+    private dialogRef: MatDialogRef<UserDetailDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { user?: any } | null,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.initForm();
-  }
-
-  private initForm() {
-    const user = this.data?.user || null;
+    const item = this.data?.user || null;
     this.form = this.fb.group({
-      name: [user?.name || '', Validators.required],
-      email: [user?.email || '', Validators.email],
-      password: ['', user ? Validators.minLength(6) : Validators.required],
-      role: [user?.role || '', Validators.required]
+      name: [item?.name || '', [Validators.required, Validators.minLength(2)]],
+      email: [item?.email || '', [Validators.email]],
+      role: [item?.role || '', [Validators.required]],
+      password: ['', item ? Validators.minLength(6) : Validators.required],
+      isActive: [item ? (item.status === 'active' || item.isActive) : true],
     });
 
-    // If editing, password is optional — clear all validators so empty is valid
-    if (user) {
+    // If editing, password is optional
+    if (item) {
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.setErrors(null);
       this.form.get('password')?.updateValueAndValidity();
@@ -92,78 +90,75 @@ export class UserDetailComponent implements OnInit {
 
     this.cloudinaryService.uploadFile(file).subscribe({
       next: (res) => {
-        // Extract fileUrl from the nested response envelope
         const fileUrl =
-          res?.data?.data?.fileUrl ||          // { data: { data: { fileUrl } } }
-          res?.data?.data?.[0]?.fileUrl ||      // { data: { data: [{ fileUrl }] } }
-          res?.data?.fileUrl;                    // { data: { fileUrl } }
+          res?.data?.data?.fileUrl ||
+          res?.data?.data?.[0]?.fileUrl ||
+          res?.data?.fileUrl;
 
         if (fileUrl) {
           this.avatarPreview = fileUrl;
           this.alertService.success(
             this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
           );
         }
         this.isUploading.set(false);
-        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Upload failed', err);
         this.alertService.error(
           this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Avatar upload failed',
-          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error'
         );
         this.isUploading.set(false);
-        this.cdr.markForCheck();
       },
     });
   }
 
-  onSubmit() {
-    this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-    const payload = this.form.value;
+    this.isSaving.set(true);
+    const payload: any = { ...this.form.value };
+
     // Don't send empty password on edit
     if (this.id && !payload.password) {
       delete payload.password;
     }
 
-    // Use the Cloudinary-uploaded avatar URL if available
+    // Use uploaded avatar URL if available
     if (this.avatarPreview && this.avatarPreview !== this.data?.user?.avatarUrl) {
       payload.avatarUrl = this.avatarPreview;
     }
 
-    this.saveOrUpdateUser(payload);
-  }
-
-  private saveOrUpdateUser(payload: any) {
-    if (this.id) {
-      this.userService.update(this.id, payload).subscribe({
-        next: () => {
-          this.alertService.success('User updated successfully');
-          this.dialogRef.close(true);
-        },
-        error: (err) => {
-          console.error('Failed to update user', err);
-        },
-      });
+    // Don't send isActive on create (backend defaults to true)
+    if (!this.id) {
+      delete payload.isActive;
     } else {
-      this.userService.save(payload).subscribe({
-        next: () => {
-          this.alertService.success('User created successfully');
-          this.dialogRef.close(true);
-        },
-        error: (err) => {
-          console.error('Failed to create user', err);
-        },
-      });
+      // Convert form isActive boolean to API format
+      payload.isActive = payload.isActive === true || payload.isActive === 'true';
     }
-  }
 
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
+    const request$ = this.id
+      ? this.userService.update(this.id, payload)
+      : this.userService.save(payload);
 
+    request$.subscribe({
+      next: (res) => {
+        this.isSaving.set(false);
+        this.dialogRef.close(res);
+      },
+      error: (err) => {
+        console.error('Failed to save user', err);
+        this.alertService.error(
+          this.lang.currentLang() === 'km'
+            ? 'ការរក្សាទុកបរាជ័យ'
+            : 'Failed to save user',
+        );
+        this.isSaving.set(false);
+      },
+    });
+  }
 }

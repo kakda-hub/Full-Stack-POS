@@ -1,8 +1,11 @@
-import { trigger, state, style, transition, animate } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { trigger, state, style, transition, animate, group } from '@angular/animations';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 import { Transaction, Product, CartItem, QuickPickItem } from '../../../core/models';
 import { AlertService } from '../../../core/services/alert.service';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { LanguageService } from '../../../core/services/language.service';
@@ -10,6 +13,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { QuickPickService } from '../../../core/services/api/quick-pick.service';
+import { SaleService, CreateSaleDto } from '../../../core/services/api/sale.service';
 import { fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition } from '../../../shared/animations/animations';
 
 // Sidebar specific animation
@@ -19,11 +23,29 @@ const sidebarAnimation = trigger('sidebarAnimation', [
   transition('open <=> closed', [animate('300ms cubic-bezier(0.4, 0, 0.2, 1)')])
 ]);
 
+// Mobile bottom drawer animations
+const drawerSlide = trigger('drawerSlide', [
+  state('closed', style({ transform: 'translateY(100%)' })),
+  state('open', style({ transform: 'translateY(0)' })),
+  transition('closed => open', [
+    animate('350ms cubic-bezier(0.32, 0.72, 0, 1)')
+  ]),
+  transition('open => closed', [
+    animate('250ms cubic-bezier(0.4, 0, 0.2, 1)')
+  ])
+]);
+
+const drawerBackdrop = trigger('drawerBackdrop', [
+  state('closed', style({ opacity: 0, pointerEvents: 'none' as const })),
+  state('open', style({ opacity: 1, pointerEvents: 'auto' as const })),
+  transition('closed <=> open', [animate('250ms ease')])
+]);
+
 @Component({
   selector: 'app-C',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition, sidebarAnimation],
+  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition, sidebarAnimation, drawerSlide, drawerBackdrop],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
@@ -33,8 +55,14 @@ export class SalesComponent implements OnInit {
   // Signal state for Sidebar
   isCartOpen = signal(true);
 
+  // Mobile responsive state
+  isMobile = signal(false);
+  private mobileBreakpoint = 768;
+  isCartDrawerOpen = signal(false);
+
   showPayment = false;
   isLoadingProducts = signal(true);
+  isProcessingSale = signal(false);
   lastTransaction: Transaction | null = null;
   lastAddedId = signal<string | null>(null);
   shakingProductId = signal<string | null>(null);
@@ -63,7 +91,14 @@ export class SalesComponent implements OnInit {
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
     private quickPickService: QuickPickService,
+    private saleService: SaleService,
+    private dialog: MatDialog,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
+    // Detect mobile on init
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkScreenSize();
+    }
     // Initialize price tracking before the effect to prevent animation on first render
     this.prevSubtotalVal = this.cart.subtotal();
     this.prevTotalVal = this.cart.total();
@@ -110,8 +145,34 @@ export class SalesComponent implements OnInit {
     });
   }
 
+  /** Check screen width and update mobile state */
+  @HostListener('window:resize')
+  checkScreenSize(): void {
+    const mobile = window.innerWidth < this.mobileBreakpoint;
+    if (mobile !== this.isMobile()) {
+      this.isMobile.set(mobile);
+      // Close drawer when resizing to desktop
+      if (!mobile) {
+        this.isCartDrawerOpen.set(false);
+      }
+      this.cdr.markForCheck();
+    }
+  }
+
   toggleCartSidebar(): void {
-    this.isCartOpen.update(v => !v);
+    if (this.isMobile()) {
+      this.isCartDrawerOpen.update(v => !v);
+      if (this.isCartDrawerOpen()) {
+        this.isCartOpen.set(true);
+      }
+    } else {
+      this.isCartOpen.update(v => !v);
+    }
+  }
+
+  /** Close mobile cart drawer */
+  closeCartDrawer(): void {
+    this.isCartDrawerOpen.set(false);
   }
 
   @HostListener('window:keydown.control.b', ['$event'])
@@ -158,7 +219,11 @@ export class SalesComponent implements OnInit {
       expiryDate: undefined,
     };
     this.cart.addItem(quickProduct);
-    if (!this.isCartOpen()) this.isCartOpen.set(true);
+    if (this.isMobile()) {
+      this.isCartDrawerOpen.set(true);
+    } else if (!this.isCartOpen()) {
+      this.isCartOpen.set(true);
+    }
   }
 
   addToCart(product: Product): void {
@@ -174,6 +239,10 @@ export class SalesComponent implements OnInit {
       return;
     }
     this.cart.addItem(product);
+    // Auto-open cart drawer on mobile when adding items
+    if (this.isMobile() && !this.isCartDrawerOpen()) {
+      this.isCartDrawerOpen.set(true);
+    }
     // Stock flash animation — cancel any previous timeout to avoid glitch on rapid clicks
     this.lastAddedId.set(product.id);
     if (this.stockTimeout) clearTimeout(this.stockTimeout);
@@ -186,7 +255,26 @@ export class SalesComponent implements OnInit {
   }
 
   clearCart(): void {
-    if (confirm('Clear all items?')) this.cart.clearCart();
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: this.langService.currentLang() === 'km' ? 'បញ្ជាក់ការសម្អាត' : 'Confirm Clear Cart',
+        message: this.langService.currentLang() === 'km'
+          ? 'តើអ្នកពិតជាចង់លុបទំនិញទាំងអស់ក្នុងកន្ត្រកមែនទេ?'
+          : 'Are you sure you want to remove all items from your cart?',
+        confirmLabel: this.langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear',
+        cancelLabel: this.langService.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.cart.clearCart();
+      this.alertService.warning(
+        this.langService.currentLang() === 'km'
+          ? 'បានសម្អាតកន្ត្រកទំនិញរួចរាល់'
+          : 'Cart has been cleared'
+      );
+    });
   }
 
   onPaymentComplete(data: any): void {
@@ -194,6 +282,53 @@ export class SalesComponent implements OnInit {
     const loyaltyDisc = data.loyaltyDiscount || 0;
     const effectiveTotal = this.cart.total() - loyaltyDisc;
 
+    // Build DTO for backend — filter out quick-pick items (synthetic 'quick-' IDs)
+    const realItems = this.cart.items().filter(i => !i.product.id.startsWith('quick-'));
+
+    if (realItems.length > 0) {
+      const dto: CreateSaleDto = {
+        items: realItems.map(i => ({
+          productId: parseInt(i.product.id, 10),
+          quantity: i.quantity,
+        })),
+        discount: this.cart.discountAmount(),
+        tax: this.cart.taxAmount(),
+        paymentMethod: data.method,
+        customerId: data.customerId,
+        pointsRedeemed: data.pointsRedeemed,
+      };
+
+      // Persist to backend first
+      this.isProcessingSale.set(true);
+      this.cdr.markForCheck();
+
+      this.saleService.createSale(dto).subscribe({
+        next: () => {
+          this.isProcessingSale.set(false);
+          this.completeSaleLocally(data, effectiveTotal);
+        },
+        error: (err) => {
+          this.isProcessingSale.set(false);
+          this.cdr.markForCheck();
+          console.error('Sale API error', err);
+          this.alertService.error(
+            this.langService.currentLang() === 'km'
+              ? 'ការលក់បរាជ័យ សូមព្យាយាមម្តងទៀត'
+              : 'Sale failed, please try again',
+          );
+        },
+      });
+    } else {
+      // All items are quick-picks — no backend persistence needed
+      this.completeSaleLocally(data, effectiveTotal);
+    }
+  }
+
+  /**
+   * Complete the sale locally: save to localStorage, reduce local stock,
+   * clear cart, and show the receipt modal.
+   */
+  private completeSaleLocally(data: any, effectiveTotal: number): void {
     const txn = this.transactionService.saveTransaction(
       this.cart.items(),
       this.cart.subtotal(),
@@ -218,8 +353,22 @@ export class SalesComponent implements OnInit {
     this.cart.clearCart();
     this.showPayment = false;
     this.lastTransaction = txn;
-    this.alertService.success('Success');
+    this.alertService.success(
+      this.langService.currentLang() === 'km'
+        ? 'លក់ជោគជ័យ'
+        : 'Sale completed',
+    );
     this.cdr.markForCheck();
+  }
+
+  /** Check if a product is already in the cart (for selected-state highlighting) */
+  isInCart(product: Product): boolean {
+    return this.cart.items().some(i => i.product.id === product.id);
+  }
+
+  /** Get the cart quantity for a product (for badge overlay) */
+  cartQuantity(product: Product): number {
+    return this.cart.items().find(i => i.product.id === product.id)?.quantity || 0;
   }
 
   trackById(_: number, p: Product): string { return p.id; }

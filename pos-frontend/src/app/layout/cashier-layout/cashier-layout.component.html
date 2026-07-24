@@ -22,8 +22,8 @@
         aria-label="Toggle theme"
       >
         <svg
-          *ngIf="theme.isDark()"
-          class="w-4 h-4 text-amber-400"
+          [hidden]="!theme.isDark()"
+          class="w-4 h-4 text-amber-400 theme-toggle-sun"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -40,8 +40,8 @@
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </svg>
         <svg
-          *ngIf="!theme.isDark()"
-          class="w-4 h-4 text-slate-600"
+          [hidden]="theme.isDark()"
+          class="w-4 h-4 text-slate-600 theme-toggle-moon"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

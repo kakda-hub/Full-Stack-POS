@@ -1,6 +1,7 @@
 {
-  "app_title": "KhmerPOS",
+  "app_title": "MiniMart",
   "nav": {
+    "dashboard": "Dashboard",
     "sales": "Sales",
     "products": "Products",
     "reports": "Reports",
@@ -47,7 +48,7 @@
   },
   "receipt": {
     "title": "Receipt",
-    "store": "KhmerPOS Store",
+    "store": "MiniMart Store",
     "date": "Date",
     "cashier": "Cashier",
     "payment": "Payment",
@@ -149,7 +150,8 @@
     "email": "Email",
     "password": "Password",
     "description": "Description",
-    "category": "Category"
+    "category": "Category",
+    "clickToChangeAvatar": "Click to change avatar"
   },
   "field": {
     "role": "Role",

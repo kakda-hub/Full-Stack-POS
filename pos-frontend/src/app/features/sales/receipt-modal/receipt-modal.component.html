@@ -8,19 +8,23 @@
     @modalAnimation
     [class.bg-slate-800]="theme.isDark()"
     [class.bg-white]="!theme.isDark()"
-    class="relative rounded-2xl shadow-2xl w-full max-w-sm"
+    [class.border-slate-700/60]="theme.isDark()"
+    [class.border-slate-100/50]="!theme.isDark()"
+    class="relative rounded-3xl shadow-2xl w-full max-w-sm border"
   >
     <div
       [class.border-slate-700]="theme.isDark()"
       [class.border-slate-100]="!theme.isDark()"
       class="px-6 py-4 border-b flex items-center justify-between"
     >
-      <h2 class="text-lg font-bold text-slate-800">
+      <h2 [class.text-slate-100]="theme.isDark()" [class.text-slate-800]="!theme.isDark()" class="text-lg font-bold">
         {{ lang.currentLang() === 'km' ? 'វិក្កយបត្រ' : 'Receipt' }}
       </h2>
       <button
         (click)="close.emit()"
-        class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+        [class.hover:bg-slate-700]="theme.isDark()"
+        [class.hover:bg-slate-100]="!theme.isDark()"
+        class="p-2 rounded-full text-slate-400 hover:text-slate-600 transition-all"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -36,131 +40,134 @@
     <div class="p-6">
       <!-- Receipt body -->
       <div id="receipt-print" class="font-mono text-xs space-y-2">
+        <!-- Corner decorative lines (not printed) -->
+        <div class="hidden print:block text-center text-slate-300 text-xs mb-1">- - - - - - - - - - - - - - - -</div>
         <!-- Header -->
-        <div class="text-center space-y-1 pb-3 border-b border-dashed border-slate-300">
-          <h3 class="font-black text-base">KhmerPOS Store</h3>
-          <p class="text-slate-500">Phnom Penh, Cambodia</p>
-          <p class="text-slate-500">Tel: +855 23 000 000</p>
+        <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="text-center space-y-1 pb-3 border-b border-dashed">
+          <h3 [class.text-indigo-400]="theme.isDark()" class="font-black text-base text-indigo-600">🏪 MiniMart Store</h3>
+          <p [class.text-slate-300]="theme.isDark()" class="text-slate-400">Phnom Penh, Cambodia</p>
+          <p [class.text-slate-300]="theme.isDark()" class="text-slate-400">Tel: +855 23 000 000</p>
         </div>
 
         <!-- Meta -->
-        <div class="py-2 border-b border-dashed border-slate-300 space-y-1">
+        <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 border-b border-dashed space-y-1">
           <div class="flex justify-between">
-            <span class="text-slate-500"
+            <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()"
               >{{ lang.currentLang() === 'km' ? 'លេខ' : 'Receipt' }}:</span
             >
-            <span class="font-bold">{{ transaction.id }}</span>
+            <span [class.text-slate-100]="theme.isDark()" class="font-bold">{{ transaction.id }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-slate-500">{{ lang.currentLang() === 'km' ? 'ថ្ងៃ' : 'Date' }}:</span>
-            <span>{{ transaction.timestamp | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'ថ្ងៃ' : 'Date' }}:</span>
+            <span [class.text-slate-200]="theme.isDark()">{{ transaction.timestamp | date: 'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-slate-500"
+            <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()"
               >{{ lang.currentLang() === 'km' ? 'អ្នកលក់' : 'Cashier' }}:</span
             >
-            <span>{{ transaction.cashier }}</span>
+            <span [class.text-slate-200]="theme.isDark()">{{ transaction.cashier }}</span>
           </div>
           @if (transaction.customerName) {
-            <div class="flex justify-between text-indigo-600">
-              <span class="text-slate-500">{{ lang.currentLang() === 'km' ? 'អតិថិជន' : 'Customer' }}:</span>
-              <span class="font-semibold">{{ transaction.customerName }}</span>
+            <div class="flex justify-between">
+              <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()">{{ lang.currentLang() === 'km' ? 'អតិថិជន' : 'Customer' }}:</span>
+              <span [class.text-indigo-400]="theme.isDark()" class="font-semibold text-indigo-600">{{ transaction.customerName }}</span>
             </div>
           }
         </div>
 
         <!-- Items -->
-        <div class="py-2 border-b border-dashed border-slate-300 space-y-1.5">
+        <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 border-b border-dashed space-y-1.5">
           <div *ngFor="let item of transaction.items">
             <div class="flex justify-between font-semibold">
-              <span class="flex-1 pr-2 truncate">{{ item.product.name }}</span>
-              <span
-                >\${{
+              <span [class.text-slate-100]="theme.isDark()" class="flex-1 pr-2 truncate">{{ item.product.name }}</span>
+              <span [class.text-slate-100]="theme.isDark()"
+                >${{
                   (item.product.price * item.quantity * (1 - item.discount / 100)).toFixed(2)
                 }}</span
               >
             </div>
-            <div class="text-slate-400 flex justify-between pl-2">
-              <span>{{ item.quantity }} × \${{ item.product.price.toFixed(2) }}</span>
+            <div [class.text-slate-400]="!theme.isDark()" class="flex justify-between pl-2 text-slate-500">
+              <span>{{ item.quantity }} × ${{ item.product.price.toFixed(2) }}</span>
               <span *ngIf="item.discount > 0" class="text-emerald-600">-{{ item.discount }}%</span>
             </div>
           </div>
         </div>
 
         <!-- Totals -->
-        <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
-          <div class="flex justify-between text-slate-600">
+        <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 space-y-1 border-b border-dashed">
+          <div [class.text-slate-300]="theme.isDark()" class="flex justify-between text-slate-600">
             <span>{{ lang.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
-            <span>\${{ transaction.subtotal.toFixed(2) }}</span>
+            <span>${{ transaction.subtotal.toFixed(2) }}</span>
           </div>
-          <div *ngIf="transaction.totalDiscount > 0" class="flex justify-between text-emerald-600">
+          <div *ngIf="transaction.totalDiscount > 0" [class.text-emerald-400]="theme.isDark()" [class.text-emerald-600]="!theme.isDark()" class="flex justify-between">
             <span>{{ lang.currentLang() === 'km' ? 'បញ្ចុះ' : 'Discount' }}</span>
-            <span>-\${{ transaction.totalDiscount.toFixed(2) }}</span>
+            <span>-${{ transaction.totalDiscount.toFixed(2) }}</span>
           </div>
-          <div *ngIf="transaction.tax > 0" class="flex justify-between text-slate-600">
+          <div *ngIf="transaction.tax > 0" [class.text-slate-300]="theme.isDark()" class="flex justify-between text-slate-600">
             <span>{{ lang.currentLang() === 'km' ? 'អាករ' : 'Tax' }}</span>
-            <span>\${{ transaction.tax.toFixed(2) }}</span>
+            <span>${{ transaction.tax.toFixed(2) }}</span>
           </div>
           <div class="flex justify-between font-black text-base pt-1">
-            <span>{{ lang.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
-            <span class="text-indigo-700">\${{ transaction.total.toFixed(2) }}</span>
+            <span [class.text-slate-100]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+            <span [class.text-indigo-400]="theme.isDark()" class="text-indigo-600 font-extrabold tracking-tight">${{ transaction.total.toFixed(2) }}</span>
           </div>
         </div>
 
         <!-- Loyalty -->
         @if (transaction.loyaltyDiscount) {
-          <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
-            <div class="flex justify-between text-emerald-600">
+          <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 space-y-1 border-b border-dashed">
+            <div [class.text-emerald-400]="theme.isDark()" [class.text-emerald-600]="!theme.isDark()" class="flex justify-between">
               <span>{{ lang.currentLang() === 'km' ? 'បញ្ចុះពិន្ទុ' : 'Loyalty Discount' }}</span>
-              <span>-\${{ transaction.loyaltyDiscount.toFixed(2) }}</span>
+              <span>-${{ transaction.loyaltyDiscount.toFixed(2) }}</span>
             </div>
             @if (transaction.pointsEarned) {
-              <div class="flex justify-between text-indigo-600">
-                <span>{{ lang.currentLang() === 'km' ? 'ពិន្ទុទទួលបាន' : 'Points Earned' }}</span>
-                <span class="font-bold">⭐ +{{ transaction.pointsEarned }}</span>
+              <div class="flex justify-between">
+                <span [class.text-indigo-400]="theme.isDark()" class="text-indigo-600">{{ lang.currentLang() === 'km' ? 'ពិន្ទុទទួលបាន' : 'Points Earned' }}</span>
+                <span [class.text-indigo-400]="theme.isDark()" class="font-bold text-indigo-600">⭐ +{{ transaction.pointsEarned }}</span>
               </div>
             }
           </div>
         }
 
         <!-- Payment -->
-        <div class="py-2 space-y-1 border-b border-dashed border-slate-300">
+        <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 space-y-1 border-b border-dashed">
           <div class="flex justify-between">
-            <span class="text-slate-500">{{
+            <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()">{{
               lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment'
             }}</span>
-            <span class="font-bold uppercase">{{ transaction.paymentMethod }}</span>
+            <span [class.bg-indigo-800\/30]="theme.isDark()" [class.text-indigo-400]="theme.isDark()" [class.bg-indigo-50]="!theme.isDark()" [class.text-indigo-700]="!theme.isDark()" class="font-bold uppercase px-2 py-0.5 rounded-md text-[10px]">{{ transaction.paymentMethod }}</span>
           </div>
           <ng-container *ngIf="transaction.paymentMethod === 'cash'">
             <div class="flex justify-between">
-              <span class="text-slate-500">{{
+              <span [class.text-slate-400]="theme.isDark()" [class.text-slate-500]="!theme.isDark()">{{
                 lang.currentLang() === 'km' ? 'ប្រាក់ទទួល' : 'Received'
               }}</span>
-              <span>\${{ transaction.cashReceived?.toFixed(2) }}</span>
+              <span [class.text-slate-200]="theme.isDark()">${{ transaction.cashReceived?.toFixed(2) }}</span>
             </div>
-            <div class="flex justify-between text-emerald-600 font-bold">
+            <div [class.text-emerald-400]="theme.isDark()" class="flex justify-between text-emerald-700 font-bold">
               <span>{{ lang.currentLang() === 'km' ? 'ប្រាក់អាប់' : 'Change' }}</span>
-              <span>\${{ transaction.change?.toFixed(2) }}</span>
+              <span>${{ transaction.change?.toFixed(2) }}</span>
             </div>
           </ng-container>
         </div>
 
         <!-- Footer -->
-        <div class="text-center pt-2 text-slate-400">
-          <p>
-            {{
+        <div class="text-center pt-3 space-y-1">
+          <p [class.text-emerald-400]="theme.isDark()" class="text-emerald-600 font-semibold">
+            🙏 {{
               lang.currentLang() === 'km' ? 'អរគុណ! សូមមកម្តងទៀត' : 'Thank you! Please come again.'
             }}
           </p>
-          <p class="mt-1">Powered by KhmerPOS</p>
+          <p [class.text-slate-500]="theme.isDark()" class="text-[9px] text-slate-300">— Powered by MiniMart —</p>
         </div>
+        <div class="hidden print:block text-center text-slate-300 text-xs mt-1">- - - - - - - - - - - - - - - -</div>
       </div>
 
       <!-- Actions -->
       <div class="mt-5 flex gap-3">
         <button
           (click)="printReceipt()"
-          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 cursor-pointer receipt-action-btn print-btn"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -174,7 +181,7 @@
         </button>
         <button
           (click)="close.emit()"
-          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-200 cursor-pointer receipt-action-btn new-sale-btn"
         >
           {{ lang.currentLang() === 'km' ? 'លក់ថ្មី' : 'New Sale' }}
         </button>

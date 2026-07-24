@@ -1,55 +1,229 @@
-/* ==========================================================
-   Purchase Order Detail Dialog Styles
-   ========================================================== */
+/* ════════════════════════════════════════════════════════
+   Purchase Order Detail Dialog – Premium Form Styles
+   ════════════════════════════════════════════════════════ */
 
-/* PO Detail Items Table */
-.po-items-table {
-  @apply border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden;
+/* ─── Reset material dialog padding ─── */
+.mat-mdc-dialog-content {
+  --mat-dialog-content-padding: 0 24px;
 }
 
+.dialog-content {
+  padding-bottom: 0.5rem !important;
+}
+
+/* ─── Form body wrapper ─── */
+.form-body {
+  @apply flex flex-col gap-5 px-1;
+}
+
+/* ─── Form grid (2 columns) ─── */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* ─── Mat-form-field outline radius override ─── */
+::ng-deep {
+  .form-field-outline {
+    .mat-mdc-text-field-wrapper {
+      border-radius: 12px !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      min-height: 44px;
+    }
+  }
+}
+
+/* ─── Read-only notice banner ─── */
+.readonly-banner {
+  @apply flex items-center gap-2.5 px-4 py-3 mb-4 rounded-xl text-sm font-medium;
+  @apply bg-blue-50/80 border border-blue-100 text-blue-700;
+  @apply dark:bg-blue-900/20 dark:border-blue-800/40 dark:text-blue-300;
+
+  svg {
+    @apply w-4 h-4 shrink-0;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   ITEMS TABLE
+   ════════════════════════════════════════════════════════ */
+
+.po-items-section {
+  @apply mt-5;
+}
+
+.po-items-header-bar {
+  @apply flex items-center justify-between mb-3;
+}
+
+.po-items-title {
+  @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+}
+
+.po-items-add-btn {
+  @apply flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold;
+  @apply text-indigo-600 bg-indigo-50 hover:bg-indigo-100;
+  @apply dark:text-indigo-400 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50;
+  @apply transition-all duration-200 active:scale-[0.96];
+
+  svg {
+    @apply w-3.5 h-3.5;
+  }
+}
+
+/* ─── Items table card ─── */
+.po-items-table {
+  @apply border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden;
+  @apply shadow-sm bg-white dark:bg-slate-800/50;
+}
+
+/* ─── Header row ─── */
 .po-items-header {
-  @apply grid grid-cols-12 gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700;
+  @apply grid grid-cols-12 gap-2 px-4 py-3;
+  @apply bg-gradient-to-r from-slate-50 to-slate-100/50;
+  @apply dark:from-slate-800 dark:to-slate-800/50;
+  @apply border-b border-slate-200 dark:border-slate-700;
 }
 
 .po-items-header-cell {
-  @apply text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider;
+  @apply text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider;
 }
 
 .po-items-col-product { @apply col-span-5; }
-.po-items-col-qty { @apply col-span-2; }
-.po-items-col-cost { @apply col-span-3; }
-.po-items-col-total { @apply col-span-1 text-right; }
-.po-items-col-action { @apply col-span-1 text-right; }
+.po-items-col-qty     { @apply col-span-2; }
+.po-items-col-cost    { @apply col-span-3; }
+.po-items-col-total   { @apply col-span-1 text-right; }
+.po-items-col-action  { @apply col-span-1 text-right; }
 
+/* ─── Item row ─── */
 .po-items-row {
-  @apply grid grid-cols-12 gap-2 px-3 py-2 items-center border-b border-slate-100 dark:border-slate-700/50 last:border-b-0;
+  @apply grid grid-cols-12 gap-2 px-4 py-3 items-center;
+  @apply border-b border-slate-100 dark:border-slate-700/50 last:border-b-0;
+  @apply transition-colors duration-150;
+  @apply hover:bg-slate-50/80 dark:hover:bg-slate-700/30;
 }
 
-/* PO Totals */
+/* ─── Delete item button ─── */
+.po-item-delete-btn {
+  @apply p-1.5 rounded-lg transition-all duration-200;
+  @apply text-red-400 hover:text-red-600 hover:bg-red-50;
+  @apply dark:text-red-500 dark:hover:text-red-400 dark:hover:bg-red-900/20;
+  @apply disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent;
+  @apply active:scale-[0.90];
+
+  svg {
+    @apply w-4 h-4;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   TOTALS SECTION
+   ════════════════════════════════════════════════════════ */
+
+.po-totals-card {
+  @apply mt-4 rounded-xl border p-4;
+  @apply border-slate-200 dark:border-slate-700;
+  @apply bg-gradient-to-b from-slate-50/50 to-white;
+  @apply dark:from-slate-800/30 dark:to-slate-800/10;
+  @apply shadow-sm;
+}
+
 .po-totals {
-  @apply mt-4 space-y-1.5 px-1;
+  @apply space-y-1.5;
 }
 
 .po-total-row {
-  @apply flex items-center justify-between text-sm;
+  @apply flex items-center justify-between py-1;
 }
 
 .po-total-label {
-  @apply text-slate-500 dark:text-slate-400;
+  @apply text-sm text-slate-500 dark:text-slate-400;
 }
 
 .po-total-value {
-  @apply font-medium text-slate-700 dark:text-slate-300;
-}
-
-.po-total-row--grand {
-  @apply pt-2 mt-2 border-t border-slate-200 dark:border-slate-700;
-}
-
-.po-total-label--grand {
   @apply text-sm font-semibold text-slate-700 dark:text-slate-300;
 }
 
+.po-total-row--discount {
+  .po-total-value {
+    @apply text-rose-600 dark:text-rose-400;
+  }
+}
+
+.po-total-row--grand {
+  @apply pt-3 mt-3 border-t border-slate-200 dark:border-slate-700;
+}
+
+.po-total-label--grand {
+  @apply text-sm font-bold text-slate-800 dark:text-slate-200;
+}
+
 .po-total-value--grand {
-  @apply text-base font-bold text-blue-600 dark:text-blue-400;
+  @apply text-lg font-black text-indigo-600 dark:text-indigo-400;
+}
+
+/* ─── Inline input fields inside totals ─── */
+.inline-input {
+  @apply inline-flex items-center;
+
+  ::ng-deep .input-field-wrapper {
+    @apply min-w-0;
+  }
+
+  ::ng-deep input {
+    @apply w-20 text-right text-sm font-semibold;
+    @apply border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1;
+    @apply bg-white dark:bg-slate-700;
+    @apply text-slate-700 dark:text-slate-200;
+    @apply focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20;
+    @apply transition-all;
+  }
+}
+
+.inline-dollar {
+  @apply text-slate-400 dark:text-slate-500 text-sm font-medium mr-1;
+}
+
+/* ════════════════════════════════════════════════════════
+   DIALOG ACTIONS
+   ════════════════════════════════════════════════════════ */
+
+.dialog-actions {
+  @apply w-full gap-3 px-6 pb-5 pt-2;
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════ */
+
+@media (max-width: 639px) {
+  .form-grid {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .po-items-header,
+  .po-items-row {
+    @apply px-3 gap-1 text-xs;
+  }
+
+  .po-items-col-product { @apply col-span-5; }
+  .po-items-col-qty     { @apply col-span-2; }
+  .po-items-col-cost    { @apply col-span-2; }
+  .po-items-col-total   { @apply col-span-2 text-left; }
+  .po-items-col-action  { @apply col-span-1 text-right; }
+}
+
+/* ════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .po-items-row,
+  .po-item-delete-btn,
+  .po-items-add-btn {
+    transition: none;
+  }
 }

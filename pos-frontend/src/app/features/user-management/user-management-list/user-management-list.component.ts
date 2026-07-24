@@ -6,7 +6,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { UserService } from '../../../core/services/api/user.service';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
-import { UserManagementDetailComponent } from '../user-management-detail/user-management-detail.component';
+import { UserDetailDialogComponent } from '../../shared/user-detail-dialog/user-detail-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
@@ -53,7 +53,7 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
   ) {
-    this.reusableDialogService.setDialogComponent(UserManagementDetailComponent);
+    this.reusableDialogService.setDialogComponent(UserDetailDialogComponent);
     this.reusableDialogService.setDialogConfigOption(this.defaultOption);
   }
 

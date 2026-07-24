@@ -1,0 +1,465 @@
+/* ═══════════════════════════════════════════════
+   DASHBOARD - Main wrapper & layout
+   ═══════════════════════════════════════════════ */
+
+.dash-wrapper {
+  @apply p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto;
+}
+
+/* ─── Header ─── */
+.dash-header {
+  @apply flex flex-col sm:flex-row sm:items-center justify-between gap-3;
+}
+
+.dash-header-left {
+  @apply flex items-center gap-3;
+}
+
+.dash-greeting {
+  @apply text-xl sm:text-2xl font-black tracking-tight;
+  @apply text-slate-800 dark:text-white;
+}
+
+.dash-date {
+  @apply text-sm text-slate-400 dark:text-slate-500 mt-0.5;
+}
+
+.dash-header-right {
+  @apply flex items-center gap-2;
+}
+
+/* ─── Live Indicator ─── */
+.dash-live-indicator {
+  @apply flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold;
+  @apply bg-emerald-50/70 dark:bg-emerald-900/20;
+  @apply border border-emerald-200/60 dark:border-emerald-700/30;
+  @apply select-none;
+}
+
+.dash-live-dot {
+  @apply w-2 h-2 rounded-full;
+  @apply bg-emerald-500;
+  animation: dashLivePulse 2s ease-in-out infinite;
+}
+
+.dash-live-dot--paused {
+  @apply bg-amber-400;
+  animation: none;
+}
+
+@keyframes dashLivePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+.dash-live-text {
+  @apply uppercase tracking-wider;
+  @apply text-emerald-700 dark:text-emerald-400;
+}
+
+.dash-live-dot--paused + .dash-live-text {
+  @apply text-amber-600 dark:text-amber-400;
+}
+
+.dash-live-time {
+  @apply text-[9px] font-mono font-normal ml-0.5;
+  @apply text-emerald-500/70 dark:text-emerald-500/60;
+}
+
+/* ─── Pause / Resume button ─── */
+.dash-btn-pause {
+  &.dash-btn-pause--active {
+    @apply text-amber-500 bg-amber-50;
+    @apply dark:text-amber-400 dark:bg-amber-900/20;
+    &:hover {
+      @apply bg-amber-100 dark:bg-amber-900/30;
+    }
+  }
+}
+
+.dash-btn-icon {
+  @apply w-9 h-9 flex items-center justify-center rounded-xl;
+  @apply text-slate-400 hover:text-indigo-600;
+  @apply bg-slate-100 hover:bg-indigo-50 dark:bg-slate-700 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400;
+  @apply transition-all duration-200 active:scale-[0.92];
+}
+
+.dash-spin svg {
+  animation: dashSpin 1s linear infinite;
+}
+
+@keyframes dashSpin {
+  to { transform: rotate(360deg); }
+}
+
+.dash-btn-primary {
+  @apply flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold;
+  @apply bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800;
+  @apply shadow-sm shadow-indigo-200 dark:shadow-indigo-900/40;
+  @apply transition-all duration-200 active:scale-[0.97];
+}
+
+/* ═══════════════════════════════════════════════
+   KPI CARDS
+   ═══════════════════════════════════════════════ */
+
+.dash-kpi-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4;
+}
+
+.dash-kpi-card {
+  @apply rounded-2xl border p-5 shadow-sm;
+  @apply bg-white dark:bg-slate-800;
+  @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+}
+
+.dash-kpi-indigo {
+  @apply border-indigo-100/80 dark:border-indigo-500/20;
+}
+
+.dash-kpi-emerald {
+  @apply border-emerald-100/80 dark:border-emerald-500/20;
+}
+
+.dash-kpi-amber {
+  @apply border-amber-100/80 dark:border-amber-500/20;
+}
+
+.dash-kpi-rose {
+  @apply border-rose-100/80 dark:border-rose-500/20;
+}
+
+.dash-kpi-top {
+  @apply flex items-center justify-between mb-3;
+}
+
+.dash-kpi-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center;
+}
+
+.dash-kpi-icon-indigo { @apply bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400; }
+.dash-kpi-icon-emerald { @apply bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400; }
+.dash-kpi-icon-amber { @apply bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400; }
+.dash-kpi-icon-rose { @apply bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400; }
+
+.dash-kpi-badge {
+  @apply text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full;
+}
+
+.dash-badge-indigo {
+  @apply bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400;
+}
+
+.dash-badge-rose {
+  @apply bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400;
+}
+
+.dash-kpi-value {
+  @apply text-2xl sm:text-3xl font-black;
+  @apply text-slate-900 dark:text-white;
+}
+
+.dash-kpi-label {
+  @apply text-sm text-slate-500 dark:text-slate-400 mt-0.5;
+}
+
+.dash-kpi-footer {
+  @apply mt-3 pt-3 border-t flex items-center gap-2;
+  @apply border-slate-100 dark:border-slate-700;
+}
+
+.dash-kpi-stat {
+  @apply text-sm font-bold;
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+.dash-kpi-stat-label {
+  @apply text-[10px] font-semibold uppercase tracking-wider;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* ─── Alert stack inside KPI ─── */
+.dash-alert-stack {
+  @apply flex items-center gap-3 mt-2;
+}
+
+.dash-alert-item {
+  @apply flex-1 flex flex-col items-center py-2;
+}
+
+.dash-alert-value {
+  @apply text-2xl font-black;
+  @apply text-slate-900 dark:text-white;
+}
+
+.dash-alert-label {
+  @apply text-[10px] font-bold uppercase tracking-wider mt-0.5;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.dash-alert-divider {
+  @apply w-px h-10;
+  @apply bg-slate-200 dark:bg-slate-700;
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS (Quick Actions, Recent Activity, Top Sellers)
+   ═══════════════════════════════════════════════ */
+
+.dash-card {
+  @apply rounded-2xl border p-5 shadow-sm;
+  @apply bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+  @apply transition-all duration-200 hover:shadow-md;
+}
+
+.dash-card-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.dash-card-title {
+  @apply flex items-center gap-2 text-sm font-bold;
+  @apply text-slate-700 dark:text-slate-200;
+}
+
+.dash-text-link {
+  @apply flex items-center gap-1 text-xs font-bold;
+  @apply text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300;
+  @apply transition-colors;
+}
+
+/* ─── Quick Actions Grid ─── */
+.dash-actions-grid {
+  @apply grid grid-cols-1 gap-2;
+}
+
+.dash-action-btn {
+  @apply flex items-center gap-3 p-3 rounded-xl;
+  @apply border border-transparent;
+  @apply transition-all duration-200 active:scale-[0.98] text-left;
+}
+
+.dash-action-sale {
+  @apply bg-indigo-50/60 hover:bg-indigo-50 hover:border-indigo-200/60;
+  @apply dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:hover:border-indigo-500/30;
+}
+
+.dash-action-product {
+  @apply bg-emerald-50/60 hover:bg-emerald-50 hover:border-emerald-200/60;
+  @apply dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:hover:border-emerald-500/30;
+}
+
+.dash-action-report {
+  @apply bg-amber-50/60 hover:bg-amber-50 hover:border-amber-200/60;
+  @apply dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:hover:border-amber-500/30;
+}
+
+.dash-action-stock {
+  @apply bg-violet-50/60 hover:bg-violet-50 hover:border-violet-200/60;
+  @apply dark:bg-violet-900/20 dark:hover:bg-violet-900/30 dark:hover:border-violet-500/30;
+}
+
+.dash-action-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+}
+
+.dash-action-sale .dash-action-icon {
+  @apply bg-indigo-100 text-indigo-600 dark:bg-indigo-800/40 dark:text-indigo-400;
+}
+
+.dash-action-product .dash-action-icon {
+  @apply bg-emerald-100 text-emerald-600 dark:bg-emerald-800/40 dark:text-emerald-400;
+}
+
+.dash-action-report .dash-action-icon {
+  @apply bg-amber-100 text-amber-600 dark:bg-amber-800/40 dark:text-amber-400;
+}
+
+.dash-action-stock .dash-action-icon {
+  @apply bg-violet-100 text-violet-600 dark:bg-violet-800/40 dark:text-violet-400;
+}
+
+.dash-action-label {
+  @apply text-sm font-bold;
+  @apply text-slate-800 dark:text-slate-100;
+}
+
+.dash-action-desc {
+  @apply text-xs;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* ─── Recent Activity ─── */
+.dash-activity-list {
+  @apply space-y-1;
+}
+
+.dash-activity-item {
+  @apply flex items-center gap-3 p-2.5 rounded-xl;
+  @apply transition-colors duration-150;
+  @apply hover:bg-slate-50 dark:hover:bg-slate-700/50;
+}
+
+.dash-activity-icon {
+  @apply text-lg flex-shrink-0 w-8 text-center;
+}
+
+.dash-activity-body {
+  @apply flex-1 min-w-0;
+}
+
+.dash-activity-top {
+  @apply flex items-center justify-between;
+}
+
+.dash-activity-id {
+  @apply text-xs font-mono font-bold;
+  @apply text-slate-600 dark:text-slate-400;
+}
+
+.dash-activity-amount {
+  @apply text-sm font-bold;
+  @apply text-indigo-600 dark:text-indigo-400;
+}
+
+.dash-activity-meta {
+  @apply flex items-center gap-1.5 text-[10px] mt-0.5;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+.dash-activity-dot {
+  @apply text-slate-300 dark:text-slate-600;
+}
+
+.dash-activity-cashier {
+  @apply truncate;
+}
+
+.dash-activity-method {
+  @apply capitalize;
+}
+
+.dash-badge-light {
+  @apply px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider;
+  @apply bg-slate-100 text-slate-500 dark:bg-slate-600 dark:text-slate-300;
+}
+
+/* ─── Top Sellers ─── */
+.dash-top-list {
+  @apply space-y-3;
+}
+
+.dash-top-item {
+  @apply flex items-center gap-3;
+}
+
+.dash-top-rank {
+  @apply w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0;
+}
+
+.dash-rank-gold {
+  @apply bg-amber-100 text-amber-700 dark:bg-amber-800/40 dark:text-amber-400;
+}
+
+.dash-rank-silver {
+  @apply bg-slate-100 text-slate-600 dark:bg-slate-600 dark:text-slate-300;
+}
+
+.dash-rank-bronze {
+  @apply bg-orange-100 text-orange-700 dark:bg-orange-800/40 dark:text-orange-400;
+}
+
+.dash-rank-default {
+  @apply bg-slate-50 text-slate-400 dark:bg-slate-700 dark:text-slate-500;
+}
+
+.dash-top-info {
+  @apply flex-1 min-w-0;
+}
+
+.dash-top-name {
+  @apply text-sm font-semibold truncate;
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+.dash-top-bar-track {
+  @apply h-1.5 rounded-full overflow-hidden mt-1;
+  @apply bg-slate-100 dark:bg-slate-700;
+}
+
+.dash-top-bar-fill {
+  @apply h-full rounded-full transition-all duration-500;
+}
+
+.dash-top-stats {
+  @apply flex flex-col items-end gap-0.5 flex-shrink-0;
+}
+
+.dash-top-qty {
+  @apply text-xs font-bold;
+  @apply text-slate-600 dark:text-slate-400;
+}
+
+.dash-top-revenue {
+  @apply text-[10px];
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* ─── Empty state ─── */
+.dash-empty {
+  @apply flex flex-col items-center justify-center py-8 text-center;
+}
+
+.dash-empty-text {
+  @apply text-sm mt-2;
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════ */
+
+@media (max-width: 639px) {
+  .dash-kpi-grid {
+    @apply grid-cols-1;
+  }
+
+  .dash-greeting {
+    @apply text-lg;
+  }
+
+  .dash-live-indicator {
+    @apply px-2 py-1;
+  }
+
+  .dash-live-time {
+    display: none;
+  }
+
+  .dash-btn-primary span {
+    display: none;
+  }
+
+  .dash-btn-primary {
+    @apply px-3;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-kpi-card,
+  .dash-card,
+  .dash-action-btn,
+  .dash-btn-primary,
+  .dash-btn-icon,
+  .dash-live-indicator {
+    transition: none;
+  }
+
+  .dash-spin svg,
+  .dash-live-dot {
+    animation: none;
+  }
+}

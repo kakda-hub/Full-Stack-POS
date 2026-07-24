@@ -13,11 +13,11 @@ export class KhqrService {
 
   constructor(private configService: ConfigService) {
     const khqr = this.configService.get('app.khqr');
-    this.merchantName = khqr?.merchantName || 'KhmerPOS Store';
+    this.merchantName = khqr?.merchantName || 'MiniMart Store';
     this.merchantCity = khqr?.merchantCity || 'Phnom Penh';
     this.bankAccount = khqr?.bankAccount || 'demo@aba';
     this.storeLabel = khqr?.storeLabel || 'Main Branch';
-    this.merchantId = khqr?.merchantId || 'khmerpos001';
+    this.merchantId = khqr?.merchantId || 'minimart001';
     this.acquiringBank = khqr?.acquiringBank || 'ABA Bank';
 
     // KHQR uses numeric EMV currency codes: 840 = USD, 116 = KHR

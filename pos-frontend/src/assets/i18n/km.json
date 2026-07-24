@@ -1,6 +1,7 @@
 {
-  "app_title": "KhmerPOS",
+  "app_title": "MiniMart",
   "nav": {
+    "dashboard": "ទិដ្ឋភាពទូទៅ",
     "sales": "លក់",
     "products": "ផលិតផល",
     "reports": "របាយការណ៍",
@@ -47,7 +48,7 @@
   },
   "receipt": {
     "title": "វិក្កយបត្រ",
-    "store": "ហាង KhmerPOS",
+    "store": "ហាង MiniMart",
     "date": "ថ្ងៃ",
     "cashier": "អ្នកលក់",
     "payment": "ការទូទាត់",
@@ -149,7 +150,8 @@
     "password": "លេខសម្ងាត់",
     "description": "ពត៌មានបន្ថែម",
     "username": "ឈ្មោះអ្នកប្រើប្រាស់",
-    "category": "ប្រភេទ"
+    "category": "ប្រភេទ",
+    "clickToChangeAvatar": "ចុចដើម្បីប្តូររូបភាព"
   },
   "field": {
     "role": "តួនាទី",

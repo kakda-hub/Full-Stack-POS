@@ -326,7 +326,7 @@ export class SalesHistoryComponent {
       </style>
       </head><body>
         <div class="header">
-          <h3>KhmerPOS Store</h3>
+          <h3>MiniMart Store</h3>
           <p>Phnom Penh, Cambodia</p>
           <p>Tel: +855 23 000 000</p>
         </div>
@@ -351,7 +351,7 @@ export class SalesHistoryComponent {
 
         <div class="footer">
           <p>Thank you! Please come again.</p>
-          <p style="margin-top:4px;">Powered by KhmerPOS</p>
+          <p style="margin-top:4px;">Powered by MiniMart</p>
         </div>
       </body></html>
     `);

@@ -2,7 +2,7 @@
 
 # 🏪 Full-Stack POS System
 
-**A production-ready Point of Sale system with NestJS backend, Angular frontend, and TiDB Cloud database**
+**A production-ready, mobile-responsive Point of Sale system with NestJS backend, Angular frontend, and TiDB Cloud database**
 
 [![NestJS](https://img.shields.io/badge/NestJS-10-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
@@ -18,6 +18,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [Quick Start (Docker)](#-quick-start-docker)
@@ -35,33 +36,42 @@
 
 ## 📖 Overview
 
-Full-Stack POS is a complete Point of Sale system built for modern retail businesses. It features Khmer/English bilingual support, role-based access for admin and cashier roles, multi-payment methods (Cash, ABA scan-to-pay, Card), real-time inventory tracking, business intelligence reports, thermal printer-optimized receipts, and barcode scanning.
+Full-Stack POS is a complete, enterprise-grade Point of Sale system built for modern retail businesses and mini-marts. It features Khmer/English bilingual support, role-based access for admins and cashiers, multi-payment methods, real-time inventory tracking, supply chain metrics, thermal-optimized receipt generation, and a fully polished, responsive layout designed for both desktops and mobile devices.
 
-### ✨ Key Features
+---
 
-**Payment Integration**  
-Engineered a flexible multi-payment system supporting Cash (with automated change calculation), Card processing, and ABA scan-to-pay QR code infrastructure.
+## ✨ Key Features
 
-**Bilingual Support**  
-Full internationalization with real-time language switching between Khmer and English across all interfaces, with no page reload required. Language preference persists across sessions.
+### 📊 Modern Interactive Admin Dashboard (NEW!)
+- **Dynamic Welcome & Metrics**: Personal greeting based on the user's local time, accompanied by live KPI metrics (Total Products, Low Stock, Near-Expiry, Daily Transactions).
+- **Inventory Safety Nets**: Integrated **Near-Expiry Alerts** dynamically detecting and flagging products expiring within the next 30 days to prevent retail losses.
+- **Top Sellers & Activity**: Displays visual progress indicators for the Top 5 Selling Products and a real-time list of recent sales transactions.
 
-**Role-Based Access Control**  
-Comprehensive RBAC system with admin and cashier roles, featuring granular permission management, user role assignments, and dynamic navigation based on user privileges.
+### 📅 Advanced Report Filters & Analytics (NEW!)
+- **Dynamic Date Ranges**: Offers intuitive report preset filters (Today, This Week, This Month) and custom date-range calendar pickers.
+- **Bi-Lingual Charting & Stats**: Smooth localization in both Khmer and English, feeding clean analytical data to the business intelligence metrics page.
 
-**Advanced Inventory Management**  
-Real-time stock tracking with automated deduction on sales, low-stock alerts, purchase order workflow, stock movement history, and product returns processing.
+### 📱 Responsive Mobile Cashier Experience (NEW!)
+- **Responsive Adaptive Design**: Clean transitions from desktop monitor scales to mobile screens on the main Sales feature.
+- **Mobile Bottom Cart Drawer**: Replaces the desktop right-sidebar with a custom slide-out bottom drawer using smooth cubic-bezier CSS/Angular animations.
+- **Active Grid Highlights**: Visually overlays item quantity badges and selected-state borders on the main product grid so cashiers instantly know what's in their cart.
+- **Localized Confirmation Modals**: Uses localized, modern Angular Material dialog popups in place of generic browser alerts when clearing active carts.
 
-**Business Intelligence Dashboard**  
-Rich reporting suite with revenue analytics, top-selling products identification, payment method breakdowns, cashier performance metrics, and customizable date range filters.
+### 💵 Loyalty points & Flexible Payment Systems (NEW!)
+- **Customer Rewards System**: Integrated customer lookup by phone number directly at checkout, displaying loyalty points balances, lifetime purchases, and total spent.
+- **Points Redemption**: Cashiers can redeem customer points (e.g., 100 points = $1.00 USD discount) to instantly update checkout totals.
+- **Real-Time ABA KHQR QR Generation**: Dynamic generation of compliant EMV-co QR codes complete with loading indicators and fallback retry prompts.
+- **Change Calculator**: Automatic calculation of cash changes with convenient, clickable Quick-Cash dollar buttons.
 
-**Thermal Receipt System**  
-80mm thermal printer-optimized receipts with complete transaction details, formatted for standard POS hardware.
+### 🖨️ Thermal-Optimized Receipt Generation
+- Styled and formatted specifically for standard **80mm thermal hardware printers**.
+- Automatically renders customer details, points earned, points redeemed, item-level discounts, VAT, payment methods, and customized thank-you footers in the user's chosen language.
 
-**Barcode Integration**  
-Native barcode scanning support for rapid product lookup and checkout, with unique barcode validation and duplicate prevention.
+### 🔄 Multi-Stage Inventory Control & Supply Chain
+- Real-time inventory deduction during sales transaction commits.
+- Full support for Supplier directories, Purchase Order lifecycles (Draft -> Approved -> Received -> Cancelled), stock movement logs (In/Out/Adjustments), and Customer product returns.
 
-**Supply Chain Management**  
-Complete supplier directory, purchase order lifecycle management, and stock movement tracking for comprehensive inventory control.
+---
 
 ### Live Demo
 
@@ -86,35 +96,35 @@ Complete supplier directory, purchase order lifecycle management, and stock move
 
 | Technology | Purpose |
 |------------|---------|
-| **NestJS 10** | Application framework |
-| **TypeORM 0.3** | ORM with MySQL driver |
-| **MySQL 8.4 / TiDB Cloud** | Database |
-| **Passport + JWT** | Authentication |
+| **NestJS 10** | Enterprise Node.js MVC framework |
+| **TypeORM 0.3** | Object-Relational Mapping (ORM) with MySQL driver |
+| **MySQL 8.4 / TiDB Cloud** | Highly-available MySQL-compatible database |
+| **Passport + JWT** | Sessionless JWT Authentication |
 | **bcryptjs** | Password hashing |
-| **class-validator** | DTO validation |
-| **Helmet** | Security headers |
-| **Swagger** | API documentation |
-| **Cloudinary / MinIO** | Image/file storage |
-| **Sharp** | Image processing |
+| **class-validator** | Strongly-typed DTO validation |
+| **Helmet** | Security HTTP headers |
+| **Swagger** | Live interactive API documentation |
+| **Cloudinary / MinIO** | Multi-channel file and image storage |
+| **Sharp** | High-performance image processing & resizing |
 
 ### Frontend (`pos-frontend/`)
 
 | Technology | Purpose |
 |------------|---------|
-| **Angular 21** | Frontend framework |
-| **Angular Material** | UI components (dialogs, tables) |
-| **Tailwind CSS 3** | Utility-first styling |
-| **@ngx-translate** | i18n (Khmer/English) |
-| **Angular Signals** | Reactive state management |
+| **Angular 21** | Next-generation web platform |
+| **Angular Signals** | Fine-grained, high-performance reactive state management |
+| **Angular Material** | Premium accessible UI components (dialogs, tables) |
+| **Tailwind CSS 3** | Utility-first styling with comprehensive grid architectures |
+| **@ngx-translate** | Dynamic internationalization with instant language toggling |
 
-### Infrastructure
+### Infrastructure & Operations
 
 | Tool | Purpose |
 |------|---------|
-| **Docker** | Containerization |
-| **Render** | Backend hosting |
-| **Vercel** | Frontend hosting |
-| **TiDB Cloud** | Managed MySQL-compatible database |
+| **Docker** | Component isolation & deployment standardization |
+| **Render** | Microservice and background process container hosting |
+| **Vercel** | Edge-optimized frontend hosting |
+| **TiDB Cloud** | Serverless MySQL-compatible cloud database |
 
 ---
 
@@ -127,10 +137,10 @@ Full-Stack-POS/
 │   │   ├── modules/
 │   │   │   ├── auth/                     # JWT login, profile, password reset
 │   │   │   ├── users/                    # User CRUD (admin only)
-│   │   │   ├── products/                 # Product catalog, barcode lookup
+│   │   │   ├── products/                 # Product catalog, barcode, expiry tracking
 │   │   │   ├── categories/               # Product categories
-│   │   │   ├── sales/                    # Transaction-safe POS sales
-│   │   │   ├── reports/                  # Business intelligence reports
+│   │   │   ├── sales/                    # Transaction-safe POS sales & loyalty allocation
+│   │   │   ├── reports/                  # Business analytics & summary generators
 │   │   │   ├── management/               # Dynamic navigation management
 │   │   │   ├── upload/                   # File upload (MinIO/S3)
 │   │   │   ├── upload-cloudinary/        # Cloudinary image upload
@@ -147,7 +157,7 @@ Full-Stack-POS/
 │   │   ├── config/                       # DB, app, TypeORM CLI config
 │   │   ├── database/
 │   │   │   ├── migrations/               # Database migration files
-│   │   │   └── seeders/                  # Seed scripts (products, sales)
+│   │   │   └── seeders/                  # Seed scripts (products, sales, customers)
 │   │   └── main.ts                       # Bootstrap entry point
 │   ├── Dockerfile                        # Multi-stage production build
 │   ├── docker-compose.yml                # Local MySQL + API services
@@ -158,11 +168,12 @@ Full-Stack-POS/
 ├── pos-frontend/                         # Angular frontend application
 │   ├── src/app/
 │   │   ├── features/                     # Lazy-loaded feature modules
-│   │   │   ├── sales/                    # POS cart, payment, receipt
-│   │   │   ├── products/                 # Product CRUD + stock mgmt
+│   │   │   ├── dashboard/                # Admin interactive dashboard (NEW!)
+│   │   │   ├── sales/                    # POS cashier cart, responsive drawer, payment modal
+│   │   │   ├── products/                 # Product CRUD + stock + expiry mgmt
 │   │   │   ├── categories/               # Category management
-│   │   │   ├── reports/                  # Dashboard KPIs + charts
-│   │   │   ├── sales-history/            # Transaction history
+│   │   │   ├── reports/                  # Dashboard KPIs + interactive date range filters
+│   │   │   ├── sales-history/            # Transaction history with search & filters
 │   │   │   ├── users/                    # User management
 │   │   │   ├── user-management/          # Role/permission config
 │   │   │   ├── user-role/                # User role assignments
@@ -174,10 +185,10 @@ Full-Stack-POS/
 │   │   │   ├── purchase-orders/          # Purchase order management
 │   │   │   ├── stock-movements/          # Stock movement tracking
 │   │   │   └── page-not-found/           # 404 page
-│   │   ├── core/                         # Guards, interceptors, services
-│   │   ├── layout/                       # Admin & Cashier layouts
-│   │   ├── services/                     # HTTP services, auth, data
-│   │   ├── shared/                       # Components, pipes, animations
+│   │   ├── core/                         # Guards, interceptors, services, models
+│   │   ├── layout/                       # Admin & Cashier adaptive layout shells
+│   │   ├── services/                     # HTTP services, auth, reactive state services
+│   │   ├── shared/                       # Shared components, translation pipes, animations
 │   │   ├── enums/                        # API endpoint constants
 │   │   └── app-routing.module.ts         # Route configuration
 │   ├── assets/i18n/                      # en.json, km.json translations
@@ -231,6 +242,15 @@ S3_BUCKET=pos-uploads
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# ABA Merchant Details (optional)
+KHQR_MERCHANT_NAME=MiniMart Store
+KHQR_MERCHANT_CITY="Phnom Penh"
+KHQR_BANK_ACCOUNT=demo@aba
+KHQR_CURRENCY=USD
+KHQR_STORE_LABEL="Main Branch"
+KHQR_MERCHANT_ID=minimart001
+KHQR_ACQUIRING_BANK="ABA Bank"
 ```
 
 ### Step 2: Start All Services
@@ -256,9 +276,10 @@ docker compose up -d
 ### Seed Data
 
 The `init.sql` script runs automatically on MySQL startup, creating:
-- **Users** — Admin (`admin@pos.com`) and Cashier (`cashier@pos.com`)
+- **Users** — Admin (`admin@pos.com`), Cashier (`cashier@pos.com`)
 - **Categories** — Beverages, Food, Snacks, Dairy
-- **Management Pages** — Navigation structure with permissions
+- **Management Pages** — Navigation structures and permission matrices
+- **Sample Products** — Complete with barcodes and pricing metrics
 
 ---
 
@@ -273,7 +294,7 @@ npm install
 # Optional: Start MySQL via Docker
 docker compose up -d mysql
 
-# Start with hot-reload
+# Start NestJS backend with hot-reload
 npm run start:dev
 ```
 
@@ -282,6 +303,8 @@ npm run start:dev
 ```bash
 cd pos-frontend
 npm install --legacy-peer-deps
+
+# Start Angular local development server
 npm start
 
 # Serves at http://localhost:4200
@@ -430,7 +453,9 @@ All subsequent requests require: `Authorization: Bearer <token>`
   ],
   "discount": 1.0,
   "tax": 0.5,
-  "paymentMethod": "cash"
+  "paymentMethod": "cash",
+  "customerId": 2,
+  "pointsRedeemed": 100
 }
 ```
 
@@ -448,95 +473,9 @@ Payment methods: `cash` | `aba` | `card`
 
 All reports accept optional `from` and `to` query params (`YYYY-MM-DD`).
 
-### 📄 Management Pages `[admin]`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/management-pages` | List dynamic navigation pages |
-
-### 🖼️ File Uploads
-
-| Endpoint | Storage | Description |
-|----------|---------|-------------|
-| `/upload` | MinIO/S3 | General file upload |
-| `/upload-cloudinary` | Cloudinary | Cloudinary image upload |
-| `/upload-dynamic` | Configurable | Dynamic storage selection |
-
-### 🏭 Suppliers `[admin]`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/suppliers` | Create supplier |
-| GET | `/suppliers` | List all suppliers |
-| GET | `/suppliers/:id` | Get supplier by ID |
-| PATCH | `/suppliers/:id` | Update supplier |
-| DELETE | `/suppliers/:id` | Delete supplier |
-
-### 📦 Purchase Orders `[admin]`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/purchase-orders` | Create purchase order |
-| GET | `/purchase-orders` | List all purchase orders |
-| GET | `/purchase-orders/:id` | Get purchase order by ID |
-| PATCH | `/purchase-orders/:id/status` | Update PO status |
-
-### 🔄 Stock Movements `[admin]`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/stock-movements` | List stock movements (filterable by product, type, date) |
-| POST | `/stock-movements` | Record a stock movement (adjustment/in/out) |
-
-### ↩️ Returns `[admin]`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/returns` | Create a return |
-| GET | `/returns` | List all returns |
-| GET | `/returns/:id` | Get return by ID |
-
 ### Swagger Auto-Authorization
 
 The Swagger UI at `/api/docs` includes **auto-authorization**: after a successful login, the JWT token is automatically detected via a DOM MutationObserver and applied to all subsequent requests — no manual token copying needed.
-
----
-
-## 🎨 Frontend Features
-
-### Cashier View (`/sales`)
-
-- **Product grid** with category filter tabs
-- **Barcode scanner** support (type barcode + Enter)
-- **Shopping cart** with quantity controls
-- **Discount & tax** controls
-- **Multi-payment modal** — Cash (with change calculation), ABA (QR scan), Card
-- **Receipt** — 80mm thermal printer-optimized format
-- **Real-time** reactive state via Angular Signals
-
-### Admin View
-
-- **Products** — Full CRUD with barcode, category, stock, image management
-- **Categories** — Product category management
-- **Reports** — Dashboard with revenue KPIs, payment breakdown, top products
-- **Sales History** — Full transaction history with search and filters
-- **Users** — User management with role assignments
-- **User Roles** — Role and permission configuration
-- **Permissions** — Granular permission management
-- **User Management** — Comprehensive user administration
-- **Management Pages** — Dynamic navigation page management
-- **File Uploads** — Cloudinary integration for image storage
-- **Suppliers** — Supplier directory and contact management
-- **Purchase Orders** — Create and track purchase orders by supplier
-- **Stock Movements** — Track inventory adjustments and movements
-
-### Shared Features
-
-- 🌐 **Khmer/English** language switching (real-time, no reload, persisted)
-- 🎨 **Responsive design** — Works on desktop and tablet
-- 🔐 **Role-based routing** — Guards protect admin routes
-- 📄 **Pagination** — All list views support paginated data
-- 🎞 **Animations** — Smooth transitions throughout
 
 ---
 
@@ -555,20 +494,25 @@ avatar_url          created_at            stock
 reset_token                               category_id → categories.id
 reset_token_expiry                        description
 created_at                                is_active
+                                          lowStockThreshold
+                                          expiryDate
                                           created_at
 
-sales               sale_items            file_uploads
-─────               ──────────            ────────────
+customers           sales                 sale_items
+─────────           ─────                 ──────────
 id (PK)             id (PK)               id (PK)
-user_id → users.id  sale_id → sales.id    original_file_name
-subtotal            product_id → products  file_name
-discount            quantity              file_path / file_url
-tax                 price (snapshot)      file_extension
-total                                     file_size
-payment_method                            upload_type
-created_at                                destination_storage
-                                          public_id (Cloudinary)
-                                          created_at
+name                user_id → users.id    sale_id → sales.id
+phone (unique)      customer_id → cust.   product_id → products
+loyalty_points      subtotal              quantity
+total_spent         discount              price (snapshot)
+total_purchases     tax                   discount (percentage)
+created_at          total
+                    payment_method
+                    cash_received
+                    change
+                    points_redeemed
+                    points_earned
+                    created_at
 
 management_pages     suppliers             purchase_orders
 ────────────────     ──────────            ───────────────
@@ -589,20 +533,11 @@ purchase_order_items  stock_movements       returns
 id (PK)             id (PK)               id (PK)
 purchase_order_id    product_id → products  sale_id → sales.id
 product_id → products  quantity_change      user_id → users.id
-quantity             type (in/out/adjustment)  reason
+quantity             type (in/out/adjust)  reason
 unit_cost            reference_type        status (pending/approved/rejected)
 total                reference_id          refund_amount
-                    notes                 created_at
-                    created_at
-
-return_items
-────────────
-id (PK)
-return_id → returns.id
-product_id → products
-quantity
-unit_price (snapshot)
-subtotal
+                     notes                 created_at
+                     created_at
 ```
 
 ---
@@ -613,6 +548,7 @@ subtotal
 |--------|:-----:|:-------:|
 | Auth (login) | ✅ | ✅ |
 | Profile | ✅ | ✅ |
+| Dashboard Overview | ✅ | ❌ |
 | Users CRUD | ✅ | ❌ |
 | Categories (read) | ✅ | ✅ |
 | Categories (write) | ✅ | ❌ |
@@ -621,14 +557,10 @@ subtotal
 | Sales (create) | ✅ | ✅ |
 | Sales (read own) | ✅ | ✅ |
 | Sales (read all) | ✅ | ❌ |
-| Reports | ✅ | ❌ |
-| Management Pages | ✅ | ❌ |
-| Suppliers | ✅ | ❌ |
-| Purchase Orders | ✅ | ❌ |
+| Reports (analytics) | ✅ | ❌ |
+| Suppliers & POs | ✅ | ❌ |
 | Stock Movements | ✅ | ❌ |
-| Returns | ✅ | ❌ |
-| Permissions | ✅ | ❌ |
-| File Uploads | ✅ | ❌ |
+| Product Returns | ✅ | ❌ |
 
 ---
 
@@ -690,19 +622,6 @@ docker compose down
 
 # Reset database (⚠️ destroys data volume)
 docker compose down -v && docker compose up -d
-```
-
-### Backend Scripts
-
-```bash
-cd pos-backend
-npm run start:dev       # Dev mode with hot-reload
-npm run build           # Production build
-npm run start:prod      # Run production build
-npm run migration:run   # Apply database migrations
-npm run migration:generate -- src/migrations/MigrationName  # Create migration
-npm run lint            # ESLint
-npm run test            # Run tests
 ```
 
 ---

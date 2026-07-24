@@ -3,21 +3,20 @@ import { CommonModule } from '@angular/common';
 
 import { UserManagementRoutingModule } from './user-management-routing.module';
 import { UserManagementListComponent } from './user-management-list/user-management-list.component';
-import { UserManagementDetailComponent } from './user-management-detail/user-management-detail.component';
 import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material.module';
 import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
-import { ReactiveFormsModule } from '@angular/forms';
+import { UserDetailDialogModule } from '../shared/user-detail-dialog/user-detail-dialog.module';
 
 @NgModule({
-  declarations: [UserManagementListComponent, UserManagementDetailComponent],
+  declarations: [UserManagementListComponent],
   imports: [
     CommonModule,
     UserManagementRoutingModule,
     SharedModule,
     MaterialModule,
     ReusableComponentModule,
-    ReactiveFormsModule,
+    UserDetailDialogModule,
   ],
 })
 export class UserManagementModule { }

@@ -12,6 +12,18 @@ import {
   SalesByCashierEntry,
 } from '../../../core/services/api/report.service';
 import { SaleService } from '../../../core/services/api/sale.service';
+import {
+  ApexChart,
+  ApexXAxis,
+  ApexYAxis,
+  ApexPlotOptions,
+  ApexTooltip,
+  ApexGrid,
+  ApexDataLabels,
+  ApexStates,
+  ApexNoData,
+  ApexTheme,
+} from 'ng-apexcharts';
 
 type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
 
@@ -136,10 +148,168 @@ export class ReportsComponent implements OnInit {
   // Near-expiry products
   nearExpiryProducts = computed(() => this.productService.nearExpiryProducts());
 
+  // ───────────────────────────────────────────────────────────────
+  // ApexCharts Options (reacts to data, theme & language changes)
+  // ───────────────────────────────────────────────────────────────
+  chartSeries = computed<{ name: string; data: number[] }[]>(() => {
+    const entries = this.dailyRevenueEntries();
+    return [{
+      name: this.lang.currentLang() === 'km' ? 'ចំណូល' : 'Revenue',
+      data: entries.map((e) => e.revenue),
+    }];
+  });
+
+  chartCategories = computed<string[]>(() => {
+    return this.dailyRevenueEntries().map((e) => this.formatDateLabel(e.date));
+  });
+
+  chartColors = computed<string[]>(() => {
+    return [this.theme.isDark() ? '#818cf8' : '#6366f1'];
+  });
+
+  chartConfig = computed<ApexChart>(() => ({
+    type: 'bar',
+    height: 220,
+    toolbar: {
+      show: true,
+      tools: {
+        download: true,
+        selection: false,
+        zoom: false,
+        zoomin: false,
+        zoomout: false,
+        pan: false,
+        reset: false,
+      },
+      export: {
+        csv: {
+          filename: `daily-revenue-${new Date().toISOString().split('T')[0]}`,
+          columnDelimiter: ',',
+          headerCategory: this.lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date',
+          headerValue: this.lang.currentLang() === 'km' ? 'ចំណូល' : 'Revenue',
+        },
+        svg: {
+          filename: `daily-revenue-${new Date().toISOString().split('T')[0]}`,
+        },
+        png: {
+          filename: `daily-revenue-${new Date().toISOString().split('T')[0]}`,
+        },
+      },
+    },
+    animations: {
+      enabled: true,
+      speed: 500,
+      animateGradually: { enabled: true, delay: 100 },
+    },
+    foreColor: this.theme.isDark() ? '#94a3b8' : '#64748b',
+    background: 'transparent',
+    fontFamily: 'inherit',
+    parentHeightOffset: 0,
+    sparkline: { enabled: false },
+    redrawOnParentResize: true,
+  }));
+
+  chartPlotOptions = computed<ApexPlotOptions>(() => ({
+    bar: {
+      borderRadius: 6,
+      columnWidth: '55%',
+      borderRadiusApplication: 'end',
+      distributed: false,
+    },
+  }));
+
+  chartXaxis = computed<ApexXAxis>(() => ({
+    categories: this.chartCategories(),
+    labels: {
+      show: true,
+      rotate: 0,
+      trim: true,
+      style: {
+        colors: this.theme.isDark() ? '#94a3b8' : '#64748b',
+        fontSize: '10px',
+        fontFamily: 'inherit',
+        fontWeight: 500,
+      },
+    },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    tooltip: { enabled: false },
+  }));
+
+  chartYaxis = computed<ApexYAxis>(() => ({
+    show: true,
+    labels: {
+      style: {
+        colors: this.theme.isDark() ? '#94a3b8' : '#64748b',
+        fontSize: '11px',
+        fontFamily: 'inherit',
+        fontWeight: 500,
+      },
+      formatter: (val: number) => `$${val.toFixed(0)}`,
+    },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+  }));
+
+  chartGrid = computed<ApexGrid>(() => ({
+    show: true,
+    borderColor: this.theme.isDark() ? '#334155' : '#e2e8f0',
+    strokeDashArray: 3,
+    xaxis: { lines: { show: false } },
+    yaxis: { lines: { show: true } },
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  }));
+
+  chartTooltip = computed<ApexTooltip>(() => {
+    const isDark = this.theme.isDark();
+    const entries = this.dailyRevenueEntries();
+    return {
+      enabled: true,
+      shared: false,
+      followCursor: true,
+      theme: isDark ? 'dark' : 'light',
+      style: { fontSize: '12px', fontFamily: 'inherit' },
+      y: {
+        formatter: (val: number, opts?: any) => {
+          const idx = opts?.dataPointIndex ?? 0;
+          const salesCount = entries[idx]?.totalSales ?? 0;
+          const salesLabel = this.lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'sales';
+          return `$${val.toFixed(2)} (${salesCount} ${salesLabel})`;
+        },
+      },
+    };
+  });
+
+  chartStates = computed<ApexStates>(() => ({
+    hover: { filter: { type: 'darken', value: 0.15 } },
+    active: { allowMultipleDataPointsSelection: false, filter: { type: 'darken' } },
+  }));
+
+  chartNoData = computed<ApexNoData>(() => ({
+    text: this.lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range',
+    align: 'center',
+    verticalAlign: 'middle',
+    style: { color: '#94a3b8', fontSize: '14px', fontFamily: 'inherit' },
+  }));
+
+  chartTheme = computed<ApexTheme>(() => ({
+    mode: this.theme.isDark() ? 'dark' : 'light',
+  }));
+
+  chartDataLabels = computed<ApexDataLabels>(() => ({ enabled: false }));
+
   // Helper: format date label (DD/MM), returns fallback for invalid dates
   formatDateLabel(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
-    const d = new Date(dateStr + 'T00:00:00');
+
+    // Handle raw YYYY-MM-DD without going through Date constructor
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const [, m, d] = dateStr.split('-');
+      return `${d}/${m}`;
+    }
+
+    // Handle ISO datetime or other parseable strings
+    const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '—';
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
   }

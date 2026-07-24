@@ -18,6 +18,7 @@ import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
 export class PaymentModalComponent {
   @Input() total = 0;
   @Input() subtotal = 0;
+  @Input() processing = false;
   @Output() paid = new EventEmitter<{
     method: 'cash' | 'aba' | 'card';
     cashReceived?: number;

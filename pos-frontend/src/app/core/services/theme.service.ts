@@ -10,6 +10,11 @@ export class ThemeService {
   isDark = () => this._theme() === 'dark';
 
   constructor() {
+    // Add .theme-ready after a microtask to prevent flash of transition on initial load
+    queueMicrotask(() => {
+      document.documentElement.classList.add('theme-ready');
+    });
+
     effect(() => {
       const theme = this._theme();
       const html = document.documentElement;

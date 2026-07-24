@@ -133,34 +133,28 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-bold" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
           {{ lang.currentLang() === 'km' ? 'ចំណូលប្រចាំថ្ងៃ' : 'Daily Revenue' }}
-        </h2>          <span class="text-xs text-slate-400" *ngIf="dailyRevenueEntries().length > 0">
+        </h2>
+        <span class="text-xs text-slate-400" *ngIf="dailyRevenueEntries().length > 0">
           {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}: ${{ dailyRevenue().reduce((s, e) => s + (e.revenue || 0), 0).toFixed(2) }}
         </span>
       </div>
-      <div *ngIf="dailyRevenueEntries().length === 0" class="text-center py-8 text-slate-400 text-sm">
-        {{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range' }}
-      </div>
-      <div *ngIf="dailyRevenueEntries().length > 0" class="flex items-end gap-1 sm:gap-2 h-48 overflow-x-auto pb-8 relative">
-        <div *ngFor="let entry of dailyRevenueEntries()" class="flex-1 flex flex-col items-center min-w-[36px] group">
-          <!-- Tooltip -->
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity mb-1 text-xs bg-slate-800 text-white px-2 py-1 rounded-lg whitespace-nowrap z-10 shadow-lg">
-            ${{ (entry.revenue || 0).toFixed(0) }} ({{ entry.totalSales || 0 }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'sales' }})
-          </div>
-          <!-- Bar -->
-          <div class="w-full flex-1 flex items-end justify-center">
-            <div
-              [style.height.%]="entry.pct || 0"
-              [class.bg-indigo-500]="!theme.isDark()"
-              [class.bg-indigo-400]="theme.isDark()"
-              class="w-3/4 rounded-t-md transition-all duration-500 min-h-[4px] hover:opacity-80 cursor-pointer">
-            </div>
-          </div>
-          <!-- Date label -->
-          <span class="text-[10px] text-slate-400 mt-1 absolute bottom-0 truncate max-w-full text-center">
-            {{ formatDateLabel(entry.date) }}
-          </span>
-        </div>
-      </div>
+
+      <!-- ApexCharts Bar Chart -->
+      <apx-chart
+        [series]="chartSeries()"
+        [chart]="chartConfig()"
+        [xaxis]="chartXaxis()"
+        [yaxis]="chartYaxis()"
+        [plotOptions]="chartPlotOptions()"
+        [tooltip]="chartTooltip()"
+        [grid]="chartGrid()"
+        [colors]="chartColors()"
+        [dataLabels]="chartDataLabels()"
+        [states]="chartStates()"
+        [noData]="chartNoData()"
+        [theme]="chartTheme()"
+        style="min-height: 220px;"
+      ></apx-chart>
     </div>
 
     <!-- Top Products -->

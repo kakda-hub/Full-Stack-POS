@@ -14,6 +14,7 @@ export interface NavItem {
 export class NavStateService {
   /** The canonical navigation items used by the sidebar */
   navItems = signal<NavItem[]>([
+    { label: 'Dashboard', labelKm: 'ទិដ្ឋភាពទូទៅ', route: '/dashboard', icon: 'dashboard' },
     { label: 'POS Sale', labelKm: 'លក់', route: '/sales', icon: 'sale' },
     { label: 'Sales History', labelKm: 'ប្រវត្តិលក់', route: '/sales-history', icon: 'history' },
     { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
