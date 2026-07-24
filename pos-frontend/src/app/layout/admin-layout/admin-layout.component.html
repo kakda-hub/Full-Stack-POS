@@ -230,23 +230,12 @@
       <!-- User Profile -->
       <div class="user-profile-card">
         <div *ngIf="!isCollapsed()" class="relative flex-shrink-0 group">
-          <div class="w-10 h-10">
-            @if (auth.currentUser()?.avatarUrl && !avatarError()) {
-              <img
-                [src]="auth.currentUser()?.avatarUrl"
-                alt="Profile"
-                class="w-full h-full rounded-full object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/40 transition-all duration-300"
-                (error)="onAvatarError()"
-              />
-            } @else {
-              <div
-                class="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center ring-2 ring-indigo-500/20 transition-all duration-300"
-                [attr.aria-label]="(auth.currentUser()?.name || 'User') + ' avatar'"
-              >
-                <span class="text-sm font-bold text-white select-none">{{ (auth.currentUser()?.name || 'U').charAt(0).toUpperCase() }}</span>
-              </div>
-            }
-          </div>
+          <app-ui-avatar
+            [imageUrl]="auth.currentUser()?.avatarUrl"
+            [name]="auth.currentUser()?.name"
+            [ringColor]="'ring-indigo-500/20'"
+            [ring]="true"
+          ></app-ui-avatar>
           <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 status-dot-border rounded-full shadow-sm shadow-emerald-500/30"></div>
         </div>
         <div *ngIf="!isCollapsed()" class="min-w-0 flex-1">

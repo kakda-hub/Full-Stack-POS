@@ -156,8 +156,14 @@ export class PaymentModalComponent {
     this.qrImage.set(null);
 
     this.khqrService.generate(amount, `TXN-${Date.now()}`).subscribe({
-      next: (res) => {
-        this.qrImage.set(res.qrImage);
+      next: async (res) => {
+        try {
+          // Render QR code on the client side from the raw qrString
+          const dataUrl = await this.khqrService.generateQrDataUrl(res.qrString);
+          this.qrImage.set(dataUrl);
+        } catch {
+          this.qrError.set(true);
+        }
         this.qrLoading.set(false);
       },
       error: () => {

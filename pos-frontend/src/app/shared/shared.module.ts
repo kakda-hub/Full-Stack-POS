@@ -16,9 +16,11 @@ import { DateFormatPipe } from './pipes/date-format-pipe';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 
 @NgModule({
   declarations: [
+    UiAvatarComponent,
     UiButtonComponent,
     ModalComponent,
     ConfirmDialogComponent,
@@ -45,6 +47,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
     ReactiveFormsModule,
     TranslateModule,
     RouterModule,
+    UiAvatarComponent,
     UiButtonComponent,
     ModalComponent,
     ConfirmDialogComponent,

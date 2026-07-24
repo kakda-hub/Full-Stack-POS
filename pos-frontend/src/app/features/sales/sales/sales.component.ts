@@ -389,6 +389,15 @@ export class SalesComponent implements OnInit {
     return map[category] || '📦';
   }
 
+  /** Remove loading state once image loads */
+  onImgLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    const container = img.closest('.img-container');
+    if (container) {
+      container.classList.remove('img-loading');
+    }
+  }
+
   getProductPhoto(category: string): string {
     const map: Record<string, string> = {
       beverages: 'https://kptmedia.ap-south-1.linodeobjects.com/uploads/2025/06/khmer-drinks-1000x600.jpg',

@@ -23,12 +23,12 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Default admin user password: admin123
--- bcrypt hash generated at cost 10
+-- Generated via bcryptjs at cost 10
 INSERT IGNORE INTO users (name, email, password, role, is_active, created_at)
 VALUES (
   'System Admin',
   'admin@pos.com',
-  '$2b$10$5L4ckx/GV3u5HySLB/m5LecmdLpK4NIErNHGgyUf93EwPSsR4hm0q',
+  '$2a$10$9Wzut7De2kI9N.v4P0NaOuQ52okxx2Wzp5eGcr4R5cJivjoz1BEom',
   'admin',
   1,
   NOW()
@@ -39,7 +39,7 @@ INSERT IGNORE INTO users (name, email, password, role, is_active, created_at)
 VALUES (
   'Cashier User',
   'cashier@pos.com',
-  '$2b$10$Se7U1YG42qaL13FSvjkTs.zZcrIY3kAzf4pxcvLC8SAw6wvfxspfa',
+  '$2a$10$ymiO1NN.wCf8CZAMsatZBOD1s62KPPt7CblSnbS7xWEt3l61B5DG.',
   'cashier',
   1,
   NOW()
