@@ -2,76 +2,81 @@
   <!-- Top Nav -->
   <header class="cashier-header">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-        <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
+      <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+        </svg>
       </div>
-      <span class="brand-text">
-        Mini Mart
-        @if (cart.itemCount() > 0) {
-          <span class="cart-count-badge" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
-        }
-      </span>
+      <div>
+        <h1 class="text-lg font-extrabold tracking-tight text-slate-800 dark:text-white">
+          Mini Mart
+        </h1>
+      </div>
+      @if (cart.itemCount() > 0) {
+        <span class="cart-count-badge" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
+      }
     </div>
     <div class="flex items-center gap-3">
-      <!-- Dark Mode Toggle -->
-      <button
-        (click)="theme.toggle()"
-        class="theme-toggle-btn"
-        [title]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-        type="button"
-        aria-label="Toggle theme"
-      >
-        <svg
-          [hidden]="!theme.isDark()"
-          class="w-4 h-4 text-amber-400 theme-toggle-sun"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          stroke-width="2"
+      <!-- Dark Mode Toggle -- Segmented control -->
+      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+        <button
+          (click)="theme.setTheme('light')"
+          [class.bg-white]="!theme.isDark()"
+          [class.shadow-sm]="!theme.isDark()"
+          [class.text-indigo-600]="!theme.isDark()"
+          [class.text-slate-400]="theme.isDark()"
+          [class.hover\:text-indigo-600]="theme.isDark()"
+          class="p-1.5 rounded transition-all"
+          [title]="theme.isDark() ? 'Switch to Light' : 'Light mode'"
+          type="button"
         >
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-        <svg
-          [hidden]="theme.isDark()"
-          class="w-4 h-4 text-slate-600 theme-toggle-moon"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          stroke-width="2"
+          <svg [@themeRotate]="theme.currentTheme()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </button>
+        <button
+          (click)="theme.setTheme('dark')"
+          [class.bg-white]="theme.isDark()"
+          [class.shadow-sm]="theme.isDark()"
+          [class.text-indigo-600]="theme.isDark()"
+          [class.text-slate-400]="!theme.isDark()"
+          [class.hover\:text-indigo-600]="!theme.isDark()"
+          class="p-1.5 rounded transition-all"
+          [title]="theme.isDark() ? 'Dark mode' : 'Switch to Dark'"
+          type="button"
         >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-      </button>
+          <svg [@themeRotate]="theme.currentTheme()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
 
-      <button
-        (click)="langService.toggle()"
-        class="lang-toggle"
-      >
+      <!-- Language Toggle -->
+      <button (click)="langService.toggle()" class="lang-toggle">
         <span>{{ langService.currentLang() === 'en' ? '🇰🇭 ខ្មែរ' : '🇬🇧 EN' }}</span>
       </button>
 
-      <div class="user-info-text">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden avatar-ring">
+      <!-- User Area -->
+      <div class="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
+        <div class="text-right hidden sm:block">
+          <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ auth.currentUser()?.name || 'Cashier' }}</p>
+          <p class="text-[10px] text-emerald-500 dark:text-emerald-400 font-medium flex items-center gap-1 justify-end">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            Online
+          </p>
+        </div>
+        <div class="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-md">
           @if (auth.currentUser()?.avatarUrl && !avatarError()) {
             <img class="w-full h-full object-cover" [src]="auth.currentUser()?.avatarUrl" alt="" (error)="onAvatarError()" />
           } @else {
             <div
-              class="w-full h-full flex items-center justify-center font-bold text-xs avatar-fallback"
+              class="w-full h-full flex items-center justify-center font-bold text-sm bg-gradient-to-br from-indigo-500 to-violet-600 text-white"
               [attr.aria-label]="(auth.currentUser()?.name || 'User') + ' avatar'"
             >
               {{ (auth.currentUser()?.name || 'U').charAt(0).toUpperCase() }}
             </div>
           }
         </div>
-        <span class="hidden sm:inline font-medium">{{ auth.currentUser()?.name }}</span>
       </div>
 
       <button (click)="auth.logout()" class="logout-btn" title="Logout">

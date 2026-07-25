@@ -57,7 +57,7 @@ Full-Stack POS is a complete, enterprise-grade Point of Sale system built for mo
 - **Active Grid Highlights**: Visually overlays item quantity badges and selected-state borders on the main product grid so cashiers instantly know what's in their cart.
 - **Localized Confirmation Modals**: Uses localized, modern Angular Material dialog popups in place of generic browser alerts when clearing active carts.
 
-### 💵 Loyalty points & Flexible Payment Systems (NEW!)
+### 💵 Loyalty Points & Flexible Payment Systems (NEW!)
 - **Customer Rewards System**: Integrated customer lookup by phone number directly at checkout, displaying loyalty points balances, lifetime purchases, and total spent.
 - **Points Redemption**: Cashiers can redeem customer points (e.g., 100 points = $1.00 USD discount) to instantly update checkout totals.
 - **Real-Time ABA KHQR QR Generation**: Dynamic generation of compliant EMV-co QR codes complete with loading indicators and fallback retry prompts.
@@ -67,11 +67,40 @@ Full-Stack POS is a complete, enterprise-grade Point of Sale system built for mo
 - Styled and formatted specifically for standard **80mm thermal hardware printers**.
 - Automatically renders customer details, points earned, points redeemed, item-level discounts, VAT, payment methods, and customized thank-you footers in the user's chosen language.
 
-### 🔄 Multi-Stage Inventory Control & Supply Chain
-- Real-time inventory deduction during sales transaction commits.
-- Full support for Supplier directories, Purchase Order lifecycles (Draft -> Approved -> Received -> Cancelled), stock movement logs (In/Out/Adjustments), and Customer product returns.
+### 🔄 Full Supply Chain Management (NEW!)
+- **Supplier Directory**: Complete supplier management with contact details, email, phone, and address records.
+- **Purchase Orders**: Full PO lifecycle — Draft → Pending → Approved → Received → Cancelled with reference tracking and itemized costing.
+- **Stock Movements**: Comprehensive audit trail logging all stock In/Out/Adjustment operations with reference linking.
+- **Product Returns**: Admin-managed return/refund processing with automatic inventory restocking.
+- **Real-Time Inventory Deduction**: Instant stock reduction during sales transaction commits.
+- **Near-Expiry Detection**: Automatic flagging of products expiring within 30 days.
+
+### ⚡ Quick Picks — Fast Checkout Items (NEW!)
+- **Frequently Bought Items**: Configurable quick-pick product shortcuts for faster checkout workflows.
+- **Admin-Managed**: Full CRUD with active/inactive toggling for seasonal item rotation.
+
+### 👤 Avatar & Profile Management (NEW!)
+- **User Avatar Uploads**: Profile picture upload and management for all users.
+- **Cloudinary & MinIO Support**: Multi-storage image hosting with automatic optimization and resizing.
 
 ---
+
+### 📸 UI Preview
+
+> Browse the **[🎨 Interactive UI Mockup Gallery](pos-frontend/src/assets/ui-mockups.html)** — a beautifully designed CSS preview of all 10 key screens:
+
+| Screen | Description |
+|--------|-------------|
+| 🔐 **Login** | Brand panel with language toggle, demo login buttons |
+| 🛒 **Cashier POS** | Product grid, category filters, barcode search, cart sidebar |
+| 💳 **Payment Modal** | Cash/ABA/Card methods, change calculator, quick-cash buttons |
+| 🧾 **Receipt** | 80mm thermal printer format with item details & totals |
+| 📊 **Admin Dashboard** | KPI metrics, inventory alerts, top sellers |
+| 📈 **Reports** | Bar charts, revenue trends, payment breakdown |
+| 📜 **Sales History** | Transaction list with payment method badges |
+| 👥 **User Management** | User cards with avatars, roles, online status |
+| 📂 **Management Pages** | Tree navigation structure with URL paths |
+| 🔑 **User Roles** | Role assignment with admin/cashier grouping |
 
 ### Live Demo
 
@@ -148,7 +177,11 @@ Full-Stack-POS/
 │   │   │   ├── suppliers/                # Supplier management
 │   │   │   ├── purchase-orders/          # Purchase order management
 │   │   │   ├── stock-movements/          # Stock movement tracking
-│   │   │   └── returns/                  # Product returns management
+│   │   │   ├── returns/                  # Product returns management
+│   │   │   ├── customers/                # Customer management & loyalty points
+│   │   │   ├── khqr/                     # ABA KHQR payment QR generation
+│   │   │   ├── quick-picks/              # Frequently bought items shortcuts
+│   │   │   └── health/                   # Application health check
 │   │   ├── common/                       # Guards, decorators, filters
 │   │   │   ├── guards/                   # JwtAuthGuard, RolesGuard
 │   │   │   ├── decorators/               # @Roles(), @CurrentUser()
@@ -184,6 +217,7 @@ Full-Stack-POS/
 │   │   │   ├── suppliers/                # Supplier management
 │   │   │   ├── purchase-orders/          # Purchase order management
 │   │   │   ├── stock-movements/          # Stock movement tracking
+│   │   │   ├── quick-picks/              # Quick-pick product shortcuts (NEW!)
 │   │   │   └── page-not-found/           # 404 page
 │   │   ├── core/                         # Guards, interceptors, services, models
 │   │   ├── layout/                       # Admin & Cashier adaptive layout shells
@@ -473,6 +507,72 @@ Payment methods: `cash` | `aba` | `card`
 
 All reports accept optional `from` and `to` query params (`YYYY-MM-DD`).
 
+### 👥 Customers
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/customers` | admin | Create customer |
+| GET | `/customers` | all | List all active customers |
+| GET | `/customers/phone/:phone` | all | Find customer by phone number |
+| POST | `/customers/phone/:phone/find-or-create` | all | Find by phone or auto-create |
+| GET | `/customers/:id` | admin | Get customer by ID |
+| PATCH | `/customers/:id` | admin | Update customer |
+| DELETE | `/customers/:id` | admin | Deactivate customer |
+| POST | `/customers/:id/points/add` | admin | Add loyalty points |
+| POST | `/customers/:id/points/redeem` | all | Redeem points for discount |
+
+### 📱 KHQR Payment
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/khqr/generate` | all | Generate ABA KHQR QR code for payment |
+
+### ⚡ Quick Picks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/quick-picks` | admin | Create quick-pick item |
+| GET | `/quick-picks` | all | List active items |
+| GET | `/quick-picks/:id` | admin | Get item by ID |
+| PATCH | `/quick-picks/:id` | admin | Update item |
+| DELETE | `/quick-picks/:id` | admin | Delete item |
+
+### 🔄 Returns `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/returns` | Create return/refund (restocks inventory) |
+| GET | `/returns` | List all returns (paginated) |
+| GET | `/returns/:id` | Get return by ID |
+
+### 📦 Suppliers `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/suppliers` | Create supplier |
+| GET | `/suppliers` | List active suppliers (paginated) |
+| GET | `/suppliers/:id` | Get supplier by ID |
+| PATCH | `/suppliers/:id` | Update supplier |
+| DELETE | `/suppliers/:id` | Deactivate supplier |
+
+### 📋 Purchase Orders `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/purchase-orders` | Create purchase order |
+| GET | `/purchase-orders` | List all (paginated) |
+| GET | `/purchase-orders/:id` | Get by ID |
+| PATCH | `/purchase-orders/:id/receive` | Receive order (updates stock) |
+| DELETE | `/purchase-orders/:id` | Cancel order |
+
+### 📊 Stock Movements `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stock-movements` | List all movements (paginated, filterable) |
+| GET | `/stock-movements/product/:productId` | Get movements for a specific product |
+| GET | `/stock-movements/near-expiry` | Get products near expiry (default: 30 days) |
+
 ### Swagger Auto-Authorization
 
 The Swagger UI at `/api/docs` includes **auto-authorization**: after a successful login, the JWT token is automatically detected via a DOM MutationObserver and applied to all subsequent requests — no manual token copying needed.
@@ -528,16 +628,16 @@ created_at / updated_at                    total
                                           notes
                                           created_at
 
-purchase_order_items  stock_movements       returns
-───────────────────  ───────────────       ───────
-id (PK)             id (PK)               id (PK)
-purchase_order_id    product_id → products  sale_id → sales.id
-product_id → products  quantity_change      user_id → users.id
-quantity             type (in/out/adjust)  reason
-unit_cost            reference_type        status (pending/approved/rejected)
-total                reference_id          refund_amount
-                     notes                 created_at
-                     created_at
+quick_picks           purchase_order_items  stock_movements       returns
+───────────           ───────────────────  ───────────────       ───────
+id (PK)              id (PK)              id (PK)               id (PK)
+product_id → products.id purchase_order_id  product_id → products  sale_id → sales.id
+display_order        product_id → products  quantity_change      user_id → users.id
+is_active            quantity              type (in/out/adjust)  reason
+created_at           unit_cost             reference_type        status (pending/approved/rejected)
+                     total                 reference_id          refund_amount
+                                            notes                 created_at
+                                            created_at
 ```
 
 ---
@@ -550,6 +650,8 @@ total                reference_id          refund_amount
 | Profile | ✅ | ✅ |
 | Dashboard Overview | ✅ | ❌ |
 | Users CRUD | ✅ | ❌ |
+| Customers (read) | ✅ | ✅ |
+| Customers (write) | ✅ | ❌ |
 | Categories (read) | ✅ | ✅ |
 | Categories (write) | ✅ | ❌ |
 | Products (read) | ✅ | ✅ |
@@ -557,6 +659,9 @@ total                reference_id          refund_amount
 | Sales (create) | ✅ | ✅ |
 | Sales (read own) | ✅ | ✅ |
 | Sales (read all) | ✅ | ❌ |
+| KHQR Payment | ✅ | ✅ |
+| Quick Picks (read) | ✅ | ✅ |
+| Quick Picks (write) | ✅ | ❌ |
 | Reports (analytics) | ✅ | ❌ |
 | Suppliers & POs | ✅ | ❌ |
 | Stock Movements | ✅ | ❌ |

@@ -52,15 +52,15 @@
 
 /* ─── Theme toggle button ─── */
 .theme-toggle-btn {
-  @apply p-2 rounded-xl transition-all duration-200;
-  @apply bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:shadow-sm hover:scale-105 active:scale-95;
+  @apply flex p-2 rounded-xl motion-safe:transition-all motion-safe:duration-200;
+  @apply bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:shadow-sm motion-safe:hover:scale-105 motion-safe:active:scale-95;
   @apply dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-700/80;
 }
 
 /* ─── Language toggle ─── */
 .lang-toggle {
-  @apply px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5;
-  @apply bg-slate-100/80 text-slate-700 hover:bg-slate-200/80 hover:shadow-sm active:scale-95;
+  @apply px-3 py-1.5 rounded-xl text-sm font-medium motion-safe:transition-all motion-safe:duration-200 flex items-center gap-1.5;
+  @apply bg-slate-100/80 text-slate-700 hover:bg-slate-200/80 hover:shadow-sm motion-safe:active:scale-95;
   @apply dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-700/80;
 }
 
@@ -72,7 +72,7 @@
 
 /* ─── Avatar ring with hover glow ─── */
 .avatar-ring {
-  @apply ring-2 transition-all duration-300;
+  @apply ring-2 motion-safe:transition-all motion-safe:duration-300;
   @apply ring-indigo-500/20;
   @apply dark:ring-indigo-400/30;
 
@@ -90,6 +90,6 @@
 
 /* ─── Logout button ─── */
 .logout-btn {
-  @apply p-2 rounded-xl transition-all duration-200;
-  @apply text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 hover:shadow-sm hover:scale-105 active:scale-95;
+  @apply p-2 rounded-xl motion-safe:transition-all motion-safe:duration-200;
+  @apply text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 hover:shadow-sm motion-safe:hover:scale-105 motion-safe:active:scale-95;
 }

@@ -1,6 +1,6 @@
 /* ─── Skeleton state ─── */
 .dt-skeleton-section {
-  @apply rounded-2xl border overflow-hidden bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+  @apply rounded-[1.5rem] border overflow-hidden bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
 }
 
 .dt-skeleton-thead {
@@ -9,7 +9,7 @@
 
 /* ─── Table container ─── */
 .dt-container {
-  @apply rounded-2xl border overflow-hidden shadow-sm bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
+  @apply rounded-[1.5rem] border overflow-hidden shadow-sm bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700;
 }
 
 .dt-thead {
@@ -26,7 +26,11 @@
 
 /* ─── Row ─── */
 .dt-row {
-  @apply transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-700;
+  @apply transition-all duration-150 hover:bg-slate-50 dark:hover:bg-slate-700;
+
+  &:active {
+    @apply scale-[0.99];
+  }
 }
 
 .dt-cell {

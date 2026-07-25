@@ -46,7 +46,7 @@
 
 /* ─── Navigation item ─── */
 .nav-item {
-  @apply flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-200 relative;
+  @apply flex items-center gap-2 px-3 py-2.5 rounded-[1.25rem] transition-all duration-200 relative;
   @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100/50;
 
   :host-context(html.dark) & {
@@ -62,12 +62,17 @@
   &:hover .nav-item-label {
     @apply translate-x-0.5;
   }
+
+  /* Press feedback */
+  &:active {
+    @apply scale-[0.97];
+  }
 }
 
 /* ─── Active link state ─── */
 .active-link {
   @apply bg-indigo-500/10 text-indigo-600 font-semibold relative;
-  box-shadow: inset 0 0 24px rgba(99, 102, 241, 0.06);
+  box-shadow: inset 0 0 24px rgba(99, 102, 241, 0.06), 0 2px 8px rgba(99, 102, 241, 0.08);
 
   :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400;
@@ -91,6 +96,10 @@
 
   &:hover {
     @apply bg-gradient-to-r from-indigo-500/10 to-indigo-500/[0.06];
+  }
+
+  &:active {
+    @apply scale-[0.97];
   }
 }
 
@@ -132,7 +141,7 @@
 
 .active-sub-link {
   @apply bg-gradient-to-r from-indigo-50 to-indigo-50/50 text-indigo-600 font-bold !important;
-  box-shadow: inset 0 1px 3px rgba(99, 102, 241, 0.04);
+  box-shadow: inset 0 1px 3px rgba(99, 102, 241, 0.04), 0 2px 6px rgba(99, 102, 241, 0.08);
 
   :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400 !important;
@@ -171,22 +180,28 @@
 
 /* ─── Sidebar toggle button ─── */
 .sidebar-toggle {
-  @apply flex absolute -right-3 top-10 w-6 h-6 rounded-full border-2 items-center justify-center transition-all shadow-lg z-50;
+  @apply flex absolute -right-3.5 top-10 w-7 h-7 rounded-full border-2 items-center justify-center transition-all shadow-lg z-50;
   @apply bg-gradient-to-br from-indigo-500 to-indigo-600 border-white text-white;
   @apply dark:border-[#0B1120];
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 
   &:hover {
-    @apply scale-110;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    @apply scale-110 rotate-12;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45);
   }
 
   &:active {
-    @apply scale-95;
+    @apply scale-90;
   }
 
   svg {
     filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Rotate the chevron when collapsed */
+  &.is-collapsed svg {
+    transform: rotate(180deg);
   }
 }
 
@@ -251,14 +266,18 @@
 
 /* ─── User profile card ─── */
 .user-profile-card {
-  @apply flex items-center gap-3 p-2.5 rounded-2xl border transition-all duration-300;
+  @apply flex items-center gap-3 p-2.5 rounded-[1.5rem] border transition-all duration-300;
   @apply bg-white/80 border-slate-200/60;
   @apply dark:bg-slate-800/40 dark:border-slate-700/40;
 
   &:hover {
     @apply border-indigo-200/60 shadow-lg shadow-indigo-500/5;
     @apply dark:border-indigo-500/20;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    @apply scale-[0.98];
   }
 }
 
@@ -344,7 +363,7 @@
 }
 
 .mobile-menu-panel {
-  @apply w-full max-h-[70vh] rounded-t-2xl border-t flex flex-col overflow-hidden;
+  @apply w-full max-h-[70vh] rounded-t-[2rem] border-t flex flex-col overflow-hidden;
   @apply bg-white border-slate-200/80;
   @apply dark:bg-slate-900 dark:border-slate-800/80;
   box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.12);
@@ -419,20 +438,79 @@
 
 /* ─── Submenu item ─── */
 .submenu-item {
-  @apply flex items-center py-2 px-3 text-[13px] rounded-lg transition-all duration-200;
+  @apply flex items-center py-2 px-3 text-[13px] rounded-[1rem] transition-all duration-200;
   @apply text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/60;
   @apply dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10;
 
   &:hover {
     @apply translate-x-0.5;
   }
+
+  &:active {
+    @apply scale-[0.97];
+  }
 }
 
 /* ==========================================================
    Animations
-   ========================================================== */
-
-@keyframes statusPulse {
+   ========================================================== */  @keyframes statusPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
+}
+
+/* ==========================================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-item,
+  .submenu-item,
+  .sidebar-toggle,
+  .user-profile-card,
+  .footer-btn,
+  .mobile-bottom-nav > a,
+  .mobile-bottom-nav > button,
+  .mobile-menu-overlay,
+  .mobile-menu-panel {
+    transition: none;
+  }
+
+  .nav-item:active,
+  .submenu-item:active,
+  .sidebar-toggle:active,
+  .user-profile-card:active,
+  .sidebar-toggle:hover,
+  .nav-item:hover .nav-item-icon,
+  .nav-item:hover .nav-item-label {
+    transform: none !important;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+  }
+
+  .sidebar-toggle.is-collapsed svg {
+    transform: none !important;
+  }
+
+  .mobile-menu-overlay {
+    animation: none;
+  }
+
+  .mobile-menu-panel {
+    animation: none;
+  }
+
+  .mobile-nav-active {
+    transform: none !important;
+  }
+
+  .active-more-btn {
+    transform: none !important;
+  }
+
+  .brand-title {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+  }
 }

@@ -82,3 +82,16 @@ export const pageTransition = trigger('pageTransition', [
     animate('220ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
   ]),
 ]);
+
+/**
+ * Smooth 360° rotation animation triggered when the theme switches.
+ * Bind to `theme.currentTheme()` so the SVG spins each time the theme changes.
+ */
+export const themeRotate = trigger('themeRotate', [
+  transition('* => *', [
+    animate('500ms cubic-bezier(0.4, 0, 0.2, 1)', keyframes([
+      style({ transform: 'rotate(0deg)', offset: 0 }),
+      style({ transform: 'rotate(360deg)', offset: 1 }),
+    ])),
+  ]),
+]);

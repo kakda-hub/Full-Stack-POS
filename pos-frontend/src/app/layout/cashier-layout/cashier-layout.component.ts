@@ -3,13 +3,13 @@ import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { counterAnimation } from '../../shared/animations/animations';
+import { counterAnimation, themeRotate } from '../../shared/animations/animations';
 
 @Component({
   selector: 'app-cashier-layout',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [counterAnimation],
+  animations: [counterAnimation, themeRotate],
   templateUrl: './cashier-layout.component.html',
   styleUrl: './cashier-layout.component.scss',
 })

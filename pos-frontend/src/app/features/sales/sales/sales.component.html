@@ -1,153 +1,80 @@
-<div
-  @pageTransition
-  [class.bg-slate-900]="theme.isDark()"
-  [class.bg-slate-50]="!theme.isDark()"
-  class="flex h-full overflow-hidden relative"
->
+<div @pageTransition class="flex h-full overflow-hidden relative bg-[#F1F5F9] dark:bg-slate-950">
   <!-- LEFT: Product Grid -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
     <!-- Search & Category Bar -->
-    <div
-      [class.bg-slate-800]="theme.isDark()"
-      [class.border-slate-700]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-200]="!theme.isDark()"
-      class="border-b px-4 py-3 space-y-3 shadow-sm bg-white"
-    >
-      <div class="flex gap-3">
-        <!-- Toggle Button (Inside Bar, only visible when cart is closed) -->
-        <button
-          *ngIf="!isCartOpen()"
-          (click)="toggleCartSidebar()"
-          [class.bg-indigo-900\/30]="theme.isDark()"
-          [class.hover\:bg-indigo-800\/40]="theme.isDark()"
-          [class.bg-indigo-50]="!theme.isDark()"
-          [class.hover\:bg-indigo-100]="!theme.isDark()"
-          class="p-2.5 rounded-xl text-indigo-600 transition-colors"
-          [title]="langService.currentLang() === 'km' ? 'បើកកន្ត្រកទំនិញ' : 'Open Cart'"
-          [attr.aria-label]="langService.currentLang() === 'km' ? 'បើកកន្ត្រកទំនិញ' : 'Open Cart'"
-          type="button"
-          aria-label="Toggle cart"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800/60 px-3 sm:px-4 lg:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 space-y-4 sm:space-y-5 shadow-sm">
+      <!-- Search -->
+      <div class="relative group">
+        <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-slate-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-        </button>
-
-        <div id="search" class="flex-1 relative">
-          <svg
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          <input
-            aria-label="Search"
-            #searchInput
-            type="text"
-            [placeholder]="
-              langService.currentLang() === 'km' ? 'ស្វែងរក ឬស្កែន...' : 'Search or scan barcode...'
-            "
-            (input)="onSearch($event)"
-            (keydown.enter)="onBarcodeEnter($event)"
-            [class.bg-slate-700]="theme.isDark()"
-            [class.border-slate-600]="theme.isDark()"
-            [class.text-slate-100]="theme.isDark()"
-            [class.bg-slate-100]="!theme.isDark()"
-            [class.border-slate-200]="!theme.isDark()"
-            class="w-full pl-9 pr-4 py-2.5 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
-          />
-        </div>
+        </span>
+        <input
+          aria-label="Search"
+          #searchInput
+          type="text"
+          [placeholder]="langService.currentLang() === 'km' ? 'ស្វែងរក ឬស្កែន... (Ctrl+F)' : 'Search products or scan barcode... (Ctrl+F)'"
+          (input)="onSearch($event)"
+          (keydown.enter)="onBarcodeEnter($event)"
+          class="block w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-100"
+        />
       </div>
 
       <!-- Category Tabs -->
-      <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
         <button
           *ngFor="let cat of productService.categories()"
           (click)="productService.setCategory(cat.id)"
           [class]="
             cat.id === productService.selectedCategory()
-              ? 'px-4 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-semibold whitespace-nowrap shadow-sm'
-              : theme.isDark()
-                ? 'px-4 py-1.5 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium whitespace-nowrap transition-all'
-                : 'px-4 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium whitespace-nowrap transition-all'
+              ? 'px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 dark:shadow-indigo-900/30 whitespace-nowrap transition-all'
+              : 'px-4 py-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-200 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all whitespace-nowrap'
           "
           type="button"
-          aria-label="Toggle category"
         >
           {{ langService.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
         </button>
       </div>
-    </div>
 
-    <!-- Quick Pick Buttons (non-barcoded items) -->
-    @if (quickPicks().length > 0) {
-      <div class="mx-4 mt-3">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1">
-          {{ langService.currentLang() === 'km' ? 'ទំនិញគ្មានបាកូដ' : 'Quick Items' }}
-        </p>
-        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          @for (item of quickPicks(); track item.id) {
-            <button
-              (click)="addQuickPick(item)"
-              [class.bg-slate-800]="theme.isDark()"
-              [class.border-slate-700]="theme.isDark()"
-              [class.hover\:bg-slate-700]="theme.isDark()"
-              [class.bg-white]="!theme.isDark()"
-              [class.border-slate-200]="!theme.isDark()"
-              [class.hover\:bg-indigo-50]="!theme.isDark()"
-              [class.hover\:border-indigo-300]="!theme.isDark()"
-              class="flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-sm active:scale-95 quick-pick-btn"
-              type="button"
-            >
-              @if (item.icon) {
-                <span class="text-lg">{{ item.icon }}</span>
-              }
-              <span>{{ langService.currentLang() === 'km' && item.labelKh ? item.labelKh : item.label }}</span>
-              <span class="text-indigo-600 font-bold">${{ item.price.toFixed(2) }}</span>
-            </button>
-          }
+      <!-- Quick Pick Buttons (non-barcoded items) -->
+      @if (quickPicks().length > 0) {
+        <div>
+          <h2 class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] px-1">
+            {{ langService.currentLang() === 'km' ? 'ទំនិញគ្មានបាកូដ' : 'Quick Add Items' }}
+          </h2>
+          <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            @for (item of quickPicks(); track item.id) {
+              <button
+                (click)="addQuickPick(item)"
+                class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all motion-safe:active:scale-95 group"
+                type="button"
+              >
+                @if (item.icon) {
+                  <span class="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-700 rounded-lg text-lg group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">{{ item.icon }}</span>
+                }
+                <div class="text-left">
+                  <p class="text-[11px] font-bold text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' && item.labelKh ? item.labelKh : item.label }}</p>
+                  <p class="text-xs font-black text-indigo-600 dark:text-indigo-400">${{ item.price.toFixed(2) }}</p>
+                </div>
+              </button>
+            }
+          </div>
         </div>
-      </div>
-    }
+      }
+    </div>
 
     <!-- Low-stock alert bar -->
     @if (productService.lowStockProducts().length > 0) {
       <div
         @fadeIn
-        [class.bg-amber-900\/20]="theme.isDark()"
-        [class.border-amber-700\/40]="theme.isDark()"
-        [class.bg-amber-50]="!theme.isDark()"
-        [class.border-amber-200]="!theme.isDark()"
-        class="mx-4 mt-2 border rounded-xl p-3 flex items-center gap-3"
+        class="mx-3 sm:mx-4 lg:mx-6 mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-2xl p-3 sm:p-4 flex items-center gap-3"
       >
-        <svg
-          class="w-5 h-5 text-amber-600 flex-shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <div class="flex-1">
-          <p [class.text-amber-300]="theme.isDark()" [class.text-amber-800]="!theme.isDark()" class="text-sm font-medium">
+          <p class="text-sm font-medium text-amber-800 dark:text-amber-300">
             {{ productService.lowStockProducts().length }}
             {{ langService.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}:
             @for (p of productService.lowStockProducts(); track p.id; let last = $last) {
@@ -156,10 +83,7 @@
           </p>
         </div>
         @if (auth.isAdmin()) {
-          <a
-            routerLink="/products"
-            class="flex-shrink-0 text-xs font-bold text-amber-700 hover:text-amber-800 bg-amber-200\/60 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors"
-          >
+          <a routerLink="/products" class="flex-shrink-0 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-200/60 dark:bg-amber-800/30 hover:bg-amber-200 dark:hover:bg-amber-700/40 px-3 py-1.5 rounded-lg transition-colors">
             {{ langService.currentLang() === 'km' ? 'គ្រប់គ្រង' : 'Manage' }}
           </a>
         }
@@ -167,241 +91,159 @@
     }
 
     <!-- Product Grid -->
-    <div class="flex-1 overflow-y-auto p-4">
-      <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        <div
-          *ngFor="let i of [1, 2, 3, 4, 8]"
-          [class.bg-slate-700]="theme.isDark()"
-          [class.bg-slate-100]="!theme.isDark()"
-          class="h-40 animate-pulse rounded-2xl"
-        ></div>
+    <div class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+      <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
+        <div *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8]" class="h-40 sm:h-44 lg:h-52 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-[2rem]"></div>
       </div>
 
       <div
         *ngIf="!isLoadingProducts()"
         [@listAnimation]="productService.filteredProducts().length"
-        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 pb-12"
       >
         <button
           *ngFor="let product of productService.filteredProducts(); trackBy: trackById"
           @fadeIn
           (click)="addToCart(product)"
           [disabled]="effectiveStock(product) <= 0"
-          [class.bg-slate-800]="theme.isDark()"
-          [class.border-slate-700]="theme.isDark()"
-          [class.bg-white]="!theme.isDark()"
-          [class.border-slate-200]="!theme.isDark()"
-          [class.ring-2]="isInCart(product)"
-          [class.ring-indigo-500]="isInCart(product)"
-          [class.bg-blue-900\/20]="isInCart(product) && theme.isDark()"
-          [class.bg-blue-50]="isInCart(product) && !theme.isDark()"
-          [class.animate-shake]="shakingProductId() === product.id"
-          class="relative overflow-hidden rounded-2xl border p-0 text-left shadow-sm product-card-hover product-card-ripple group"
+          [class]="
+            isInCart(product)
+              ? 'group bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-indigo-500 shadow-xl shadow-indigo-100/50 dark:shadow-indigo-900/30 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col scale-[1.02]'
+              : 'group bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-indigo-900/20 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col motion-safe:hover:-translate-y-1'
+          "
         >
           <!-- Stock add animation indicator -->
           @if (lastAddedId() === product.id) {
-            <span
-              class="stock-add-fly"
-              [class.text-indigo-500]="!theme.isDark()"
-              [class.text-indigo-300]="theme.isDark()"
-            >+1</span>
+            <span class="stock-add-fly text-indigo-500 dark:text-indigo-300">+1</span>
           }
-          <!-- Low-stock badge -->
-          @let avail = effectiveStock(product);
-          @if (avail > 0 && avail <= 5) {
-            <span
-              class="absolute -top-2 -right-2 z-10 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
-            >
-              {{ avail }}
-              {{ langService.currentLang() === 'km' ? 'នៅសល់' : 'left' }}
-            </span>
-          } @else if (avail <= 0) {
-            <span
-              class="absolute -top-2 -right-2 z-10 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg"
-            >
-              {{ langService.currentLang() === 'km' ? 'អស់' : 'Out' }}
-            </span>
-          }
-          <div class="relative mb-1 overflow-hidden">
-            <!-- Cart quantity badge (top-left) -->
-            @let qty = cartQuantity(product);
-            @if (qty > 0) {
-              <span
-                class="cart-qty-badge absolute top-2 left-2 z-10"
-                [@counterAnimation]="qty"
-              >
-                {{ qty }}
-              </span>
-            }
-            <!-- Category emoji badge -->
-            <span class="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm shadow-sm text-slate-700 dark:text-slate-300">
-              {{ getCategoryEmoji(product.category) }}
-              <span class="text-[10px] font-medium uppercase tracking-wider">{{ product.category }}</span>
-            </span>
-            <!-- Image with gradient overlay -->
-            <div class="relative img-container overflow-hidden" [class.img-loading]="!product.imgUrl && !getProductPhoto(product.category)">
-              <img
-                [src]="product.imgUrl || getProductPhoto(product.category)"
-                [alt]="product.name"
-                [class.opacity-40]="avail <= 0"
-                class="w-full h-40 object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                (load)="onImgLoad($event)"
-                loading="lazy"
-              />
-              <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-800 dark:via-slate-800/80 dark:to-transparent"></div>
+          <!-- Shake animation -->
+          <div [class.animate-shake]="shakingProductId() === product.id" class="flex flex-col flex-1">
+            <div class="h-36 sm:h-40 lg:h-44 bg-slate-50 dark:bg-slate-700 relative overflow-hidden">
+              <!-- Stock Badge with Glassmorphism -->
+              @let avail = effectiveStock(product);
+              @if (avail > 0) {
+                <div class="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 border border-slate-100 dark:border-slate-700">
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    [class.bg-emerald-500]="avail > 5"
+                    [class.bg-amber-500]="avail <= 5"
+                    [class.animate-pulse]="avail <= 5"
+                  ></span>
+                  <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">{{ avail }} in stock</span>
+                </div>
+              } @else {
+                <div class="absolute top-4 right-4 z-10 bg-rose-500/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 border border-rose-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                  <span class="text-[10px] font-bold text-white">{{ langService.currentLang() === 'km' ? 'អស់' : 'Out of stock' }}</span>
+                </div>
+              }
+              <!-- Cart quantity badge (top-left) -->
+              @let qty = cartQuantity(product);
+              @if (qty > 0) {
+                <span class="cart-qty-badge absolute top-4 left-4 z-10" [@counterAnimation]="qty">{{ qty }}</span>
+              }
+              <!-- Product image with subtle scale on hover -->
+              <div class="relative img-container overflow-hidden w-full h-full" [class.img-loading]="!product.imgUrl && !getProductPhoto(product.category)">
+                <img
+                  [src]="product.imgUrl || getProductPhoto(product.category)"
+                  [alt]="product.name"
+                  [class.opacity-30]="avail <= 0"
+                  class="w-full h-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-105"
+                  (load)="onImgLoad($event)"
+                  loading="lazy"
+                />
+              </div>
             </div>
-          </div>
-          <div class="space-y-1.5 px-3 pb-4">
-            <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1 leading-snug">
-              {{
-                langService.currentLang() === 'km' ? product.nameKm || product.name : product.name
-              }}
-            </p>
-            <div class="flex items-center justify-between gap-2">
-              <span
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-extrabold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 transition-all duration-200 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/50 group-hover:shadow-sm price-pill"
-              >
-                ${{ product.price.toFixed(2) }}
-              </span>
-            </div>
-            @if (avail <= 0) {
-              <p class="text-[10px] text-rose-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>
-                {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
-              </p>
-            } @else {
-              <p
-                [class.animate-stock-flash]="lastAddedId() === product.id"
-                [class.text-rose-500]="lastAddedId() === product.id"
-                [class.font-bold]="lastAddedId() === product.id"
-                class="text-xs font-medium tracking-wider flex items-center gap-1"
-                [class.text-slate-400]="!(lastAddedId() === product.id) && theme.isDark()"
-                [class.text-slate-500]="!(lastAddedId() === product.id) && !theme.isDark()"
-              >
+            <div class="p-3 sm:p-4 lg:p-5 flex flex-col flex-1">
+              <div class="flex-1">
+                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 text-left">
+                  {{ langService.currentLang() === 'km' ? product.nameKm || product.name : product.name }}
+                </h3>
+              </div>
+              <div class="mt-4 flex items-center justify-between">
+                <span class="text-lg font-black text-slate-900 dark:text-white leading-none">
+                  ${{ product.price.toFixed(2) }}
+                </span>
                 <span
-                  class="w-1.5 h-1.5 rounded-full inline-block"
-                  [class.bg-emerald-500]="avail > 5"
-                  [class.bg-amber-500]="avail <= 5"
-                ></span>
-                {{ avail }}
-                {{ langService.currentLang() === 'km' ? 'ក្នុងស្តុក' : 'in stock' }}
-              </p>
-            }
+                  class="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center motion-safe:opacity-0 motion-safe:group-hover:opacity-100 transition-opacity hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
         </button>
       </div>
     </div>
+    
   </div>
 
   <!-- RIGHT: Cart Sidebar (Desktop) -->
   <div
     [@sidebarAnimation]="isCartOpen() ? 'open' : 'closed'"
-    [class.bg-slate-800]="theme.isDark()"
-    [class.border-slate-700]="theme.isDark()"
-    [class.bg-white]="!theme.isDark()"
-    [class.border-slate-200]="!theme.isDark()"
-    class="hidden md:flex w-80 xl:w-96 border-l flex-col shadow-sm z-20 overflow-hidden"
+    class="hidden md:flex w-80 xl:w-96 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex-col shadow-2xl z-20 overflow-hidden"
   >
-    <!-- Cart Header -->
-    <div
-      [class.border-slate-700]="theme.isDark()"
-      [class.border-slate-100]="!theme.isDark()"
-      class="px-4 py-4 border-b flex items-center justify-between"
-    >
+    <!-- Cart Top -->
+    <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/80">
       <div class="flex items-center gap-3">
-        <button
-          type="button"
-          aria-label="Toggle cart"
-          (click)="toggleCartSidebar()"
-          [class.hover\:bg-slate-600]="theme.isDark()"
-          [class.text-slate-500]="theme.isDark()"
-          [class.hover\:text-slate-300]="theme.isDark()"
-          [class.hover\:bg-slate-100]="!theme.isDark()"
-          [class.hover\:text-slate-600]="!theme.isDark()"
-          class="p-1 rounded-lg transition-colors text-slate-400"
-          [title]="langService.currentLang() === 'km' ? 'បិទកន្ត្រកទំនិញ' : 'Close Cart'"
-          [attr.aria-label]="langService.currentLang() === 'km' ? 'បិទកន្ត្រកទំនិញ' : 'Close Cart'"
-        >
+        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/40 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 5l7 7-7 7M5 5l7 7-7 7"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
-        </button>
-        <h2 [class.text-slate-100]="theme.isDark()" class="font-bold text-slate-800">
-          {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}
-        </h2>
+        </div>
+        <div>
+          <h2 class="text-base font-black text-slate-800 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
+          <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+            {{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : (cart.items().length === 1 ? 'Item' : 'Items') }}
+          </p>
+        </div>
       </div>
       <button
         *ngIf="cart.items().length > 0"
         (click)="clearCart()"
-        class="text-xs text-rose-500 font-bold hover:underline"
+        class="text-xs text-rose-500 font-bold hover:text-rose-600 transition-colors"
       >
         {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
       </button>
     </div>
 
     <!-- Cart Items -->
-    <div class="flex-1 overflow-y-auto p-3 space-y-2">
+    <div class="flex-1 overflow-y-auto p-4 space-y-2">
+      <!-- Empty State -->
       <div
         *ngIf="cart.items().length === 0"
         @fadeIn
-        class="flex flex-col items-center justify-center h-full text-slate-300"
+        class="flex flex-col items-center justify-center h-full text-center opacity-60"
       >
-        <svg
-          class="w-16 h-16 mb-2 opacity-20"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-          />
-        </svg>
-        <p class="text-sm font-medium">
-          {{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}
-        </p>
+        <div class="w-24 h-24 bg-slate-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</h3>
+        <p class="text-sm text-slate-400 dark:text-slate-500">{{ langService.currentLang() === 'km' ? 'ស្កែន ឬជ្រើសរើសទំនិញដើម្បីចាប់ផ្ដើម' : 'Scan a barcode or select an item from the grid to begin' }}</p>
       </div>
 
+      <!-- Cart Items List -->
       <div
         *ngFor="let item of cart.items(); trackBy: trackByProductId"
         @cartItemAnimation
-        [class.bg-slate-700]="theme.isDark()"
-        [class.border-slate-600]="theme.isDark()"
-        [class.bg-slate-50]="!theme.isDark()"
-        [class.border-slate-100]="!theme.isDark()"
-        class="rounded-lg p-3 border hover:border-indigo-200 transition-all"
+        class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-600 transition-all"
       >
-        <div class="flex justify-between gap-2 mb-2">
-          <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1">
-            {{
-              langService.currentLang() === 'km'
-                ? item.product.nameKm || item.product.name
-                : item.product.name
-            }}
+        <div class="flex justify-between gap-2 mb-3">
+          <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1 text-left">
+            {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
           </p>
           <button
             type="button"
-            aria-label="Remove item"
             (click)="cart.removeItem(item.product.id)"
-            [class.text-slate-400]="theme.isDark()"
-            class="text-slate-300 hover:text-rose-500"
+            class="text-slate-300 dark:text-slate-500 hover:text-rose-500 transition-colors flex-shrink-0"
             [title]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
-            [attr.aria-label]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -409,73 +251,53 @@
           <div class="flex items-center gap-2">
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
-              [class.border-slate-600]="theme.isDark()"
-              [class.bg-slate-600]="theme.isDark()"
-              [class.text-slate-200]="theme.isDark()"
-              [class.bg-white]="!theme.isDark()"
-              [class.text-slate-600]="!theme.isDark()"
-              class="w-7 h-7 rounded-lg border flex items-center justify-center"
+              class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all motion-safe:active:scale-90"
               [title]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
-              [attr.aria-label]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
             >
               -
             </button>
-            <span class="w-6 text-center text-sm font-bold" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
+            <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
             <button
               (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
               [disabled]="item.quantity >= item.product.stock"
-              [class.border-slate-600]="theme.isDark()"
-              [class.bg-slate-600]="theme.isDark()"
-              [class.text-slate-200]="theme.isDark()"
-              [class.bg-white]="!theme.isDark()"
-              [class.text-slate-600]="!theme.isDark()"
-              class="w-7 h-7 rounded-lg border flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
-              [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
-              [attr.aria-label]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock reached') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
+              class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
+              [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
             >
               +
             </button>
           </div>
-          <p class="text-sm font-bold text-indigo-600">
+          <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">
             ${{ (item.product.price * item.quantity).toFixed(2) }}
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Totals & Payment -->
-    <div
-      [class.bg-slate-800]="theme.isDark()"
-      [class.border-slate-700]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-100]="!theme.isDark()"
-      class="border-t p-4 space-y-4 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]"
-    >
-      <div [class.border-slate-700]="theme.isDark()" class="space-y-2 text-sm border-t border-slate-100 pt-3">
-        <div [class.text-slate-400]="theme.isDark()" class="flex justify-between text-slate-500">
+    <!-- Totals & Payment Footer -->
+    <div class="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-5 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
+      <div class="space-y-3">
+        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
           <span>{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
           <div class="relative h-5 overflow-hidden text-right">
             @if (showOldSubtotal()) {
-              <span [class.text-slate-300]="theme.isDark()" class="absolute inset-0 font-bold text-slate-700 flex items-center justify-end" @slideOut>
-                ${{ prevSubtotalVal.toFixed(2) }}
-              </span>
+              <span class="absolute inset-0 font-bold text-slate-700 dark:text-slate-300 flex items-center justify-end" @slideOut>${{ prevSubtotalVal.toFixed(2) }}</span>
             }
-            <span [class.text-slate-300]="theme.isDark()" class="font-bold text-slate-700" @slideIn>
-              ${{ cart.subtotal().toFixed(2) }}
-            </span>
+            <span class="font-bold text-slate-700 dark:text-slate-300" @slideIn>${{ cart.subtotal().toFixed(2) }}</span>
           </div>
         </div>
-        <div [class.border-slate-700]="theme.isDark()" class="flex justify-between text-lg font-extrabold text-slate-900 border-t border-slate-100 pt-3">
-          <span [class.text-slate-100]="theme.isDark()">{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
-          <div class="relative h-6 overflow-hidden text-right">
+        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
+          <span>Tax</span>
+          <span>${{ cart.taxAmount().toFixed(2) }}</span>
+        </div>
+        <div class="flex justify-between items-end pt-4 border-t border-slate-100 dark:border-slate-700">
+          <span class="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
+            {{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'Grand Total' }}
+          </span>
+          <div class="relative h-8 overflow-hidden text-right">
             @if (showOldTotal()) {
-              <span class="absolute inset-0 text-indigo-600 flex items-center justify-end" @slideOut>
-                ${{ prevTotalVal.toFixed(2) }}
-              </span>
+              <span class="absolute inset-0 text-indigo-600 dark:text-indigo-400 flex items-center justify-end text-3xl font-black" @slideOut>${{ prevTotalVal.toFixed(2) }}</span>
             }
-            <span class="text-indigo-600" @slideIn>
-              ${{ cart.total().toFixed(2) }}
-            </span>
+            <span class="text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter" @slideIn>${{ cart.total().toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -483,9 +305,7 @@
       <button
         [disabled]="cart.items().length === 0"
         (click)="showPayment = true"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
-        [class.shadow-indigo-800\/30]="theme.isDark()"
-        [class.shadow-indigo-200]="!theme.isDark()"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 motion-safe:active:scale-[0.98] flex items-center justify-center gap-2"
       >
         {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
       </button>
@@ -495,37 +315,23 @@
   <!-- MOBILE: Bottom Cart Peek Bar -->
   @if (isMobile() && cart.items().length > 0) {
     <div
-      [class.bg-slate-800]="theme.isDark()"
-      [class.border-slate-700]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      [class.border-slate-200]="!theme.isDark()"
       (click)="toggleCartSidebar()"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t px-4 py-3 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] cursor-pointer active:scale-[0.99] transition-transform mobile-peek-bar safe-area-bottom"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] cursor-pointer motion-safe:active:scale-[0.99] transition-transform mobile-peek-bar safe-area-bottom"
     >
       <div class="flex items-center gap-3">
         <div class="relative">
-          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <span
-            class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1"
-            [@counterAnimation]="cart.itemCount()"
-          >
-            {{ cart.itemCount() }}
-          </span>
+          <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
         </div>
         <div class="text-sm">
-          <p [class.text-slate-100]="theme.isDark()" class="font-semibold text-slate-800">
-            {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Cart' }}
-          </p>
-          <p class="text-xs text-slate-400">
-            {{ cart.items().length }}
-            {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}
-          </p>
+          <p class="font-semibold text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Cart' }}</p>
+          <p class="text-xs text-slate-400">{{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-lg font-extrabold text-indigo-600">${{ cart.total().toFixed(2) }}</span>
+        <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">${{ cart.total().toFixed(2) }}</span>
         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
         </svg>
@@ -546,50 +352,27 @@
   @if (isMobile() || isCartDrawerOpen()) {
     <div
       [@drawerSlide]="isCartDrawerOpen() ? 'open' : 'closed'"
-      [class.bg-slate-800]="theme.isDark()"
-      [class.bg-white]="!theme.isDark()"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-40 rounded-t-2xl shadow-2xl flex flex-col overflow-hidden"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden"
       [class.h-\[70vh\]]="true"
     >
       <!-- Drawer Handle -->
-      <div class="flex justify-center pt-2 pb-1 flex-shrink-0">
-        <div [class.bg-slate-500]="theme.isDark()" class="w-10 h-1 rounded-full bg-slate-300"></div>
+      <div class="flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
       </div>
 
       <!-- Drawer Header -->
-      <div
-        [class.border-slate-700]="theme.isDark()"
-        [class.border-slate-100]="!theme.isDark()"
-        class="px-4 pb-3 border-b flex items-center justify-between flex-shrink-0"
-      >
+      <div class="px-5 pb-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-3">
-          <h2 [class.text-slate-100]="theme.isDark()" class="font-bold text-slate-800 text-base">
-            {{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}
-          </h2>
+          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
           @if (cart.items().length > 0) {
-            <span class="text-xs text-slate-400">
-              ({{ cart.items().length }}
-              {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }})
-            </span>
+            <span class="text-xs text-slate-400">({{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }})</span>
           }
         </div>
         <div class="flex items-center gap-2">
-          <button
-            *ngIf="cart.items().length > 0"
-            (click)="clearCart()"
-            class="text-xs text-rose-500 font-bold hover:underline"
-          >
+          <button *ngIf="cart.items().length > 0" (click)="clearCart()" class="text-xs text-rose-500 font-bold hover:underline">
             {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
           </button>
-          <button
-            type="button"
-            (click)="closeCartDrawer()"
-            [class.hover\:bg-slate-600]="theme.isDark()"
-            [class.hover\:text-slate-300]="theme.isDark()"
-            [class.hover\:bg-slate-100]="!theme.isDark()"
-            [class.hover\:text-slate-600]="!theme.isDark()"
-            class="p-1.5 rounded-lg text-slate-400 transition-colors"
-          >
+          <button type="button" (click)="closeCartDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -598,41 +381,23 @@
       </div>
 
       <!-- Drawer Cart Items -->
-      <div class="flex-1 overflow-y-auto px-4 py-2 space-y-2">
-        <div
-          *ngIf="cart.items().length === 0"
-          class="flex flex-col items-center justify-center h-full text-slate-300"
-        >
+      <div class="flex-1 overflow-y-auto px-5 py-2 space-y-2">
+        <div *ngIf="cart.items().length === 0" class="flex flex-col items-center justify-center h-full text-slate-300 dark:text-slate-600">
           <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
-          <p class="text-sm font-medium">
-            {{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}
-          </p>
+          <p class="text-sm font-medium">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</p>
         </div>
 
         <div
           *ngFor="let item of cart.items(); trackBy: trackByProductId"
-          [class.bg-slate-700]="theme.isDark()"
-          [class.border-slate-600]="theme.isDark()"
-          [class.bg-slate-50]="!theme.isDark()"
-          [class.border-slate-100]="!theme.isDark()"
-          class="rounded-lg p-3 border hover:border-indigo-200 transition-all"
+          class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700"
         >
-          <div class="flex justify-between gap-2 mb-2">
-            <p [class.text-slate-100]="theme.isDark()" class="text-sm font-semibold text-slate-800 line-clamp-1">
-              {{
-                langService.currentLang() === 'km'
-                  ? item.product.nameKm || item.product.name
-                  : item.product.name
-              }}
+          <div class="flex justify-between gap-2 mb-3">
+            <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1">
+              {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
             </p>
-            <button
-              type="button"
-              (click)="cart.removeItem(item.product.id)"
-              [class.text-slate-500]="theme.isDark()"
-              class="text-slate-300 hover:text-rose-500 flex-shrink-0"
-            >
+            <button type="button" (click)="cart.removeItem(item.product.id)" class="text-slate-300 dark:text-slate-500 hover:text-rose-500 flex-shrink-0">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -640,64 +405,37 @@
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <button
-                (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
-                [class.border-slate-600]="theme.isDark()"
-              [class.bg-slate-600]="theme.isDark()"
-              [class.text-slate-200]="theme.isDark()"
-              [class.bg-white]="!theme.isDark()"
-              [class.text-slate-600]="!theme.isDark()"
-              class="w-8 h-8 rounded-lg border flex items-center justify-center text-sm font-bold active:scale-90 transition-transform"
-              >
+              <button (click)="cart.updateQuantity(item.product.id, item.quantity - 1)" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 active:scale-90 transition-transform">
                 -
               </button>
-              <span [class.text-slate-200]="theme.isDark()" class="w-7 text-center text-sm font-bold">{{ item.quantity }}</span>
+              <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200">{{ item.quantity }}</span>
               <button
                 (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
                 [disabled]="item.quantity >= item.product.stock"
-                [class.border-slate-600]="theme.isDark()"
-                [class.bg-slate-600]="theme.isDark()"
-                [class.text-slate-200]="theme.isDark()"
-                [class.bg-white]="!theme.isDark()"
-                [class.text-slate-600]="!theme.isDark()"
-                class="w-8 h-8 rounded-lg border flex items-center justify-center text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-transform"
+                class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-transform"
               >
                 +
               </button>
             </div>
-            <p class="text-sm font-bold text-indigo-600">
-              ${{ (item.product.price * item.quantity).toFixed(2) }}
-            </p>
+            <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">${{ (item.product.price * item.quantity).toFixed(2) }}</p>
           </div>
         </div>
       </div>
 
       <!-- Drawer Totals & Checkout -->
-      <div
-        [class.bg-slate-800]="theme.isDark()"
-        [class.border-slate-700]="theme.isDark()"
-        [class.bg-white]="!theme.isDark()"
-        [class.border-slate-100]="!theme.isDark()"
-        class="border-t p-4 space-y-3 flex-shrink-0 safe-area-bottom"
-      >
+      <div class="p-5 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-3 flex-shrink-0 safe-area-bottom">
         <div class="flex justify-between items-center">
-          <span class="text-sm text-slate-500">
-            {{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}
-          </span>
-          <span [class.text-slate-300]="theme.isDark()" class="font-bold text-slate-700">${{ cart.subtotal().toFixed(2) }}</span>
+          <span class="text-sm text-slate-500">{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
+          <span class="font-bold text-slate-700 dark:text-slate-300">${{ cart.subtotal().toFixed(2) }}</span>
         </div>
         <div class="flex justify-between items-center text-lg">
-          <span [class.text-slate-100]="theme.isDark()" class="font-extrabold text-slate-900">
-            {{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}
-          </span>
-          <span class="font-black text-indigo-600">${{ cart.total().toFixed(2) }}</span>
+          <span class="font-extrabold text-slate-900 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+          <span class="font-black text-indigo-600 dark:text-indigo-400">${{ cart.total().toFixed(2) }}</span>
         </div>
         <button
           [disabled]="cart.items().length === 0"
           (click)="showPayment = true"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-base"
-        [class.shadow-indigo-800\/30]="theme.isDark()"
-        [class.shadow-indigo-200]="!theme.isDark()"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 active:scale-[0.98] flex items-center justify-center gap-2 text-base"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />

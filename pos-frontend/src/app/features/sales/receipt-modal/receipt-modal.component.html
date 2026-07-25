@@ -10,7 +10,7 @@
     [class.bg-white]="!theme.isDark()"
     [class.border-slate-700/60]="theme.isDark()"
     [class.border-slate-100/50]="!theme.isDark()"
-    class="relative rounded-3xl shadow-2xl w-full max-w-sm border"
+    class="relative rounded-[2rem] shadow-2xl w-full max-w-sm border"
   >
     <div
       [class.border-slate-700]="theme.isDark()"
@@ -167,7 +167,7 @@
       <div class="mt-5 flex gap-3">
         <button
           (click)="printReceipt()"
-          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 cursor-pointer receipt-action-btn print-btn"
+          class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 dark:shadow-slate-900/40 cursor-pointer receipt-action-btn print-btn"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -181,7 +181,7 @@
         </button>
         <button
           (click)="close.emit()"
-          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-200 cursor-pointer receipt-action-btn new-sale-btn"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-[1.5rem] transition-all shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 cursor-pointer receipt-action-btn new-sale-btn"
         >
           {{ lang.currentLang() === 'km' ? 'លក់ថ្មី' : 'New Sale' }}
         </button>

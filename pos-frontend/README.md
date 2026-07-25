@@ -37,7 +37,7 @@
 This is the Angular frontend for the Full-Stack POS system. It provides two distinct interfaces:
 
 - **Cashier View** — A streamlined POS sales interface with product grid, barcode scanning, cart management, multi-payment modal (Cash/ABA/Card), and thermal printer-optimized receipts.
-- **Admin View** — A full management dashboard for products, categories, users, roles, permissions, sales history, reports, file uploads, and dynamic navigation pages.
+- **Admin View** — A full management dashboard with KPI metrics, product/category management, users & roles, permissions, sales history, reports, suppliers, purchase orders, stock movements, quick picks, file uploads, and dynamic navigation pages.
 
 The app features real-time Khmer/English language switching, role-based route protection, Angular Signals for reactive state, and responsive design for desktop and tablet use.
 
@@ -135,8 +135,13 @@ pos-frontend/
 │   │   │   ├── user-management/         # Role/permission configuration
 │   │   │   ├── user-role/               # User role assignments
 │   │   │   ├── permissions/             # Permission management
+│   │   │   ├── dashboard/                # Admin interactive dashboard with KPIs
 │   │   │   ├── management-page/         # Dynamic navigation page management
 │   │   │   ├── cloudinary-file-upload/  # File upload UI
+│   │   │   ├── suppliers/                # Supplier management
+│   │   │   ├── purchase-orders/          # Purchase order management
+│   │   │   ├── stock-movements/          # Stock movement tracking
+│   │   │   ├── quick-picks/              # Quick-pick product shortcuts
 │   │   │   └── page-not-found/          # 404 page
 │   │   ├── layout/                      # Layout components
 │   │   │   ├── admin-layout/            # Dark sidebar + main content
@@ -184,22 +189,30 @@ pos-frontend/
 | 🛒 **Shopping Cart** | Quantity controls, per-item adjustments, line totals |
 | 💰 **Discount & Tax** | Global discount % and tax % controls |
 | 💳 **Multi-Payment Modal** | Cash (with change calculation), ABA scan-to-pay QR, Card |
+| 👤 **Customer Lookup** | Find customer by phone, view loyalty points & history |
+| 💰 **Points Redemption** | Redeem loyalty points for instant discounts at checkout |
 | 🧾 **Receipt** | 80mm thermal printer-optimized receipt format |
 | ⚡ **Real-Time State** | Reactive cart via Angular Signals |
+| ⚡ **Quick Picks** | Frequently bought items for faster checkout workflows |
 
-### Admin (`/products`, `/reports`, `/users`, etc.)
+### Admin (`/dashboard`, `/products`, `/reports`, `/users`, etc.)
 
 | Feature | Description |
 |---------|-------------|
+| 📊 **Dashboard** | Interactive admin dashboard with KPI metrics, near-expiry alerts, top sellers |
 | 📦 **Products** | Full CRUD with barcode, category, stock, image management |
 | 📂 **Categories** | Product category CRUD |
-| 📊 **Reports** | Dashboard with revenue KPIs, daily trends, top products, payment breakdown |
+| 📊 **Reports** | Revenue KPIs, daily trends, top products, payment breakdown |
 | 📜 **Sales History** | Transaction history with search and filters |
 | 👥 **Users** | User management with role assignments |
 | 🔐 **User Roles & Permissions** | Role configuration and permission management |
 | 📄 **Management Pages** | Dynamic navigation page management |
 | 🖼️ **File Uploads** | Cloudinary integration for image storage |
 | 🌐 **Language Manager** | Khmer/English translation interface |
+| 📦 **Suppliers** | Supplier directory with contact and address details |
+| 📋 **Purchase Orders** | Full PO lifecycle management (Draft → Received) |
+| 📊 **Stock Movements** | Inventory audit trail and near-expiry detection |
+| ⚡ **Quick Picks** | Configure frequently bought items for fast checkout |
 
 ### Shared
 
@@ -226,7 +239,12 @@ pos-frontend/
 | `/user-role` | UserRoleModule | Admin | Role assignments |
 | `/permission` | PermissionsModule | Admin | Permission configuration |
 | `/management-page` | ManagementPageModule | Admin | Dynamic navigation pages |
+| `/dashboard` | DashboardModule | Admin | Admin interactive dashboard (NEW!) |
 | `/cloudinary-file-upload` | CloudinaryFileUploadModule | Admin | File upload interface |
+| `/suppliers` | SuppliersModule | Admin | Supplier management |
+| `/purchase-orders` | PurchaseOrdersModule | Admin | Purchase order management |
+| `/stock-movements` | StockMovementsModule | Admin | Stock movement tracking |
+| `/quick-picks` | QuickPicksModule | Admin | Quick-pick product shortcuts |
 | `/**` | PageNotFoundModule | All | 404 page |
 
 ---

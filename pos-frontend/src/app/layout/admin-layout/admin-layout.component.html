@@ -9,7 +9,7 @@
     <button
       (click)="toggleSidebar()"
       class="sidebar-toggle"
-      [class.rotate-180]="isCollapsed()"
+      [class.is-collapsed]="isCollapsed()"
       [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
       [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
       type="button"
@@ -172,13 +172,14 @@
       <button
         (click)="theme.toggle()"
         class="footer-btn theme-toggle-btn"
-        [title]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-        [attr.aria-label]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        [title]="theme.isDark() ? 'Dark — Switch to Light' : 'Light — Switch to Dark'"
+        [attr.aria-label]="theme.isDark() ? 'Dark — Switch to Light' : 'Light — Switch to Dark'"
       >
-        <div class="footer-btn-icon">
+        <div class="footer-btn-icon ring-2 ring-indigo-300/60">
           <svg
             [hidden]="!theme.isDark()"
-            class="w-4 h-4 text-white theme-toggle-moon"
+            [@themeRotate]="theme.currentTheme()"
+            class="w-4 h-4 text-indigo-100 theme-toggle-moon"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -188,7 +189,8 @@
           </svg>
           <svg
             [hidden]="theme.isDark()"
-            class="w-4 h-4 text-white theme-toggle-sun"
+            [@themeRotate]="theme.currentTheme()"
+            class="w-4 h-4 text-indigo-200 theme-toggle-sun"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -286,7 +288,7 @@
     <a
       routerLink="/sales"
       routerLinkActive="mobile-nav-active"
-      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl transition-all duration-300"
+      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [routerLinkActiveOptions]="{ exact: true }"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -299,7 +301,7 @@
     <a
       routerLink="/sales-history"
       routerLinkActive="mobile-nav-active"
-      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl transition-all duration-300"
+      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [routerLinkActiveOptions]="{ exact: true }"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -311,7 +313,7 @@
     <!-- More / Menu Toggle (Pill Style) -->
     <button
       (click)="toggleMobileMenu()"
-      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl transition-all duration-300"
+      class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [class.active-more-btn]="isMobileMenuOpen()"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

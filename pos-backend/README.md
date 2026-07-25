@@ -44,6 +44,13 @@ This is the NestJS backend for the Full-Stack POS system. It provides a RESTful 
 - **Product Catalog** — Products with barcode lookup, stock management, category association
 - **Sales Processing** — Transaction-safe sales with stock validation and deduction
 - **Reports** — Aggregated business intelligence (daily revenue, top products, payment breakdown)
+- **Customer Management** — Customer CRUD, loyalty points, and rewards redemption
+- **KHQR Payment** — Real-time ABA KHQR QR code generation for scan-to-pay
+- **Quick Picks** — Configurable frequently-bought items for fast checkout
+- **Supplier Management** — Complete supplier directory with contact details
+- **Purchase Orders** — Full PO lifecycle (Draft → Approved → Received → Cancelled)
+- **Stock Movements** — Audit trail for all stock In/Out/Adjustment operations
+- **Product Returns** — Admin-managed returns with automatic inventory restocking
 - **File Uploads** — MinIO/S3 and Cloudinary storage support
 - **Dynamic Navigation** — Management pages with role-based permissions
 
@@ -170,6 +177,42 @@ pos-backend/
 │   ├── upload/                        # File upload (MinIO/S3)
 │   ├── upload-cloudinary/             # Cloudinary image upload
 │   ├── upload-dynamic/                # Dynamic storage selection
+│   ├── customers/                     # Customer CRUD & loyalty points
+│   │   ├── dto/                       # Customer DTOs
+│   │   ├── customers.service.ts
+│   │   ├── customers.controller.ts
+│   │   └── customers.module.ts
+│   ├── khqr/                          # ABA KHQR QR payment generation
+│   │   ├── dto/                       # KHQR DTOs
+│   │   ├── khqr.service.ts
+│   │   ├── khqr.controller.ts
+│   │   └── khqr.module.ts
+│   ├── quick-picks/                   # Frequently bought items shortcuts
+│   │   ├── dto/                       # Quick pick DTOs
+│   │   ├── quick-picks.service.ts
+│   │   ├── quick-picks.controller.ts
+│   │   └── quick-picks.module.ts
+│   ├── suppliers/                     # Supplier management
+│   │   ├── dto/                       # Supplier DTOs
+│   │   ├── suppliers.service.ts
+│   │   ├── suppliers.controller.ts
+│   │   └── suppliers.module.ts
+│   ├── purchase-orders/               # Purchase order lifecycle
+│   │   ├── dto/                       # PO DTOs
+│   │   ├── purchase-orders.service.ts
+│   │   ├── purchase-orders.controller.ts
+│   │   └── purchase-orders.module.ts
+│   ├── stock-movements/               # Stock movement tracking
+│   │   ├── dto/                       # Stock movement DTOs
+│   │   ├── stock-movements.service.ts
+│   │   ├── stock-movements.controller.ts
+│   │   └── stock-movements.module.ts
+│   ├── returns/                       # Product returns & refunds
+│   │   ├── dto/                       # Return DTOs
+│   │   ├── returns.service.ts
+│   │   ├── returns.controller.ts
+│   │   └── returns.module.ts
+│   ├── health/                        # Application health check
 │   ├── common/                        # Shared infrastructure
 │   │   ├── guards/                    # JwtAuthGuard, RolesGuard
 │   │   ├── decorators/               # @Roles(), @CurrentUser(), @SkipIntercept()
@@ -533,6 +576,86 @@ Used by the admin layout to render dynamic sidebar navigation with role-based vi
 | `/upload-cloudinary` | Cloudinary | Cloudinary image upload |
 | `/upload-dynamic` | Configurable | Dynamic storage backend selection |
 
+### 👥 Customers
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/customers` | admin | Create customer |
+| GET | `/customers` | all | List all active customers |
+| GET | `/customers/phone/:phone` | all | Find customer by phone number |
+| POST | `/customers/phone/:phone/find-or-create` | all | Find by phone or auto-create |
+| GET | `/customers/:id` | admin | Get customer by ID |
+| PATCH | `/customers/:id` | admin | Update customer |
+| DELETE | `/customers/:id` | admin | Deactivate customer |
+| POST | `/customers/:id/points/add` | admin | Add loyalty points |
+| POST | `/customers/:id/points/redeem` | all | Redeem points for discount |
+
+---
+
+### 📱 KHQR Payment
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/khqr/generate` | all | Generate ABA KHQR QR code for payment |
+
+---
+
+### ⚡ Quick Picks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/quick-picks` | admin | Create quick-pick item |
+| GET | `/quick-picks` | all | List active items |
+| GET | `/quick-picks/:id` | admin | Get item by ID |
+| PATCH | `/quick-picks/:id` | admin | Update item |
+| DELETE | `/quick-picks/:id` | admin | Delete item |
+
+---
+
+### 📦 Suppliers `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/suppliers` | Create supplier |
+| GET | `/suppliers` | List active suppliers (paginated) |
+| GET | `/suppliers/:id` | Get supplier by ID |
+| PATCH | `/suppliers/:id` | Update supplier |
+| DELETE | `/suppliers/:id` | Deactivate supplier |
+
+---
+
+### 📋 Purchase Orders `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/purchase-orders` | Create purchase order |
+| GET | `/purchase-orders` | List all (paginated) |
+| GET | `/purchase-orders/:id` | Get by ID |
+| PATCH | `/purchase-orders/:id/receive` | Receive order (updates stock) |
+| DELETE | `/purchase-orders/:id` | Cancel order |
+
+---
+
+### 🔄 Returns `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/returns` | Create return/refund (restocks inventory) |
+| GET | `/returns` | List all returns (paginated) |
+| GET | `/returns/:id` | Get return by ID |
+
+---
+
+### 📊 Stock Movements `[admin]`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stock-movements` | List all movements (paginated, filterable) |
+| GET | `/stock-movements/product/:productId` | Get movements for a specific product |
+| GET | `/stock-movements/near-expiry` | Get products near expiry (default: 30 days) |
+
+---
+
 ### 📖 Swagger Documentation
 
 Interactive API documentation is available at **`/api/docs`** when the server is running.
@@ -571,16 +694,41 @@ created_at                                  destination_storage
                                             public_id (Cloudinary)
                                             created_at
 
-management_pages
-────────────────
-id (PK)
-title / title_km
-icon, type, url
-permissions, badge
-sort_order
-is_active
-parent_id (self-ref)
+management_pages     customers             quick_picks
+────────────────     ──────────            ───────────
+id (PK)             id (PK)               id (PK)
+title / title_km    name                  product_id → products.id
+icon, type, url     phone (unique)        display_order
+permissions, badge   loyalty_points        is_active
+sort_order          total_spent           created_at
+is_active           total_purchases
+parent_id (self-ref)  created_at
 created_at / updated_at
+
+suppliers             purchase_orders       purchase_order_items
+──────────            ───────────────       ───────────────────
+id (PK)              id (PK)               id (PK)
+name                 supplier_id → suppliers.id  purchase_order_id
+contact_person       reference_number (unique)   product_id → products
+email                status (pending/approved/received/cancelled)
+phone                order_date            unit_cost
+address              expected_delivery     total
+is_active            subtotal
+created_at           tax
+                     total
+                     notes
+                     created_at
+
+stock_movements       returns
+───────────────       ───────
+id (PK)              id (PK)
+product_id → products  sale_id → sales.id
+quantity_change      user_id → users.id
+type (in/out/adjust) reason
+reference_type       status (pending/approved/rejected)
+reference_id         refund_amount
+notes                created_at
+created_at
 ```
 
 ---
@@ -592,6 +740,8 @@ created_at / updated_at
 | Auth (login) | ✅ | ✅ |
 | Profile | ✅ | ✅ |
 | Users CRUD | ✅ | ❌ |
+| Customers (read) | ✅ | ✅ |
+| Customers (write) | ✅ | ❌ |
 | Categories (read) | ✅ | ✅ |
 | Categories (write) | ✅ | ❌ |
 | Products (read) | ✅ | ✅ |
@@ -599,8 +749,14 @@ created_at / updated_at
 | Sales (create) | ✅ | ✅ |
 | Sales (read own) | ✅ | ✅ |
 | Sales (read all) | ✅ | ❌ |
+| KHQR Payment | ✅ | ✅ |
+| Quick Picks (read) | ✅ | ✅ |
+| Quick Picks (write) | ✅ | ❌ |
 | Reports | ✅ | ❌ |
 | Management Pages | ✅ | ❌ |
+| Suppliers & POs | ✅ | ❌ |
+| Stock Movements | ✅ | ❌ |
+| Product Returns | ✅ | ❌ |
 
 ---
 

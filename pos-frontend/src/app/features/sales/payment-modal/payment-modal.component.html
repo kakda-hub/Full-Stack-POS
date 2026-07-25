@@ -10,7 +10,7 @@
     [class.bg-white]="!theme.isDark()"
     [class.border-slate-700/60]="theme.isDark()"
     [class.border-slate-100/50]="!theme.isDark()"
-    class="relative rounded-3xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto border"
+    class="relative rounded-[2rem] shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto border"
   >
     <div
       [class.border-slate-700]="theme.isDark()"
@@ -263,7 +263,7 @@
             [class.bg-slate-50]="!theme.isDark()"
             [class.text-slate-800]="!theme.isDark()"
             [class.focus\:bg-white]="!theme.isDark()"
-            class="w-full border-2 rounded-xl px-4 py-3 text-2xl font-bold focus:outline-none focus:border-indigo-500 transition-all text-center focus:ring-2 focus:ring-indigo-500/20"
+            class="w-full border-2 rounded-2xl px-4 py-3 text-2xl font-bold focus:outline-none focus:border-indigo-500 transition-all text-center focus:ring-2 focus:ring-indigo-500/20"
             placeholder="0.00"
           />
         </div>
@@ -277,7 +277,7 @@
             [class.bg-slate-700]="theme.isDark()"
             [class.border-slate-200]="!theme.isDark()"
             [class.text-slate-700]="!theme.isDark()"
-            class="py-2.5 rounded-xl border hover:border-indigo-300 hover:bg-indigo-600 hover:text-white text-sm font-semibold active:scale-95 transition-all quick-cash-btn"
+            class="py-2.5 rounded-xl border hover:border-indigo-300 hover:bg-indigo-600 hover:text-white text-sm font-semibold motion-safe:active:scale-95 transition-all quick-cash-btn"
           >
             ${{ amt }}
           </button>
@@ -341,7 +341,7 @@
         }
 
         @if (qrImage() && !qrLoading()) {
-          <div [class.bg-slate-700]="theme.isDark()" [class.border-indigo-500\/20]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-indigo-100]="!theme.isDark()" class="rounded-2xl p-4 border-2 shadow-sm text-center">
+          <div [class.bg-slate-700]="theme.isDark()" [class.border-indigo-500\/20]="theme.isDark()" [class.bg-white]="!theme.isDark()" [class.border-indigo-100]="!theme.isDark()"            class="rounded-[2rem] p-4 border-2 shadow-sm text-center">
             <div class="flex items-center justify-center mb-2">
               <img [src]="qrImage()" alt="ABA KHQR" class="w-56 h-56" />
             </div>
@@ -402,9 +402,7 @@
       <button
         [disabled]="!canConfirm() || processing"
         (click)="confirm()"
-        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 cursor-pointer confirm-payment-btn"
-        [class.shadow-emerald-800\/30]="theme.isDark()"
-        [class.shadow-emerald-200]="!theme.isDark()"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 cursor-pointer confirm-payment-btn"
       >
         @if (processing) {
           <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

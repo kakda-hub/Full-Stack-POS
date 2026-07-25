@@ -13,7 +13,7 @@
 }
 
 button {
-  @apply inline-flex items-center justify-center font-semibold rounded-xl 
+  @apply inline-flex items-center justify-center rounded-xl 
          transition-all duration-200 select-none cursor-pointer border border-transparent
          active:scale-[0.97] hover:scale-[1.01];
 

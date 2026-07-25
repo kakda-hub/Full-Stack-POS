@@ -121,7 +121,32 @@ html:not(.theme-ready) *::after {
   *,
   *::before,
   *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable transform-based hover/press effects globally */
+  [class*="hover:scale-"],
+  [class*="hover:-translate-"],
+  [class*="hover:translate-"],
+  [class*="hover:rotate-"],
+  [class*="group-hover:scale-"],
+  [class*="group-hover:-translate-"],
+  [class*="group-hover:rotate-"],
+  [class*="active:scale-"] {
+    transform: none !important;
+  }
+
+  /* Disable opacity changes on group hover */
+  [class*="group-hover:opacity-"] {
+    opacity: 1 !important;
+  }
+
+  /* Disable scale on selected card states */
+  [class*="scale-\["] {
+    transform: none !important;
   }
 }
 
