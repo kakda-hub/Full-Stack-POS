@@ -6,7 +6,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { UserService } from '../../../core/services/api/user.service';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
-import { UserDetailDialogComponent } from '../../shared/user-detail-dialog/user-detail-dialog.component';
+import { UserDetailDialogComponent } from '../../../shared/user-detail-dialog/user-detail-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 

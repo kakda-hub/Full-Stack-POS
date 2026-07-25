@@ -5,7 +5,7 @@ import { AlertService } from '../../../core/services/alert.service';
 import { fadeIn, pageTransition } from '../../../shared/animations/animations';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { UserDetailDialogComponent } from '../../shared/user-detail-dialog/user-detail-dialog.component';
+import { UserDetailDialogComponent } from '../../../shared/user-detail-dialog/user-detail-dialog.component';
 import { UserService } from '../../../core/services/api/user.service';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 

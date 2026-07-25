@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsInt,
@@ -43,6 +44,7 @@ export class UpdateQuickPickDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   label?: string;
 
   @ApiPropertyOptional()

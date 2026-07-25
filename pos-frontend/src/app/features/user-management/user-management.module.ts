@@ -6,7 +6,7 @@ import { UserManagementListComponent } from './user-management-list/user-managem
 import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material.module';
 import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
-import { UserDetailDialogModule } from '../shared/user-detail-dialog/user-detail-dialog.module';
+import { UserDetailDialogModule } from '../../shared/user-detail-dialog/user-detail-dialog.module';
 
 @NgModule({
   declarations: [UserManagementListComponent],

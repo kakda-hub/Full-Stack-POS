@@ -9,15 +9,15 @@ import { ResponseInterceptor } from '../src/common/interceptors/response.interce
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
 import { JwtAuthGuard } from '../src/common/guards/jwt-auth.guard';
 import { RolesGuard } from '../src/common/guards/roles.guard';
-import { JwtStrategy } from '../src/auth/strategies/jwt.strategy';
-import { AuthController } from '../src/auth/auth.controller';
-import { AuthService } from '../src/auth/auth.service';
-import { ProductsController } from '../src/products/products.controller';
-import { ProductsService } from '../src/products/products.service';
-import { SalesController } from '../src/sales/sales.controller';
-import { SalesService } from '../src/sales/sales.service';
-import { CategoriesController } from '../src/categories/categories.controller';
-import { CategoriesService } from '../src/categories/categories.service';
+import { JwtStrategy } from '../src/modules/auth/strategies/jwt.strategy';
+import { AuthController } from '../src/modules/auth/auth.controller';
+import { AuthService } from '../src/modules/auth/auth.service';
+import { ProductsController } from '../src/modules/products/products.controller';
+import { ProductsService } from '../src/modules/products/products.service';
+import { SalesController } from '../src/modules/sales/sales.controller';
+import { SalesService } from '../src/modules/sales/sales.service';
+import { CategoriesController } from '../src/modules/categories/categories.controller';
+import { CategoriesService } from '../src/modules/categories/categories.service';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 

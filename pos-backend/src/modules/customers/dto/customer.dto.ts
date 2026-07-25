@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsInt,
@@ -43,12 +44,14 @@ export class UpdateCustomerDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   name?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   phone?: string;
 
   @ApiPropertyOptional()

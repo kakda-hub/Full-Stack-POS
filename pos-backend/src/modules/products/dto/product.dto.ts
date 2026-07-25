@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
@@ -31,6 +32,7 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   imgUrl?: string;
 
   @ApiProperty({ example: '8850000000000' })
@@ -58,6 +60,7 @@ export class CreateProductDto {
   @ApiPropertyOptional({ description: 'Expiry date (for perishable goods, ISO format)' })
   @IsDateString()
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   expiryDate?: string;
 
   @ApiProperty({ example: 100 })
@@ -97,6 +100,7 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   imgUrl?: string;
 
   @ApiPropertyOptional()
@@ -120,6 +124,7 @@ export class UpdateProductDto {
   @ApiPropertyOptional({ description: 'Expiry date (for perishable goods, ISO format)' })
   @IsDateString()
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   expiryDate?: string;
 
   @ApiPropertyOptional()

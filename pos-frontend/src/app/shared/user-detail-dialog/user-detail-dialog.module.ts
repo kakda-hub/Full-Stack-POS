@@ -4,8 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { SharedModule } from '../../../shared/shared.module';
-import { ReusableComponentModule } from '../../../shared/reusable-component/reusable-component.module';
+import { SharedModule } from '../../shared/shared.module';
+import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
 import { UserDetailDialogComponent } from './user-detail-dialog.component';
 
 @NgModule({

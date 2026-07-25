@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { UserService } from '../../../core/services/api/user.service';
-import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
-import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
+import { LanguageService } from '../../core/services/language.service';
+import { ThemeService } from '../../core/services/theme.service';
+import { AlertService } from '../../core/services/alert.service';
+import { UserService } from '../../core/services/api/user.service';
+import { CloudinaryService } from '../../core/services/api/cloudinary.service';
+import { modalAnimation, backdropAnimation } from '../../shared/animations/animations';
 
 @Component({
   selector: 'app-user-detail-dialog',

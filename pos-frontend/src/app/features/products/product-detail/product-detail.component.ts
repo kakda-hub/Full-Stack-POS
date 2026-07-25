@@ -188,7 +188,11 @@ export class ProductDetailComponent implements OnInit {
 
     this.isSaving.set(true);
     this.serverError.set(null);
-    const payload = this.form.value;
+
+    // Strip empty strings from optional fields so they aren't sent to the API
+    const payload = Object.fromEntries(
+      Object.entries(this.form.value).filter(([_, v]) => v !== '')
+    );
 
     const product = this.product;
     const request$ = product?.id
