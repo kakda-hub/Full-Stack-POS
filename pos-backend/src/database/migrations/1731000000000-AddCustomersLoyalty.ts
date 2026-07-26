@@ -9,6 +9,14 @@ export class AddCustomersLoyalty1731000000000 implements MigrationInterface {
   name = 'AddCustomersLoyalty1731000000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // ── Safety check: ensure customer_id column exists first ────────────
+    // This prevents failures when the migration is re-run or when the
+    // sales table was created by init.sql without this column.
+    await queryRunner.query(`
+      ALTER TABLE \`sales\`
+      ADD COLUMN IF NOT EXISTS \`customer_id\` INT NULL
+    `);
+
     // ── customers table ─────────────────────────────────────────────────
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS \`customers\` (
@@ -29,20 +37,32 @@ export class AddCustomersLoyalty1731000000000 implements MigrationInterface {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // ── sales.customer_id ──────────────────────────────────────────────
-    const hasCustomerId = await queryRunner.query(`
+    // ── sales.points_earned ────────────────────────────────────────────
+    // Check for points_earned (not customer_id) because the safety check
+    // above already adds customer_id. This ensures the remaining loyalty
+    // columns are still created on first run.
+    const hasPointsEarned = await queryRunner.query(`
       SELECT 1 AS \`exists\`
       FROM \`information_schema\`.\`COLUMNS\`
       WHERE \`TABLE_SCHEMA\` = DATABASE()
         AND \`TABLE_NAME\` = 'sales'
-        AND \`COLUMN_NAME\` = 'customer_id'
+        AND \`COLUMN_NAME\` = 'points_earned'
     `);
-    if (hasCustomerId.length === 0) {
+    if (hasPointsEarned.length === 0) {
+      // Each column is added in a separate ALTER TABLE statement for
+      // compatibility with TiDB / MySQL < 8.0.12, which does not support
+      // referencing a newly-added column in an AFTER clause within the
+      // same ALTER TABLE statement.
       await queryRunner.query(`
         ALTER TABLE \`sales\`
-        ADD COLUMN \`customer_id\` INT NULL AFTER \`payment_method\`,
-        ADD COLUMN \`points_earned\` INT NOT NULL DEFAULT 0 AFTER \`customer_id\`,
-        ADD COLUMN \`points_redeemed\` INT NOT NULL DEFAULT 0 AFTER \`points_earned\`,
+        ADD COLUMN \`points_earned\` INT NOT NULL DEFAULT 0 AFTER \`customer_id\`
+      `);
+      await queryRunner.query(`
+        ALTER TABLE \`sales\`
+        ADD COLUMN \`points_redeemed\` INT NOT NULL DEFAULT 0 AFTER \`points_earned\`
+      `);
+      await queryRunner.query(`
+        ALTER TABLE \`sales\`
         ADD COLUMN \`loyalty_discount\` DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER \`points_redeemed\`
       `);
     }

@@ -173,11 +173,10 @@ async function seed() {
       process.env.MYSQL_PASSWORD ||
       '',
     database: process.env.DB_NAME || 'pos_db',
-    ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: true },
+    ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
     extra: {
       connectionLimit: 2,
       charset: 'utf8mb4',
-      initCommand: "SET NAMES utf8mb4",
     },
   });
 

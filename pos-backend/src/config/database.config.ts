@@ -134,16 +134,14 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
      *   Set DB_SSL=false to disable.
      */
     ssl: configService.get<string>('DB_SSL', 'true') === 'true'
-      ? { 
-          minVersion: 'TLSv1.2',
-          rejectUnauthorized: true 
+      ? {
+          rejectUnauthorized: false,
         }
       : false,
 
     extra: {
       connectionLimit: 10,
       charset: 'utf8mb4',
-      initCommand: "SET NAMES utf8mb4",
     },
 
     // Retry connection for up to ~90 seconds (30 attempts × 3s delay)

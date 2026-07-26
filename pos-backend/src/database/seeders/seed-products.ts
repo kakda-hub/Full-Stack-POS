@@ -246,11 +246,10 @@ async function seed() {
     ssl:
       process.env.DB_SSL === 'false'
         ? false
-        : { rejectUnauthorized: true },
+        : { rejectUnauthorized: false },
     extra: {
       connectionLimit: 2,
       charset: 'utf8mb4',
-      initCommand: "SET NAMES utf8mb4",
     },
   });
 
