@@ -13,6 +13,16 @@ export class ProductService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Get low-stock products (stock ≤ lowStockThreshold)
+   */
+  getLowStockProducts(threshold?: number): Observable<any> {
+    const params = threshold ? `?threshold=${threshold}` : '';
+    return this.http.get<any>(`${this.apiUrl}/low-stock${params}`).pipe(
+      map((res) => res?.data ?? res)
+    );
+  }
+
+  /**
    * Get all products
    */
   getAllProducts(): Observable<any[]> {

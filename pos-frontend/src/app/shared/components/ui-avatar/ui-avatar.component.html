@@ -1,23 +1,83 @@
-<div class="relative" [ngClass]="size">
-  @if (imageUrl && !avatarError) {
-    <img
-      [src]="imageUrl"
-      alt="Profile"
-      class="w-full h-full rounded-full object-cover transition-all duration-300"
-      [class.ring-2]="ring"
-      [class.group-hover:ring-4]="ring"
-      [class]="ring ? ringColor : ''"
-      (error)="onAvatarError()"
-    />
-  } @else {
+<div
+  class="avatar-wrapper"
+  [class.clickable]="clickable"
+  [class]="getSizeClasses()"
+  [attr.role]="clickable ? 'button' : null"
+  [attr.tabindex]="clickable ? 0 : null"
+  (click)="clickable && avatarClick.emit()"
+  (keydown.enter)="clickable && avatarClick.emit()"
+  (keydown.space)="clickable && avatarClick.emit(); $event.preventDefault()"
+>
+  <!-- Shimmer skeleton while image loads (only when imageUrl is set) -->
+  @if (imageUrl && !avatarError() && !imageLoaded()) {
     <div
-      class="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center transition-all duration-300"
+      class="avatar-shimmer w-full h-full rounded-full"
       [class.ring-2]="ring"
-      [class.group-hover:ring-4]="ring"
       [class]="ring ? ringColor : ''"
-      [attr.aria-label]="(name || 'User') + ' avatar'"
     >
-      <span class="font-bold text-white select-none" [ngClass]="textSize">{{ initial }}</span>
+      <div class="shimmer-slide"></div>
     </div>
   }
+
+  <!-- Image avatar -->
+  @if (imageUrl && !avatarError()) {
+    <img
+      [src]="imageUrl"
+      alt="{{ name || 'User' }} avatar"
+      class="avatar-img w-full h-full rounded-full object-cover"
+      [class.ring-2]="ring"
+      [class]="ring ? ringColor : ''"
+      [class.avatar-img-loaded]="imageLoaded()"
+      [class.avatar-img-loading]="!imageLoaded()"
+      (load)="onImageLoad()"
+      (error)="onAvatarError()"
+      loading="lazy"
+    />
+  }
+
+  <!-- Default image fallback (shown when no imageUrl or on image error) -->
+  @if (!imageUrl || avatarError()) {
+    <div
+      class="avatar-fallback w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+      [class.ring-2]="ring"
+      [ngClass]="[ring ? ringColor : '', 'bg-slate-100 dark:bg-slate-800']"
+      [attr.aria-label]="(name || 'User') + ' avatar'"
+    >
+      @if (defaultImage) {
+        <img
+          [src]="defaultImage"
+          alt="{{ name || 'User' }} avatar"
+          class="w-full h-full object-cover"
+        />
+      } @else {
+        <!-- Inline SVG user silhouette placeholder -->
+        <svg
+          class="w-1/2 h-1/2 text-slate-400 dark:text-slate-500 select-none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="8" r="4.5" fill="currentColor" stroke="none" opacity="0.25" />
+          <circle cx="12" cy="8" r="4.5" />
+          <path d="M3 21c0-4.5 4-8 9-8s9 3.5 9 8" />
+        </svg>
+      }
+    </div>
+  }
+
+  <!-- Status indicator dot -->
+  @if (status) {
+    <span
+      class="avatar-status-dot"
+      [class]="statusDotColor"
+      [attr.aria-label]="status"
+      [title]="status"
+    ></span>
+  }
+
+  <!-- Hover overlay glow effect -->
+  <div class="avatar-hover-glow rounded-full"></div>
 </div>

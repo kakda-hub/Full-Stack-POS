@@ -7,9 +7,10 @@ import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material.module';
 import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
 import { UserDetailDialogModule } from '../../shared/user-detail-dialog/user-detail-dialog.module';
+import { UserManagementCardComponent } from './user-management-card/user-management-card.component';
 
 @NgModule({
-  declarations: [UserManagementListComponent],
+  declarations: [UserManagementListComponent, UserManagementCardComponent],
   imports: [
     CommonModule,
     UserManagementRoutingModule,
@@ -19,4 +20,4 @@ import { UserDetailDialogModule } from '../../shared/user-detail-dialog/user-det
     UserDetailDialogModule,
   ],
 })
-export class UserManagementModule { }
+export class UserManagementModule {}

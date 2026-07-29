@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Not, In } from 'typeorm';
 import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Product } from '../products/entities/product.entity';
@@ -66,6 +66,14 @@ export class PurchaseOrdersService {
     });
 
     return this.poRepository.save(po);
+  }
+
+  async getPendingCount(): Promise<number> {
+    return this.poRepository.count({
+      where: {
+        status: Not(In([PurchaseOrderStatus.RECEIVED, PurchaseOrderStatus.CANCELLED])),
+      },
+    });
   }
 
   async findAll(pagination?: PaginationDto): Promise<PaginatedResult<PurchaseOrder>> {

@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, AdjustStockDto } from './dto/product.dto';
+import { LowStockQueryDto } from './dto/low-stock-query.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -46,6 +47,13 @@ export class ProductsController {
     @Query() pagination?: PaginationDto,
   ) {
     return this.productsService.findAll(includeInactive === 'true', pagination ?? {});
+  }
+
+  // GET /api/v1/products/low-stock  [all roles]
+  @Get('low-stock')
+  @ApiOperation({ summary: 'Get all low-stock products (stock ≤ threshold)' })
+  getLowStock(@Query() query: LowStockQueryDto) {
+    return this.productsService.getLowStock(query.threshold, query);
   }
 
   // GET /api/v1/products/barcode/:barcode  [all roles]

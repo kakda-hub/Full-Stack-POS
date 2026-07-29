@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { parseNumericFields } from '../../../shared/helpers/number.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -12,17 +13,33 @@ export class PurchaseOrderService {
 
   constructor(private http: HttpClient) {}
 
+  /** Parse numeric fields that MySQL DECIMAL returns as strings */
+  private mapPO(po: any): any {
+    if (!po) return po;
+    return parseNumericFields([po], ['total', 'subtotal', 'discount', 'shippingCost'])[0];
+  }
+
+  /** Get the count of pending (non-received, non-cancelled) purchase orders */
+  getPendingCount(): Observable<number> {
+    return this.http.get<{ count: number }>(`${this.apiUrl}/pending-count`).pipe(
+      map((res) => res?.count ?? 0)
+    );
+  }
+
   /** Get all purchase orders (paginated) */
   getAll(): Observable<any[]> {
     return this.http.get<any>(this.apiUrl).pipe(
-      map((res) => res?.data ?? res)
+      map((res) => {
+        const data: any[] = res?.data ?? res ?? [];
+        return data.map((po: any) => this.mapPO(po));
+      }),
     );
   }
 
   /** Get a single purchase order by ID */
   getById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map((res) => res?.data ?? res)
+      map((res) => this.mapPO(res?.data ?? res)),
     );
   }
 

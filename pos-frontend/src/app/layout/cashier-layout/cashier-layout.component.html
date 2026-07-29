@@ -65,18 +65,16 @@
             Online
           </p>
         </div>
-        <div class="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-md">
-          @if (auth.currentUser()?.avatarUrl && !avatarError()) {
-            <img class="w-full h-full object-cover" [src]="auth.currentUser()?.avatarUrl" alt="" (error)="onAvatarError()" />
-          } @else {
-            <div
-              class="w-full h-full flex items-center justify-center font-bold text-sm bg-gradient-to-br from-indigo-500 to-violet-600 text-white"
-              [attr.aria-label]="(auth.currentUser()?.name || 'User') + ' avatar'"
-            >
-              {{ (auth.currentUser()?.name || 'U').charAt(0).toUpperCase() }}
-            </div>
-          }
-        </div>
+        <app-ui-avatar
+          [imageUrl]="auth.currentUser()?.avatarUrl"
+          [name]="auth.currentUser()?.name"
+          size="sm"
+          [ring]="true"
+          ringColor="ring-white dark:ring-slate-700 shadow-sm"
+          status="online"
+          [clickable]="true"
+          (avatarClick)="openAvatarDialog()"
+        ></app-ui-avatar>
       </div>
 
       <button (click)="auth.logout()" class="logout-btn" title="Logout">

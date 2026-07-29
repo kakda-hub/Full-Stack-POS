@@ -99,7 +99,7 @@
                 {{ po.items?.length || 0 }}
               </td>
               <td class="px-4 py-3.5 text-right font-bold text-indigo-600 dark:text-indigo-400">
-                ${{ po.total?.toFixed(2) }}
+                {{ po.total | appNumber:'currency' }}
               </td>
               <td class="px-4 py-3.5">
                 <span [class]="'status-badge ' + getStatusClass(po.status)">
@@ -191,7 +191,7 @@
             <span class="text-slate-400 uppercase tracking-wider font-semibold">
               {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}
             </span>
-            <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">${{ po.total?.toFixed(2) }}</span>
+            <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">{{ po.total | appNumber:'currency' }}</span>
           </div>
         </div>
 

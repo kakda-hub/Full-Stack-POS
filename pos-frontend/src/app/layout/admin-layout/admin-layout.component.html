@@ -112,6 +112,10 @@
             <span *ngIf="!isCollapsed()" class="nav-item-label">
               {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
             </span>
+            <!-- Warning dot for Purchase Orders with pending count -->
+            @if (item.icon === 'purchase-order' && pendingPoCount() > 0) {
+              <div class="po-pending-dot" [class.po-pending-dot-collapsed]="isCollapsed()" [title]="pendingPoCount() + ' pending'"></div>
+            }
             <div class="active-accent"></div>
           </a>
 
@@ -144,23 +148,25 @@
             <div class="active-accent" [class.opacity-100]="isManagementActive()"></div>
           </button>
 
-          <!-- Submenu Content (for Management) -->
+          <!-- Submenu Content (for Management) — slide animation -->
           <div
-            *ngIf="item.subMenus && item.route !== '/more' && selectedMenu() === item.route && !isCollapsed()"
-            @fadeIn
-            class="ml-10 space-y-1 pt-1"
+            *ngIf="item.subMenus && !isCollapsed()"
+            class="sidebar-submenu"
+            [class.expanded]="selectedMenu() === item.route"
           >
-            <a
-              *ngFor="let sub of item.subMenus"
-              [routerLink]="sub.route"
-              routerLinkActive="active-sub-link"
-              class="submenu-item group/sub"
-            >
-              <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-3 group-[.active-sub-link]/sub:bg-indigo-500 transition-colors"></div>
-              <span class="font-medium">
-                {{ langService.currentLang() === 'km' ? sub.labelKm : sub.label }}
-              </span>
-            </a>
+            <div class="sidebar-submenu-inner">
+              <a
+                *ngFor="let sub of item.subMenus"
+                [routerLink]="sub.route"
+                routerLinkActive="active-sub-link"
+                class="submenu-item group/sub"
+              >
+                <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-3 group-[.active-sub-link]/sub:bg-indigo-500 transition-colors"></div>
+                <span class="font-medium">
+                  {{ langService.currentLang() === 'km' ? sub.labelKm : sub.label }}
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -207,11 +213,21 @@
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
           </svg>
         </div>
-        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
+        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider flex-1 text-left">
           {{ theme.isDark()
             ? (langService.currentLang() === 'km' ? 'ពន្លឺ' : 'Light')
             : (langService.currentLang() === 'km' ? 'ងងឹត' : 'Dark') }}
         </span>
+        <div
+          *ngIf="!isCollapsed()"
+          class="toggle-switch flex-shrink-0"
+          [class.toggle-switch-active]="theme.isDark()"
+          [attr.data-tooltip]="theme.isDark()
+            ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
+            : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
+        >
+          <div class="toggle-switch-knob"></div>
+        </div>
       </button>
 
       <!-- Language Toggle -->
@@ -224,9 +240,19 @@
         <div class="w-7 h-7 rounded-md bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold">
           {{ langService.currentLang() === 'en' ? 'KH' : 'EN' }}
         </div>
-        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider">
+        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider flex-1 text-left">
           {{ langService.currentLang() === 'en' ? 'ភាសាខ្មែរ' : 'English' }}
         </span>
+        <div
+          *ngIf="!isCollapsed()"
+          class="toggle-switch flex-shrink-0"
+          [class.toggle-switch-active]="langService.currentLang() === 'km'"
+          [attr.data-tooltip]="langService.currentLang() === 'km'
+            ? 'Switch to English'
+            : (langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'ប្តូរទៅភាសាខ្មែរ')"
+        >
+          <div class="toggle-switch-knob"></div>
+        </div>
       </button>
 
       <!-- User Profile -->
@@ -237,8 +263,10 @@
             [name]="auth.currentUser()?.name"
             [ringColor]="'ring-indigo-500/20'"
             [ring]="true"
+            status="online"
+            [clickable]="true"
+            (avatarClick)="openAvatarDialog()"
           ></app-ui-avatar>
-          <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 status-dot-border rounded-full shadow-sm shadow-emerald-500/30"></div>
         </div>
         <div *ngIf="!isCollapsed()" class="min-w-0 flex-1">
           <div class="user-name">
@@ -323,91 +351,364 @@
     </button>
   </nav>
 
-  <!-- ===== Mobile Menu Overlay ===== -->
+  <!-- ===== Mobile Menu Overlay (Restructured) ===== -->
   @if (isMobileMenuOpen()) {
-    <div class="mobile-menu-overlay" (click)="closeMobileMenu()">
-      <div class="mobile-menu-panel" (click)="$event.stopPropagation()">
+    <div
+      class="mobile-menu-overlay"
+      (click)="closeMobileMenu()"
+      (touchstart)="onSwipeStart($event)"
+      (touchmove)="onSwipeMove($event)"
+      (touchend)="onSwipeEnd($event)"
+    >
+      <div
+        class="mobile-menu-panel"
+        [style.transform]="swipeTranslateY()"
+        [style.transition]="swipeTransition()"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- ── Drag Handle ── -->
+        <div class="mobile-menu-handle">
+          <div class="mobile-menu-handle-bar"></div>
+        </div>
+
+        <!-- ── Header: Profile + Close ── -->
         <div class="mobile-menu-header">
-          <h3 class="mobile-menu-title">{{ langService.currentLang() === 'km' ? 'ម៉ឺនុយ' : 'Menu' }}</h3>
-          <button (click)="closeMobileMenu()" class="mobile-menu-close">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <app-ui-avatar
+              [imageUrl]="auth.currentUser()?.avatarUrl"
+              [name]="auth.currentUser()?.name"
+              size="w-12 h-12"
+              textSize="text-base"
+              [ring]="true"
+              ringColor="ring-indigo-500/30"
+              status="online"
+              [clickable]="true"
+              (avatarClick)="openAvatarDialog()"
+            ></app-ui-avatar>
+            <div class="min-w-0 flex-1">
+              <div class="mobile-menu-user-name truncate">
+                {{ auth.currentUser()?.name || (langService.currentLang() === 'km' ? 'អ្នកប្រើ' : 'User') }}
+              </div>
+              <div class="mobile-menu-user-role truncate">
+                {{ auth.currentUser()?.role || (langService.currentLang() === 'km' ? 'តួនាទី' : 'Role') }}
+              </div>
+              <div class="mobile-menu-user-email truncate">
+                {{ auth.currentUser()?.username || (langService.currentLang() === 'km' ? 'email@example.com' : 'email@example.com') }}
+              </div>
+            </div>
+          </div>
+          <button (click)="closeMobileMenu()" class="mobile-menu-close" aria-label="Close menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
-        <div class="mobile-menu-items">
-          <ng-container *ngFor="let item of navItems">
-            <!-- Skip items that have their own dedicated tab -->
-            <ng-container *ngIf="item.route !== '/sales' && item.route !== '/sales-history'">
-              <!-- Link items (no submenus) -->
-              <a
-                *ngIf="!item.subMenus || item.route === '/more'"
-                [routerLink]="item.route"
-                (click)="closeMobileMenu()"
-                routerLinkActive="mobile-menu-item-active"
-                class="mobile-menu-item"
+
+        <!-- ── Scrollable Body ── -->
+        <div class="mobile-menu-body">
+
+          <!-- ═══ MAIN Section ═══ -->
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'មេ' : 'MAIN' }}</div>
+
+            <!-- Dashboard -->
+            <a
+              [routerLink]="'/dashboard'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទិដ្ឋភាពទូទៅ' : 'Dashboard' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Products -->
+            <a
+              [routerLink]="'/products'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="M12 22.08V12" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ផលិតផល' : 'Products' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Quick Picks -->
+            <a
+              [routerLink]="'/quick-picks'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទំនិញរហ័ស' : 'Quick Picks' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- ═══ INVENTORY Section ═══ -->
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'ស្តុក' : 'INVENTORY' }}</div>
+
+            <!-- Purchase Orders (with badge) -->
+            <a
+              [routerLink]="'/purchase-orders'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 13h6M9 17h4" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'បញ្ជាទិញ' : 'Purchase Orders' }}</span>
+              @if (pendingPoCount() > 0) {
+                <span class="mobile-menu-badge">{{ pendingPoCount() }} {{ langService.currentLang() === 'km' ? 'កំពុងរង់ចាំ' : 'Pending' }}</span>
+              }
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Stock Movements -->
+            <a
+              [routerLink]="'/stock-movements'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" /><path d="M12 3v6" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ចលនាស្តុក' : 'Stock Movements' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Suppliers -->
+            <a
+              [routerLink]="'/suppliers'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 17h14M5 17a2 2 0 1 1-4 0M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 1-4 0M19 17a2 2 0 1 0 4 0" /><path d="M14 3H2v12h12V3Z" /><path d="M14 8h4l4 4v5h-2" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Suppliers' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- ═══ MANAGEMENT Section ═══ -->
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'គ្រប់គ្រង' : 'MANAGEMENT' }}</div>
+
+            <!-- Report -->
+            <a
+              [routerLink]="'/reports'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'របាយការណ៍' : 'Reports' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Users -->
+            <a
+              [routerLink]="'/users'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'អ្នកប្រើ' : 'Users' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Categories -->
+            <a
+              [routerLink]="'/categories'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ប្រភេទ' : 'Categories' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Permission -->
+            <a
+              [routerLink]="'/permission'"
+              (click)="closeMobileMenu()"
+              routerLinkActive="mobile-menu-item-active"
+              class="mobile-menu-item"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការអនុញ្ញាត' : 'Permissions' }}</span>
+              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </a>
+
+            <!-- Management (Settings) with submenus -->
+            @let mgmtItem = getNavItem('/settings');
+            @if (mgmtItem) {
+            <div class="mobile-menu-accordion">
+              <button
+                (click)="toggleSubMenu(mgmtItem)"
+                class="mobile-menu-item w-full text-left"
+                [class.mobile-menu-item-active]="isManagementActive()"
               >
                 <div class="mobile-menu-item-icon">
-                  <div class="w-5 h-5">
-                    <svg *ngIf="item.icon === 'dashboard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="M12 22.08V12" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'permission'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'purchase-order'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 13h6M9 17h4" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'stock-movement'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="M3 9h18" /><path d="M12 3v6" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'supplier'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M5 17h14M5 17a2 2 0 1 1-4 0M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 1-4 0M19 17a2 2 0 1 0 4 0" /><path d="M14 3H2v12h12V3Z" /><path d="M14 8h4l4 4v5h-2" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'history'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    <svg *ngIf="item.icon === 'management'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                  </div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                  </svg>
                 </div>
-                <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? item.labelKm : item.label }}</span>
-                <svg class="w-4 h-4 text-slate-300 ml-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M9 18l6-6-6-6"/>
-                </svg>
-              </a>
-
-              <!-- Submenu items (nested under management) -->
-              <ng-container *ngIf="item.subMenus && item.route !== '/more'">
-                <div class="mobile-menu-submenu-label">
-                  {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
-                </div>
-                <a
-                  *ngFor="let sub of item.subMenus"
-                  [routerLink]="sub.route"
-                  (click)="closeMobileMenu()"
-                  routerLinkActive="mobile-menu-item-active"
-                  class="mobile-menu-item mobile-menu-item-sub"
+                <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការកំណត់' : 'Settings' }}</span>
+                <svg
+                  class="mobile-menu-item-chevron ml-auto transition-transform duration-300"
+                  [class.rotate-180]="selectedMenu() === '/settings'"
+                  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
                 >
-                  <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-3"></div>
-                  <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? sub.labelKm : sub.label }}</span>
-                </a>
-              </ng-container>
-            </ng-container>
-          </ng-container>
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+
+              <div class="mobile-menu-submenu" [class.expanded]="selectedMenu() === '/settings'">
+                <div class="mobile-menu-submenu-inner">
+                  @for (sub of mgmtItem.subMenus; track sub.route) {
+                    <a
+                      [routerLink]="sub.route"
+                      (click)="closeMobileMenu()"
+                      routerLinkActive="mobile-menu-item-active"
+                      class="mobile-menu-item mobile-menu-item-sub"
+                    >
+                      <div class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mr-3 flex-shrink-0"></div>
+                      <span class="mobile-menu-item-label text-sm">{{ langService.currentLang() === 'km' ? sub.labelKm : sub.label }}</span>
+                    </a>
+                  }
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+
+          <!-- ═══ PREFERENCES Section ═══ -->
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'ចំណូលចិត្ត' : 'PREFERENCES' }}</div>
+
+            <!-- Dark Mode Toggle -->
+            <button
+              (click)="theme.toggle()"
+              class="mobile-menu-item w-full text-left"
+            >
+              <div class="mobile-menu-item-icon">
+                @if (theme.isDark()) {
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                } @else {
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  </svg>
+                }
+              </div>
+              <span class="mobile-menu-item-label">
+                {{ langService.currentLang() === 'km'
+                  ? (theme.isDark() ? 'របៀបភ្លឺ' : 'របៀបងងឹត')
+                  : (theme.isDark() ? 'Light Mode' : 'Dark Mode') }}
+              </span>
+              <div class="ml-auto">
+                <div class="toggle-switch" [class.toggle-switch-active]="theme.isDark()">
+                  <div class="toggle-switch-knob"></div>
+                </div>
+              </div>
+            </button>
+
+            <!-- Language Toggle -->
+            <button
+              (click)="langService.toggle()"
+              class="mobile-menu-item w-full text-left"
+            >
+              <div class="mobile-menu-item-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <span class="mobile-menu-item-label">
+                {{ langService.currentLang() === 'km' ? 'ភាសាអង់គ្លេស' : 'Khmer' }}
+              </span>
+              <div class="ml-auto">
+                <div class="toggle-switch" [class.toggle-switch-active]="langService.currentLang() === 'km'">
+                  <div class="toggle-switch-knob"></div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Footer: Logout ── -->
+        <div class="mobile-menu-footer">
+          <button (click)="auth.logout()" class="mobile-menu-logout-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Logout' }}</span>
+          </button>
         </div>
       </div>
     </div>

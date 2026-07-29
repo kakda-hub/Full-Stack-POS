@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto, AdjustStockDto } from './dto/product.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginate } from '../../common/helpers/pagination.helper';
+import { paginate, paginateQuery } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class ProductsService {
@@ -58,6 +58,29 @@ export class ProductsService {
       throw new NotFoundException(`Product with barcode "${barcode}" not found`);
     }
     return product;
+  }
+
+  /**
+   * Get all products where stock is at or below their low-stock threshold.
+   * Optionally override the threshold across all products via query param.
+   */
+  async getLowStock(threshold?: number, pagination?: PaginationDto): Promise<PaginatedResult<Product>> {
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .where('product.isActive = :isActive', { isActive: true });
+
+    if (threshold !== undefined) {
+      // Use a global threshold override
+      queryBuilder.andWhere('product.stock <= :threshold', { threshold });
+    } else {
+      // Use each product's own low_stock_threshold
+      queryBuilder.andWhere('product.stock <= product.low_stock_threshold');
+    }
+
+    queryBuilder.orderBy('product.stock', 'ASC');
+
+    return paginateQuery(queryBuilder, pagination ?? {});
   }
 
   async update(id: number, dto: UpdateProductDto): Promise<Product> {

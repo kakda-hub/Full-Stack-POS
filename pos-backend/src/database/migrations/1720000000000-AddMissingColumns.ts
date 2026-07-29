@@ -59,11 +59,32 @@ export class AddMissingColumns1720000000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-      ALTER TABLE \`categories\` DROP COLUMN IF EXISTS \`img_url\`
+    // NOTE: MySQL 8.x does NOT support `DROP COLUMN IF EXISTS`.
+    //       Use information_schema to check column existence instead.
+    const hasCategoryImgUrl = await queryRunner.query(`
+      SELECT 1 AS \`exists\`
+      FROM \`information_schema\`.\`COLUMNS\`
+      WHERE \`TABLE_SCHEMA\` = DATABASE()
+        AND \`TABLE_NAME\` = 'categories'
+        AND \`COLUMN_NAME\` = 'img_url'
     `);
-    await queryRunner.query(`
-      ALTER TABLE \`products\` DROP COLUMN IF EXISTS \`name_kh\`
+    if (hasCategoryImgUrl.length > 0) {
+      await queryRunner.query(`
+        ALTER TABLE \`categories\` DROP COLUMN \`img_url\`
+      `);
+    }
+
+    const hasProductNameKh = await queryRunner.query(`
+      SELECT 1 AS \`exists\`
+      FROM \`information_schema\`.\`COLUMNS\`
+      WHERE \`TABLE_SCHEMA\` = DATABASE()
+        AND \`TABLE_NAME\` = 'products'
+        AND \`COLUMN_NAME\` = 'name_kh'
     `);
+    if (hasProductNameKh.length > 0) {
+      await queryRunner.query(`
+        ALTER TABLE \`products\` DROP COLUMN \`name_kh\`
+      `);
+    }
   }
 }

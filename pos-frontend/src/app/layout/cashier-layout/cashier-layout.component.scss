@@ -70,24 +70,6 @@
   @apply text-slate-600 dark:text-slate-300;
 }
 
-/* ─── Avatar ring with hover glow ─── */
-.avatar-ring {
-  @apply ring-2 motion-safe:transition-all motion-safe:duration-300;
-  @apply ring-indigo-500/20;
-  @apply dark:ring-indigo-400/30;
-
-  &:hover {
-    @apply ring-indigo-500/40 shadow-md shadow-indigo-500/10;
-    @apply dark:ring-indigo-400/50;
-  }
-}
-
-/* ─── Avatar fallback background ─── */
-.avatar-fallback {
-  @apply bg-gradient-to-br from-indigo-500 to-violet-600 text-white;
-  @apply dark:from-indigo-600 dark:to-violet-700;
-}
-
 /* ─── Logout button ─── */
 .logout-btn {
   @apply p-2 rounded-xl motion-safe:transition-all motion-safe:duration-200;

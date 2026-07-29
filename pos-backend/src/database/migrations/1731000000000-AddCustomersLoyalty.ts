@@ -12,10 +12,21 @@ export class AddCustomersLoyalty1731000000000 implements MigrationInterface {
     // ── Safety check: ensure customer_id column exists first ────────────
     // This prevents failures when the migration is re-run or when the
     // sales table was created by init.sql without this column.
-    await queryRunner.query(`
-      ALTER TABLE \`sales\`
-      ADD COLUMN IF NOT EXISTS \`customer_id\` INT NULL
+    // NOTE: MySQL 8.x does NOT support `ADD COLUMN IF NOT EXISTS`.
+    //       Use information_schema to check column existence instead.
+    const hasCustomerId = await queryRunner.query(`
+      SELECT 1 AS \`exists\`
+      FROM \`information_schema\`.\`COLUMNS\`
+      WHERE \`TABLE_SCHEMA\` = DATABASE()
+        AND \`TABLE_NAME\` = 'sales'
+        AND \`COLUMN_NAME\` = 'customer_id'
     `);
+    if (hasCustomerId.length === 0) {
+      await queryRunner.query(`
+        ALTER TABLE \`sales\`
+        ADD COLUMN \`customer_id\` INT NULL
+      `);
+    }
 
     // ── customers table ─────────────────────────────────────────────────
     await queryRunner.query(`

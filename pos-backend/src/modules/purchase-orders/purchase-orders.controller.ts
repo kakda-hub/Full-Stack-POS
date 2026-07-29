@@ -33,6 +33,13 @@ export class PurchaseOrdersController {
     return this.poService.findAll(pagination ?? {});
   }
 
+  @Get('pending-count')
+  @ApiOperation({ summary: 'Get the count of pending (non-received, non-cancelled) purchase orders' })
+  async getPendingCount() {
+    const count = await this.poService.getPendingCount();
+    return { count };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a purchase order by ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {

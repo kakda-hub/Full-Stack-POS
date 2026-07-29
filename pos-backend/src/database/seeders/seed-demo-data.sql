@@ -227,7 +227,7 @@ INSERT IGNORE INTO products (id, name, name_kh, barcode, price, cost_price, stoc
 (98,  'Fish Sauce 500ml',        'ទឹកត្រី 500ml',               '885000900006', 2.00,  1.10,  40,  15, NULL,                 10, 'Premium fish sauce',     1, NOW() - INTERVAL 60 DAY),
 (99,  'Cooking Oil 1L',          'ប្រេងឆា 1L',                  '885000900007', 3.00,  1.80,  25,  15, NULL,                 10, 'Vegetable cooking oil',   1, NOW() - INTERVAL 55 DAY),
 (100, 'Tomato Ketchup 500ml',    'ទឹកប៉េងប៉ោះ 500ml',          '885000900008', 2.50,  1.40,  30,  15, NULL,                 10, 'Tomato ketchup',         1, NOW() - INTERVAL 50 DAY)
-ON DUPLICATE KEY UPDATE name = VALUES(name);
+ON DUPLICATE KEY UPDATE name = VALUES(name), category_id = VALUES(category_id);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --  6. QUICK PICKS  (10 popular items)
@@ -316,7 +316,7 @@ ON DUPLICATE KEY UPDATE id = VALUES(id);
 --  9. SALES  (500 sales over last 90 days — single INSERT statement)
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Check if sales already exist first
-SELECT COUNT(*) INTO @existing_sales FROM sales;
+SET @existing_sales = (SELECT COUNT(*) FROM sales);
 
 -- Only generate if fewer than 400 sales exist
 INSERT INTO sales (user_id, subtotal, discount, tax, total, payment_method, customer_id, points_earned, points_redeemed, loyalty_discount, created_at)
@@ -337,18 +337,31 @@ SELECT
   0.00,
   -- payment_method: cash 45%, aba 35%, card 20%
   CASE WHEN RAND() < 0.45 THEN 'cash' WHEN RAND() < 0.80 THEN 'aba' ELSE 'card' END,
-  -- customer_id: 80% assigned
-  CASE WHEN RAND() < 0.8 THEN FLOOR(1 + RAND() * 45) ELSE NULL END,
+  -- customer_id: 80% assigned, weighted toward high-spending customers (IDs 1-20)
+  CASE
+    WHEN RAND() < 0.2 THEN NULL                                                              -- 20% walk-in
+    WHEN RAND() < 0.6 THEN FLOOR(1 + RAND() * 15)                                              -- 32% → VIP customers (1-15)
+    WHEN RAND() < 0.85 THEN 15 + FLOOR(1 + RAND() * 20)                                      -- 20% → regulars (16-35)
+    ELSE 35 + FLOOR(1 + RAND() * 10)                                                         -- 12% → occasional (36-45)
+  END,
   -- points_earned
   FLOOR((2.00 + RAND() * 48.00) * 10),
   -- points_redeemed: sometimes
   CASE WHEN RAND() < 0.3 THEN FLOOR(RAND() * 50) ELSE 0 END,
   -- loyalty_discount
   CASE WHEN RAND() < 0.3 THEN ROUND(FLOOR(RAND() * 50) * 0.01, 2) ELSE 0.00 END,
-  -- created_at: uniform distribution over last 90 days
-  NOW() - INTERVAL FLOOR(RAND() * 90) DAY - INTERVAL FLOOR(RAND() * 12) HOUR - INTERVAL FLOOR(RAND() * 60) MINUTE
+  -- created_at: weighted toward business hours
+  -- 50% Morning/Afternoon (7-16), 35% Evening (17-22), 15% Late Night (23-6)
+  NOW() - INTERVAL FLOOR(RAND() * 90) DAY
+    - INTERVAL (
+        CASE
+          WHEN RAND() < 0.50 THEN 7 + FLOOR(RAND() * 10)   -- 7AM-4PM (50%)
+          WHEN RAND() < 0.85 THEN 17 + FLOOR(RAND() * 6)   -- 5PM-10PM (35%)
+          ELSE FLOOR(RAND() * 7)                            -- 12AM-6AM (15%)
+        END
+      ) HOUR
+    - INTERVAL FLOOR(RAND() * 60) MINUTE
 FROM (
-  -- Generate 500 rows using a number series
   SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
   UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
 ) a CROSS JOIN (
@@ -366,7 +379,7 @@ UPDATE sales SET total = ROUND(subtotal - discount + tax - loyalty_discount, 2) 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --  10. SALE ITEMS  (1-6 items per sale)
 -- ═══════════════════════════════════════════════════════════════════════════════
-SELECT COUNT(*) INTO @existing_items FROM sale_items;
+SET @existing_items = (SELECT COUNT(*) FROM sale_items);
 
 INSERT INTO sale_items (sale_id, product_id, quantity, price)
 SELECT
@@ -386,7 +399,7 @@ LIMIT 2500;
 -- ═══════════════════════════════════════════════════════════════════════════════
 --  11. STOCK MOVEMENTS  (260 movements)
 -- ═══════════════════════════════════════════════════════════════════════════════
-SELECT COUNT(*) INTO @existing_moves FROM stock_movements;
+SET @existing_moves = (SELECT COUNT(*) FROM stock_movements);
 
 INSERT INTO stock_movements (product_id, quantity, type, reference_type, reference_id, cost_price, price, note, performed_by, created_at)
 SELECT
@@ -435,34 +448,29 @@ WHERE @existing_moves < 200
 LIMIT 260;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---  12. RETURNS  (30 returns)
+--  12. RETURNS  (up to 30 returns referencing actual sales)
 -- ═══════════════════════════════════════════════════════════════════════════════
-SELECT COUNT(*) INTO @existing_returns FROM returns;
-SELECT MAX(id) INTO @max_sale_id FROM sales;
+SET @existing_returns = (SELECT COUNT(*) FROM returns);
 
 INSERT INTO returns (sale_id, total, status, reason, processed_by, created_at)
 SELECT
-  FLOOR(1 + RAND() * @max_sale_id),
-  ROUND(2.00 + RAND() * 20.00, 2),
+  s.id,
+  ROUND(s.total * (0.1 + RAND() * 0.9), 2),
   CASE WHEN RAND() < 0.5 THEN 'approved' WHEN RAND() < 0.8 THEN 'pending' ELSE 'rejected' END,
   CASE WHEN RAND() < 0.33 THEN 'Customer changed mind'
        WHEN RAND() < 0.66 THEN 'Product damaged'
        ELSE 'Wrong item purchased' END,
   1 + FLOOR(RAND() * 3),
-  NOW() - INTERVAL FLOOR(RAND() * 60) DAY
-FROM (
-  SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
-  UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
-) a CROSS JOIN (
-  SELECT 1 AS n UNION SELECT 2 UNION SELECT 3
-) b
+  s.created_at + INTERVAL FLOOR(1 + RAND() * 3) DAY
+FROM sales s
 WHERE @existing_returns < 15
+ORDER BY RAND()
 LIMIT 30;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --  13. RETURN ITEMS  (1-3 items per return)
 -- ═══════════════════════════════════════════════════════════════════════════════
-SELECT COUNT(*) INTO @existing_return_items FROM return_items;
+SET @existing_return_items = (SELECT COUNT(*) FROM return_items);
 
 INSERT INTO return_items (return_id, product_id, quantity, price, refund_amount)
 SELECT

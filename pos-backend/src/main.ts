@@ -75,51 +75,86 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  // Inline JS that auto-authorizes Swagger UI after a successful login
-  // Uses a DOM MutationObserver to watch for response JSON containing
-  // "accessToken" in <pre> elements — works regardless of how Swagger UI
-  // makes HTTP requests (fetch, XHR, swagger-client, etc.).
+  // Inline JS that auto-authorizes Swagger UI.
+  // Priority order:
+  //   1. localStorage (frontend's pos_user session or raw accessToken)
+  //   2. Cookie (access_token)
+  //   3. DOM MutationObserver (watches API responses rendered in <pre> elements)
+  //
+  // The DOM observer approach works regardless of how Swagger UI makes HTTP
+  // requests (fetch, XHR, swagger-client, etc.).
   const autoAuthScript = `
 (function() {
   var authorized = false;
+  var observer = null;
 
-  function tryAuthorize(text) {
+  // ── Core: feed a token into Swagger UI's Bearer auth ──────────────
+  function doAuthorize(token) {
+    if (!token || authorized || !window.ui || !window.ui.authActions) return false;
+    // Swagger UI auto-prepends 'Bearer ' for http/bearer schemes
+    window.ui.authActions.authorize({
+      bearer: {
+        name: 'bearer',
+        value: token,
+        schema: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    });
+    authorized = true;
+    if (observer) observer.disconnect();
+    return true;
+  }
+
+  // ── Source 1: localStorage ─────────────────────────────────────────
+  // Picks up the frontend's existing user session (pos_user.token)
+  // or a raw accessToken key stored by other means.
+  function getTokenFromStorage() {
+    try {
+      var stored = localStorage.getItem('pos_user');
+      if (stored) {
+        var user = JSON.parse(stored);
+        if (user && user.token) return user.token;
+      }
+      var raw = localStorage.getItem('accessToken');
+      if (raw) return raw;
+    } catch (e) {}
+    return null;
+  }
+
+  // ── Source 2: Cookie ───────────────────────────────────────────────
+  function getTokenFromCookie() {
+    try {
+      var match = document.cookie.match(/access_token=([^;]+)/);
+      if (match) return match[1];
+    } catch (e) {}
+    return null;
+  }
+
+  // ── Source 3: DOM observer (catches Swagger login responses) ───────
+  function tryAuthorizeFromText(text) {
     if (authorized) return true;
     try {
       var obj = JSON.parse(text);
       var token = obj && (obj.accessToken || (obj.data && obj.data.accessToken));
-      if (token && window.ui && window.ui.authActions) {
-        // Swagger UI auto-prepends 'Bearer ' for http/bearer schemes
-        window.ui.authActions.authorize({
-          bearer: {
-            name: 'bearer',
-            value: token,
-            schema: {
-              type: 'http',
-              scheme: 'bearer',
-              bearerFormat: 'JWT',
-            },
-          },
-        });
-        authorized = true;
-        observer.disconnect();
+      if (token && doAuthorize(token)) {
+        console.log('[Swagger] ✅ Auto-authorized via DOM observer');
         return true;
       }
     } catch (e) {}
     return false;
   }
 
-  var observer = new MutationObserver(function() {
+  observer = new MutationObserver(function() {
     if (authorized) return;
     // Swagger UI renders response JSON in <pre> elements
     var pres = document.querySelectorAll('pre');
     for (var i = 0; i < pres.length; i++) {
       var text = pres[i].textContent || '';
       if (text.indexOf('accessToken') !== -1) {
-        if (tryAuthorize(text)) {
-          console.log('[Swagger] ✅ Auto-authorized via DOM observer');
-          return;
-        }
+        if (tryAuthorizeFromText(text)) return;
       }
     }
   });
@@ -129,6 +164,22 @@ async function bootstrap() {
       setTimeout(init, 300);
       return;
     }
+
+    // 1. Try localStorage (frontend's existing session)
+    var storageToken = getTokenFromStorage();
+    if (storageToken && doAuthorize(storageToken)) {
+      console.log('[Swagger] ✅ Auto-authorized via localStorage (frontend session)');
+      return;
+    }
+
+    // 2. Try cookie
+    var cookieToken = getTokenFromCookie();
+    if (cookieToken && doAuthorize(cookieToken)) {
+      console.log('[Swagger] ✅ Auto-authorized via cookie');
+      return;
+    }
+
+    // 3. Fall back to DOM observer (catches login-on-the-fly)
     observer.observe(document.body, { childList: true, subtree: true });
     console.log('[Swagger] ✅ Auto-auth DOM observer active');
   }

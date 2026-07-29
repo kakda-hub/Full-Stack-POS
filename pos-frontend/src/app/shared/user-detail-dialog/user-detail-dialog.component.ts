@@ -26,7 +26,7 @@ export class UserDetailDialogComponent implements OnInit {
   ];
 
   // Avatar state
-  avatarPreview: string | null = null;
+  avatarPreview = signal<string | null>(null);
   avatarError = false;
 
   get id(): number | undefined {
@@ -35,11 +35,11 @@ export class UserDetailDialogComponent implements OnInit {
 
   get currentAvatar(): string {
     if (this.avatarError) return '';
-    return this.avatarPreview || this.data?.user?.avatarUrl || '';
+    return this.avatarPreview() || this.data?.user?.avatarUrl || '';
   }
 
   get hasAvatar(): boolean {
-    return !!(this.avatarPreview || this.data?.user?.avatarUrl);
+    return !!(this.avatarPreview() || this.data?.user?.avatarUrl);
   }
 
   get initials(): string {
@@ -70,6 +70,7 @@ export class UserDetailDialogComponent implements OnInit {
       role: [item?.role || '', [Validators.required]],
       password: ['', item ? Validators.minLength(6) : Validators.required],
       isActive: [item ? (item.status === 'active' || item.isActive) : true],
+      avatarUrl: [item?.avatarUrl || ''],
     });
 
     // If editing, password is optional
@@ -78,6 +79,51 @@ export class UserDetailDialogComponent implements OnInit {
       this.form.get('password')?.setErrors(null);
       this.form.get('password')?.updateValueAndValidity();
     }
+  }
+
+  /** Handle avatar file selected from inline upload component */
+  onAvatarChange(file: File): void {
+    this.isUploading.set(true);
+    this.avatarError = false;
+
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.avatarPreview.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to cloudinary
+    this.cloudinaryService.uploadFile(file).subscribe({
+      next: (res) => {
+        const fileUrl =
+          res?.data?.data?.fileUrl ||
+          res?.data?.data?.[0]?.fileUrl ||
+          res?.data?.fileUrl;
+
+        if (fileUrl) {
+          this.avatarPreview.set(fileUrl);
+          this.form.patchValue({ avatarUrl: fileUrl });
+          this.alertService.success(
+            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
+          );
+        }
+        this.isUploading.set(false);
+      },
+      error: () => {
+        this.alertService.error(
+          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Avatar upload failed',
+        );
+        this.isUploading.set(false);
+      },
+    });
+  }
+
+  /** Handle avatar removal */
+  onAvatarRemoved(): void {
+    this.avatarPreview.set(null);
+    this.avatarError = false;
+    this.form.patchValue({ avatarUrl: '' });
   }
 
   onAvatarSelected(event: Event): void {
@@ -96,7 +142,7 @@ export class UserDetailDialogComponent implements OnInit {
           res?.data?.fileUrl;
 
         if (fileUrl) {
-          this.avatarPreview = fileUrl;
+          this.avatarPreview.set(fileUrl);
           this.alertService.success(
             this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
             this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
@@ -128,9 +174,10 @@ export class UserDetailDialogComponent implements OnInit {
       delete payload.password;
     }
 
-    // Use uploaded avatar URL if available
-    if (this.avatarPreview && this.avatarPreview !== this.data?.user?.avatarUrl) {
-      payload.avatarUrl = this.avatarPreview;
+    // Use uploaded avatar URL if a new one was uploaded
+    const preview = this.avatarPreview();
+    if (preview && preview !== this.data?.user?.avatarUrl) {
+      payload.avatarUrl = preview;
     }
 
     // Don't send isActive on create (backend defaults to true)

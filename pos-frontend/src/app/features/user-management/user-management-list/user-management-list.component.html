@@ -65,17 +65,13 @@
             <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
             <td class="td">
               <div class="flex items-center gap-3">
-                @if (item.avatarUrl) {
-                  <img
-                    class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50"
-                    [src]="item.avatarUrl"
-                    [alt]="item.name"
-                  />
-                } @else {
-                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-xs font-bold text-white">{{ (item.name || '?').charAt(0).toUpperCase() }}</span>
-                  </div>
-                }
+                <app-ui-avatar
+                  [imageUrl]="item.avatarUrl"
+                  [name]="item.name"
+                  size="w-9 h-9"
+                  [ring]="true"
+                  ringColor="ring-indigo-100 dark:ring-indigo-900/50"
+                ></app-ui-avatar>
                 <div>
                   <span class="font-semibold text-slate-800 dark:text-slate-100">{{ item.name }}</span>
                   <div class="text-xs text-slate-400">@{{ item.username }}</div>
@@ -135,13 +131,13 @@
       <div *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
         <div class="pl-card-header">
           <div class="flex items-center gap-3">
-            @if (item.avatarUrl) {
-              <img class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50" [src]="item.avatarUrl" [alt]="item.name" />
-            } @else {
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0">
-                <span class="text-sm font-bold text-white">{{ (item.name || '?').charAt(0).toUpperCase() }}</span>
-              </div>
-            }
+            <app-ui-avatar
+              [imageUrl]="item.avatarUrl"
+              [name]="item.name"
+              size="md"
+              [ring]="true"
+              ringColor="ring-indigo-100 dark:ring-indigo-900/50"
+            ></app-ui-avatar>
             <div>
               <span class="pl-card-title">{{ item.name }}</span>
               <div class="text-xs text-slate-400">@{{ item.username }}</div>

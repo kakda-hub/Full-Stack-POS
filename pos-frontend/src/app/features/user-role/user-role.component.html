@@ -104,27 +104,14 @@
         >
           <div class="flex items-center gap-4">
             <!-- Avatar -->
-            <div class="relative flex-shrink-0">
-              @if (user.avatarUrl) {
-                <img
-                  class="w-11 h-11 rounded-full object-cover ring-2 ring-indigo-100/50 dark:ring-indigo-900/30"
-                  [src]="user.avatarUrl"
-                  [alt]="user.name"
-                  (error)="user.avatarUrl = ''"
-                />
-              } @else {
-                <div
-                  class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center ring-2 ring-indigo-100/50 dark:ring-indigo-900/30"
-                >
-                  <span class="text-sm font-bold text-white select-none">{{ (user.name || '?').charAt(0).toUpperCase() }}</span>
-                </div>
-              }
-              <div
-                class="status-dot-border absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full shadow-sm"
-                [class.bg-emerald-500]="user.status === 'active'"
-                [class.shadow-emerald-500/30]="user.status === 'active'"
-                [class.bg-slate-400]="user.status !== 'active'"
-              ></div>
+            <div class="flex-shrink-0">
+              <app-ui-avatar
+                [imageUrl]="user.avatarUrl"
+                [name]="user.name"
+                [ring]="true"
+                ringColor="ring-indigo-100/50 dark:ring-indigo-900/30"
+                [status]="user.status === 'active' ? 'online' : 'offline'"
+              ></app-ui-avatar>
             </div>
 
             <!-- Info -->
@@ -202,27 +189,14 @@
         >
           <div class="flex items-center gap-4">
             <!-- Avatar -->
-            <div class="relative flex-shrink-0">
-              @if (user.avatarUrl) {
-                <img
-                  class="w-11 h-11 rounded-full object-cover ring-2 ring-indigo-100/50 dark:ring-indigo-900/30"
-                  [src]="user.avatarUrl"
-                  [alt]="user.name"
-                  (error)="user.avatarUrl = ''"
-                />
-              } @else {
-                <div
-                  class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center ring-2 ring-indigo-100/50 dark:ring-indigo-900/30"
-                >
-                  <span class="text-sm font-bold text-white select-none">{{ (user.name || '?').charAt(0).toUpperCase() }}</span>
-                </div>
-              }
-              <div
-                class="status-dot-border absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full shadow-sm"
-                [class.bg-emerald-500]="user.status === 'active'"
-                [class.shadow-emerald-500/30]="user.status === 'active'"
-                [class.bg-slate-400]="user.status !== 'active'"
-              ></div>
+            <div class="flex-shrink-0">
+              <app-ui-avatar
+                [imageUrl]="user.avatarUrl"
+                [name]="user.name"
+                [ring]="true"
+                ringColor="ring-indigo-100/50 dark:ring-indigo-900/30"
+                [status]="user.status === 'active' ? 'online' : 'offline'"
+              ></app-ui-avatar>
             </div>
 
             <!-- Info -->

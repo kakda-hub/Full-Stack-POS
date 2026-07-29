@@ -13,24 +13,34 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { DynamicTableComponent } from './components/dynamic-table/dynamic-table.component';
 import { DateFormatPipe } from './pipes/date-format-pipe';
+import { FormatNumberPipe } from './pipes/format-number.pipe';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
+import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
+import { AvatarUploadDialogComponent } from './components/avatar-upload-dialog/avatar-upload-dialog.component';
 
-@NgModule({
-  declarations: [
+const components = [ 
     UiAvatarComponent,
     UiButtonComponent,
     ModalComponent,
     ConfirmDialogComponent,
+    AvatarUploadComponent,
+    AvatarUploadDialogComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,
     SkeletonComponent,
     DynamicTableComponent,
     DateFormatPipe,
+    FormatNumberPipe,
     PaginationComponent,
+]
+
+@NgModule({
+  declarations: [
+    ...components 
   ],
   imports: [
     CommonModule,
@@ -47,17 +57,7 @@ import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
     ReactiveFormsModule,
     TranslateModule,
     RouterModule,
-    UiAvatarComponent,
-    UiButtonComponent,
-    ModalComponent,
-    ConfirmDialogComponent,
-    AlertComponent,
-    AlertHostComponent,
-    LoaderComponent,
-    SkeletonComponent,
-    DynamicTableComponent,
-    DateFormatPipe,
-    PaginationComponent,
+    ...components
   ],
 })
 export class SharedModule { }

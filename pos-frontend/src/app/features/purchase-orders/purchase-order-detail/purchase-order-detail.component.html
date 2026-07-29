@@ -150,7 +150,7 @@
                     <app-input-field formControlName="discount" [placeholder]="'0.00'"></app-input-field>
                   </span>
                 } @else {
-                  ${{ (form.get('discount')?.value || 0).toFixed(2) }}
+                  {{ form.get('discount')?.value | appNumber:'currency' }}
                 }
               </span>
             </div>
@@ -164,7 +164,7 @@
                     <app-input-field formControlName="shippingCost" [placeholder]="'0.00'"></app-input-field>
                   </span>
                 } @else {
-                  ${{ (form.get('shippingCost')?.value || 0).toFixed(2) }}
+                  {{ form.get('shippingCost')?.value | appNumber:'currency' }}
                 }
               </span>
             </div>
