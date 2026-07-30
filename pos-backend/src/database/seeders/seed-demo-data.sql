@@ -19,10 +19,10 @@ USE pos_db;
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Passwords are bcrypt hashes (admin123 / cashier123)
 INSERT IGNORE INTO users (id, name, email, password, role, is_active, created_at) VALUES
-(1,  'System Admin',   'admin@pos.com',   '$2a$10$9Wzut7De2kI9N.v4P0NaOuQ52okxx2Wzp5eGcr4R5cJivjoz1BEom', 'admin',   1, NOW() - INTERVAL 90 DAY),
-(2,  'Sokha Chea',     'sokha@pos.com',   '$2a$10$ymiO1NN.wCf8CZAMsatZBOD1s62KPPt7CblSnbS7xWEt3l61B5DG.', 'cashier', 1, NOW() - INTERVAL 85 DAY),
-(3,  'Rattanak Phorn', 'rattanak@pos.com', '$2a$10$ymiO1NN.wCf8CZAMsatZBOD1s62KPPt7CblSnbS7xWEt3l61B5DG.', 'cashier', 1, NOW() - INTERVAL 60 DAY),
-(4,  'Malis Srey',     'malis@pos.com',   '$2a$10$ymiO1NN.wCf8CZAMsatZBOD1s62KPPt7CblSnbS7xWEt3l61B5DG.', 'cashier', 1, NOW() - INTERVAL 30 DAY)
+(1,  'System Admin',   'admin@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.QYzcMj77TYep2t5glUFlMi5xKkFEt2e', 'admin',   1, NOW() - INTERVAL 90 DAY),
+(2,  'Sokha Chea',     'sokha@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 85 DAY),
+(3,  'Rattanak Phorn', 'rattanak@pos.com', '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 60 DAY),
+(4,  'Malis Srey',     'malis@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 30 DAY)
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 -- ═══════════════════════════════════════════════════════════════════════════════

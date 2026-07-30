@@ -168,12 +168,12 @@ export class InitialSchema1719240000000 implements MigrationInterface {
     await queryRunner.query(`
       INSERT IGNORE INTO \`users\` (\`name\`, \`email\`, \`password\`, \`role\`, \`is_active\`, \`created_at\`)
       VALUES
-        ('System Admin', 'admin@pos.com', '$2a$10$icRoPSw9bvBWU23LcQs5I./uh0.a8ZDN.jgnlvl.I7Jzfepta/wUe', 'admin', 1, NOW())
+        ('System Admin', 'admin@pos.com', '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.QYzcMj77TYep2t5glUFlMi5xKkFEt2e', 'admin', 1, NOW())
     `);
     await queryRunner.query(`
       INSERT IGNORE INTO \`users\` (\`name\`, \`email\`, \`password\`, \`role\`, \`is_active\`, \`created_at\`)
       VALUES
-        ('Cashier User', 'cashier@pos.com', '$2a$10$/ir59IWBkazIrGO59Icfxuk1j98CC83vCJlx855Mdp/v3a3CChkla', 'cashier', 1, NOW())
+        ('Cashier User', 'cashier@pos.com', '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW())
     `);
 
     // Default categories

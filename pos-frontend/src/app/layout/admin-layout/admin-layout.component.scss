@@ -466,7 +466,7 @@
 
 /* ── Item (minimum 48px touch target, 60-64px optimal) ── */
 .mobile-menu-item {
-  @apply flex items-center gap-3 px-4 rounded-xl transition-all duration-200 relative overflow-hidden;
+  @apply flex items-center gap-2.5 px-4 rounded-xl transition-all duration-200 relative overflow-hidden;
   @apply text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/60;
   @apply dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10;
   min-height: 56px;
@@ -496,13 +496,18 @@
 }
 
 .mobile-menu-item-sub {
-  @apply ml-10 min-h-[48px] !important;
+  @apply ml-9 min-h-[48px] !important;
 }
 
 .mobile-menu-item-icon {
-  @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200;
+  @apply w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200;
   @apply bg-slate-100 text-slate-500;
   @apply dark:bg-slate-800 dark:text-slate-400;
+
+  svg {
+    @apply w-[18px] h-[18px];
+    transition: none;
+  }
 
   .mobile-menu-item:hover & {
     @apply bg-indigo-100 text-indigo-500;

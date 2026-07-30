@@ -45,11 +45,6 @@ const routes: Routes = [
         data: { breadcrumb: 'Reports', labelKh: 'របាយការណ៍' }
       },
       {
-        path: 'users',
-        loadChildren: () => import('./features/users/users.module').then((m) => m.UsersModule),
-        data: { breadcrumb: 'Users', labelKh: 'អ្នកប្រើប្រាស់' }
-      },
-      {
         path: 'page-not-found',
         loadChildren: () => import('./features/page-not-found/page-not-found.module').then((m) => m.PageNotFoundModule),
       },
@@ -73,21 +68,21 @@ const routes: Routes = [
         loadChildren: () => import('./features/user-management/user-management.module').then((m) => m.UserManagementModule),
         data: { breadcrumb: 'User Management', labelKh: 'ការគ្រប់គ្រងអ្នកប្រើប្រាស់' }
       },
-      {
-        path: 'cloudinary-file-upload', 
-        loadChildren: () => import('./features/cloudinary-file-upload/cloudinary-file-upload.module').then((m) => m.CloudinaryFileUploadModule),
-        data: { breadcrumb: 'Cloudinary File Upload', labelKh: 'ការផ្ទុកឯកសារ Cloudinary' }
-      },
-      {
-        path: 'user-role',
-        loadChildren: () => import('./features/user-role/user-role.module').then((m) => m.UserRoleModule),
-        data: { breadcrumb: 'User Role', labelKh: 'តួនាទីអ្នកប្រើ' }
-      },
-      {
-        path: 'management-page',
-        loadChildren: () => import('./features/management-page/management-page.module').then((m) => m.ManagementPageModule),
-        data: { breadcrumb: 'Management Page', labelKh: 'គ្រប់គ្រង់ទំព័រ' }
-      },
+      // {
+      //   path: 'cloudinary-file-upload', 
+      //   loadChildren: () => import('./features/cloudinary-file-upload/cloudinary-file-upload.module').then((m) => m.CloudinaryFileUploadModule),
+      //   data: { breadcrumb: 'Cloudinary File Upload', labelKh: 'ការផ្ទុកឯកសារ Cloudinary' }
+      // },
+      // {
+      //   path: 'user-role',
+      //   loadChildren: () => import('./features/user-role/user-role.module').then((m) => m.UserRoleModule),
+      //   data: { breadcrumb: 'User Role', labelKh: 'តួនាទីអ្នកប្រើ' }
+      // },
+      // {
+      //   path: 'management-page',
+      //   loadChildren: () => import('./features/management-page/management-page.module').then((m) => m.ManagementPageModule),
+      //   data: { breadcrumb: 'Management Page', labelKh: 'គ្រប់គ្រង់ទំព័រ' }
+      // },
       {
         path: 'suppliers',
         loadChildren: () =>

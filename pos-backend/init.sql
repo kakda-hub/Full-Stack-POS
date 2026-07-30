@@ -28,7 +28,7 @@ INSERT IGNORE INTO users (name, email, password, role, is_active, created_at)
 VALUES (
   'System Admin',
   'admin@pos.com',
-  '$2a$10$9Wzut7De2kI9N.v4P0NaOuQ52okxx2Wzp5eGcr4R5cJivjoz1BEom',
+  '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.QYzcMj77TYep2t5glUFlMi5xKkFEt2e',
   'admin',
   1,
   NOW()
@@ -39,7 +39,7 @@ INSERT IGNORE INTO users (name, email, password, role, is_active, created_at)
 VALUES (
   'Cashier User',
   'cashier@pos.com',
-  '$2a$10$ymiO1NN.wCf8CZAMsatZBOD1s62KPPt7CblSnbS7xWEt3l61B5DG.',
+  '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie',
   'cashier',
   1,
   NOW()
