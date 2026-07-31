@@ -37,7 +37,12 @@ services:
       - ./pos-backend/src:/app/src
       - ./pos-backend/nest-cli.json:/app/nest-cli.json
       - ./pos-backend/tsconfig.json:/app/tsconfig.json
-    # Load all DB credentials & secrets from this file into the container
+    # Load all DB credentials & secrets from this file into the container.
+    # NOTE: DB_HOST / DB_PORT / DB_SSL intentionally come ONLY from env_file —
+    # do NOT add environment: overrides for them, or a plain `docker compose up`
+    # would inject the local defaults (mysql:3306/false) on top of whatever DB
+    # credentials the .env contains (e.g. TiDB Cloud), breaking the connection.
+    # For local MySQL dev, set DB_HOST=mysql DB_PORT=3306 DB_SSL=false in the .env.
     env_file:
       - ./pos-backend/.env
     environment:
@@ -45,9 +50,6 @@ services:
       PORT: 3000
       CHOKIDAR_USEPOLLING: '1'
       FRONTEND_URL: http://localhost:4200
-      DB_HOST: ${DB_HOST:-mysql}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_SSL: ${DB_SSL:-false}
       S3_ENDPOINT: http://minio:9000
       S3_REGION: us-east-1
       S3_ACCESS_KEY: minioadmin

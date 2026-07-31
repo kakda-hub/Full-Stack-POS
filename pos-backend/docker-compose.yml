@@ -41,10 +41,11 @@ services:
     environment:
       PORT: 3000
       NODE_ENV: ${NODE_ENV:-development}
-      # Local MySQL inside the Docker network (override via .env if needed)
-      DB_HOST: ${DB_HOST:-mysql}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_SSL: ${DB_SSL:-false}
+      # NOTE: DB_HOST / DB_PORT / DB_SSL intentionally come ONLY from env_file —
+      # do NOT add environment: overrides for them, or a plain `docker compose up`
+      # would inject the local defaults (mysql:3306/false) on top of whatever DB
+      # credentials the .env contains (e.g. TiDB Cloud), breaking the connection.
+      # For local MySQL dev, set DB_HOST=mysql DB_PORT=3306 DB_SSL=false in the .env.
     ports:
       - '3000:3000'
     networks:
