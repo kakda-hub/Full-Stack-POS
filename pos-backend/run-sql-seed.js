@@ -20,28 +20,30 @@ if (fs.existsSync(envPath)) {
 }
 
 async function runSeed() {
-  if (process.env.DB_PASSWORD === '<PASSWORD>') {
-    console.error('❌ Error: Please update <PASSWORD> in your .env file to your actual TiDB password before running this script.');
+  const user = process.env.DB_USER || process.env.DB_USERNAME;
+  const dbName = process.env.DB_NAME || process.env.DB_DATABASE;
+  if (!process.env.DB_HOST || !user || !process.env.DB_PASSWORD || !dbName) {
+    console.error('❌ Error: Missing database environment variables. Copy pos-backend/.env.example to .env and fill in your real values before running this script.');
     process.exit(1);
   }
 
   console.log('Connecting to the database...');
   console.log(`Host: ${process.env.DB_HOST}`);
-  console.log(`Database: ${process.env.DB_NAME}`);
+  console.log(`Database: ${dbName}`);
   
   try {
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
-      user: process.env.DB_USER,
+      user,
       password: process.env.DB_PASSWORD,
       multipleStatements: true, // This allows running multiple queries from a file
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+      ssl: String(process.env.DB_SSL || '').trim() === 'true' ? { rejectUnauthorized: true } : undefined
     });
 
     console.log('Connected! Creating database if not exists...');
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await connection.query(`USE \`${process.env.DB_NAME}\`;`);
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+    await connection.query(`USE \`${dbName}\`;`);
 
     console.log('Reading SQL file...');
     const sqlPath = path.join(__dirname, 'src', 'database', 'seeders', 'seed-demo-data.sql');

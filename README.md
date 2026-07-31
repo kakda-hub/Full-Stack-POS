@@ -28,6 +28,7 @@
 - [Frontend Features](#-frontend-features)
 - [Database Schema](#-database-schema)
 - [Role Permissions](#-role-permissions)
+- [Branch Strategy & Merge Workflow](#-branch-strategy--merge-workflow)
 - [Deployment](#-deployment)
 - [Useful Commands](#-useful-commands)
 - [Production Checklist](#-production-checklist)
@@ -258,7 +259,7 @@ JWT_SECRET=your-super-secret-key-change-in-production
 JWT_EXPIRES_IN=8h
 
 # Database (Local MySQL via Docker)
-DB_HOST=db
+DB_HOST=mysql
 DB_PORT=3306
 DB_USER=pos_user
 DB_PASSWORD=pos_password
@@ -356,13 +357,12 @@ npm start
 | `PORT` | `3000` | API listen port |
 | `NODE_ENV` | `development` | Runtime environment |
 | `FRONTEND_URL` | `*` | CORS allowed origin |
-| `DB_HOST` | `localhost` | Database host |
-| `DB_PORT` | `4000` | DB port (3306 local, 4000 TiDB Cloud) |
-| `DB_USER` | `root` | Database username |
-| `DB_PASS` | — | Database password (checked first) |
-| `DB_PASSWORD` | — | Database password (fallback) |
+| `DB_HOST` | `localhost` | Database host (`mysql` inside Docker, TiDB gateway in prod) |
+| `DB_PORT` | `3306` | DB port (3306 local MySQL, 4000 TiDB Cloud) |
+| `DB_USER` | — | Database username |
+| `DB_PASSWORD` | — | Database password |
 | `DB_NAME` | `pos_db` | Database name |
-| `DB_SSL` | `true` | Enable SSL connection |
+| `DB_SSL` | `false` | Enable SSL (`true` required by TiDB Cloud) |
 | `JWT_SECRET` | — | **Required in production** (32+ chars) |
 | `JWT_EXPIRES_IN` | `8h` | JWT token lifetime |
 | `CLOUDINARY_CLOUD_NAME` | — | Cloudinary cloud name |
@@ -381,13 +381,17 @@ npm start
 
 The system checks these env vars in order and uses the first one found:
 
-1. `DB_PASS`
-2. `DB_PASSWORD`
+1. `DB_PASSWORD`
+2. `DB_PASS` (legacy)
 3. `DATABASE_PASSWORD`
 4. `MYSQL_PASSWORD`
 5. `MYSQL_ROOT_PASSWORD`
 6. `TIDB_PASSWORD`
 7. `MYSQL_PWD` (legacy)
+
+### Environment validation
+
+At startup the app **validates required environment variables** (via `ConfigModule`). In production (`NODE_ENV=production`) it additionally requires `JWT_SECRET` and `FRONTEND_URL`. If any required variable is missing, the application **fails to start with a clear error message** instead of booting misconfigured.
 
 ---
 
@@ -669,6 +673,60 @@ created_at           unit_cost             reference_type        status (pending
 
 ---
 
+## 🌿 Branch Strategy & Merge Workflow
+
+This project uses **two long-lived branches that share the exact same source code**. The only difference between them is the **runtime environment**, which is configured entirely through **environment variables** — never hardcoded.
+
+```
+feature/*
+   │
+   ▼
+master          ← Local development (Docker + MySQL, SSL disabled)
+   │
+   ▼
+main            ← Production (Render + TiDB Cloud, SSL enabled)
+   │
+   ▼
+Render Auto Deploy
+```
+
+| Branch | Environment | Database | SSL |
+|--------|-------------|----------|-----|
+| **master** | Development | Local MySQL (Docker) | `DB_SSL=false` |
+| **main** | Production | TiDB Cloud | `DB_SSL=true` |
+
+### How the environment is chosen
+
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL` in `pos-backend/.env` (local) or Render's Environment tab (production) determine the database.
+- The application reads these values at startup via `ConfigService` and **fails fast** if required production variables are missing.
+- Database credentials are **never stored in Git**. `pos-backend/.env` is git-ignored; only the placeholder template `.env.example` is committed.
+
+### Merge workflow
+
+```bash
+# Develop on a feature branch
+git checkout -b feature/my-change master
+# ... commit work ...
+
+# Merge into master (local dev) and test locally
+git checkout master
+git merge feature/my-change
+
+# Promote to main (production) once verified
+git checkout main
+git merge master
+
+# Render auto-deploys the main branch — no credential changes needed
+```
+
+**Why credentials never break during merge:**
+
+- `master` uses **local MySQL** credentials from your local `.env` — never committed.
+- `main` uses **TiDB Cloud** credentials that live only in the **Render dashboard** → Environment tab.
+- Merging `master → main` only changes application code, never database config.
+
+---
+
 ## 🚢 Deployment
 
 ### Backend — Render
@@ -682,11 +740,24 @@ git push origin main
 #    → Runtime: Docker
 #    → Root Directory: pos-backend
 
-# 3. Set environment variables in Render dashboard:
-#    DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT=4000
-#    DB_SSL=true, JWT_SECRET, NODE_ENV=production
+# 3. Set environment variables in Render dashboard (production values):
+#    DB_HOST=<TiDB Cloud gateway host>
+#    DB_PORT=4000
+#    DB_USER=<TiDB username>
+#    DB_PASSWORD=<TiDB password>
+#    DB_NAME=<database>
+#    DB_SSL=true
+#    JWT_SECRET=<strong random secret>
+#    NODE_ENV=production
 #    FRONTEND_URL=https://pos-frontend.vercel.app
 ```
+
+### TiDB Cloud
+
+1. Create a free **Serverless** cluster at [tidbcloud.com](https://tidbcloud.com).
+2. Copy the connection details → MySQL protocol → **Host** (e.g. `gateway01.ap-southeast-1.prod.aws.tidbcloud.com`), **Port** `4000`, **Username**, and **Password**.
+3. Put those values in Render's Environment tab with `DB_SSL=true`. TiDB Cloud requires SSL, which the app enables automatically when `DB_SSL=true`.
+4. `DB_NAME` defaults to `pos_db`; run migrations on Render with `npm run migration:run` (or the health check will apply them at startup).
 
 ### Frontend — Vercel
 

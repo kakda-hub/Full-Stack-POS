@@ -9,6 +9,7 @@ import { SalesModule } from './modules/sales/sales.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { databaseConfig } from './config/database.config';
+import { validateEnv } from './config/env.validation';
 import { UploadDynamicModule } from './modules/upload-dynamic/upload-dynamic.module';
 import appConfig from './config/app.config';
 import { UploadCloudinaryModule } from './modules/upload-cloudinary/upload-cloudinary.module';
@@ -29,6 +30,8 @@ import { KhqrModule } from './modules/khqr/khqr.module';
       isGlobal: true,
       load: [appConfig],
       envFilePath: '.env',
+      // Fail startup when required environment variables are missing.
+      validate: validateEnv,
     }),
 
     // ─── Database (TiDB Cloud via MySQL) ──────────────────────────────────────
