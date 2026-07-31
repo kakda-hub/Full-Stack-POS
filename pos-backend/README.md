@@ -102,8 +102,9 @@ npm install
 # 3. Start MySQL (using Docker — optional but recommended)
 docker compose up -d mysql
 
-# 4. Create a .env file (see Environment Variables section below)
-#    Or copy from .env.example if available
+# 4. Create a .env file from the template
+cp .env.example .env
+#    Then edit .env and fill in your local values (see Environment Variables below)
 
 # 5. Start the development server with hot-reload
 npm run start:dev
@@ -271,13 +272,12 @@ CLOUDINARY_API_SECRET=your_api_secret
 | `PORT` | `3000` | API listen port |
 | `NODE_ENV` | `development` | Runtime environment (`development` / `production`) |
 | `FRONTEND_URL` | `*` | CORS allowed origin |
-| `DB_HOST` | `localhost` | Database host |
-| `DB_PORT` | `4000` | DB port (3306 for local MySQL, 4000 for TiDB Cloud) |
-| `DB_USER` | `root` | Database username |
-| `DB_PASS` | — | Database password **(checked first)** |
-| `DB_PASSWORD` | — | Database password (fallback) |
+| `DB_HOST` | `localhost` | Database host (`mysql` inside Docker, TiDB gateway in prod) |
+| `DB_PORT` | `3306` | DB port (3306 for local MySQL, 4000 for TiDB Cloud) |
+| `DB_USER` | — | Database username |
+| `DB_PASSWORD` | — | Database password |
 | `DB_NAME` | `pos_db` | Database name |
-| `DB_SSL` | `true` | Enable SSL connection |
+| `DB_SSL` | `false` | Enable SSL connection (`true` required by TiDB Cloud) |
 | `JWT_SECRET` | — | **Required in production** (32+ random characters) |
 | `JWT_EXPIRES_IN` | `8h` | JWT token lifetime |
 | `CLOUDINARY_CLOUD_NAME` | — | Cloudinary cloud name |
@@ -288,13 +288,19 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 The system checks these environment variables in order and uses the first one found:
 
-1. `DB_PASS`
-2. `DB_PASSWORD`
+1. `DB_PASSWORD`
+2. `DB_PASS` (legacy)
 3. `DATABASE_PASSWORD`
 4. `MYSQL_PASSWORD`
 5. `MYSQL_ROOT_PASSWORD`
 6. `TIDB_PASSWORD`
 7. `MYSQL_PWD` (legacy)
+
+### Environment Validation
+
+At startup the app **validates required environment variables** via `ConfigModule`. In production (`NODE_ENV=production`) it additionally requires `JWT_SECRET`, `FRONTEND_URL`, and `DB_SSL`. Missing variables cause the application to **fail fast** with a clear message.
+
+> **Troubleshooting SSL:** `DB_SSL=true` uses `{ rejectUnauthorized: true }`. TiDB Cloud serves a trusted chain for the default gateway, but if your provider uses a non-public CA and the connection fails with an SSL certificate error, relax verification by setting `DB_SSL=false` (local/testing only) or adjusting the CA in `src/config/db-options.ts`.
 
 ---
 
@@ -813,20 +819,48 @@ The `Dockerfile` uses a multi-stage build:
 
 ### Render (recommended)
 
+The `main` branch is the production branch. It is auto-deployed by Render and connects to **TiDB Cloud**.
+
 ```bash
-# 1. Push your code to GitHub
+# 1. Push the main branch to GitHub
 
 # 2. In the Render dashboard:
 #    → New Web Service
 #    → Connect your repository
 #    → Runtime: Docker
 #    → Root Directory: pos-backend
+#    → Auto-Deploy: on (only the main branch)
 
-# 3. Set required environment variables:
-#    DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT=4000
-#    DB_SSL=true, JWT_SECRET, NODE_ENV=production
+# 3. Set required environment variables (TiDB Cloud values):
+#    DB_HOST=<TiDB gateway host>
+#    DB_PORT=4000
+#    DB_USER=<TiDB username>
+#    DB_PASSWORD=<TiDB password>
+#    DB_NAME=<database>
+#    DB_SSL=true
+#    JWT_SECRET=<strong random secret>
+#    NODE_ENV=production
 #    FRONTEND_URL=https://your-frontend.vercel.app
 ```
+
+### Branch strategy
+
+```
+feature/*
+   │
+   ▼
+master      ← Local dev (Docker + MySQL, DB_SSL=false)
+   │
+   ▼
+main        ← Production (Render + TiDB Cloud, DB_SSL=true)
+   │
+   ▼
+Render Auto Deploy
+```
+
+The source code is identical on both branches — only environment variables differ. Local credentials live in `pos-backend/.env` (git-ignored), production credentials live in the Render dashboard, so **merging `master → main` never changes database credentials**.
+
+> ⚙️ `pos-backend/.env.example` is a committed placeholder template — copy it to `.env` and fill in real values. Never commit `.env`.
 
 ---
 

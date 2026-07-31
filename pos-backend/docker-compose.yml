@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  # ─── Local MySQL (available for local dev/testing; app connects to TiDB Cloud externally)
+  # ─── Local MySQL (development branch only — production uses TiDB Cloud)
   mysql:
     image: mysql:8.4
     container_name: pos_mysql_local
@@ -40,13 +40,11 @@ services:
       - .env
     environment:
       PORT: 3000
-      NODE_ENV: ${NODE_ENV:-production}
-      # TiDB Cloud connection (override .env if needed via shell)
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT:-4000}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+      NODE_ENV: ${NODE_ENV:-development}
+      # Local MySQL inside the Docker network (override via .env if needed)
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_SSL: ${DB_SSL:-false}
     ports:
       - '3000:3000'
     networks:

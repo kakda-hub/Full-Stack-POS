@@ -19,6 +19,7 @@
 
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { buildEnvDbOptions } from '../../config/db-options';
 
 dotenv.config();
 
@@ -163,17 +164,8 @@ async function seed() {
   console.log('🧾 Starting sales seed...\n');
 
   const dataSource = new DataSource({
-    type: 'mysql',
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    username: process.env.DB_USER || process.env.DB_USERNAME || 'root',
-    password:
-      process.env.DB_PASSWORD ||
-      process.env.DATABASE_PASSWORD ||
-      process.env.MYSQL_PASSWORD ||
-      '',
-    database: process.env.DB_NAME || process.env.DB_DATABASE || 'pos_db',
-    ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
+    ...buildEnvDbOptions(),
+
     extra: {
       connectionLimit: 2,
       charset: 'utf8mb4',
