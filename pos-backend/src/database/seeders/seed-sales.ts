@@ -166,13 +166,13 @@ async function seed() {
     type: 'mysql',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    username: process.env.DB_USER || 'root',
+    username: process.env.DB_USER || process.env.DB_USERNAME || 'root',
     password:
       process.env.DB_PASSWORD ||
       process.env.DATABASE_PASSWORD ||
       process.env.MYSQL_PASSWORD ||
       '',
-    database: process.env.DB_NAME || 'pos_db',
+    database: process.env.DB_NAME || process.env.DB_DATABASE || 'pos_db',
     ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
     extra: {
       connectionLimit: 2,

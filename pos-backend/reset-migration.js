@@ -4,9 +4,9 @@ async function main() {
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT),
-    user: process.env.DB_USER,
+    user: process.env.DB_USER || process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    database: process.env.DB_NAME || process.env.DB_DATABASE,
     ssl: { rejectUnauthorized: true }
   });
 

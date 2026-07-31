@@ -26,22 +26,24 @@ async function runSeed() {
   }
 
   console.log('Connecting to the database...');
+  const resolvedDbName = process.env.DB_NAME || process.env.DB_DATABASE;
   console.log(`Host: ${process.env.DB_HOST}`);
-  console.log(`Database: ${process.env.DB_NAME}`);
+  console.log(`Database: ${resolvedDbName}`);
   
   try {
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
-      user: process.env.DB_USER,
+      user: process.env.DB_USER || process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       multipleStatements: true, // This allows running multiple queries from a file
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
     });
 
+    const dbName = process.env.DB_NAME || process.env.DB_DATABASE;
     console.log('Connected! Creating database if not exists...');
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await connection.query(`USE \`${process.env.DB_NAME}\`;`);
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+    await connection.query(`USE \`${dbName}\`;`);
 
     console.log('Reading SQL file...');
     const sqlPath = path.join(__dirname, 'src', 'database', 'seeders', 'seed-demo-data.sql');

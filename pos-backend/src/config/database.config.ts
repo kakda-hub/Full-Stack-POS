@@ -29,8 +29,10 @@ function logDbEnvDiagnostics(configService: ConfigService): void {
     'DB_HOST',
     'DB_PORT',
     'DB_USER',
+    'DB_USERNAME',     // alternative naming convention
     'DB_PASSWORD',
     'DB_NAME',
+    'DB_DATABASE',     // alternative naming convention
     'DB_SSL',
     'DATABASE_URL',
     'DATABASE_PASSWORD',
@@ -91,8 +93,8 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
   // ── Resolve password (with logging) ────────────────────────────────────
   const password = resolveDbPassword(configService);
   const host = configService.get<string>('DB_HOST');
-  const user = configService.get<string>('DB_USER');
-  const database = configService.get<string>('DB_NAME');
+  const user = configService.get<string>('DB_USER') || configService.get<string>('DB_USERNAME');
+  const database = configService.get<string>('DB_NAME') || configService.get<string>('DB_DATABASE');
 
   console.log(
     '[DB] Connecting with → host=%s  user=%s  database=%s  port=%d  password=%s',
