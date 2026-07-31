@@ -21,9 +21,22 @@ import { validateEnv } from './env.validation';
 // Mirror the .env loading used by reset-migration.js / run-sql-seed.js so the
 // check works locally too, not only in CI. Existing process.env values win
 // (dotenv semantics), and NO_DOTENV=1 disables loading entirely.
+//
+// NOTE: the project root is resolved robustly because `__dirname` differs
+// between the ts-node run (src/config) and the compiled production build
+// (dist/src/config): a naive `path.join(__dirname, '..', '..', '.env')` would
+// point at dist/.env when running the compiled output, silently losing the
+// whole .env file. Candidates are tried in order; the first existing file wins.
+const ENV_CANDIDATES = [
+  path.join(process.cwd(), '.env'), // npm scripts run from the project root
+  path.join(__dirname, '..', '..', '.env'), // src/config -> project root
+  path.join(__dirname, '..', '..', '..', '.env'), // dist/src/config -> project root
+  path.join(__dirname, '.env'),
+];
+
 if (process.env.NO_DOTENV !== '1') {
-  const envPath = path.join(__dirname, '..', '..', '.env');
-  if (fs.existsSync(envPath)) {
+  const envPath = ENV_CANDIDATES.find((p) => fs.existsSync(p));
+  if (envPath) {
     const envFile = fs.readFileSync(envPath, 'utf8');
     envFile.split('\n').forEach((line) => {
       if (line.trim().startsWith('#') || !line.includes('=')) return;
