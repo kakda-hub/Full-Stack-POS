@@ -62,7 +62,7 @@ const products: ProductSeed[] = [
     stock: 200,
     categoryId: 1,
     description: 'Natural spring water, 500ml bottle',
-    imgUrl: 'https://images.unsplash.com/photo-1560023907-5f3394ea0a82?w=200',
+    imgUrl: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=200',
   },
   {
     name: 'Orange Juice',

@@ -300,6 +300,18 @@ The system checks these environment variables in order and uses the first one fo
 
 At startup the app **validates required environment variables** via `ConfigModule`. In production (`NODE_ENV=production`) it additionally requires `JWT_SECRET`, `FRONTEND_URL`, and `DB_SSL`. Missing variables cause the application to **fail fast** with a clear message.
 
+### CI Sanity Check
+
+Run a standalone production environment check **without booting the app or connecting to a database**:
+
+```bash
+npm run check:env:prod
+```
+
+Exits with code `0` when every required production variable is present, or code `1` with a clear message otherwise — ideal for CI / pre-deploy pipelines. It reuses the exact same `validateEnv()` the app runs at startup (so the check can never drift from what the runtime actually requires), and it is also chained into `npm run start:prod` so a production boot never proceeds with a broken environment.
+
+> 💡 Set `NO_DOTENV=1` to ignore any local `.env` file and validate only injected environment variables.
+
 > **Troubleshooting SSL:** `DB_SSL=true` uses `{ rejectUnauthorized: true }`. TiDB Cloud serves a trusted chain for the default gateway, but if your provider uses a non-public CA and the connection fails with an SSL certificate error, relax verification by setting `DB_SSL=false` (local/testing only) or adjusting the CA in `src/config/db-options.ts`.
 
 ---
@@ -873,7 +885,8 @@ npm run start:debug          # Debug mode with watch
 
 # Building
 npm run build                # Production build (output: dist/)
-npm run start:prod           # Run production build
+npm run check:env:prod       # CI sanity check: fails if production env vars are missing
+npm run start:prod           # Runs env check, then starts the production build
 
 # Database Migrations
 npm run migration:generate -- src/migrations/MigrationName  # Generate migration from entities
