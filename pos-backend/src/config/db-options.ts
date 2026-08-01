@@ -77,7 +77,7 @@ export function buildDbOptions(env: DbEnvValues): MysqlDbOptions {
     database: env.database,
     charset: 'utf8mb4',
     timezone: '+00:00',
-    ssl: env.ssl === true ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : false,
+    ssl: env.ssl === true ? { minVersion: 'TLSv1.2', rejectUnauthorized: false } : false,
     extra: {
       connectionLimit: 10,
       charset: 'utf8mb4',
