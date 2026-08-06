@@ -10,11 +10,11 @@
     container-height: 42px,
     
     // 2. set Khmer font and size 12px
-    container-text-font: 'Khmer OS Battambang',
+    container-text-font: ('Kantumruy Pro', 'Inter', sans-serif),
     container-text-size: 12px,
 
     // set Khmer font for label
-    filled-label-text-font: 'Khmer OS Battambang',
+    filled-label-text-font: ('Kantumruy Pro', 'Inter', sans-serif),
     filled-label-text-size: 12px,
     
     // set Padding for top and bottom (Important for Fill)
@@ -29,7 +29,7 @@
   // set placeholder for Khmer font
   input.mat-mdc-input-element::placeholder {
     font-size: 12px !important;
-    font-family: 'Khmer OS Battambang', 'Hanuman', 'Siemreap' !important;
+    font-family: 'Kantumruy Pro', 'Inter', sans-serif !important;
     opacity: 0.6;
   }
 

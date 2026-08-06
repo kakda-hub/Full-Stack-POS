@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        khmer: ['Khmer OS Battambang', 'Hanuman', 'Siemreap', 'Battambang', 'Inter', 'sans-serif'],
+        sans: ['Kantumruy Pro', 'Inter', 'system-ui', 'sans-serif'],
+        receipt: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
     },
   },

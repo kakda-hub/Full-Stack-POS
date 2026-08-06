@@ -1,11 +1,14 @@
 import { Injectable, signal } from '@angular/core';
+import { AppIconName, asAppIconName } from '../../shared/components/app-icon/app-icon.component';
 
 export interface NavItem {
   label: string;
   labelKm: string;
   route: string;
-  icon: string;
+  /** Must be a registered app-icon name — unknown strings fall back to '' via asAppIconName(). */
+  icon: AppIconName;
   subMenus?: NavItem[];
+  badge?: string;
 }
 
 @Injectable({
@@ -19,7 +22,6 @@ export class NavStateService {
     { label: 'Sales History', labelKm: 'ប្រវត្តិលក់', route: '/sales-history', icon: 'history' },
     { label: 'Quick Picks', labelKm: 'ទំនិញរហ័ស', route: '/quick-picks', icon: 'product' },
     { label: 'Purchase Orders', labelKm: 'បញ្ជាទិញ', route: '/purchase-orders', icon: 'purchase-order' },
-    { label: 'Stock Movements', labelKm: 'ចលនាស្តុក', route: '/stock-movements', icon: 'stock-movement' },
     { label: 'Suppliers', labelKm: 'អ្នកផ្គត់ផ្គង់', route: '/suppliers', icon: 'supplier' },
     { label: 'Report', labelKm: 'របាយការណ៍', route: '/reports', icon: 'report' },
     { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
@@ -45,7 +47,7 @@ export class NavStateService {
    * If the parent is found, the new item is pushed into its subMenus array.
    * The signal reactivity automatically updates the sidebar.
    */
-  addPage(data: { label: string; labelKm: string; route: string; icon: string }, parentLabel: string): void {
+addPage(data: { label: string; labelKm: string; route: string; icon: string }, parentLabel: string): void {
     this.navItems.update(items =>
       items.map(item => {
         if (item.label === parentLabel || item.labelKm === parentLabel) {
@@ -55,7 +57,8 @@ export class NavStateService {
               label: data.label,
               labelKm: data.labelKm,
               route: data.route,
-              icon: data.icon,
+              // Dynamic icons may not be in the registry — fall back to '' (renders empty)
+              icon: asAppIconName(data.icon),
             }],
           };
         }

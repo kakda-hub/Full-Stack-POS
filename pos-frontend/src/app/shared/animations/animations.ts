@@ -84,14 +84,19 @@ export const pageTransition = trigger('pageTransition', [
 ]);
 
 /**
- * Smooth 360° rotation animation triggered when the theme switches.
- * Bind to `theme.currentTheme()` so the SVG spins each time the theme changes.
+ * Spin-in animation for the theme icon when the theme switches.
+ *
+ * IMPORTANT: must be `:enter` only — NOT `* => *`. The `*` wildcard also
+ * matches the `void` state, so `* => *` would run a `:leave` transition too,
+ * keeping the OLD icon in the DOM for the animation duration and showing
+ * BOTH sun/moon icons at once. With `:enter` the outgoing icon is removed
+ * instantly and only the new icon is ever visible.
+ * Bind it as a bare `[@themeRotate]` — no value is needed since `:enter`
+ * fires on element insertion.
  */
 export const themeRotate = trigger('themeRotate', [
-  transition('* => *', [
-    animate('500ms cubic-bezier(0.4, 0, 0.2, 1)', keyframes([
-      style({ transform: 'rotate(0deg)', offset: 0 }),
-      style({ transform: 'rotate(360deg)', offset: 1 }),
-    ])),
+  transition(':enter', [
+    style({ opacity: 0, transform: 'rotate(-180deg) scale(0.6)' }),
+    animate('500ms cubic-bezier(0.34, 1.56, 0.64, 1)', style({ opacity: 1, transform: 'rotate(0deg) scale(1)' })),
   ]),
 ]);

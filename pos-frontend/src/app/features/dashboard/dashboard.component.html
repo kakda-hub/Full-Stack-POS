@@ -8,42 +8,6 @@
       </div>
     </div>
     <div class="dash-header-right">
-      <!-- Live Indicator -->
-      <div class="dash-live-indicator">
-        <span class="dash-live-dot" [class.dash-live-dot--paused]="!isPolling()"></span>
-        <span class="dash-live-text">
-          @if (isPolling()) {
-            {{ lang.currentLang() === 'km' ? 'ផ្សាយផ្ទាល់' : 'LIVE' }}
-          } @else {
-            {{ lang.currentLang() === 'km' ? 'ផ្អាក' : 'PAUSED' }}
-          }
-        </span>
-        @if (lastRefreshed(); as time) {
-          <span class="dash-live-time">{{ formatRefreshTime(time) }}</span>
-        }
-      </div>
-
-      <!-- Pause / Resume -->
-      <button
-        (click)="togglePolling()"
-        class="dash-btn-icon dash-btn-pause"
-        [class.dash-btn-pause--active]="!isPolling()"
-        [title]="isPolling()
-          ? (lang.currentLang() === 'km' ? 'ផ្អាកធ្វើឱ្យស្រស់' : 'Pause auto-refresh')
-          : (lang.currentLang() === 'km' ? 'បន្តធ្វើឱ្យស្រស់' : 'Resume auto-refresh')"
-        [attr.aria-label]="isPolling() ? 'Pause auto-refresh' : 'Resume auto-refresh'"
-      >
-        @if (isPolling()) {
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-          </svg>
-        } @else {
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        }
-      </button>
-
       <!-- Manual Refresh -->
       <button
         (click)="refresh()"
@@ -203,30 +167,18 @@
             </div>
           </button>
 
-          <button (click)="goTo('/reports')" class="dash-action-btn dash-action-report">
-            <div class="dash-action-icon">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
-              </svg>
-            </div>
-            <div>
-              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'មើលរបាយការណ៍' : 'View Reports' }}</p>
-              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'វិភាគប្រតិបត្តិការ' : 'Analyze sales performance' }}</p>
-            </div>
-          </button>
-
-          <button (click)="goTo('/stock-movements')" class="dash-action-btn dash-action-stock">
-            <div class="dash-action-icon">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" /><path d="M12 3v6" />
-              </svg>
-            </div>
-            <div>
-              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'គ្រប់គ្រងស្តុក' : 'Manage Stock' }}</p>
-              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'ពិនិត្យស្តុកទំនិញ' : 'Update inventory levels' }}</p>
-            </div>
-          </button>
-        </div>
+           <button (click)="goTo('/reports')" class="dash-action-btn dash-action-report">
+             <div class="dash-action-icon">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                 <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
+               </svg>
+             </div>
+             <div>
+               <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'មើលរបាយការណ៍' : 'View Reports' }}</p>
+               <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'វិភាគប្រតិបត្តិការ' : 'Analyze sales performance' }}</p>
+             </div>
+           </button>
+         </div>
       </div>
 
       <!-- Recent Activity -->

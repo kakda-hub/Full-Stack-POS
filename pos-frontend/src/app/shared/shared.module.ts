@@ -19,15 +19,15 @@ import { ModalComponent } from './components/modal/modal.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
-import { AvatarUploadDialogComponent } from './components/avatar-upload-dialog/avatar-upload-dialog.component';
+import { AppIconComponent } from './components/app-icon/app-icon.component';
 
 const components = [ 
     UiAvatarComponent,
+    AppIconComponent,
     UiButtonComponent,
     ModalComponent,
     ConfirmDialogComponent,
     AvatarUploadComponent,
-    AvatarUploadDialogComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,

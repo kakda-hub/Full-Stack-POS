@@ -1,8 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [iconType]="'supplier'"
-    [subtitle]="id ? (lang.currentLang() === 'km' ? 'កែប្រែព័ត៌មានអ្នកផ្គត់ផ្គង់' : 'Edit supplier details') : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកផ្គត់ផ្គង់ថ្មី' : 'Add a new supplier')"
+    [title]="id
+      ? (lang.currentLang() === 'km' ? 'កែប្រែអ្នកផ្គត់ផ្គង់' : 'Edit Supplier')
+      : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកផ្គត់ផ្គង់' : 'Add Supplier')"
   ></app-header-detail>
 
   <mat-dialog-content class="px-3 !pb-2">

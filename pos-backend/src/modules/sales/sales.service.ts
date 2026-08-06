@@ -9,7 +9,6 @@ import { Repository, DataSource } from 'typeorm';
 import { Sale, PaymentMethod } from './entities/sale.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
-import { StockMovement, StockMovementType } from '../stock-movements/entities/stock-movement.entity';
 import { Customer } from '../customers/entities/customer.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
@@ -26,9 +25,6 @@ export class SalesService {
 
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-
-    @InjectRepository(StockMovement)
-    private readonly movementRepository: Repository<StockMovement>,
 
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
@@ -154,20 +150,6 @@ export class SalesService {
           'stock',
           item.quantity,
         );
-
-        // Record stock movement for inventory tracking
-        const movement = this.movementRepository.create({
-          productId: item.productId,
-          quantity: -item.quantity,
-          type: StockMovementType.SALE,
-          referenceType: 'sale',
-          referenceId: savedSale.id,
-          costPrice: product.costPrice ?? 0,
-          price: Number(product.price),
-          performedBy: userId,
-          note: `Sale #${savedSale.id}`,
-        });
-        await queryRunner.manager.save(StockMovement, movement);
       }
 
       await queryRunner.commitTransaction();

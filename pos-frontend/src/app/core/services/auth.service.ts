@@ -57,16 +57,6 @@ export class AuthService {
     }
   }
 
-  /** Update the avatar URL in the stored user profile without a full re-login */
-  updateAvatar(avatarUrl: string): void {
-    const current = this._currentUser();
-    if (current) {
-      const updated = { ...current, avatarUrl };
-      this._currentUser.set(updated);
-      localStorage.setItem('pos_user', JSON.stringify(updated));
-    }
-  }
-
   getToken(): string | null {
     return this._currentUser()?.token || null;
   }

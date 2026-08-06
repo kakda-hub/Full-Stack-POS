@@ -5,7 +5,6 @@ import { Repository, DataSource, Not, In } from 'typeorm';
 import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Product } from '../products/entities/product.entity';
-import { StockMovement, StockMovementType } from '../stock-movements/entities/stock-movement.entity';
 import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto } from './dto/purchase-order.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
 import { paginateQuery } from '../../common/helpers/pagination.helper';
@@ -19,8 +18,6 @@ export class PurchaseOrdersService {
     private readonly poItemRepository: Repository<PurchaseOrderItem>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @InjectRepository(StockMovement)
-    private readonly movementRepository: Repository<StockMovement>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
@@ -136,20 +133,6 @@ export class PurchaseOrdersService {
             costPrice: item.unitCost,
           });
         }
-
-        // Record stock movement
-        const movement = this.movementRepository.create({
-          productId: item.productId,
-          quantity: item.quantity,
-          type: StockMovementType.PURCHASE,
-          referenceType: 'purchase_order',
-          referenceId: po.id,
-          costPrice: item.unitCost,
-          price: product?.price ?? 0,
-          performedBy: dto.receivedBy,
-          note: `PO ${po.orderNumber} received`,
-        });
-        await queryRunner.manager.save(StockMovement, movement);
       }
 
       po.status = PurchaseOrderStatus.RECEIVED;

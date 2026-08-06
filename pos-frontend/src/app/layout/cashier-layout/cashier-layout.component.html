@@ -1,88 +1,158 @@
-<div class="cashier-layout">
+<div class="cashier-layout font-sans">
   <!-- Top Nav -->
   <header class="cashier-header">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-        </svg>
-      </div>
-      <div>
-        <h1 class="text-lg font-extrabold tracking-tight text-slate-800 dark:text-white">
+    <div class="flex items-center gap-3 min-w-0">
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40">
+          <app-icon name="shopping-bag" svgClass="w-5 h-5" />
+        </div>
+        <h1 class="hidden sm:block text-lg font-extrabold tracking-tight text-slate-800 dark:text-white">
           Mini Mart
         </h1>
+        @if (cart.itemCount() > 0) {
+          <span class="cart-count-badge" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
+        }
       </div>
-      @if (cart.itemCount() > 0) {
-        <span class="cart-count-badge" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
-      }
+
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        @for (crumb of breadcrumbs(); track crumb; let last = $last) {
+          <span class="breadcrumb-item" [class.breadcrumb-current]="last">{{ crumb }}</span>
+          @if (!last) {
+            <app-icon name="chevron-right" svgClass="w-3.5 h-3.5 flex-shrink-0 text-slate-300 dark:text-slate-600" />
+          }
+        }
+      </nav>
     </div>
-    <div class="flex items-center gap-3">
-      <!-- Dark Mode Toggle -- Segmented control -->
-      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+
+    <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <!-- Language Dropdown -->
+      <div class="dropdown-wrap" [class.dropdown-open]="langMenuOpen()">
         <button
-          (click)="theme.setTheme('light')"
-          [class.bg-white]="!theme.isDark()"
-          [class.shadow-sm]="!theme.isDark()"
-          [class.text-indigo-600]="!theme.isDark()"
-          [class.text-slate-400]="theme.isDark()"
-          [class.hover\:text-indigo-600]="theme.isDark()"
-          class="p-1.5 rounded transition-all"
-          [title]="theme.isDark() ? 'Switch to Light' : 'Light mode'"
+          (click)="toggleLangMenu()"
+          class="lang-pill"
+          aria-haspopup="true"
+          [attr.aria-expanded]="langMenuOpen()"
+          [title]="langService.currentLang() === 'en' ? 'Language' : 'ភាសា'"
           type="button"
         >
-          <svg [@themeRotate]="theme.currentTheme()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-          </svg>
+          <img class="lang-flag-img" [src]="langService.currentLang() === 'en' ? 'assets/images/en-flag.png' : 'assets/images/kh-flag.png'" alt="" />
+          <span class="lang-label">{{ langService.currentLang() === 'en' ? 'ENGLISH' : 'ភាសាខ្មែរ' }}</span>
+          <app-icon
+            name="chevron-down"
+            class="transition-transform duration-200"
+            [class.rotate-180]="langMenuOpen()"
+            svgClass="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
+          />
         </button>
+
+        @if (langMenuOpen()) {
+          <div class="dropdown-menu lang-dropdown" role="menu">
+            <button
+              class="dropdown-item"
+              [class.dropdown-item-active]="langService.currentLang() === 'en'"
+              (click)="setLanguage('en')"
+              role="menuitem"
+              type="button"
+            >
+              <img class="dropdown-item-flag-img" src="assets/images/en-flag.png" alt="" />
+              <span class="dropdown-item-label">ENGLISH</span>
+              @if (langService.currentLang() === 'en') {
+                <app-icon name="check" svgClass="w-4 h-4 text-indigo-500" />
+              }
+            </button>
+            <button
+              class="dropdown-item"
+              [class.dropdown-item-active]="langService.currentLang() === 'km'"
+              (click)="setLanguage('km')"
+              role="menuitem"
+              type="button"
+            >
+              <img class="dropdown-item-flag-img" src="assets/images/kh-flag.png" alt="" />
+              <span class="dropdown-item-label">ភាសាខ្មែរ</span>
+              @if (langService.currentLang() === 'km') {
+                <app-icon name="check" svgClass="w-4 h-4 text-indigo-500" />
+              }
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <button
+        (click)="theme.toggle()"
+        class="topbar-icon-btn"
+        [title]="theme.isDark()
+          ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
+          : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
+        [attr.aria-label]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+        type="button"
+      >
+        @if (theme.isDark()) {
+          <app-icon name="sun" svgClass="w-5 h-5" [@themeRotate] />
+        } @else {
+          <app-icon name="moon" svgClass="w-5 h-5" [@themeRotate] />
+        }
+      </button>
+
+      <!-- User Menu -->
+      <div class="dropdown-wrap" [class.dropdown-open]="userMenuOpen()">
         <button
-          (click)="theme.setTheme('dark')"
-          [class.bg-white]="theme.isDark()"
-          [class.shadow-sm]="theme.isDark()"
-          [class.text-indigo-600]="theme.isDark()"
-          [class.text-slate-400]="!theme.isDark()"
-          [class.hover\:text-indigo-600]="!theme.isDark()"
-          class="p-1.5 rounded transition-all"
-          [title]="theme.isDark() ? 'Dark mode' : 'Switch to Dark'"
+          (click)="toggleUserMenu()"
+          class="user-menu-btn"
+          aria-haspopup="true"
+          [attr.aria-expanded]="userMenuOpen()"
+          [attr.aria-label]="auth.currentUser()?.name || 'User'"
+          [title]="auth.currentUser()?.name || 'User'"
           type="button"
         >
-          <svg [@themeRotate]="theme.currentTheme()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-          </svg>
+          <app-ui-avatar
+            [imageUrl]="auth.currentUser()?.avatarUrl"
+            [name]="auth.currentUser()?.name"
+            size="sm"
+            [ring]="true"
+            ringColor="ring-indigo-500/30"
+          ></app-ui-avatar>
         </button>
+
+        @if (userMenuOpen()) {
+          <div class="dropdown-menu user-dropdown" role="menu">
+            <div class="user-dropdown-header">
+              <div class="flex items-center gap-3">
+                <app-ui-avatar
+                  [imageUrl]="auth.currentUser()?.avatarUrl"
+                  [name]="auth.currentUser()?.name"
+                  size="md"
+                  [ring]="true"
+                  ringColor="ring-indigo-500/30"
+                  class="flex-shrink-0"
+                ></app-ui-avatar>
+                <div class="min-w-0 flex-1">
+                  <p class="user-dropdown-name">{{ auth.currentUser()?.name || 'User' }}</p>
+                  <p class="user-dropdown-role">{{ userRoleLabel() }}</p>
+                  <p class="user-dropdown-email">{{ auth.currentUser()?.username }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" (click)="logout()" role="menuitem" type="button">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span class="dropdown-item-label">{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}</span>
+            </button>
+          </div>
+        }
       </div>
-
-      <!-- Language Toggle -->
-      <button (click)="langService.toggle()" class="lang-toggle">
-        <span>{{ langService.currentLang() === 'en' ? '🇰🇭 ខ្មែរ' : '🇬🇧 EN' }}</span>
-      </button>
-
-      <!-- User Area -->
-      <div class="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
-        <div class="text-right hidden sm:block">
-          <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ auth.currentUser()?.name || 'Cashier' }}</p>
-          <p class="text-[10px] text-emerald-500 dark:text-emerald-400 font-medium flex items-center gap-1 justify-end">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            Online
-          </p>
-        </div>
-        <app-ui-avatar
-          [imageUrl]="auth.currentUser()?.avatarUrl"
-          [name]="auth.currentUser()?.name"
-          size="sm"
-          [ring]="true"
-          ringColor="ring-white dark:ring-slate-700 shadow-sm"
-          status="online"
-          [clickable]="true"
-          (avatarClick)="openAvatarDialog()"
-        ></app-ui-avatar>
-      </div>
-
-      <button (click)="auth.logout()" class="logout-btn" title="Logout">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-      </button>
     </div>
+
+    <!-- Backdrop to close dropdowns -->
+    @if (langMenuOpen() || userMenuOpen()) {
+      <div class="dropdown-backdrop" (click)="closeMenus()"></div>
+    }
   </header>
 
   <!-- Main -->

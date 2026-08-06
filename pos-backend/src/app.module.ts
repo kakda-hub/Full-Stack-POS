@@ -15,7 +15,6 @@ import appConfig from './config/app.config';
 import { UploadCloudinaryModule } from './modules/upload-cloudinary/upload-cloudinary.module';
 import { ManagementModule } from './modules/management/management.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
-import { StockMovementsModule } from './modules/stock-movements/stock-movements.module';
 import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
 import { ReturnsModule } from './modules/returns/returns.module';
 import { HealthModule } from './modules/health/health.module';
@@ -53,7 +52,6 @@ import { KhqrModule } from './modules/khqr/khqr.module';
     UploadCloudinaryModule,
     ManagementModule,
     SuppliersModule,
-    StockMovementsModule,
     PurchaseOrdersModule,
     ReturnsModule,
     QuickPicksModule,

@@ -46,17 +46,11 @@
 
 /* ─── Navigation item ─── */
 .nav-item {
-  @apply flex items-center gap-2 px-3 py-2.5 rounded-[1.25rem] transition-all duration-200 relative;
-  @apply text-slate-500 hover:text-slate-900 hover:bg-slate-100/50;
+  @apply flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 relative;
+  @apply text-gray-600 hover:text-gray-900 hover:bg-gray-50;
 
   :host-context(html.dark) & {
     @apply text-slate-400 hover:text-white hover:bg-white/[0.03];
-  }
-
-  /* Staggered reveal on hover – icon subtle scale + glow */
-  &:hover .nav-item-icon {
-    @apply scale-110;
-    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.25));
   }
 
   &:hover .nav-item-label {
@@ -69,21 +63,16 @@
   }
 }
 
-/* ─── Active link state ─── */
+/* ─── Active link state (indigo pill) ─── */
 .active-link {
-  @apply bg-indigo-500/10 text-indigo-600 font-semibold relative;
-  box-shadow: inset 0 0 24px rgba(99, 102, 241, 0.06), 0 2px 8px rgba(99, 102, 241, 0.08);
+  @apply bg-indigo-50 text-indigo-600 font-medium rounded-xl relative;
 
   :host-context(html.dark) & {
     @apply bg-indigo-500/10 text-indigo-400;
   }
 
-  .active-accent {
-    @apply opacity-100;
-  }
-
   svg {
-    @apply text-indigo-600 drop-shadow-[0_0_6px_rgba(99,102,241,0.3)];
+    @apply text-indigo-600;
 
     :host-context(html.dark) & {
       @apply text-indigo-400;
@@ -91,11 +80,15 @@
   }
 
   .nav-item-label {
-    @apply font-bold;
+    @apply font-semibold;
   }
 
   &:hover {
-    @apply bg-gradient-to-r from-indigo-500/10 to-indigo-500/[0.06];
+    @apply bg-indigo-50;
+
+    :host-context(html.dark) & {
+      @apply bg-indigo-500/10;
+    }
   }
 
   &:active {
@@ -103,10 +96,10 @@
   }
 }
 
-/* ─── Active accent bar ─── */
-.active-accent {
-  @apply absolute left-0 w-[5px] h-6 bg-gradient-to-b from-indigo-500 to-indigo-400 rounded-r-full opacity-0 transition-all duration-300;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+/* ─── Sidebar section label (e.g. Main Menu) ─── */
+.sidebar-section-label {
+  @apply px-4 pt-4 pb-2 text-xs font-bold uppercase tracking-[0.15em];
+  @apply text-gray-400 dark:text-slate-500;
 }
 
 /* ─── Nav item icon wrapper ─── */
@@ -150,21 +143,232 @@
 
 /* ─── Layout containers ─── */
 .layout-root {
-  @apply h-screen flex overflow-hidden font-sans relative transition-colors duration-500;
+  @apply h-screen flex flex-col overflow-hidden font-sans relative transition-colors duration-500;
   @apply bg-[#F8FAFC] dark:bg-slate-950;
 }
 
-/* ─── Sidebar with subtle glass-morphism ─── */
+.layout-body {
+  @apply flex flex-1 overflow-hidden min-h-0;
+}
+
+  /* ─── Top row: sidebar brand + main header ─── */
+  .layout-top {
+    @apply flex flex-shrink-0;
+  }
+
+  /* ─── Sidebar logo header (top-left, aligned with main header) ─── */
+  .sidebar-brand {
+    @apply hidden md:flex relative z-40 items-center flex-shrink-0 h-16 border-b border-r transition-all duration-300 ease-out;
+    @apply bg-white border-gray-200;
+    @apply dark:bg-slate-950 dark:border-slate-800;
+  }
+
+  .brand-content {
+    @apply flex items-center gap-3 w-full h-full min-w-0 px-4;
+  }
+
+  /* ─── Top header (Gimbal Shop style) ─── */
+  .top-header {
+    @apply relative z-40 flex items-center justify-between gap-3 h-16 px-6 border-b flex-1 min-w-0;
+    @apply bg-white border-gray-200;
+    @apply dark:bg-slate-950 dark:border-slate-800/80;
+  }
+
+.top-header-left {
+  @apply flex items-center min-w-0;
+}
+
+  .top-header-right {
+    @apply flex items-center gap-3 flex-shrink-0;
+  }
+
+  /* ─── Sidebar toggle button (top header) ─── */
+  .sidebar-toggle-btn {
+    @apply w-9 h-9 items-center justify-center rounded-lg transition-colors duration-200;
+    @apply text-gray-600 hover:bg-gray-100;
+    @apply dark:text-slate-300 dark:hover:bg-slate-800;
+    @apply mr-3 flex-shrink-0;
+
+    &:active {
+      @apply scale-95;
+    }
+  }
+
+/* ─── Breadcrumbs ─── */
+.breadcrumbs {
+  @apply flex items-center gap-1.5 min-w-0 text-sm;
+}
+
+  .breadcrumb-item {
+    @apply truncate font-medium transition-colors;
+    @apply text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300;
+    max-width: 180px;
+  }
+
+  .breadcrumb-current {
+    @apply font-semibold;
+    @apply text-gray-900 dark:text-slate-100;
+  }
+
+  .breadcrumb-sep {
+    @apply flex-shrink-0 text-xs font-bold;
+    @apply text-slate-300 dark:text-slate-600;
+  }
+
+  .breadcrumb-admin {
+    @apply text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors;
+  }
+
+  /* ─── Theme toggle button (minimalist, transparent) ─── */
+  .topbar-icon-btn {
+    @apply w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-200;
+    @apply text-gray-600 hover:bg-gray-100;
+    @apply dark:text-slate-300 dark:hover:bg-slate-800;
+
+  &:active {
+    @apply scale-95;
+  }
+}
+
+  /* ─── Header sidebar toggle button (hamburger / panel icon) ─── */
+
+/* ─── Dropdown wrapper ─── */
+.dropdown-wrap {
+  @apply relative;
+}
+
+  /* ─── Language pill ─── */
+  .lang-pill {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all duration-200;
+    @apply text-slate-600 border border-gray-200 bg-white;
+    @apply dark:text-slate-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600;
+
+    &:hover {
+      @apply text-indigo-600 border-indigo-200/60 bg-indigo-50;
+      @apply dark:text-indigo-400 dark:border-indigo-500/20 dark:bg-indigo-500/10;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    }
+
+    &:active {
+      @apply scale-95;
+    }
+  }
+
+.lang-flag-img {
+  @apply w-5 h-3.5 object-cover rounded-sm flex-shrink-0;
+}
+
+.lang-label {
+  @apply whitespace-nowrap;
+}
+
+/* ─── User menu button ─── */
+.user-menu-btn {
+  @apply flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200;
+  @apply border-2 border-transparent;
+
+  &:hover {
+    @apply border-indigo-300/60 dark:border-indigo-500/40;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  }
+
+  &:active {
+    @apply scale-95;
+  }
+}
+
+  /* ─── Dropdown menu (shared) ─── */
+  .dropdown-menu {
+    @apply absolute right-0 top-[calc(100%+0.5rem)] min-w-[140px] rounded-xl border p-1 shadow-xl z-50;
+    @apply bg-white border-gray-100;
+    @apply dark:bg-slate-900 dark:border-slate-700/80;
+    animation: dropdownIn 160ms cubic-bezier(0.32, 0.72, 0, 1);
+    transform-origin: top right;
+  }
+
+  .lang-dropdown {
+    @apply min-w-[140px];
+  }
+
+.user-dropdown {
+  @apply min-w-[220px] w-72 p-4 rounded-2xl;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+  .dropdown-item {
+    @apply w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+    @apply text-slate-600 hover:text-indigo-600 hover:bg-gray-50;
+    @apply dark:text-slate-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10;
+
+    &:active {
+      @apply scale-[0.98];
+    }
+
+    .dropdown-item-flag-img {
+      @apply w-5 h-3.5 object-cover rounded-sm flex-shrink-0;
+    }
+
+    .dropdown-item-label {
+      @apply flex-1 text-left;
+    }
+  }
+
+.dropdown-item-active {
+  @apply font-bold;
+  @apply text-indigo-600 bg-indigo-50/80;
+  @apply dark:text-indigo-400 dark:bg-indigo-500/10;
+}
+
+.dropdown-item-danger {
+  @apply text-rose-600 hover:text-rose-600 hover:bg-rose-50;
+  @apply dark:text-rose-400 dark:hover:text-rose-400 dark:hover:bg-rose-500/10;
+}
+
+.dropdown-divider {
+  @apply h-px my-3;
+  @apply bg-gray-100 dark:bg-slate-800;
+}
+
+.user-dropdown-header {
+  @apply px-3 py-2;
+}
+
+.user-dropdown-name {
+  @apply text-sm font-bold truncate;
+  @apply text-slate-900 dark:text-white;
+}
+
+.user-dropdown-role {
+  @apply text-xs font-semibold uppercase tracking-wider mt-0.5;
+  @apply text-indigo-600 dark:text-indigo-400;
+}
+
+.user-dropdown-email {
+  @apply text-xs mt-0.5 truncate;
+  @apply text-gray-400 dark:text-slate-500;
+}
+
+/* ─── Sign Out action (matches profile card spec) ─── */
+.user-dropdown .dropdown-item-danger {
+  @apply gap-2 px-2 py-2 transition-colors text-red-600 hover:text-red-600 hover:bg-red-50;
+  @apply dark:text-red-400 dark:hover:bg-red-500/10;
+}
+
+/* ─── Dropdown backdrop ─── */
+.dropdown-backdrop {
+  @apply fixed inset-0 z-40 cursor-default;
+  background: transparent;
+}
+
+/* ─── Sidebar (clean white) ─── */
 .sidebar {
   @apply hidden md:flex flex-col transition-all duration-300 ease-out relative z-40 border-r;
-  @apply bg-white/95 border-slate-200/80 text-slate-600;
-  @apply dark:bg-slate-950 dark:border-slate-800/80 dark:text-slate-300;
-
-  &::after {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: linear-gradient(180deg, rgba(99,102,241,0.02) 0%, transparent 30%, transparent 70%, rgba(99,102,241,0.02) 100%);
-  }
+  @apply bg-white border-gray-200 text-gray-600;
+  @apply dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300;
 }
 
 .main-content {
@@ -209,117 +413,37 @@
   }
 }
 
-/* ─── Sidebar toggle button ─── */
-.sidebar-toggle {
-  @apply flex absolute -right-3.5 top-10 w-7 h-7 rounded-full border-2 items-center justify-center transition-all shadow-lg z-50;
-  @apply bg-gradient-to-br from-indigo-500 to-indigo-600 border-white text-white;
-  @apply dark:border-[#0B1120];
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-
-  &:hover {
-    @apply scale-110 rotate-12;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45);
-  }
-
-  &:active {
-    @apply scale-90;
-  }
-
-  svg {
-    filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Rotate the chevron when collapsed */
-  &.is-collapsed svg {
-    transform: rotate(180deg);
-  }
-}
-
-/* ─── Brand title ─── */
+/* ─── Brand title / subtitle ─── */
 .brand-title {
-  @apply font-black text-2xl tracking-tight whitespace-nowrap transition-colors leading-tight;
-  @apply text-slate-900 dark:text-white;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-
-  :host-context(html.dark) & {
-    background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  @apply font-extrabold text-[15px] tracking-tight whitespace-nowrap transition-colors leading-tight;
+  @apply text-gray-900 dark:text-white;
 }
 
-/* ─── Sidebar footer ─── */
+.brand-subtitle {
+  @apply text-[9px] font-bold uppercase tracking-[0.25em] mt-0.5 whitespace-nowrap;
+  @apply text-gray-400 dark:text-slate-500;
+}
+
+/* ─── Sidebar footer credit ─── */
 .sidebar-footer {
-  @apply p-4 space-y-3 border-t transition-all duration-300 relative;
-  @apply bg-gradient-to-t from-slate-50/80 to-transparent border-slate-100;
-  @apply dark:from-slate-900/60 dark:to-transparent dark:border-slate-800/60;
+  @apply px-4 py-3 border-t transition-all duration-300 flex-shrink-0;
+  @apply border-gray-100;
+  @apply dark:border-slate-800/60;
+}
 
-  &::before {
-    content: '';
-    @apply absolute top-0 left-3 right-3 h-px;
-    @apply bg-gradient-to-r from-transparent via-slate-200 to-transparent;
-    @apply dark:via-slate-700/50;
+.sidebar-credit {
+  @apply text-xs leading-relaxed select-none;
+  @apply text-gray-400 dark:text-slate-500;
+
+  .sidebar-credit-name {
+    @apply font-semibold;
+    @apply text-gray-500 dark:text-slate-400;
   }
 }
 
-/* ─── Theme/lang toggle button ─── */
-.footer-btn {
-  @apply w-full h-10 rounded-xl border text-xs flex items-center transition-all px-2 relative;
-  @apply bg-white/80 border-slate-200/60 text-slate-600;
-  @apply dark:bg-slate-800/40 dark:border-slate-700/40 dark:text-slate-400;
-
-  &:hover {
-    @apply bg-white border-indigo-200/60 text-indigo-600 shadow-sm;
-    @apply dark:bg-slate-800/60 dark:border-indigo-500/20 dark:text-indigo-400;
-  }
-
-  &:active {
-    @apply scale-[0.98];
-  }
-}
-
-.footer-btn-icon {
-  @apply w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0;
-  @apply bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-sm shadow-indigo-500/20;
-  @apply dark:from-indigo-600 dark:to-indigo-700;
-  transition: all 0.3s ease;
-
-  .footer-btn:hover & {
-    @apply shadow-md shadow-indigo-500/30;
-    transform: scale(1.05);
-  }
-}
-
-/* ─── User profile card ─── */
-.user-profile-card {
-  @apply flex items-center gap-3 p-2.5 rounded-[1.5rem] border transition-all duration-300;
-  @apply bg-white/80 border-slate-200/60;
-  @apply dark:bg-slate-800/40 dark:border-slate-700/40;
-
-  &:hover {
-    @apply border-indigo-200/60 shadow-lg shadow-indigo-500/5;
-    @apply dark:border-indigo-500/20;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    @apply scale-[0.98];
-  }
-}
-
-.user-name {
-  @apply text-sm font-bold truncate transition-colors leading-tight;
-  @apply text-slate-900 dark:text-white;
-}
-
-.user-role-badge {
-  @apply text-[10px] font-black uppercase tracking-wider mt-0.5;
-  @apply bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-transparent;
+.sidebar-credit-mini {
+  @apply font-bold tracking-widest;
+  @apply text-gray-400 dark:text-slate-500;
 }
 
 .status-dot-border {
@@ -520,16 +644,6 @@
 }
 
 /* ── Chevron indicator › ── */
-.mobile-menu-item-chevron {
-  @apply w-4 h-4 ml-auto flex-shrink-0;
-  @apply text-slate-300 dark:text-slate-600;
-  transition: transform 0.2s ease, color 0.2s ease;
-
-  .mobile-menu-item:hover & {
-    @apply text-indigo-400;
-  }
-}
-
 /* ── Badge ── */
 .mobile-menu-badge {
   @apply ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0;
@@ -714,6 +828,28 @@
   50% { opacity: 0.6; }
 }
 
+/* ─── Responsive: top header on small screens ─── */
+@media (max-width: 639px) {
+  /* Flag-only language pill to save space on small screens */
+  .lang-label {
+    display: none;
+  }
+
+  .lang-flag-img {
+    @apply w-5 h-3.5;
+  }
+
+  .lang-pill {
+    @apply px-2.5 py-1.5;
+  }
+
+  /* Collapse breadcrumbs to the current page only */
+  .breadcrumb-item:not(.breadcrumb-current),
+  .breadcrumb-sep {
+    display: none;
+  }
+}
+
 /* ==========================================================
    REDUCED MOTION ACCESSIBILITY
    ========================================================== */
@@ -721,9 +857,6 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-item,
   .submenu-item,
-  .sidebar-toggle,
-  .user-profile-card,
-  .footer-btn,
   .mobile-bottom-nav > a,
   .mobile-bottom-nav > button,
   .mobile-menu-overlay,
@@ -733,16 +866,19 @@
   .mobile-menu-logout-btn,
   .toggle-switch,
   .toggle-switch-knob,
-  .mobile-menu-item-chevron,
-  .mobile-menu-submenu {
-    transition: none !important;
-  }
+  .mobile-menu-submenu,
+  .top-header,
+  .topbar-icon-btn,
+  .lang-pill,
+  .user-menu-btn,
+   .dropdown-menu,
+   .dropdown-item,
+    .breadcrumb-admin {
+      transition: none !important;
+    }
 
   .nav-item:active,
   .submenu-item:active,
-  .sidebar-toggle:active,
-  .user-profile-card:active,
-  .sidebar-toggle:hover,
   .nav-item:hover .nav-item-icon,
   .nav-item:hover .nav-item-label,
   .mobile-menu-item:active,
@@ -763,15 +899,17 @@
     0%, 100% { opacity: 1; transform: scale(1); }
   }
 
-  .sidebar-toggle.is-collapsed svg {
-    transform: none !important;
-  }
+
 
   .mobile-menu-overlay {
     animation: none;
   }
 
   .mobile-menu-panel {
+    animation: none;
+  }
+
+  .dropdown-menu {
     animation: none;
   }
 
@@ -784,10 +922,6 @@
   }
 
   .toggle-switch-active .toggle-switch-knob {
-    transform: none !important;
-  }
-
-  .mobile-menu-item-chevron.rotate-180 {
     transform: none !important;
   }
 

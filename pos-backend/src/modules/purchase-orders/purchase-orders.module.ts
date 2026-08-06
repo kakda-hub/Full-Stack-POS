@@ -5,11 +5,10 @@ import { PurchaseOrdersController } from './purchase-orders.controller';
 import { PurchaseOrder } from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Product } from '../products/entities/product.entity';
-import { StockMovement } from '../stock-movements/entities/stock-movement.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PurchaseOrder, PurchaseOrderItem, Product, StockMovement]),
+    TypeOrmModule.forFeature([PurchaseOrder, PurchaseOrderItem, Product]),
   ],
   controllers: [PurchaseOrdersController],
   providers: [PurchaseOrdersService],

@@ -1,19 +1,7 @@
 <header class="dialog-header">
-  <div class="flex items-center gap-3">
-    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
-      <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path [attr.d]="iconPath" />
-      </svg>
-    </div>
-    <div>
-      <h3 class="text-base font-extrabold text-slate-800 dark:text-white m-0 leading-tight tracking-tight">
-        {{ title || (id ? 'កែប្រែ' : 'បង្កើត') }}
-      </h3>
-      <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 m-0 mt-0.5">
-        {{ defaultSubtitle }}
-      </p>
-    </div>
-  </div>
+  <h3 class="dialog-header-title">
+    {{ fallbackTitle }}
+  </h3>
   <button
     mat-icon-button
     mat-dialog-close

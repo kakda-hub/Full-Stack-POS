@@ -4,7 +4,6 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Priority 1 Mini Mart features migration:
  *   - cost_price on products
  *   - suppliers
- *   - stock_movements
  *   - purchase_orders / purchase_order_items
  *   - returns / return_items
  *
@@ -46,37 +45,6 @@ export class AddMiniMartFeatures1721000000000 implements MigrationInterface {
         \`created_at\`      DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
         \`updated_at\`      DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (\`id\`)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-
-    // ── stock_movements ──────────────────────────────────────────────────────
-    await queryRunner.query(`
-      CREATE TABLE IF NOT EXISTS \`stock_movements\` (
-        \`id\`              INT              NOT NULL AUTO_INCREMENT,
-        \`product_id\`      INT              NOT NULL,
-        \`quantity\`        INT              NOT NULL,
-        \`type\`            ENUM('sale','purchase','return','adjustment','damaged') NOT NULL,
-        \`reference_type\`  VARCHAR(50)      NULL,
-        \`reference_id\`    INT              NULL,
-        \`cost_price\`      DECIMAL(10,2)    NULL,
-        \`price\`           DECIMAL(10,2)    NULL,
-        \`note\`            TEXT             NULL,
-        \`performed_by\`    INT              NOT NULL,
-        \`created_at\`      DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`),
-        INDEX \`IDX_stock_movements_product\` (\`product_id\`),
-        INDEX \`IDX_stock_movements_type\` (\`type\`),
-        INDEX \`IDX_stock_movements_reference\` (\`reference_type\`, \`reference_id\`),
-        CONSTRAINT \`FK_stock_movements_product\`
-          FOREIGN KEY (\`product_id\`)
-          REFERENCES \`products\`(\`id\`)
-          ON DELETE RESTRICT
-          ON UPDATE CASCADE,
-        CONSTRAINT \`FK_stock_movements_user\`
-          FOREIGN KEY (\`performed_by\`)
-          REFERENCES \`users\`(\`id\`)
-          ON DELETE RESTRICT
-          ON UPDATE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
@@ -195,7 +163,6 @@ export class AddMiniMartFeatures1721000000000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS \`returns\``);
     await queryRunner.query(`DROP TABLE IF EXISTS \`purchase_order_items\``);
     await queryRunner.query(`DROP TABLE IF EXISTS \`purchase_orders\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`stock_movements\``);
     await queryRunner.query(`DROP TABLE IF EXISTS \`suppliers\``);
 
     // Remove cost_price column (safe check via information_schema)

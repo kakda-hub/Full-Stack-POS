@@ -7,7 +7,6 @@ import { Sale, PaymentMethod } from './entities/sale.entity';
 import { Customer } from '../customers/entities/customer.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
-import { StockMovement } from '../stock-movements/entities/stock-movement.entity';
 import { CreateSaleDto, SaleItemDto } from './dto/create-sale.dto';
 
 describe('SalesService', () => {
@@ -112,12 +111,6 @@ describe('SalesService', () => {
           useValue: {},
         },
         {
-          provide: getRepositoryToken(StockMovement),
-          useValue: {
-            create: jest.fn().mockReturnValue({}),
-          },
-        },
-        {
           provide: getRepositoryToken(Customer),
           useValue: {},
         },
@@ -155,8 +148,7 @@ describe('SalesService', () => {
       mockQueryRunner.manager.save
         .mockResolvedValueOnce(mockSale) // save sale
         .mockResolvedValueOnce({ id: 1, saleId: 1, productId: 1, quantity: 2, price: 1.5 }) // save sale item
-        .mockResolvedValueOnce(undefined) // decrement
-        .mockResolvedValueOnce({ id: 1, productId: 1, quantity: -2, type: 'sale' }); // save stock movement
+        .mockResolvedValueOnce(undefined); // decrement
 
       // Mock findOne for the return call (service.findOne is called after commit)
       jest.spyOn(service, 'findOne').mockResolvedValue(mockSaleWithItems);

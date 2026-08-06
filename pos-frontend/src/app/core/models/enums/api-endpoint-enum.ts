@@ -6,9 +6,8 @@ export enum ApiEndpointEnum {
   REPORTS = "/api/v1/reports",
   MANAGEMENT = "/api/v1/management-pages",
   SUPPLIERS = "/api/v1/suppliers",
-  PURCHASE_ORDERS = "/api/v1/purchase-orders",
-  STOCK_MOVEMENTS = "/api/v1/stock-movements",
-  QUICK_PICKS = "/api/v1/quick-picks",
+   PURCHASE_ORDERS = "/api/v1/purchase-orders",
+   QUICK_PICKS = "/api/v1/quick-picks",
   CUSTOMERS = "/api/v1/customers",
   KHQR = "/api/v1/khqr",
 }

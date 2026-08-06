@@ -1,8 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [iconType]="'category'"
-    [subtitle]="id ? (lang.currentLang() === 'km' ? 'កែប្រែព័ត៌មានប្រភេទ' : 'Edit category details') : (lang.currentLang() === 'km' ? 'បន្ថែមប្រភេទថ្មី' : 'Add a new category')"
+    [title]="id
+      ? (lang.currentLang() === 'km' ? 'កែប្រែប្រភេទ' : 'Edit Category')
+      : (lang.currentLang() === 'km' ? 'បន្ថែមប្រភេទ' : 'Add Category')"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">

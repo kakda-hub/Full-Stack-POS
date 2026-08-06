@@ -20,7 +20,10 @@ body {
   color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  font-family: var(--font-sans);
+  font-size: var(--mat-sys-body-medium-size, 14px);
+  font-weight: var(--mat-sys-body-medium-weight, 400);
+  line-height: var(--mat-sys-body-medium-line-height, 20px);
   margin: 0;
   height: 100%;
 }
@@ -29,11 +32,11 @@ body {
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Battambang:wght@400;700;900&family=Siemreap&family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Kantumruy+Pro:wght@400;500;600;700&display=swap');
 
 :root {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-khmer: 'Khmer OS Battambang', 'Hanuman', 'Siemreap', 'Battambang', system-ui;
+  --font-sans: 'Kantumruy Pro', 'Inter', system-ui, sans-serif;
+  --font-receipt: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
   --scrollbar-thumb: #e2e8f0;
   --scrollbar-thumb-hover: #cbd5e1;
 }
@@ -150,49 +153,18 @@ html:not(.theme-ready) *::after {
   }
 }
 
-/* ─── Theme Toggle Button Animations ─── */
-.theme-toggle-btn {
-  position: relative;
-}
-
-/* Sun and moon icons spin in/out with a spring bounce */
-.theme-toggle-btn .theme-toggle-sun,
-.theme-toggle-btn .theme-toggle-moon {
-  transition:
-    transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 350ms ease;
-}
-
-/* Hidden state via [hidden] attribute — we override display for animation */
-.theme-toggle-btn .theme-toggle-sun[hidden],
-.theme-toggle-btn .theme-toggle-moon[hidden] {
-  display: inline-block !important;
-  transform: scale(0) rotate(-180deg);
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-/* Visible state */
-.theme-toggle-btn .theme-toggle-sun:not([hidden]),
-.theme-toggle-btn .theme-toggle-moon:not([hidden]) {
-  transform: scale(1) rotate(0deg);
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .theme-toggle-btn .theme-toggle-sun,
-  .theme-toggle-btn .theme-toggle-moon {
-    transition: none;
-  }
-}
+/* Theme toggle icon rendering now uses @if/@else (one icon in the DOM at a time),
+   so no global CSS is needed here. The sun/moon swap animation lives on the
+   @themeRotate trigger in the layout components. */
 
 html {
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html[lang='km'] {
-  font-family: var(--font-khmer);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -386,4 +358,14 @@ html.dark .product-card-hover:hover {
 html.dark .skeleton-base {
   background: linear-gradient(90deg, #1e293b 25%, #293548 50%, #1e293b 75%) !important;
   background-size: 200% 100% !important;
+}
+
+/* =====================================================
+   TYPOGRAPHY: Receipt monospaced helper
+   ===================================================== */
+.font-receipt {
+  font-family: var(--font-receipt) !important;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  letter-spacing: 0.02em;
 }

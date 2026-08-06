@@ -24,20 +24,21 @@ import {
   ApexNoData,
   ApexTheme,
 } from 'ng-apexcharts';
+import { SaleItem } from '../../../models/sale';
 
 type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
 
-interface SaleItem {
-  id: number;
-  total: number;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  paymentMethod: string;
-  createdAt: string;
-  items: { id: number; quantity: number; price: number; product?: { id: number; name: string; barcode: string } }[];
-  user?: { id: number; name: string; email: string };
-}
+// interface SaleItem {
+//   id: number;
+//   total: number;
+//   subtotal: number;
+//   discount: number;
+//   tax: number;
+//   paymentMethod: string;
+//   createdAt: string;
+//   items: { id: number; quantity: number; price: number; product?: { id: number; name: string; barcode: string } }[];
+//   user?: { id: number; name: string; email: string };
+// }
 
 @Component({
   selector: 'app-reports',

@@ -2,12 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription, interval, forkJoin, of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { fadeIn, pageTransition } from '../../shared/animations/animations';
 import { LanguageService } from '../../core/services/language.service';
@@ -37,17 +36,11 @@ interface SaleItem {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   isLoading = signal(true);
   summary = signal<ReportSummary | null>(null);
   topProducts = signal<TopProductEntry[]>([]);
   recentSales = signal<SaleItem[]>([]);
-
-  // ── Live refresh state ────────────────────────────────────────────────────
-  readonly refreshInterval = 30_000; // 30 seconds
-  lastRefreshed = signal<Date | null>(null);
-  isPolling = signal(true);
-  private pollingSub: Subscription | null = null;
 
   // ── Computed KPIs ──────────────────────────────────────────────────────
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
@@ -118,18 +111,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.loadData();
-    this.startPolling();
-  }
-
-  ngOnDestroy(): void {
-    this.stopPolling();
   }
 
   // ── Data fetching ─────────────────────────────────────────────────────────
-  private loadData(showLoading: boolean = true): void {
-    if (showLoading) {
-      this.isLoading.set(true);
-    }
+  private loadData(): void {
+    this.isLoading.set(true);
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -155,35 +141,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         );
         this.recentSales.set(todaySales);
 
-        this.lastRefreshed.set(new Date());
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
       },
     });
-  }
-
-  // ── Polling ────────────────────────────────────────────────────────────────
-  private startPolling(): void {
-    this.stopPolling();
-    this.pollingSub = interval(this.refreshInterval).subscribe(() => {
-      this.loadData(false);
-    });
-  }
-
-  private stopPolling(): void {
-    this.pollingSub?.unsubscribe();
-    this.pollingSub = null;
-  }
-
-  togglePolling(): void {
-    this.isPolling.update((v) => !v);
-    if (this.isPolling()) {
-      this.startPolling();
-    } else {
-      this.stopPolling();
-    }
   }
 
   // ── Navigation helpers ──────────────────────────────────────────────────
@@ -206,16 +169,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // ── Refresh handler ─────────────────────────────────────────────────────
   refresh(): void {
-    this.loadData(true);
-  }
-
-  // ── Time formatting helpers ───────────────────────────────────────────────
-  formatRefreshTime(date: Date): string {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
+    this.loadData();
   }
 }

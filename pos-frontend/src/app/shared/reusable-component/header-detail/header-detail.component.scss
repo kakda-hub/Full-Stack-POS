@@ -15,6 +15,10 @@
   }
 }
 
+.dialog-header-title {
+  @apply text-base font-extrabold text-slate-800 dark:text-white m-0 leading-tight tracking-tight;
+}
+
 .dialog-close-btn {
   @apply w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200;
   @apply text-slate-400 bg-transparent;

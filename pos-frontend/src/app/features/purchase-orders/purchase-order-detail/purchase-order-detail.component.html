@@ -1,9 +1,8 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="po?.id"
-    [title]="po?.orderNumber"
-    [iconType]="'purchase'"
-    [subtitle]="po?.id ? (lang.currentLang() === 'km' ? 'ព័ត៌មានបញ្ជាទិញ' : 'Purchase order details') : (lang.currentLang() === 'km' ? 'បង្កើតបញ្ជាទិញថ្មី' : 'Create a new purchase order')"
+    [title]="po?.orderNumber
+      || (lang.currentLang() === 'km' ? 'បង្កើតបញ្ជាទិញ' : 'New Purchase Order')"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">

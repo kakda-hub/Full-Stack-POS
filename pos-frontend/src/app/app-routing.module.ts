@@ -96,12 +96,6 @@ const routes: Routes = [
         data: { breadcrumb: 'Purchase Orders', labelKh: 'បញ្ជាទិញ' }
       },
       {
-        path: 'stock-movements',
-        loadChildren: () =>
-          import('./features/stock-movements/stock-movements.module').then((m) => m.StockMovementsModule),
-        data: { breadcrumb: 'Stock Movements', labelKh: 'ចលនាស្តុក' }
-      },
-      {
         path: 'quick-picks',
         loadChildren: () =>
           import('./features/quick-picks/quick-picks.module').then((m) => m.QuickPicksModule),

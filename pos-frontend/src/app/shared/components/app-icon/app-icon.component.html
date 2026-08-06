@@ -1,0 +1,131 @@
+<svg
+  [class]="svgClass"
+  fill="none"
+  stroke="currentColor"
+  viewBox="0 0 24 24"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  @switch (name) {
+    @case ('logout') {
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    }
+    @case ('sun') {
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    }
+    @case ('moon') {
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    }
+    @case ('chevron-down') {
+      <path d="m6 9 6 6 6-6" />
+    }
+    @case ('chevron-right') {
+      <path d="m9 18 6-6-6-6" />
+    }
+    @case ('check') {
+      <path stroke-width="2.5" d="m5 13 4 4L19 7" />
+    }
+    @case ('menu') {
+      <path stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+    }
+    @case ('panel-collapse') {
+      <path d="M4 6h16M4 12h10M4 18h16" />
+    }
+    @case ('panel-expand') {
+      <path d="M4 6h16M10 12h10M4 18h16" />
+    }
+    @case ('dashboard') {
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+    }
+    @case ('sale') {
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    }
+    @case ('product') {
+      <path d="m7.5 4.27 9 5.15" />
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="m3.27 6.96 8.73 5.05 8.73-5.05" />
+      <path d="M12 22.08V12" />
+    }
+    @case ('report') {
+      <path d="M3 3v18h18" />
+      <path d="m19 9-5 5-4-4-3 3" />
+    }
+    @case ('history') {
+      <path stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    }
+    @case ('user') {
+      <path stroke-width="1.5" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle stroke-width="1.5" cx="9" cy="7" r="4" />
+    }
+    @case ('category') {
+      <rect stroke-width="1.5" x="3" y="4" width="7" height="7" />
+      <rect stroke-width="1.5" x="14" y="4" width="7" height="7" />
+      <rect stroke-width="1.5" x="14" y="13" width="7" height="7" />
+      <rect stroke-width="1.5" x="3" y="13" width="7" height="7" />
+    }
+    @case ('permission') {
+      <path stroke-width="1.5" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+    }
+    @case ('purchase-order') {
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M9 9h6M9 13h6M9 17h4" />
+    }
+    @case ('supplier') {
+      <path d="M5 17h14M5 17a2 2 0 1 1-4 0M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 1-4 0M19 17a2 2 0 1 0 4 0" />
+      <path d="M14 3H2v12h12V3Z" />
+      <path d="M14 8h4l4 4v5h-2" />
+    }
+    @case ('management') {
+      <rect stroke-width="1.5" x="3" y="3" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="14" y="3" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="3" y="14" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="14" y="14" width="7" height="7" rx="1" />
+      <line stroke-width="1.5" x1="10" y1="6.5" x2="14" y2="6.5" />
+      <line stroke-width="1.5" x1="6.5" y1="10" x2="6.5" y2="14" />
+      <line stroke-width="1.5" x1="17.5" y1="10" x2="17.5" y2="14" />
+      <line stroke-width="1.5" x1="10" y1="17.5" x2="14" y2="17.5" />
+    }
+    @case ('settings') {
+      <rect stroke-width="1.5" x="3" y="3" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="14" y="3" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="3" y="14" width="7" height="7" rx="1" />
+      <rect stroke-width="1.5" x="14" y="14" width="7" height="7" rx="1" />
+    }
+    @case ('cart') {
+      <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+    }
+    @case ('orders') {
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    }
+    @case ('x') {
+      <path stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+    }
+    @case ('zap') {
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    }
+    @case ('globe') {
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    }
+    @case ('shopping-bag') {
+      <path stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    }
+  }
+</svg>

@@ -4,9 +4,9 @@
 --  Executes safely with IF NOT EXISTS / ON DUPLICATE KEY patterns
 --
 --  Tables populated (in order):
---    1. users            6. quick_picks       11. stock_movements
---    2. categories       7. purchase_orders   12. returns
---    3. customers        8. purchase_order_items  13. return_items
+--    1. users            6. quick_picks       11. returns
+--    2. categories       7. purchase_orders   12. return_items
+--    3. customers        8. purchase_order_items
 --    4. suppliers        9. sales
 --    5. products        10. sale_items
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -19,10 +19,10 @@ USE pos_db;
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Passwords are bcrypt hashes (admin123 / cashier123)
 INSERT IGNORE INTO users (id, name, email, password, role, is_active, created_at) VALUES
-(1,  'System Admin',   'admin@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.QYzcMj77TYep2t5glUFlMi5xKkFEt2e', 'admin',   1, NOW() - INTERVAL 90 DAY),
-(2,  'Sokha Chea',     'sokha@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 85 DAY),
-(3,  'Rattanak Phorn', 'rattanak@pos.com', '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 60 DAY),
-(4,  'Malis Srey',     'malis@pos.com',   '$2a$10$UxYq7Vfn.TEVN5P9bJ.QS.7oxh6XB7oyjMdRYmjgaC.TPjX8nfwie', 'cashier', 1, NOW() - INTERVAL 30 DAY)
+(1,  'System Admin',   'admin@pos.com',   '$2a$10$hK2OimcYH1nu.UmwEBTo6Os.YtF9AMjGg/PRIVmmrceGHtxX0HNIi', 'admin',   1, NOW() - INTERVAL 90 DAY),
+(2,  'Sokha Chea',     'sokha@pos.com',   '$2a$10$NlaoKxag.pYQ1STh.Jfag.7CLOUO8W5rvJIk3vD9Ava0EH6088.le', 'cashier', 1, NOW() - INTERVAL 85 DAY),
+(3,  'Rattanak Phorn', 'rattanak@pos.com', '$2a$10$NlaoKxag.pYQ1STh.Jfag.7CLOUO8W5rvJIk3vD9Ava0EH6088.le', 'cashier', 1, NOW() - INTERVAL 60 DAY),
+(4,  'Malis Srey',     'malis@pos.com',   '$2a$10$NlaoKxag.pYQ1STh.Jfag.7CLOUO8W5rvJIk3vD9Ava0EH6088.le', 'cashier', 1, NOW() - INTERVAL 30 DAY)
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -397,58 +397,7 @@ ORDER BY RAND()
 LIMIT 2500;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---  11. STOCK MOVEMENTS  (260 movements)
--- ═══════════════════════════════════════════════════════════════════════════════
-SET @existing_moves = (SELECT COUNT(*) FROM stock_movements);
-
-INSERT INTO stock_movements (product_id, quantity, type, reference_type, reference_id, cost_price, price, note, performed_by, created_at)
-SELECT
-  1 + FLOOR(RAND() * 100),
-  CASE
-    WHEN RAND() < 0.35 THEN -1 - FLOOR(RAND() * 20)   -- sale: negative
-    WHEN RAND() < 0.60 THEN 1 + FLOOR(RAND() * 20)    -- purchase: positive
-    WHEN RAND() < 0.78 THEN 1 + FLOOR(RAND() * 10)    -- return: positive
-    WHEN RAND() < 0.90 THEN -1 - FLOOR(RAND() * 5)    -- adjustment: negative
-    ELSE -1 - FLOOR(RAND() * 3)                        -- damaged: negative
-  END,
-  CASE
-    WHEN RAND() < 0.35 THEN 'sale'
-    WHEN RAND() < 0.60 THEN 'purchase'
-    WHEN RAND() < 0.78 THEN 'return'
-    WHEN RAND() < 0.90 THEN 'adjustment'
-    ELSE 'damaged'
-  END,
-  CASE
-    WHEN RAND() < 0.35 THEN 'sale'
-    WHEN RAND() < 0.60 THEN 'purchase_order'
-    WHEN RAND() < 0.78 THEN 'return'
-    ELSE NULL
-  END,
-  CASE
-    WHEN RAND() < 0.35 THEN FLOOR(1 + RAND() * 500)
-    WHEN RAND() < 0.60 THEN FLOOR(1 + RAND() * 30)
-    WHEN RAND() < 0.78 THEN FLOOR(1 + RAND() * 30)
-    ELSE NULL
-  END,
-  ROUND(0.50 + RAND() * 3.00, 2),
-  ROUND(1.00 + RAND() * 5.00, 2),
-  'Demo data seed',
-  1 + FLOOR(RAND() * 3),
-  NOW() - INTERVAL FLOOR(RAND() * 90) DAY
-FROM (
-  SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
-  UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
-) a CROSS JOIN (
-  SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
-  UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
-) b CROSS JOIN (
-  SELECT 1 AS n UNION SELECT 2 UNION SELECT 3
-) c
-WHERE @existing_moves < 200
-LIMIT 260;
-
--- ═══════════════════════════════════════════════════════════════════════════════
---  12. RETURNS  (up to 30 returns referencing actual sales)
+--  11. RETURNS  (up to 30 returns referencing actual sales)
 -- ═══════════════════════════════════════════════════════════════════════════════
 SET @existing_returns = (SELECT COUNT(*) FROM returns);
 
@@ -468,7 +417,7 @@ ORDER BY RAND()
 LIMIT 30;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---  13. RETURN ITEMS  (1-3 items per return)
+--  12. RETURN ITEMS  (1-3 items per return)
 -- ═══════════════════════════════════════════════════════════════════════════════
 SET @existing_return_items = (SELECT COUNT(*) FROM return_items);
 
@@ -487,19 +436,6 @@ WHERE @existing_return_items < 10
   AND nums.n <= 1 + FLOOR(RAND() * 2)
 ORDER BY RAND()
 LIMIT 90;
-
--- ═══════════════════════════════════════════════════════════════════════════════
---  Update product stock based on stock movements (sale reduces, purchase/return increases)
--- ═══════════════════════════════════════════════════════════════════════════════
-UPDATE products p
-SET p.stock = p.stock + COALESCE((
-  SELECT SUM(sm.quantity)
-  FROM stock_movements sm
-  WHERE sm.product_id = p.id
-), 0);
-
--- Ensure stock never goes below 0
-UPDATE products SET stock = GREATEST(stock, 0) WHERE stock < 0;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --  Update customer total_spent and total_purchases from sales
@@ -525,7 +461,6 @@ UNION ALL SELECT 'PURCHASE ORDERS', COUNT(*) FROM purchase_orders
 UNION ALL SELECT 'PO ITEMS', COUNT(*) FROM purchase_order_items
 UNION ALL SELECT 'SALES', COUNT(*) FROM sales
 UNION ALL SELECT 'SALE ITEMS', COUNT(*) FROM sale_items
-UNION ALL SELECT 'STOCK MOVEMENTS', COUNT(*) FROM stock_movements
 UNION ALL SELECT 'RETURNS', COUNT(*) FROM returns
 UNION ALL SELECT 'RETURN ITEMS', COUNT(*) FROM return_items
 ORDER BY `table`;

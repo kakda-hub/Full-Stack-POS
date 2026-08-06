@@ -3,7 +3,6 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * Migration: Add Mini Mart Phase 1 features
  *   - low_stock_threshold & expiry_date on products
- *   - expiry_date on stock_movements
  *   - quick_picks table
  */
 export class AddMiniMartPhase11730000000000 implements MigrationInterface {
@@ -39,22 +38,6 @@ export class AddMiniMartPhase11730000000000 implements MigrationInterface {
         ALTER TABLE \`products\`
         ADD COLUMN \`expiry_date\` DATE NULL
         AFTER \`low_stock_threshold\`
-      `);
-    }
-
-    // ── stock_movements.expiry_date ─────────────────────────────────────
-    const hasSmExpiry = await queryRunner.query(`
-      SELECT 1 AS \`exists\`
-      FROM \`information_schema\`.\`COLUMNS\`
-      WHERE \`TABLE_SCHEMA\` = DATABASE()
-        AND \`TABLE_NAME\` = 'stock_movements'
-        AND \`COLUMN_NAME\` = 'expiry_date'
-    `);
-    if (hasSmExpiry.length === 0) {
-      await queryRunner.query(`
-        ALTER TABLE \`stock_movements\`
-        ADD COLUMN \`expiry_date\` DATE NULL
-        AFTER \`price\`
       `);
     }
 
@@ -106,17 +89,6 @@ export class AddMiniMartPhase11730000000000 implements MigrationInterface {
     `);
     if (hasExpiry.length > 0) {
       await queryRunner.query(`ALTER TABLE \`products\` DROP COLUMN \`expiry_date\``);
-    }
-
-    const hasSmExpiry = await queryRunner.query(`
-      SELECT 1 AS \`exists\`
-      FROM \`information_schema\`.\`COLUMNS\`
-      WHERE \`TABLE_SCHEMA\` = DATABASE()
-        AND \`TABLE_NAME\` = 'stock_movements'
-        AND \`COLUMN_NAME\` = 'expiry_date'
-    `);
-    if (hasSmExpiry.length > 0) {
-      await queryRunner.query(`ALTER TABLE \`stock_movements\` DROP COLUMN \`expiry_date\``);
     }
 
     await queryRunner.query(`DROP TABLE IF EXISTS \`quick_picks\``);

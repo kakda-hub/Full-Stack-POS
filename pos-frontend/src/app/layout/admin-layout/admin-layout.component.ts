@@ -1,13 +1,12 @@
-import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, computed, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../core/services/auth.service';
-import { LanguageService } from '../../core/services/language.service';
+import { LanguageService, AppLanguage } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { NavStateService, NavItem } from '../../core/services/nav-state.service';
 import { PendingCountService } from '../../core/services/pending-count.service';
-import { AvatarUploadDialogComponent } from '../../shared/components/avatar-upload-dialog/avatar-upload-dialog.component';
+import { AlertService } from '../../core/services/alert.service';
 import { fadeIn, themeRotate } from '../../shared/animations/animations';
 
 @Component({
@@ -19,13 +18,16 @@ import { fadeIn, themeRotate } from '../../shared/animations/animations';
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
     isCollapsed = signal(false);
-    avatarError = signal(false);
     isMobileMenuOpen = signal(false);
 
     selectedMenu = signal<string>('');
 
     /** Tracks the current URL so the computed can react to route changes */
     currentUrl = signal('');
+
+    /** ── Top header dropdown state ── */
+    langMenuOpen = signal(false);
+    userMenuOpen = signal(false);
 
     private routerSub: Subscription | null = null;
 
@@ -56,14 +58,45 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.managementSubRoutes().some(route => this.currentUrl().startsWith(route))
     );
 
+    /** Dynamic breadcrumb trail: e.g. Admin › Management › User Management */
+    breadcrumbs = computed(() => {
+        const path = this.currentUrl().split('?')[0];
+        const lang = this.langService.currentLang();
+        const trail: string[] = [lang === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admin'];
+        if (!path) return trail;
+
+        const item = this.navItems.find(i =>
+            path === i.route || path.startsWith(i.route + '/')
+        );
+        if (item) {
+            trail.push(lang === 'km' ? item.labelKm : item.label);
+            const sub = item.subMenus?.find(s =>
+                path === s.route || path.startsWith(s.route + '/')
+            );
+            if (sub) trail.push(lang === 'km' ? sub.labelKm : sub.label);
+        } else {
+            // Fallback for unmapped routes: title-case the last path segment
+            const segment = path.split('/').filter(Boolean).pop();
+            if (segment) {
+                trail.push(
+                    segment
+                        .split('-')
+                        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(' ')
+                );
+            }
+        }
+        return trail;
+    });
+
     constructor(
         public auth: AuthService,
         public langService: LanguageService,
         public theme: ThemeService,
         public navState: NavStateService,
         public pendingCountService: PendingCountService,
+        private alertService: AlertService,
         private router: Router,
-        private dialog: MatDialog,
     ) { }
 
     ngOnInit() {
@@ -75,6 +108,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
             .subscribe(e => {
                 this.currentUrl.set(e.urlAfterRedirects);
                 this.pendingCountService.refresh();
+                this.closeMenus();
             });
     }
 
@@ -100,33 +134,58 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.selectedMenu.update(current => current === item.route ? '' : item.route);
     }
 
-    collapseAll() {
-        this.selectedMenu.set('');
-    }
-
-    openAvatarDialog() {
-        this.dialog.open(AvatarUploadDialogComponent, {
-            width: '440px',
-            maxWidth: '95vw',
-            panelClass: 'avatar-upload-dialog-panel',
-            disableClose: true,
-            data: {
-                currentAvatarUrl: this.auth.currentUser()?.avatarUrl || '',
-                userName: this.auth.currentUser()?.name || 'User',
-            },
-        });
-    }
-
-    onAvatarError() {
-        this.avatarError.set(true);
+    toggleMobileMenu() {
+        this.isMobileMenuOpen.update(v => !v);
     }
 
     toggleSidebar() {
         this.isCollapsed.update((val) => !val);
     }
 
-    toggleMobileMenu() {
-        this.isMobileMenuOpen.update(v => !v);
+    /** ── Top header dropdown handlers ── */
+    toggleLangMenu() {
+        this.langMenuOpen.update(v => !v);
+        this.userMenuOpen.set(false);
+    }
+
+    setLanguage(lang: AppLanguage) {
+        this.langService.switchLanguage(lang);
+        this.langMenuOpen.set(false);
+    }
+
+    toggleUserMenu() {
+        this.userMenuOpen.update(v => !v);
+        this.langMenuOpen.set(false);
+    }
+
+    closeMenus() {
+        this.langMenuOpen.set(false);
+        this.userMenuOpen.set(false);
+    }
+
+    @HostListener('document:keydown.escape')
+    onEscape() {
+        this.closeMenus();
+    }
+
+    /** Human-readable label for the current user's role (localized) */
+    userRoleLabel = computed(() => {
+        const role = this.auth.currentUser()?.role;
+        if (this.langService.currentLang() === 'km') {
+            return role === 'admin' ? 'អ្នកគ្រប់គ្រង' : 'អ្នកគិតលុយ';
+        }
+        return role === 'admin' ? 'Admin' : 'Cashier';
+    });
+
+    /** Sign out: close menus, clear auth state, return to login, and confirm via toast */
+    logout() {
+        this.closeMenus();
+        this.auth.logout();
+        this.alertService.success(
+            this.langService.currentLang() === 'km'
+                ? 'បានចាកចេញដោយជោគជ័យ'
+                : 'Successfully logged out'
+        );
     }
 
     closeMobileMenu() {

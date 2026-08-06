@@ -1,103 +1,201 @@
 <div class="layout-root">
+  <!-- ════════════════════ TOP ROW: Sidebar brand + Main header ════════════════════ -->
+  <div class="layout-top">
+    <!-- Sidebar Logo Header (top-left box, aligned with main header) -->
+    <aside
+      class="sidebar-brand"
+      [class.w-64]="!isCollapsed()"
+      [class.w-20]="isCollapsed()"
+    >
+      <!-- Logo + stacked brand title -->
+      <div class="brand-content">
+        <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+          <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
+        </div>
+        <div *ngIf="!isCollapsed()" class="flex flex-col min-w-0">
+          <div class="brand-title">Mini Mart</div>
+          <div class="brand-subtitle">POS Solutions</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ════════════════════ TOP HEADER ════════════════════ -->
+    <header class="top-header">
+    <div class="top-header-left">
+       <!-- Sidebar Toggle Button -->
+       <button
+         (click)="toggleSidebar()"
+         class="sidebar-toggle-btn hidden md:flex"
+         [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
+         [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
+         type="button"
+       >
+         @if (!isCollapsed()) {
+           <app-icon name="panel-collapse" svgClass="w-5 h-5 transition-transform duration-200" />
+         } @else {
+           <app-icon name="panel-expand" svgClass="w-5 h-5 transition-transform duration-200" />
+         }
+       </button>
+
+       <!-- Breadcrumbs -->
+       <nav class="breadcrumbs" aria-label="Breadcrumb">
+         @for (crumb of breadcrumbs(); track crumb; let last = $last; let i = $index) {
+           @if (i === 0) {
+              <span class="breadcrumb-admin">{{ crumb }}</span>
+            } @else {
+              <span class="breadcrumb-sep">></span>
+              <span
+                class="breadcrumb-item"
+                [class.breadcrumb-current]="last"
+              >{{ crumb }}</span>
+            }
+         }
+       </nav>
+    </div>
+
+    <div class="top-header-right">
+      <!-- Language Dropdown -->
+      <div class="dropdown-wrap" [class.dropdown-open]="langMenuOpen()">
+        <button
+          (click)="toggleLangMenu()"
+          class="lang-pill"
+          aria-haspopup="true"
+          [attr.aria-expanded]="langMenuOpen()"
+          [title]="langService.currentLang() === 'en' ? 'Language' : 'ភាសា'"
+          type="button"
+        >
+          <img class="lang-flag-img" [src]="langService.currentLang() === 'en' ? 'assets/images/en-flag.png' : 'assets/images/kh-flag.png'" alt="" />
+          <span class="lang-label">{{ langService.currentLang() === 'en' ? 'ENGLISH' : 'ភាសាខ្មែរ' }}</span>
+          <app-icon
+            name="chevron-down"
+            class="transition-transform duration-200"
+            [class.rotate-180]="langMenuOpen()"
+            svgClass="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
+          />
+        </button>
+
+        @if (langMenuOpen()) {
+          <div class="dropdown-menu lang-dropdown" role="menu">
+            <button
+              class="dropdown-item"
+              [class.dropdown-item-active]="langService.currentLang() === 'en'"
+              (click)="setLanguage('en')"
+              role="menuitem"
+              type="button"
+            >
+              <img class="dropdown-item-flag-img" src="assets/images/en-flag.png" alt="" />
+              <span class="dropdown-item-label">ENGLISH</span>
+              @if (langService.currentLang() === 'en') {
+                <app-icon name="check" svgClass="w-4 h-4 text-indigo-500" />
+              }
+            </button>
+            <button
+              class="dropdown-item"
+              [class.dropdown-item-active]="langService.currentLang() === 'km'"
+              (click)="setLanguage('km')"
+              role="menuitem"
+              type="button"
+            >
+              <img class="dropdown-item-flag-img" src="assets/images/kh-flag.png" alt="" />
+              <span class="dropdown-item-label">ភាសាខ្មែរ</span>
+              @if (langService.currentLang() === 'km') {
+                <app-icon name="check" svgClass="w-4 h-4 text-indigo-500" />
+              }
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <button
+        (click)="theme.toggle()"
+        class="topbar-icon-btn"
+        [title]="theme.isDark()
+          ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
+          : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
+        [attr.aria-label]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+        type="button"
+      >
+        @if (theme.isDark()) {
+          <app-icon name="sun" svgClass="w-5 h-5" [@themeRotate] />
+        } @else {
+          <app-icon name="moon" svgClass="w-5 h-5" [@themeRotate] />
+        }
+      </button>
+
+      <!-- User Menu -->
+      <div class="dropdown-wrap" [class.dropdown-open]="userMenuOpen()">
+        <button
+          (click)="toggleUserMenu()"
+          class="user-menu-btn"
+          aria-haspopup="true"
+          [attr.aria-expanded]="userMenuOpen()"
+          [attr.aria-label]="auth.currentUser()?.name || 'User'"
+          [title]="auth.currentUser()?.name || 'User'"
+          type="button"
+        >
+          <app-ui-avatar
+            [imageUrl]="auth.currentUser()?.avatarUrl"
+            [name]="auth.currentUser()?.name"
+            size="sm"
+            [ring]="true"
+            ringColor="ring-indigo-500/30"
+          ></app-ui-avatar>
+        </button>
+
+        @if (userMenuOpen()) {
+          <div class="dropdown-menu user-dropdown" role="menu">
+            <div class="user-dropdown-header">
+              <p class="user-dropdown-name">{{ auth.currentUser()?.name || 'User' }}</p>
+              <p class="user-dropdown-role">{{ userRoleLabel() }}</p>
+              <p class="user-dropdown-email">{{ auth.currentUser()?.username }}</p>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" (click)="logout()" role="menuitem" type="button">
+              <app-icon name="logout" svgClass="w-4 h-4 flex-shrink-0" />
+              <span class="dropdown-item-label">{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Backdrop to close dropdowns -->
+    @if (langMenuOpen() || userMenuOpen()) {
+      <div class="dropdown-backdrop" (click)="closeMenus()"></div>
+    }
+    </header>
+  </div><!-- /layout-top -->
+
+  <div class="layout-body">
   <!-- Sidebar -->
   <aside
     [class.w-64]="!isCollapsed()"
     [class.w-20]="isCollapsed()"
     class="sidebar"
   >
-    <!-- Toggle Button -->
-    <button
-      (click)="toggleSidebar()"
-      class="sidebar-toggle"
-      [class.is-collapsed]="isCollapsed()"
-      [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
-      [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
-      type="button"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-    </button>
-
-    <!-- Header -->
-    <div class="p-6 h-24 flex items-center mb-2">
-      <div class="flex items-center gap-3 overflow-hidden">
-        <div class="w-11 h-11">
-          <img class="w-full h-full object-cover" src="https://img.freepik.com/premium-vector/vector-design-pos-terminal-icon-style_1134108-160792.jpg?semt=ais_hybrid&w=740&q=80" alt="" />
-        </div>
-        <div *ngIf="!isCollapsed()" class="flex flex-col">
-          <div class="brand-title">
-            Mini Mart
-          </div>
-          <div class="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-black mt-0.5 opacity-80">
-            Smart Solutions
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Navigation -->
     <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-      <div *ngIf="!isCollapsed()" class="px-4 pb-3 flex items-center">
-        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] opacity-60">Menu Overview</span>
+      <!-- MAIN MENU section label -->
+      <div *ngIf="!isCollapsed()" class="sidebar-section-label">
+        <span>{{ langService.currentLang() === 'km' ? 'ម៉ឺនុយមេ' : 'Main Menu' }}</span>
       </div>
 
       <div *ngFor="let item of navItems" class="space-y-1">
         <div class="relative flex flex-col">
           <!-- Main Item (Link) – for primary 4 items -->
+          <!-- /sales must match exactly: its route is a string-prefix of /sales-history and would otherwise double-highlight -->
           <a
             *ngIf="!item.subMenus"
             [routerLink]="item.route"
             routerLinkActive="active-link"
             class="nav-item group"
             [title]="isCollapsed() ? (langService.currentLang() === 'km' ? item.labelKm : item.label) : ''"
-            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActiveOptions]="item.route === '/sales' ? { exact: true } : { exact: false }"
           >
             <div class="nav-item-icon">
               <div class="nav-item-icon-inner">
-                <svg *ngIf="item.icon === 'dashboard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                </svg>
-                <svg *ngIf="item.icon === 'sale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
-                </svg>
-                <svg *ngIf="item.icon === 'product'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.27 6.96 8.73 5.05 8.73-5.05" /><path d="M12 22.08V12" />
-                </svg>
-                <svg *ngIf="item.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
-                </svg>
-                <svg *ngIf="item.icon === 'history'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                <svg *ngIf="item.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                </svg>
-                <svg *ngIf="item.icon === 'category'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
-                </svg>
-                <svg *ngIf="item.icon === 'permission'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-                </svg>
-                <svg *ngIf="item.icon === 'purchase-order'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 13h6M9 17h4" />
-                </svg>
-                <svg *ngIf="item.icon === 'stock-movement'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" /><path d="M12 3v6" />
-                </svg>
-                <svg *ngIf="item.icon === 'supplier'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M5 17h14M5 17a2 2 0 1 1-4 0M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 1-4 0M19 17a2 2 0 1 0 4 0" /><path d="M14 3H2v12h12V3Z" /><path d="M14 8h4l4 4v5h-2" />
-                </svg>
+                <app-icon [name]="item.icon" />
               </div>
             </div>
             <span *ngIf="!isCollapsed()" class="nav-item-label">
@@ -107,7 +205,6 @@
             @if (item.icon === 'purchase-order' && pendingPoCount() > 0) {
               <div class="po-pending-dot" [class.po-pending-dot-collapsed]="isCollapsed()" [title]="pendingPoCount() + ' pending'"></div>
             }
-            <div class="active-accent"></div>
           </a>
 
           <!-- Toggle for Submenu (Management) -->
@@ -120,23 +217,18 @@
           >
             <div class="nav-item-icon">
               <div class="nav-item-icon-inner">
-                <svg *ngIf="item.icon === 'management'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><line x1="10" y1="6.5" x2="14" y2="6.5" /><line x1="6.5" y1="10" x2="6.5" y2="14" /><line x1="17.5" y1="10" x2="17.5" y2="14" /><line x1="10" y1="17.5" x2="14" y2="17.5" />
-                </svg>
+                <app-icon [name]="item.icon" />
               </div>
             </div>
             <span *ngIf="!isCollapsed()" class="nav-item-label flex-1">
               {{ langService.currentLang() === 'km' ? item.labelKm : item.label }}
             </span>
-            <svg
+            <app-icon
               *ngIf="!isCollapsed()"
-              class="w-4 h-4 transition-transform duration-200"
+              name="chevron-down"
+              svgClass="w-4 h-4 transition-transform duration-200"
               [class.rotate-180]="selectedMenu() === item.route"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-            <div class="active-accent" [class.opacity-100]="isManagementActive()"></div>
+            />
           </button>
 
           <!-- Submenu Content (for Management) — slide animation -->
@@ -163,136 +255,15 @@
       </div>
     </nav>
 
-    <!-- Footer -->
+    <!-- Footer Credit -->
     <div class="sidebar-footer">
-      <!-- Dark Mode Toggle -->
-      <button
-        (click)="theme.toggle()"
-        class="footer-btn theme-toggle-btn"
-        [title]="theme.isDark() ? 'Dark — Switch to Light' : 'Light — Switch to Dark'"
-        [attr.aria-label]="theme.isDark() ? 'Dark — Switch to Light' : 'Light — Switch to Dark'"
-      >
-        <div class="footer-btn-icon ring-2 ring-indigo-300/60">
-          <svg
-            [hidden]="!theme.isDark()"
-            [@themeRotate]="theme.currentTheme()"
-            class="w-4 h-4 text-indigo-100 theme-toggle-moon"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-          <svg
-            [hidden]="theme.isDark()"
-            [@themeRotate]="theme.currentTheme()"
-            class="w-4 h-4 text-indigo-200 theme-toggle-sun"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
-        </div>
-        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider flex-1 text-left">
-          {{ theme.isDark()
-            ? (langService.currentLang() === 'km' ? 'ពន្លឺ' : 'Light')
-            : (langService.currentLang() === 'km' ? 'ងងឹត' : 'Dark') }}
-        </span>
-        <div
-          *ngIf="!isCollapsed()"
-          class="toggle-switch flex-shrink-0"
-          [class.toggle-switch-active]="theme.isDark()"
-          [attr.data-tooltip]="theme.isDark()
-            ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
-            : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
-        >
-          <div class="toggle-switch-knob"></div>
-        </div>
-      </button>
-
-      <!-- Language Toggle -->
-      <button
-        (click)="langService.toggle()"
-        class="footer-btn"
-        [title]="langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'"
-        [attr.aria-label]="langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'Switch to English'"
-      >
-        <div class="w-7 h-7 rounded-md bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold">
-          {{ langService.currentLang() === 'en' ? 'KH' : 'EN' }}
-        </div>
-        <span *ngIf="!isCollapsed()" class="ml-3 font-semibold uppercase tracking-wider flex-1 text-left">
-          {{ langService.currentLang() === 'en' ? 'ភាសាខ្មែរ' : 'English' }}
-        </span>
-        <div
-          *ngIf="!isCollapsed()"
-          class="toggle-switch flex-shrink-0"
-          [class.toggle-switch-active]="langService.currentLang() === 'km'"
-          [attr.data-tooltip]="langService.currentLang() === 'km'
-            ? 'Switch to English'
-            : (langService.currentLang() === 'en' ? 'ប្តូរទៅភាសាខ្មែរ' : 'ប្តូរទៅភាសាខ្មែរ')"
-        >
-          <div class="toggle-switch-knob"></div>
-        </div>
-      </button>
-
-      <!-- User Profile -->
-      <div class="user-profile-card">
-        <div *ngIf="!isCollapsed()" class="relative flex-shrink-0 group">
-          <app-ui-avatar
-            [imageUrl]="auth.currentUser()?.avatarUrl"
-            [name]="auth.currentUser()?.name"
-            [ringColor]="'ring-indigo-500/20'"
-            [ring]="true"
-            status="online"
-            [clickable]="true"
-            (avatarClick)="openAvatarDialog()"
-          ></app-ui-avatar>
-        </div>
-        <div *ngIf="!isCollapsed()" class="min-w-0 flex-1">
-          <div class="user-name">
-            {{ auth.currentUser()?.name }}
-          </div>
-          <div class="user-role-badge">
-            {{ auth.currentUser()?.role }}
-          </div>
-        </div>
-        <button
-          (click)="auth.logout()"
-          class="pl-1 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all group"
-          title="Logout"
-        >
-          <svg
-            class="w-5 h-5 transition-transform group-hover:rotate-12"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-        </button>
-      </div>
+      <p class="sidebar-credit" *ngIf="!isCollapsed()">
+        {{ langService.currentLang() === 'km' ? 'បង្កើតឡើងដោយ' : 'Developed by' }}
+        <span class="sidebar-credit-name">Khiev Kakda</span>
+      </p>
+      <p class="sidebar-credit sidebar-credit-mini" *ngIf="isCollapsed()">KK</p>
     </div>
   </aside>
-
-  <!-- Alert host (toast notifications) -->
-  <app-alert-host></app-alert-host>
 
   <!-- Main content -->
   <main class="main-content">
@@ -300,6 +271,7 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+  </div><!-- /layout-body -->
 
   <!-- ===== Mobile Bottom Navigation (3-Tab Design) ===== -->
   <nav class="mobile-bottom-nav scrollbar-hide">
@@ -310,9 +282,7 @@
       class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
-      </svg>
+      <app-icon name="cart" svgClass="w-5 h-5" />
       <span class="text-[10px] font-medium">{{ langService.currentLang() === 'km' ? 'លក់' : 'Register' }}</span>
     </a>
 
@@ -323,9 +293,7 @@
       class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
+      <app-icon name="orders" svgClass="w-5 h-5" />
       <span class="text-[10px] font-medium">{{ langService.currentLang() === 'km' ? 'ការបញ្ជាទិញ' : 'Orders' }}</span>
     </a>
 
@@ -335,9 +303,7 @@
       class="relative flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 h-[52px] rounded-2xl motion-safe:transition-all motion-safe:duration-300"
       [class.active-more-btn]="isMobileMenuOpen()"
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path d="M4 6h16M4 12h16M4 18h16"/>
-      </svg>
+      <app-icon name="menu" svgClass="w-5 h-5" />
       <span class="text-[10px] font-bold tracking-tight">{{ langService.currentLang() === 'km' ? 'បន្ថែម' : 'More' }}</span>
     </button>
   </nav>
@@ -373,8 +339,6 @@
               [ring]="true"
               ringColor="ring-indigo-500/30"
               status="online"
-              [clickable]="true"
-              (avatarClick)="openAvatarDialog()"
             ></app-ui-avatar>
             <div class="min-w-0 flex-1">
               <div class="mobile-menu-user-name truncate">
@@ -389,9 +353,7 @@
             </div>
           </div>
           <button (click)="closeMobileMenu()" class="mobile-menu-close" aria-label="Close menu">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon name="x" svgClass="w-5 h-5" />
           </button>
         </div>
 
@@ -410,14 +372,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                </svg>
+                <app-icon name="dashboard" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទិដ្ឋភាពទូទៅ' : 'Dashboard' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- Products -->
@@ -428,14 +385,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="M12 22.08V12" />
-                </svg>
+                <app-icon name="product" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ផលិតផល' : 'Products' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- Quick Picks -->
@@ -446,14 +398,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                </svg>
+                <app-icon name="zap" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទំនិញរហ័ស' : 'Quick Picks' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
           </div>
 
@@ -469,53 +416,25 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 13h6M9 17h4" />
-                </svg>
+                <app-icon name="purchase-order" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'បញ្ជាទិញ' : 'Purchase Orders' }}</span>
               @if (pendingPoCount() > 0) {
                 <span class="mobile-menu-badge">{{ pendingPoCount() }} {{ langService.currentLang() === 'km' ? 'កំពុងរង់ចាំ' : 'Pending' }}</span>
               }
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
-            <!-- Stock Movements -->
-            <a
-              [routerLink]="'/stock-movements'"
+             <!-- Suppliers -->
+             <a
+               [routerLink]="'/suppliers'"
               (click)="closeMobileMenu()"
               routerLinkActive="mobile-menu-item-active"
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" /><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" /><path d="M12 3v6" />
-                </svg>
-              </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ចលនាស្តុក' : 'Stock Movements' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </a>
-
-            <!-- Suppliers -->
-            <a
-              [routerLink]="'/suppliers'"
-              (click)="closeMobileMenu()"
-              routerLinkActive="mobile-menu-item-active"
-              class="mobile-menu-item"
-            >
-              <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M5 17h14M5 17a2 2 0 1 1-4 0M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 1-4 0M19 17a2 2 0 1 0 4 0" /><path d="M14 3H2v12h12V3Z" /><path d="M14 8h4l4 4v5h-2" />
-                </svg>
+                <app-icon name="supplier" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Suppliers' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
           </div>
 
@@ -531,14 +450,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
-                </svg>
+                <app-icon name="report" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'របាយការណ៍' : 'Reports' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- User Management -->
@@ -549,14 +463,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                </svg>
+                <app-icon name="user" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការគ្រប់គ្រងអ្នកប្រើ' : 'User Management' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- Categories -->
@@ -567,14 +476,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="4" width="7" height="7" /><rect x="14" y="4" width="7" height="7" /><rect x="14" y="13" width="7" height="7" /><rect x="3" y="13" width="7" height="7" />
-                </svg>
+                <app-icon name="category" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ប្រភេទ' : 'Categories' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- Permission -->
@@ -585,14 +489,9 @@
               class="mobile-menu-item"
             >
               <div class="mobile-menu-item-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-                </svg>
+                <app-icon name="permission" svgClass="w-[18px] h-[18px]" />
               </div>
               <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការអនុញ្ញាត' : 'Permissions' }}</span>
-              <svg class="mobile-menu-item-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
             </a>
 
             <!-- Management (Settings) with submenus -->
@@ -605,18 +504,14 @@
                 [class.mobile-menu-item-active]="isManagementActive()"
               >
                 <div class="mobile-menu-item-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                  </svg>
+                <app-icon name="settings" svgClass="w-[18px] h-[18px]" />
                 </div>
                 <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការកំណត់' : 'Settings' }}</span>
-                <svg
-                  class="mobile-menu-item-chevron ml-auto transition-transform duration-300"
+                <app-icon
+                  name="chevron-down"
+                  svgClass="w-4 h-4 ml-auto flex-shrink-0 text-slate-300 dark:text-slate-600 transition-transform duration-300"
                   [class.rotate-180]="selectedMenu() === '/settings'"
-                  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                >
-                  <path d="m6 9 6 6 6-6"/>
-                </svg>
+                />
               </button>
 
               <div class="mobile-menu-submenu" [class.expanded]="selectedMenu() === '/settings'">
@@ -637,67 +532,12 @@
             </div>
             }
           </div>
-
-          <!-- ═══ PREFERENCES Section ═══ -->
-          <div class="mobile-menu-section">
-            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'ចំណូលចិត្ត' : 'PREFERENCES' }}</div>
-
-            <!-- Dark Mode Toggle -->
-            <button
-              (click)="theme.toggle()"
-              class="mobile-menu-item w-full text-left"
-            >
-              <div class="mobile-menu-item-icon">
-                @if (theme.isDark()) {
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                  </svg>
-                } @else {
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                  </svg>
-                }
-              </div>
-              <span class="mobile-menu-item-label">
-                {{ langService.currentLang() === 'km'
-                  ? (theme.isDark() ? 'របៀបភ្លឺ' : 'របៀបងងឹត')
-                  : (theme.isDark() ? 'Light Mode' : 'Dark Mode') }}
-              </span>
-              <div class="ml-auto">
-                <div class="toggle-switch" [class.toggle-switch-active]="theme.isDark()">
-                  <div class="toggle-switch-knob"></div>
-                </div>
-              </div>
-            </button>
-
-            <!-- Language Toggle -->
-            <button
-              (click)="langService.toggle()"
-              class="mobile-menu-item w-full text-left"
-            >
-              <div class="mobile-menu-item-icon">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-              </div>
-              <span class="mobile-menu-item-label">
-                {{ langService.currentLang() === 'km' ? 'ភាសាអង់គ្លេស' : 'Khmer' }}
-              </span>
-              <div class="ml-auto">
-                <div class="toggle-switch" [class.toggle-switch-active]="langService.currentLang() === 'km'">
-                  <div class="toggle-switch-knob"></div>
-                </div>
-              </div>
-            </button>
-          </div>
         </div>
 
         <!-- ── Footer: Logout ── -->
         <div class="mobile-menu-footer">
-          <button (click)="auth.logout()" class="mobile-menu-logout-btn">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+          <button (click)="logout()" class="mobile-menu-logout-btn">
+            <app-icon name="logout" svgClass="w-5 h-5" />
             <span>{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Logout' }}</span>
           </button>
         </div>

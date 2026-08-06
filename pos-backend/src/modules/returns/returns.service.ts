@@ -7,7 +7,6 @@ import { ReturnItem } from './entities/return-item.entity';
 import { Sale } from '../sales/entities/sale.entity';
 import { SaleItem } from '../sales/entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
-import { StockMovement, StockMovementType } from '../stock-movements/entities/stock-movement.entity';
 import { CreateReturnDto } from './dto/return.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
 import { paginateQuery } from '../../common/helpers/pagination.helper';
@@ -25,8 +24,6 @@ export class ReturnsService {
     private readonly saleItemRepository: Repository<SaleItem>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @InjectRepository(StockMovement)
-    private readonly movementRepository: Repository<StockMovement>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
@@ -58,8 +55,6 @@ export class ReturnsService {
           );
         }
 
-        const costPrice = saleItem.product?.costPrice ?? 0;
-
         const returnItem = this.returnItemRepository.create({
           productId: itemDto.productId,
           quantity: itemDto.quantity,
@@ -76,20 +71,6 @@ export class ReturnsService {
           'stock',
           itemDto.quantity,
         );
-
-        // Record stock movement
-        const movement = this.movementRepository.create({
-          productId: itemDto.productId,
-          quantity: itemDto.quantity,
-          type: StockMovementType.RETURN,
-          referenceType: 'return',
-          referenceId: 0, // Will update after save
-          costPrice,
-          price: Number(saleItem.price),
-          performedBy: userId,
-          note: `Return from Sale #${dto.saleId}`,
-        });
-        await queryRunner.manager.save(StockMovement, movement);
       }
 
       const returnEntity = this.returnRepository.create({
@@ -102,16 +83,6 @@ export class ReturnsService {
       });
 
       const saved = await queryRunner.manager.save(Return, returnEntity);
-
-      // Update reference IDs on movements
-      if (saved.items) {
-        for (const item of saved.items) {
-          await queryRunner.manager.update(StockMovement,
-            { referenceType: 'return', referenceId: 0, productId: item.productId },
-            { referenceId: saved.id },
-          );
-        }
-      }
 
       await queryRunner.commitTransaction();
       return this.findOne(saved.id);

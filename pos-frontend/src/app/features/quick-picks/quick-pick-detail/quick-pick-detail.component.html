@@ -1,8 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [iconType]="'product'"
-    [subtitle]="id ? (lang.currentLang() === 'km' ? 'កែប្រែទំនិញរហ័ស' : 'Edit quick pick item') : (lang.currentLang() === 'km' ? 'បន្ថែមទំនិញរហ័សថ្មី' : 'Add a new quick pick item')"
+    [title]="id
+      ? (lang.currentLang() === 'km' ? 'កែប្រែទំនិញរហ័ស' : 'Edit Quick Pick')
+      : (lang.currentLang() === 'km' ? 'បន្ថែមទំនិញរហ័ស' : 'Add Quick Pick')"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">

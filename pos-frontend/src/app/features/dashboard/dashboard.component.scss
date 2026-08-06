@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════ */
 
 .dash-wrapper {
-  @apply p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 mx-auto;
+  @apply space-y-4 sm:space-y-6 mx-auto;
 }
 
 /* ─── Header ─── */
@@ -26,55 +26,6 @@
 
 .dash-header-right {
   @apply flex items-center gap-2;
-}
-
-/* ─── Live Indicator ─── */
-.dash-live-indicator {
-  @apply flex items-center gap-1.5 px-2.5 py-1.5 rounded-[1rem] text-[10px] font-bold;
-  @apply bg-emerald-50/70 dark:bg-emerald-900/20;
-  @apply border border-emerald-200/60 dark:border-emerald-700/30;
-  @apply select-none;
-}
-
-.dash-live-dot {
-  @apply w-2 h-2 rounded-full;
-  @apply bg-emerald-500;
-  animation: dashLivePulse 2s ease-in-out infinite;
-}
-
-.dash-live-dot--paused {
-  @apply bg-amber-400;
-  animation: none;
-}
-
-@keyframes dashLivePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.75); }
-}
-
-.dash-live-text {
-  @apply uppercase tracking-wider;
-  @apply text-emerald-700 dark:text-emerald-400;
-}
-
-.dash-live-dot--paused + .dash-live-text {
-  @apply text-amber-600 dark:text-amber-400;
-}
-
-.dash-live-time {
-  @apply text-[9px] font-mono font-normal ml-0.5;
-  @apply text-emerald-500/70 dark:text-emerald-500/60;
-}
-
-/* ─── Pause / Resume button ─── */
-.dash-btn-pause {
-  &.dash-btn-pause--active {
-    @apply text-amber-500 bg-amber-50;
-    @apply dark:text-amber-400 dark:bg-amber-900/20;
-    &:hover {
-      @apply bg-amber-100 dark:bg-amber-900/30;
-    }
-  }
 }
 
 .dash-btn-icon {
@@ -483,14 +434,6 @@
     @apply text-lg;
   }
 
-  .dash-live-indicator {
-    @apply px-2 py-1;
-  }
-
-  .dash-live-time {
-    display: none;
-  }
-
   .dash-btn-primary span {
     display: none;
   }
@@ -509,13 +452,11 @@
   .dash-card,
   .dash-action-btn,
   .dash-btn-primary,
-  .dash-btn-icon,
-  .dash-live-indicator {
+  .dash-btn-icon {
     transition: none;
   }
 
-  .dash-spin svg,
-  .dash-live-dot {
+  .dash-spin svg {
     animation: none;
   }
 }
