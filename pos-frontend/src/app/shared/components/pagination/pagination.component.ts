@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
@@ -52,15 +52,29 @@ export class PaginationComponent {
   onPageSizeChange(size: number): void {
     if (size !== this.pageSize) {
       this.pageSizeChange.emit(size);
-      this.isDropdownOpen = false;
     }
+    this.isDropdownOpen = false;
   }
 
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target && !target.closest('app-pagination')) {
+      this.isDropdownOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    this.isDropdownOpen = false;
+  }
+
   get startIndex(): number {
+    if (this.totalItems === 0) return 0;
     return (this.currentPage - 1) * this.pageSize + 1;
   }
 

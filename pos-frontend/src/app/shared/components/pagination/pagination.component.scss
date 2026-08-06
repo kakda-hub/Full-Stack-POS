@@ -1,51 +1,125 @@
 /* ─── Pagination bar ─── */
 .pag-bar {
-  @apply flex items-center justify-end px-4 py-2 text-sm;
-  @apply bg-white dark:bg-slate-900 transition-colors duration-200;
+  @apply flex flex-wrap items-center justify-end gap-x-6 gap-y-2 px-4 py-2.5 text-sm;
+  @apply bg-white dark:bg-slate-800 transition-colors duration-200;
+  @apply border-t border-slate-100 dark:border-slate-700/60;
+}
+
+/* ─── Items per page ─── */
+.pag-size {
+  @apply flex items-center gap-3;
 }
 
 .pag-label {
-  @apply text-slate-500 dark:text-slate-400 mr-4;
+  @apply text-slate-500 dark:text-slate-400 select-none whitespace-nowrap;
 }
 
 .pag-size-btn {
-  @apply flex items-center gap-4 px-3 py-1.5 border rounded-lg transition-all duration-200;
-  @apply border-slate-200 bg-white text-slate-900;
-  @apply hover:border-indigo-500;
-  @apply dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-indigo-400;
+  @apply flex items-center gap-3 px-3 py-1.5 rounded-lg font-medium transition-all duration-200;
+  @apply bg-white border border-slate-200 text-slate-900;
+  @apply hover:border-indigo-500 hover:shadow-sm;
+  @apply focus-visible:ring-2 focus-visible:ring-indigo-500/30 focus-visible:border-indigo-500;
+  @apply dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:hover:border-indigo-400;
+}
+
+.pag-size-btn-value {
+  @apply min-w-4 text-center tabular-nums;
 }
 
 .pag-size-btn-icon {
   @apply w-4 h-4 text-indigo-600 transition-transform duration-200;
 }
 
+.pag-size-btn-icon--open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel (opens upward) */
 .pag-dropdown {
-  @apply absolute bottom-full left-0 mb-2 w-full min-w-[70px] rounded-lg shadow-xl z-50 overflow-hidden;
+  @apply absolute bottom-full left-0 mb-2 min-w-full w-max rounded-lg shadow-xl z-50 overflow-hidden;
   @apply bg-white border border-slate-200;
-  @apply dark:bg-slate-800 dark:border-slate-700;
+  @apply dark:bg-slate-900 dark:border-slate-700;
+  animation: pag-dropdown-in 0.15s ease-out;
 }
 
 .pag-dropdown-item {
-  @apply w-full text-left px-4 py-2 transition-colors duration-150;
-  @apply hover:bg-slate-50 text-slate-700;
-  @apply dark:hover:bg-slate-700 dark:text-slate-200;
+  @apply w-full flex items-center justify-between gap-5 px-3.5 py-2 text-left font-medium transition-colors duration-150;
+  @apply text-slate-700 hover:bg-slate-50;
+  @apply dark:text-slate-200 dark:hover:bg-slate-800;
 }
 
 .pag-dropdown-item--active {
-  @apply bg-slate-100 dark:bg-slate-700 font-bold;
+  @apply bg-indigo-50 text-indigo-700 hover:bg-indigo-100;
+  @apply dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20;
 }
 
+.pag-dropdown-check {
+  @apply w-4 h-4 text-indigo-600;
+  @apply dark:text-indigo-400;
+}
+
+@keyframes pag-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Range display ─── */
 .pag-range {
-  @apply mr-8 text-slate-600 dark:text-slate-400;
+  @apply flex items-center text-slate-500 dark:text-slate-400 tabular-nums whitespace-nowrap;
+}
+
+.pag-range-value {
+  @apply font-semibold text-slate-800;
+  @apply dark:text-slate-200;
+}
+
+.pag-range-sep {
+  @apply mx-1.5 text-slate-400;
+  @apply dark:text-slate-500;
+}
+
+/* ─── Navigation ─── */
+.pag-nav {
+  @apply flex items-center gap-1.5;
 }
 
 .pag-nav-btn {
-  @apply p-2 rounded-lg transition-all duration-200;
-  @apply text-slate-400 hover:bg-slate-50 hover:text-indigo-600;
-  @apply disabled:opacity-30 disabled:cursor-not-allowed;
-  @apply dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-indigo-400;
+  @apply flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200;
+  @apply text-slate-500 hover:bg-slate-100 hover:text-indigo-600;
+  @apply disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500;
+  @apply dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400;
+  @apply dark:disabled:hover:bg-transparent dark:disabled:hover:text-slate-400;
 }
 
 .pag-nav-icon {
   @apply w-5 h-5;
+}
+
+/* Page number buttons (hidden on very small screens) */
+.pag-pages {
+  @apply hidden sm:flex items-center gap-1;
+}
+
+.pag-page-btn {
+  @apply flex items-center justify-center min-w-9 h-9 px-2.5 rounded-lg font-medium text-sm tabular-nums transition-all duration-200;
+  @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+  @apply dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100;
+}
+
+.pag-page-btn--active {
+  @apply bg-indigo-600 text-white font-semibold;
+  @apply hover:bg-indigo-600 hover:text-white;
+  @apply dark:bg-indigo-600 dark:hover:bg-indigo-600 dark:hover:text-white;
+  box-shadow: 0 2px 10px -2px rgba(99, 102, 241, 0.45);
+}
+
+.pag-ellipsis {
+  @apply flex items-center justify-center min-w-6 h-9 px-1 text-slate-400 select-none;
+  @apply dark:text-slate-500;
 }

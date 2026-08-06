@@ -165,6 +165,8 @@
     "to": "to",
     "of": "of",
     "results": "results",
-    "items_per_page": "Items per page"
+    "items_per_page": "Items per page",
+    "page": "Page {{page}}",
+    "navigation": "Pagination"
   }
 }
