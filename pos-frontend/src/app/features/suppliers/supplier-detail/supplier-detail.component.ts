@@ -13,6 +13,7 @@ import { modalAnimation, backdropAnimation } from '../../../shared/animations/an
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [modalAnimation, backdropAnimation],
   templateUrl: './supplier-detail.component.html',
+  styleUrl: './supplier-detail.component.scss',
 })
 export class SupplierDetailComponent implements OnInit {
   form!: FormGroup;

@@ -1,6 +1,14 @@
     <div @pageTransition class="space-y-4">
       <div class="flex items-center justify-between">
-        <app-breadcrumb></app-breadcrumb>
+        <div class="flex items-center gap-3">
+          <app-breadcrumb></app-breadcrumb>
+          <a routerLink="/user-management" class="back-link" aria-label="Back to list">
+            <svg class="back-link__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>{{ lang.currentLang() === 'km' ? 'ត្រឡប់ទៅបញ្ជី' : 'Back to list' }}</span>
+          </a>
+        </div>
         <app-ui-button [variant]="'primary'" [size]="'md'" (click)="onAdd()" type="button">
           <span>{{ 'button.addNew' | translate }}</span>
         </app-ui-button>

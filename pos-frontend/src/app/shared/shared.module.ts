@@ -21,6 +21,7 @@ import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
 import { AppIconComponent } from './components/app-icon/app-icon.component';
 import { SortHeaderComponent } from './components/sort-header/sort-header.component';
+import { ImgFallbackDirective } from './directives/img-fallback.directive';
 
 const components = [ 
     UiAvatarComponent,
@@ -52,6 +53,7 @@ const components = [
     RouterModule,
     MatDialogModule,
     MatPaginatorModule,
+    ImgFallbackDirective,
   ],
   exports: [
     CommonModule,
@@ -59,7 +61,8 @@ const components = [
     ReactiveFormsModule,
     TranslateModule,
     RouterModule,
-    ...components
+    ...components,
+    ImgFallbackDirective,
   ],
 })
 export class SharedModule { }

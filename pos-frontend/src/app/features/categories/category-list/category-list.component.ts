@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
@@ -11,6 +11,7 @@ import { ReusableDialogService } from '../../../core/services/dialogs/reusable-d
 import { CategoryDetailComponent } from '../category-detail/category-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { buildListParams } from '../../../core/services/api/list-params';
 
 @Component({
   selector: 'app-category-list',
@@ -23,8 +24,16 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 export class CategoryListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingCategory: any | null = null;
+
+  // Server-side pagination state
   categories = signal<any[]>([]);
-  filteredCategories = signal<any[]>([]);
+  totalItems = signal(0);
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  searchQuery = signal('');
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
 
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
@@ -32,14 +41,6 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     { key: 'nameKh', label: 'Name (Khmer)', labelKm: 'ឈ្មោះ (ខ្មែរ)' },
     { key: 'description', label: 'Description', labelKm: 'ការពិពណ៌នា', type: 'description', responsive: 'md' },
   ];
-
-  // Pagination
-  pageSize = signal(10);
-  pageIndex = signal(0);
-  paginatedCategories = computed(() => {
-    const startIndex = this.pageIndex() * this.pageSize();
-    return this.filteredCategories().slice(startIndex, startIndex + this.pageSize());
-  });
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
@@ -66,30 +67,46 @@ export class CategoryListComponent implements OnInit, OnDestroy {
 
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe(q => {
-        const query = q.toLowerCase().trim();
-        if (!query) {
-          this.filteredCategories.set(this.categories());
-        } else {
-          this.filteredCategories.set(
-            this.categories().filter(c =>
-              (c.name || '').toLowerCase().includes(query) ||
-              (c.nameKh || '').includes(query) ||
-              (c.nameKm || '').includes(query)
-            )
-          );
-        }
+        this.searchQuery.set(q.trim());
         this.pageIndex.set(0); // Reset to first page on search
+        this.loadCategories();
       });
   }
 
+  /** Loads one server-side page using the standard list query params. */
   loadCategories() {
     this.isLoading.set(true);
-    this.categoriesService.list().subscribe((res: any) => {
-      const data = res.data || [];
-      this.categories.set(data);
-      this.filteredCategories.set(data);
-      this.isLoading.set(false);
-      this.cdr.markForCheck();
+    const seq = ++this.loadSeq;
+    const params = buildListParams({
+      search: this.searchQuery() || undefined,
+      sortBy: 'name',
+      sort: 'asc',
+      offset: this.pageIndex() * this.pageSize(),
+      max: this.pageSize(),
+    });
+    this.categoriesService.list({ params }).subscribe({
+      next: (res: any) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        const data = res?.data ?? [];
+        // After a delete, the current page may be empty — step back one page.
+        if (data.length === 0 && this.pageIndex() > 0) {
+          this.pageIndex.update(p => p - 1);
+          this.loadCategories();
+          return;
+        }
+        this.categories.set(data);
+        this.totalItems.set(res?.total ?? data.length);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        console.error('Failed to load categories', err);
+        this.categories.set([]);
+        this.totalItems.set(0);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -100,6 +117,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   onPageChange(event: PageEvent) {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
+    this.loadCategories();
   }
 
   openEdit(c: any): void {

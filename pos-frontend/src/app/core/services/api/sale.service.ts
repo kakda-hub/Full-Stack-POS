@@ -72,6 +72,20 @@ export class SaleService {
   }
 
   /**
+   * Server-side paginated page (standard offset-based list query) plus the
+   * envelope total — used by the sales-history table. Supports dateFrom/dateTo.
+   */
+  getSalesPage(query?: ListQuery): Observable<{ data: any[]; total: number }> {
+    const params = buildListParams(query);
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map((res) => ({
+        data: ((res?.data ?? []) as any[]).map((s: any) => this.mapSale(s)),
+        total: res?.total ?? 0,
+      })),
+    );
+  }
+
+  /**
    * Get a single sale by ID
    */
   getSaleById(id: number): Observable<any> {

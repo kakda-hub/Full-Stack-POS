@@ -26,6 +26,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingProduct: Product | null = null;
 
+  isLowStockDrawerOpen = false;
+  lowStockThreshold = 10;
+
   // Server-side pagination state
   products = signal<Product[]>([]);
   totalItems = signal(0);
@@ -255,6 +258,20 @@ export class ProductListComponent implements OnInit, OnDestroy {
     const cat = this.productService.categories().find(c => c.id === categoryId);
     if (!cat) return categoryId;
     return this.lang.currentLang() === 'km' && cat.nameKm ? cat.nameKm : cat.name;
+  }
+
+  get lowStockProducts(): Product[] {
+    return this.products().filter(
+      p => p.stock <= (p.lowStockThreshold ?? this.lowStockThreshold)
+    );
+  }
+
+  openLowStockDrawer(): void {
+    this.isLowStockDrawerOpen = true;
+  }
+
+  closeLowStockDrawer(): void {
+    this.isLowStockDrawerOpen = false;
   }
 
   trackById(_: number, p: Product): string { return p.id; }

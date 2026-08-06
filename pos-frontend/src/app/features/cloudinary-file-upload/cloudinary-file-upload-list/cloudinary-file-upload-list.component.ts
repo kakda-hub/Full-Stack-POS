@@ -30,6 +30,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { ListQuery } from '../../../models/list-query';
 
 type SortColumn = 'public_id' | 'format' | 'bytes' | 'created_at';
 type SortDirection = 'asc' | 'desc';
@@ -48,8 +49,9 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
   private readonly searchSubject = new Subject<string>();
   private readonly refreshSubject = new Subject<void>();
 
-  // Core state
+  // Core state — `resources` holds the current server-side page
   resources = signal<CloudinaryResource[]>([]);
+  totalItems = signal(0);
   isLoading = signal(false);
   error = signal('');
 
@@ -57,60 +59,25 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
 
   // Derived: KPI stats
-  totalFiles = computed(() => this.resources().length);
-  totalSize = computed(() => this.resources().reduce((sum, r) => sum + (r.bytes || 0), 0));
-  uniqueFormats = computed(() => new Set(this.resources().map((r) => r.format)).size);
-  showingCount = computed(() => this.filteredResources().length);
+  // totalFiles uses the envelope total (search-scoped, never the page length).
+  totalFiles = computed(() => this.totalItems());
+  // totalSize / uniqueFormats are computed from a global stats snapshot
+  // (capped at the backend's 500-resource ceiling) so the cards stay accurate
+  // even though the table only shows one page.
+  statsResources = signal<CloudinaryResource[]>([]);
+  totalSize = computed(() => this.statsResources().reduce((sum, r) => sum + (r.bytes || 0), 0));
+  uniqueFormats = computed(() => new Set(this.statsResources().map((r) => r.format)).size);
+  showingCount = computed(() => this.totalItems());
 
-  // Derived: filter / sort / pagination
-  filteredResources = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.resources();
-    return this.resources().filter(
-      (r) =>
-        String(r.public_id ?? '')
-          .toLowerCase()
-          .includes(q) ||
-        String(r.format ?? '')
-          .toLowerCase()
-          .includes(q),
-    );
-  });
-
+  // Server-side sort + offset-based pagination
   sortColumn = signal<SortColumn>('created_at');
   sortDirection = signal<SortDirection>('desc');
-
-  sortedResources = computed(() => {
-    const col = this.sortColumn();
-    const dir = this.sortDirection();
-    return [...this.filteredResources()].sort((a, b) => {
-      let cmp = 0;
-      switch (col) {
-        case 'public_id':
-          cmp = String(a.public_id ?? '').localeCompare(String(b.public_id ?? ''));
-          break;
-        case 'format':
-          cmp = String(a.format ?? '').localeCompare(String(b.format ?? ''));
-          break;
-        case 'bytes':
-          cmp = (a.bytes || 0) - (b.bytes || 0);
-          break;
-        case 'created_at':
-          cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-          break;
-      }
-      return dir === 'asc' ? cmp : -cmp;
-    });
-  });
-
   currentPage = signal(1);
   pageSize = signal(10);
   pageSizeOptions = [10, 25, 50, 100];
 
-  paginatedResources = computed(() => {
-    const start = (this.currentPage() - 1) * this.pageSize();
-    return this.sortedResources().slice(start, start + this.pageSize());
-  });
+  /** Monotonic token that invalidates in-flight page requests (stale-response guard). */
+  private loadSeq = 0;
 
   // Upload state
   showUploadPanel = false;
@@ -172,31 +139,101 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     return Array.isArray(response?.data) ? response.data : [];
   }
 
+  /** Standard offset-based list query: max/offset/sort/sortBy/search. */
+  private buildQuery(): ListQuery {
+    return {
+      search: this.searchQuery() || undefined,
+      sortBy: this.sortColumn(),
+      sort: this.sortDirection(),
+      offset: (this.currentPage() - 1) * this.pageSize(),
+      max: this.pageSize(),
+    };
+  }
+
+  private applyPage(res: CloudinaryApiResponse | null): void {
+    const page = this.unwrapResources(res);
+    this.resources.set(page);
+    this.totalItems.set(res?.total ?? page.length);
+    this.isLoading.set(false);
+  }
+
+  private errorMessage(err: any): string {
+    return (
+      err.error?.message ||
+      err.error?.error?.message ||
+      (this.lang.currentLang() === 'km'
+        ? 'សេវាកម្ម Cloudinary មិនអាចប្រើបានទេ។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។'
+        : 'Cloudinary service is currently unavailable. Please try again later.')
+    );
+  }
+
+  /**
+   * Search / refresh pipeline: resets to page 1 and also refreshes the global
+   * KPI stats so the stat cards stay search-scoped.
+   */
   private fetchResources(searchTerm: string): Observable<CloudinaryResource[]> {
     this.isLoading.set(true);
     this.error.set('');
     this.searchQuery.set(searchTerm);
+    this.currentPage.set(1);
+    const seq = ++this.loadSeq; // stale-response guard shared with fetchPage
 
-    return this.cloudinaryService.listResources(searchTerm).pipe(
+    return this.cloudinaryService.listResources(this.buildQuery()).pipe(
       map((res) => {
-        const resources = this.unwrapResources(res);
-        this.resources.set(resources);
-        this.currentPage.set(1);
-        this.isLoading.set(false);
-        return resources;
+        if (seq !== this.loadSeq) return this.resources(); // stale response — ignore
+        this.applyPage(res);
+        this.loadStats();
+        return this.resources();
       }),
       catchError((err) => {
-        this.error.set(
-          err.error?.message ||
-            err.error?.error?.message ||
-            (this.lang.currentLang() === 'km'
-              ? 'សេវាកម្ម Cloudinary មិនអាចប្រើបានទេ។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។'
-              : 'Cloudinary service is currently unavailable. Please try again later.'),
-        );
+        if (seq !== this.loadSeq) return of(this.resources()); // stale response — ignore
+        this.error.set(this.errorMessage(err));
         this.isLoading.set(false);
         return of([]);
       }),
     );
+  }
+
+  /** Page navigation / sort / page-size change: fetches a fresh page only. */
+  private fetchPage(): void {
+    this.isLoading.set(true);
+    this.error.set('');
+    const seq = ++this.loadSeq;
+
+    this.cloudinaryService.listResources(this.buildQuery()).subscribe({
+      next: (res) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        const page = this.unwrapResources(res);
+        // After a delete (or concurrent data shrink) the current page may be
+        // empty while more records exist — step back one page, like the other
+        // list pages do.
+        if (page.length === 0 && this.currentPage() > 1 && (res?.total ?? 0) > 0) {
+          this.currentPage.update(p => p - 1);
+          this.fetchPage();
+          return;
+        }
+        this.applyPage(res);
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        this.error.set(this.errorMessage(err));
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Global KPI snapshot (capped at the backend's 500 ceiling, search-scoped).
+   * Keeps the Total Size / Unique Formats cards accurate while the table
+   * paginates server-side.
+   */
+  private loadStats(): void {
+    this.cloudinaryService
+      .listResources({ search: this.searchQuery() || undefined, max: 500, sortBy: 'created_at', sort: 'desc' })
+      .subscribe({
+        next: (res) => this.statsResources.set(this.unwrapResources(res)),
+        error: () => this.statsResources.set([]),
+      });
   }
 
   // Upload
@@ -288,7 +325,7 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     this.uploadFolder = 'pos-general';
   }
 
-  // Sorting
+  // Sorting (server-side: reset offset to 0, then reload)
   toggleSort(column: SortColumn): void {
     if (this.sortColumn() === column) {
       this.sortDirection.update((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -297,6 +334,7 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
       this.sortDirection.set('asc');
     }
     this.currentPage.set(1);
+    this.fetchPage();
   }
 
   sortIndicator(column: SortColumn): string {
@@ -304,14 +342,16 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     return this.sortDirection() === 'asc' ? '▲' : '▼';
   }
 
-  // Pagination
+  // Pagination (offset-based: next page = offset + max, never below 0)
   onPageChange(page: number): void {
     this.currentPage.set(page);
+    this.fetchPage();
   }
 
   onPageSizeChange(size: number): void {
     this.pageSize.set(size);
-    this.currentPage.set(1);
+    this.currentPage.set(1); // changing page size resets the offset to 0
+    this.fetchPage();
   }
 
   // Delete
@@ -337,7 +377,9 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
         next: () => {
           this.deleting = false;
           this.resources.update((list) => list.filter((r) => r.public_id !== resource.public_id));
+          this.totalItems.update((t) => Math.max(0, t - 1));
           this.currentPage.set(1);
+          this.loadStats();
           this.alertService.success(
             this.lang.currentLang() === 'km'
               ? `ធនធាន "${resource.public_id}" ត្រូវបានលុបដោយជោគជ័យ`

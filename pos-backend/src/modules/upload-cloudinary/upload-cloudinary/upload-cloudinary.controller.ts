@@ -51,14 +51,28 @@ export class UploadCloudinaryController {
 
   @Get()
   @SkipIntercept()
-  @ApiOperation({ summary: 'List recent Cloudinary resources' })
+  @ApiOperation({ summary: 'List Cloudinary resources (server-side paginated)' })
   @ApiQuery({ name: 'search', required: false, description: 'Filter resources by public ID or format (case-insensitive). Omit or leave empty to return all records.' })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['public_id', 'format', 'bytes', 'created_at'], description: 'Field to sort by (default: created_at)' })
+  @ApiQuery({ name: 'sort', required: false, enum: ['asc', 'desc'], description: 'Sort direction (default: desc)' })
+  @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Zero-based offset (default: 0)' })
+  @ApiQuery({ name: 'max', required: false, type: Number, description: 'Max records (default: 10, max: 500)' })
   async list(
     @Query('search') search?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sort') sort?: string,
+    @Query('offset') offset?: string,
+    @Query('max') max?: string,
     @Res({ passthrough: true }) res?: Response,
   ) {
     try {
-      const { resources, total_count } = await this.cloudinaryService.listResources(search);
+      const { resources, total_count } = await this.cloudinaryService.listResources({
+        search,
+        sortBy,
+        sort: sort === 'asc' ? 'asc' : 'desc',
+        offset: Number(offset) || 0,
+        max: Number(max) || 10,
+      });
       return {
         success: true,
         statusCode: 200,

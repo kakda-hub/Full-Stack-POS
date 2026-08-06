@@ -22,17 +22,19 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 export class QuickPickListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingItem: QuickPickItem | null = null;
-  items = signal<QuickPickItem[]>([]);
-  filteredItems = signal<QuickPickItem[]>([]);
 
-  // Pagination
+  // Server-side pagination state
+  items = signal<QuickPickItem[]>([]);
+  totalItems = signal(0);
   pageSize = signal(10);
   pageIndex = signal(0);
-  paginatedItems = computed(() => {
-    const startIndex = this.pageIndex() * this.pageSize();
-    return this.filteredItems().slice(startIndex, startIndex + this.pageSize());
-  });
+  searchQuery = signal('');
 
+  /** Alias so the template keeps rendering the current page. */
+  paginatedItems = computed(() => this.items());
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
   private defaultOption: MatDialogConfig = {
@@ -58,31 +60,45 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
 
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe((q) => {
-        const query = q.toLowerCase().trim();
-        if (!query) {
-          this.filteredItems.set(this.items());
-        } else {
-          this.filteredItems.set(
-            this.items().filter(
-              (i) =>
-                (i.label || '').toLowerCase().includes(query) ||
-                (i.labelKh || '').toLowerCase().includes(query) ||
-                String(i.price).includes(query)
-            )
-          );
-        }
-        this.pageIndex.set(0);
+        this.searchQuery.set(q.trim());
+        this.pageIndex.set(0); // Reset to first page on search
+        this.loadItems();
       });
   }
 
+  /** Loads one server-side page using the standard list query params. */
   loadItems(): void {
     this.isLoading.set(true);
-    this.quickPickService.getAll().subscribe((res: any) => {
-      const data = Array.isArray(res) ? res : res?.data ?? res ?? [];
-      this.items.set(data);
-      this.filteredItems.set(data);
-      this.isLoading.set(false);
-      this.cdr.markForCheck();
+    const seq = ++this.loadSeq;
+    this.quickPickService.getPage({
+      search: this.searchQuery() || undefined,
+      sortBy: 'sortOrder',
+      sort: 'asc',
+      offset: this.pageIndex() * this.pageSize(),
+      max: this.pageSize(),
+    }).subscribe({
+      next: (res) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        const data = res?.data ?? [];
+        // After a delete, the current page may be empty — step back one page.
+        if (data.length === 0 && this.pageIndex() > 0) {
+          this.pageIndex.update(p => p - 1);
+          this.loadItems();
+          return;
+        }
+        this.items.set(data);
+        this.totalItems.set(res?.total ?? data.length);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        console.error('Failed to load quick pick items', err);
+        this.items.set([]);
+        this.totalItems.set(0);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -97,6 +113,13 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.pageIndex.set(page - 1);
+    this.loadItems();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.pageIndex.set(0); // changing page size resets the offset to 0
+    this.loadItems();
   }
 
   openEdit(item: QuickPickItem): void {

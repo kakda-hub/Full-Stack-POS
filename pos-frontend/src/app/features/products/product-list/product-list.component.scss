@@ -14,24 +14,6 @@
   @apply flex items-center justify-between;
 }
 
-/* ─── Low stock alert banner ─── */
-.low-stock-alert {
-  @apply border rounded-xl p-4 flex items-center gap-3;
-  @apply border-amber-200 bg-amber-50 dark:border-amber-700/40 dark:bg-amber-900/20;
-
-  &-icon {
-    @apply w-5 h-5 text-amber-600 flex-shrink-0;
-  }
-
-  &-text {
-    @apply text-sm text-amber-800 font-medium dark:text-amber-400;
-  }
-
-  &-names {
-    @apply font-bold;
-  }
-}
-
 /* ─── Filter bar ─── */
 .filters-bar {
   @apply flex gap-2 sm:gap-3 flex-wrap;
@@ -366,4 +348,13 @@
 /* Empty state */
 .pl-cards-empty {
   @apply px-4 py-16 text-center;
+}
+
+/* ─── Low stock button ─── */
+.low-stock-btn {
+  @apply inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-sm font-semibold rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.low-stock-count {
+  @apply bg-white/25 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full border border-white/20;
 }

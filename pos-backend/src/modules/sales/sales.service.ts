@@ -194,6 +194,19 @@ export class SalesService {
       });
     }
 
+    // Date-range filter (inclusive). Dates arrive as YYYY-MM-DD; we expand them
+    // to full-day UTC boundaries so the whole calendar day is included.
+    if (query.dateFrom) {
+      queryBuilder.andWhere('sale.createdAt >= :dateFrom', {
+        dateFrom: new Date(`${query.dateFrom}T00:00:00.000Z`),
+      });
+    }
+    if (query.dateTo) {
+      queryBuilder.andWhere('sale.createdAt <= :dateTo', {
+        dateTo: new Date(`${query.dateTo}T23:59:59.999Z`),
+      });
+    }
+
     // Search matches the cashier name or the sale id
     const search = query.search?.trim();
     if (search) {

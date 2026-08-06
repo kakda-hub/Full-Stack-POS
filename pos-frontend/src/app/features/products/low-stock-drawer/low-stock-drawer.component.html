@@ -1,0 +1,56 @@
+<div class="low-stock-overlay" (click)="close.emit()">
+  <div class="low-stock-drawer" (click)="$event.stopPropagation()">
+    <div class="low-stock-drawer-header">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-100 text-amber-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="low-stock-drawer-title">Low Stock Alert</h3>
+          <p class="low-stock-drawer-subtitle">{{ products.length }} item{{ products.length !== 1 ? 's' : '' }} requiring reorder</p>
+        </div>
+      </div>
+      <button (click)="close.emit()" class="low-stock-drawer-close" aria-label="Close drawer">✕</button>
+    </div>
+    <div class="low-stock-drawer-body">
+      <div class="low-stock-alert">
+        <svg class="low-stock-alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <p class="low-stock-alert-text">
+          {{ products.length }}
+          products with low stock:
+          <span *ngFor="let p of products; let last = last" class="low-stock-alert-names">
+            {{ p.name }}{{ !last ? ', ' : '' }}
+          </span>
+        </p>
+      </div>
+
+      <div *ngFor="let item of products" class="low-stock-item group">
+        <div class="low-stock-item-img-wrap">
+          <img [src]="item.imgUrl || 'assets/images/placeholder.svg'" alt="{{ item.name }}" class="low-stock-item-img" appImgFallback />
+        </div>
+        <div class="low-stock-item-info">
+          <h4 class="low-stock-item-name">{{ item.name }}</h4>
+          <p class="low-stock-item-meta">{{ getCategoryName(item.category) }} · ${{ item.price.toFixed(2) }}</p>
+        </div>
+        <div class="low-stock-item-stock">
+          {{ item.stock }} left
+        </div>
+      </div>
+      <div *ngIf="products.length === 0" class="low-stock-empty">
+        <svg class="low-stock-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+        </svg>
+        <p class="low-stock-empty-text">No low stock items found</p>
+      </div>
+    </div>
+  </div>
+</div>

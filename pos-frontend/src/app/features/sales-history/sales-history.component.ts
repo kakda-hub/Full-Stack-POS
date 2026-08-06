@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { backdropAnimation, fadeIn, modalAnimation, pageTransition } from '../../shared/animations/animations';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { SaleService } from '../../core/services/api/sale.service';
 import { nextSort, SortDirection } from '../../shared/helpers/sort.helper';
+import { ListQuery } from '../../models/list-query';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 interface SaleItemDisplay {
   productName: string;
@@ -45,8 +47,10 @@ interface SaleDisplay {
   templateUrl: './sales-history.component.html',
   styleUrl: './sales-history.component.scss',
 })
-export class SalesHistoryComponent {
+export class SalesHistoryComponent implements OnInit, OnDestroy {
+  // Server-side pagination state — `sales` holds the current page
   sales = signal<SaleDisplay[]>([]);
+  totalItems = signal(0);
   isLoading = signal(true);
   error = signal<string | null>(null);
   currentPage = signal(1);
@@ -63,50 +67,24 @@ export class SalesHistoryComponent {
 
   selectedSale = signal<SaleDetail | null>(null);
 
-  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
-  private loadSeq = 0;
-
-  filteredSales = computed(() => {
-    let result = this.sales();
-
-    // Filter by search query (cashier name or sale ID)
-    const query = this.searchQuery().toLowerCase().trim();
-    if (query) {
-      result = result.filter(s =>
-        s.cashierName.toLowerCase().includes(query) ||
-        String(s.id).includes(query)
-      );
-    }
-
-    // Filter by date range
-    const from = this.dateFrom();
-    const to = this.dateTo();
-    if (from || to) {
-      const fromDate = from ? new Date(from) : null;
-      const toDate = to ? new Date(to + 'T23:59:59') : null;
-      result = result.filter(s => {
-        if (fromDate && s.date < fromDate) return false;
-        if (toDate && s.date > toDate) return false;
-        return true;
-      });
-    }
-
-    // Apply the active column sort to the filtered subset
-    return this.sortSales(result);
-  });
-
-  totalRevenue = computed(() =>
-    this.filteredSales().reduce((sum, s) => sum + s.total, 0)
-  );
-
+  // KPI stats come from a separate search/date-scoped snapshot (capped at the
+  // same 100 records the old client-side page used), so the cards stay accurate
+  // even though the table only renders one page.
+  statsSales = signal<SaleDisplay[]>([]);
+  totalRevenue = computed(() => this.statsSales().reduce((sum, s) => sum + s.total, 0));
   uniqueCashiers = computed(() => {
-    const names = new Set(this.filteredSales().map(s => s.cashierName));
+    const names = new Set(this.statsSales().map((s) => s.cashierName));
     return Array.from(names);
   });
-
   averageOrderValue = computed(() =>
-    this.filteredSales().length > 0 ? this.totalRevenue() / this.filteredSales().length : 0
+    this.statsSales().length > 0 ? this.totalRevenue() / this.statsSales().length : 0
   );
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
+  private statsSeq = 0;
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   constructor(
     public lang: LanguageService,
@@ -115,26 +93,58 @@ export class SalesHistoryComponent {
   ) {}
 
   ngOnInit(): void {
-    this.fetchSales();
+    this.fetchPage();
+    this.loadStats();
+
+    // Search is debounced and hits the server (cashier name / sale ID).
+    this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
+      .subscribe((q) => {
+        this.searchQuery.set(q.trim());
+        this.currentPage.set(1); // reset offset to 0 on search
+        this.fetchPage();
+        this.loadStats();
+      });
   }
 
-  private fetchSales(): void {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Standard offset-based list query: max/offset/sort/sortBy/search/date range. */
+  private buildQuery(): ListQuery {
+    return {
+      search: this.searchQuery() || undefined,
+      sortBy: this.sortBy(),
+      sort: this.sortDir(),
+      offset: (this.currentPage() - 1) * this.pageSize,
+      max: this.pageSize,
+      dateFrom: this.dateFrom() || undefined,
+      dateTo: this.dateTo() || undefined,
+    };
+  }
+
+  /** Fetches one server-side page and keeps the raw rows for the detail modal. */
+  private fetchPage(): void {
     this.isLoading.set(true);
     this.error.set(null);
     const seq = ++this.loadSeq;
 
-    this.saleService.getAllSales({
-      max: 100,
-      sortBy: this.sortBy(),
-      sort: this.sortDir(),
-    }).subscribe({
-      next: (data: any[]) => {
+    this.saleService.getSalesPage(this.buildQuery()).subscribe({
+      next: (res) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
-        this._rawSales = data || [];
-        const mapped = (this._rawSales).map((sale: any) => this.mapSale(sale));
-        // Sort by date descending (newest first)
-        mapped.sort((a: SaleDisplay, b: SaleDisplay) => b.date.getTime() - a.date.getTime());
+        const data = res?.data ?? [];
+        // After a delete (or concurrent data shrink) the current page may be
+        // empty while more records exist — step back one page.
+        if (data.length === 0 && this.currentPage() > 1 && (res?.total ?? 0) > 0) {
+          this.currentPage.update((p) => p - 1);
+          this.fetchPage();
+          return;
+        }
+        this._rawSales = data;
+        const mapped = data.map((sale: any) => this.mapSale(sale));
         this.sales.set(mapped);
+        this.totalItems.set(res?.total ?? data.length);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -145,7 +155,35 @@ export class SalesHistoryComponent {
             ? 'មិនអាចផ្ទុកប្រវត្តិការលក់បានទេ'
             : 'Failed to load sales history'
         );
+        this.sales.set([]);
+        this.totalItems.set(0);
         this.isLoading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Global KPI snapshot (max=100, same filter scope as the table) so the
+   * revenue / cashier / average cards match the active search + date range.
+   */
+  private loadStats(): void {
+    const seq = ++this.statsSeq; // stale-response guard (rapid filter changes)
+    this.saleService.getSalesPage({
+      search: this.searchQuery() || undefined,
+      sortBy: 'createdAt',
+      sort: 'desc',
+      offset: 0,
+      max: 100,
+      dateFrom: this.dateFrom() || undefined,
+      dateTo: this.dateTo() || undefined,
+    }).subscribe({
+      next: (res) => {
+        if (seq !== this.statsSeq) return; // stale response — ignore
+        this.statsSales.set((res?.data ?? []).map((sale: any) => this.mapSale(sale)));
+      },
+      error: () => {
+        if (seq !== this.statsSeq) return; // stale response — ignore
+        this.statsSales.set([]);
       },
     });
   }
@@ -190,7 +228,7 @@ export class SalesHistoryComponent {
   }
 
   openDetail(saleDisplay: SaleDisplay): void {
-    const rawSale = this._rawSales?.find(r => r.id === saleDisplay.id);
+    const rawSale = this._rawSales?.find((r) => r.id === saleDisplay.id);
     if (rawSale) {
       this.selectedSale.set(this.mapDetail(rawSale));
     }
@@ -220,13 +258,8 @@ export class SalesHistoryComponent {
     );
   }
 
-  get paginatedSales(): SaleDisplay[] {
-    const start = (this.currentPage() - 1) * this.pageSize;
-    return this.filteredSales().slice(start, start + this.pageSize);
-  }
-
   get totalPages(): number {
-    return Math.ceil(this.filteredSales().length / this.pageSize) || 1;
+    return Math.ceil(this.totalItems() / this.pageSize) || 1;
   }
 
   quickFilters = [
@@ -237,14 +270,14 @@ export class SalesHistoryComponent {
   ];
 
   onSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(value);
-    this.currentPage.set(1);
+    this.searchSubject.next((event.target as HTMLInputElement).value);
   }
 
   clearSearch(): void {
     this.searchQuery.set('');
     this.currentPage.set(1);
+    this.fetchPage();
+    this.loadStats();
   }
 
   onDateChange(event: Event, field: 'from' | 'to'): void {
@@ -256,6 +289,8 @@ export class SalesHistoryComponent {
     }
     this.activeQuickFilter.set('');
     this.currentPage.set(1);
+    this.fetchPage();
+    this.loadStats();
   }
 
   setQuickFilter(filter: string): void {
@@ -289,6 +324,9 @@ export class SalesHistoryComponent {
         break;
       }
     }
+
+    this.fetchPage();
+    this.loadStats();
   }
 
   private formatDate(date: Date): string {
@@ -377,6 +415,7 @@ export class SalesHistoryComponent {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
+    this.fetchPage();
   }
 
   /** Column header click: toggle asc/desc on the active column, else start asc. */
@@ -385,28 +424,12 @@ export class SalesHistoryComponent {
     const next = nextSort(this.sortBy(), this.sortDir(), field, ['createdAt', 'total']);
     this.sortBy.set(next.sortBy);
     this.sortDir.set(next.sort);
-    this.currentPage.set(1);
-    this.fetchSales();
-  }
-
-  /** Client-side sort of the filtered subset (server sorts the fetched slice). */
-  private sortSales(list: SaleDisplay[]): SaleDisplay[] {
-    const field = this.sortBy();
-    const dir = this.sortDir() === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      let cmp = 0;
-      switch (field) {
-        case 'createdAt': cmp = a.date.getTime() - b.date.getTime(); break;
-        case 'cashierName': cmp = a.cashierName.localeCompare(b.cashierName); break;
-        case 'paymentMethod': cmp = a.paymentMethod.localeCompare(b.paymentMethod); break;
-        case 'total': cmp = a.total - b.total; break;
-        default: cmp = a.date.getTime() - b.date.getTime();
-      }
-      return cmp * dir;
-    });
+    this.currentPage.set(1); // reset offset to 0 on sort change
+    this.fetchPage();
   }
 
   refresh(): void {
-    this.fetchSales();
+    this.fetchPage();
+    this.loadStats();
   }
 }

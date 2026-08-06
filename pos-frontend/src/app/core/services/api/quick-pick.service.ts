@@ -26,6 +26,23 @@ export class QuickPickService {
     );
   }
 
+  /**
+   * Server-side paginated page (standard offset-based list query) plus the
+   * envelope total — used by the quick-pick list table.
+   */
+  getPage(query?: ListQuery): Observable<{ data: QuickPickItem[]; total: number }> {
+    const params = buildListParams(query);
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map((res) => ({
+        data: ((res?.data ?? []) as any[]).map((item) => ({
+          ...item,
+          price: Number(item.price),
+        })),
+        total: res?.total ?? 0,
+      })),
+    );
+  }
+
   getById(id: number): Observable<QuickPickItem> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map((res) => {

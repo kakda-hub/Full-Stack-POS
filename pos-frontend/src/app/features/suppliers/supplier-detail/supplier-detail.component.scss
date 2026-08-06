@@ -1,1 +1,34 @@
-/* Supplier Detail – no custom SCSS needed, all styling uses inline Tailwind classes */
+/* ════════════════════════════════════════════════════════
+   Supplier Detail Dialog – Form Styles
+   ════════════════════════════════════════════════════════ */
+
+/* ─── Reset material dialog padding ─── */
+.mat-mdc-dialog-content {
+  --mat-dialog-content-padding: 0 24px;
+}
+
+.dialog-content {
+  padding: 0.25rem 0.5rem 0.5rem !important;
+}
+
+/* ─── Form body ─── */
+.form-body {
+  @apply flex flex-col gap-5 px-3;
+}
+
+/* ─── Form grid (2 columns) ─── */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* ─── Dialog actions ─── */
+.dialog-actions {
+  @apply w-full gap-3 px-6 pb-5 pt-1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 639px) {
+  .form-grid {
+    @apply grid-cols-1 gap-3;
+  }
+}

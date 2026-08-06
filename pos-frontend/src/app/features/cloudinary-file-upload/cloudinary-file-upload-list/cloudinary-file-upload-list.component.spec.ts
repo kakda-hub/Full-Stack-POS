@@ -147,10 +147,20 @@ describe('CloudinaryFileUploadListComponent', () => {
 
   // ─── Initial load ─────────────────────────────────────────────────────────
   describe('initial load', () => {
-    it('fetches resources on init with an empty search term', async () => {
+    it('fetches the first page with the standard defaults (max=10, offset=0, sort=desc)', async () => {
       await mount();
-      expect(cloudinaryMock.listResources).toHaveBeenCalledWith('');
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ max: 10, offset: 0, sort: 'desc', sortBy: 'created_at' }),
+      );
       expect(component.isLoading()).toBe(false);
+      expect(component.totalItems()).toBe(sampleResources.length);
+    });
+
+    it('also fetches a global stats snapshot (capped at 500) for the KPI cards', async () => {
+      await mount();
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ max: 500, sortBy: 'created_at' }),
+      );
     });
 
     it('renders one table row per resource', async () => {
@@ -205,13 +215,15 @@ describe('CloudinaryFileUploadListComponent', () => {
       // Cross the 300ms debounce window.
       await sleep(DEBOUNCE_MS + 50);
 
-      expect(cloudinaryMock.listResources).toHaveBeenCalledWith('pos-products');
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ search: 'pos-products', offset: 0 }),
+      );
       expect(component.searchQuery()).toBe('pos-products');
       // debounced fetch resets to page 1
       expect(component.currentPage()).toBe(1);
     });
 
-    it('clearing the search reloads everything', async () => {
+    it('clearing the search reloads everything from page 1', async () => {
       await mount();
       cloudinaryMock.listResources.mockClear();
 
@@ -221,44 +233,28 @@ describe('CloudinaryFileUploadListComponent', () => {
 
       typeInSearch('');
       await sleep(DEBOUNCE_MS + 50);
-      expect(cloudinaryMock.listResources).toHaveBeenCalledWith('');
-    });
-
-    it('filters the loaded resources client-side as a fallback', async () => {
-      await mount();
-      component.resources.set(sampleResources);
-      component.searchQuery.set('invoice');
-      expect(component.filteredResources().length).toBe(1);
-      expect(component.filteredResources()[0].public_id).toBe('docs/invoice');
-    });
-
-    it('is case-insensitive client-side', async () => {
-      await mount();
-      component.resources.set(sampleResources);
-      component.searchQuery.set('TSHIRT');
-      expect(component.filteredResources().length).toBe(1);
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ offset: 0 }),
+      );
     });
   });
 
-  // ─── Sorting ──────────────────────────────────────────────────────────────
+  // ─── Sorting (server-side) ────────────────────────────────────────────────
   describe('sorting', () => {
-    it('sorts by public_id ascending, then descending on second click', async () => {
+    it('sorts by public_id ascending on first click, then desc, resetting the offset', async () => {
       await mount();
-      component.toggleSort('public_id');
-      expect(component.sortedResources().map((r) => r.public_id)).toEqual([
-        'docs/invoice',
-        'pos-banners/sale',
-        'pos-products/tshirt',
-      ]);
+      cloudinaryMock.listResources.mockClear();
 
       component.toggleSort('public_id');
-      expect(component.sortedResources()[0].public_id).toBe('pos-products/tshirt');
-    });
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ sortBy: 'public_id', sort: 'asc', offset: 0 }),
+      );
 
-    it('sorts by bytes numerically', async () => {
-      await mount();
-      component.toggleSort('bytes');
-      expect(component.sortedResources().map((r) => r.bytes)).toEqual([1000, 2000, 3000]);
+      cloudinaryMock.listResources.mockClear();
+      component.toggleSort('public_id');
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ sortBy: 'public_id', sort: 'desc', offset: 0 }),
+      );
     });
 
     it('renders a sort indicator only for the active column', async () => {
@@ -271,7 +267,7 @@ describe('CloudinaryFileUploadListComponent', () => {
     });
   });
 
-  // ─── Pagination ───────────────────────────────────────────────────────────
+  // ─── Pagination (offset-based, server-side) ───────────────────────────────
   describe('pagination', () => {
     function manyResources(count: number): CloudinaryResource[] {
       return Array.from({ length: count }, (_, i) => ({
@@ -282,25 +278,30 @@ describe('CloudinaryFileUploadListComponent', () => {
       }));
     }
 
-    it('paginates resources and navigates pages', async () => {
+    it('navigates pages via offset = (page - 1) * max', async () => {
       mockListResponse(manyResources(15));
       await mount();
+      cloudinaryMock.listResources.mockClear();
 
-      expect(component.paginatedResources().length).toBe(10);
       component.onPageChange(2);
       expect(component.currentPage()).toBe(2);
-      expect(component.paginatedResources().length).toBe(5);
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ offset: 10, max: 10 }),
+      );
     });
 
-    it('changing page size resets to page 1', async () => {
+    it('changing page size resets to page 1 (offset = 0)', async () => {
       mockListResponse(manyResources(15));
       await mount();
+      cloudinaryMock.listResources.mockClear();
 
       component.onPageChange(2);
       component.onPageSizeChange(25);
       expect(component.pageSize()).toBe(25);
       expect(component.currentPage()).toBe(1);
-      expect(component.paginatedResources().length).toBe(15);
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ max: 25, offset: 0 }),
+      );
     });
   });
 
@@ -495,7 +496,9 @@ describe('CloudinaryFileUploadListComponent', () => {
 
       component.loadResources();
 
-      expect(cloudinaryMock.listResources).toHaveBeenCalledWith('invoice');
+      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
+        expect.objectContaining({ search: 'invoice', offset: 0 }),
+      );
     });
   });
 });

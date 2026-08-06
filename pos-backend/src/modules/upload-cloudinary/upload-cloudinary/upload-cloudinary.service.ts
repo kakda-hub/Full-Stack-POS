@@ -45,7 +45,13 @@ export class UploadCloudinaryService {
     });
   }
 
-  async listResources(search?: string): Promise<any> {
+  async listResources(options: {
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+    offset?: number;
+    max?: number;
+  } = {}): Promise<any> {
     try {
       // Fetch the maximum page size Cloudinary allows so search filtering
       // covers as many resources as possible in a single request.
@@ -54,7 +60,7 @@ export class UploadCloudinaryService {
 
       // Optional search filter: matches public_id or format (case-insensitive).
       // Empty/undefined search returns all records without filtering.
-      const q = search?.trim().toLowerCase();
+      const q = options.search?.trim().toLowerCase();
       if (q) {
         resources = resources.filter(
           (r) =>
@@ -63,12 +69,40 @@ export class UploadCloudinaryService {
         );
       }
 
-      // Cloudinary's account-wide total; fall back to the returned count when
-      // the API omits total_count (older API / some account tiers).
-      const total_count = cloudinaryResult.total_count ?? resources.length;
+      // Server-side sort (allowlist enforced so raw input is never trusted as
+      // a sort key). Defaults to newest-first.
+      const ALLOWED_SORT_FIELDS = ['public_id', 'format', 'bytes', 'created_at'];
+      const sortBy = ALLOWED_SORT_FIELDS.includes(options.sortBy ?? '')
+        ? (options.sortBy as string)
+        : 'created_at';
+      const dir = options.sort === 'asc' ? 1 : -1;
+      resources = [...resources].sort((a, b) => {
+        let cmp = 0;
+        switch (sortBy) {
+          case 'public_id':
+            cmp = String(a.public_id ?? '').localeCompare(String(b.public_id ?? ''));
+            break;
+          case 'format':
+            cmp = String(a.format ?? '').localeCompare(String(b.format ?? ''));
+            break;
+          case 'bytes':
+            cmp = (a.bytes || 0) - (b.bytes || 0);
+            break;
+          default:
+            cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        }
+        return cmp * dir;
+      });
+
+      // Offset/max slice. total_count is the full (filtered + sorted) count so
+      // the client can paginate correctly; Cloudinary caps a single call at 500.
+      const total_count = resources.length;
+      const offset = Math.max(0, Math.floor(options.offset ?? 0));
+      const max = Math.min(500, Math.max(1, Math.floor(options.max ?? 10)));
+      const page = resources.slice(offset, offset + max);
 
       return {
-        resources: resources.map((r) => this.mapCloudinaryResourceToContract(r)),
+        resources: page.map((r) => this.mapCloudinaryResourceToContract(r)),
         total_count,
       };
     } catch (error) {

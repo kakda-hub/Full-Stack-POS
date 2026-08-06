@@ -2,9 +2,37 @@
   <!-- Header -->
   <div class="header-row">
     <app-breadcrumb></app-breadcrumb>
-    <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="editingItem = null; openDialog()">
-      <span>{{ 'button.addNew' | translate }}</span>
-    </app-ui-button>
+    <div class="flex items-center gap-3">
+      <!-- View toggle: Table (list) ⇄ Cards -->
+      <div class="view-toggle">
+        <a
+          routerLink="/user-management"
+          routerLinkActive="view-toggle__btn--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="view-toggle__btn"
+          aria-label="List view"
+        >
+          <svg class="view-toggle__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span>{{ lang.currentLang() === 'km' ? 'បញ្ជី' : 'List' }}</span>
+        </a>
+        <a
+          routerLink="/user-management/card"
+          routerLinkActive="view-toggle__btn--active"
+          class="view-toggle__btn"
+          aria-label="Card view"
+        >
+          <svg class="view-toggle__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm10 0a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V7zM3 17a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4zm10 0a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z" />
+          </svg>
+          <span>{{ lang.currentLang() === 'km' ? 'កាត' : 'Cards' }}</span>
+        </a>
+      </div>
+      <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="editingItem = null; openDialog()">
+        <span>{{ 'button.addNew' | translate }}</span>
+      </app-ui-button>
+    </div>
   </div>
 
   <!-- Stats cards -->

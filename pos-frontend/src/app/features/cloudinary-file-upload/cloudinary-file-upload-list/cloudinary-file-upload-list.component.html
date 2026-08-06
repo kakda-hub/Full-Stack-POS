@@ -708,11 +708,11 @@
           class="text-xs"
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-400]="!theme.isDark()"
-          >{{ filteredResources().length }}
+          >{{ totalItems() }}
           {{
             lang.currentLang() === 'km'
               ? 'ឯកសារ'
-              : filteredResources().length === 1
+              : totalItems() === 1
                 ? 'file'
                 : 'files'
           }}</span
@@ -803,13 +803,13 @@
             </tr>
           </thead>
           <tbody
-            [@listAnimation]="filteredResources().length"
+            [@listAnimation]="totalItems()"
             class="divide-y"
             [class.divide-slate-700/50]="theme.isDark()"
             [class.divide-slate-100]="!theme.isDark()"
           >
             <tr
-              *ngFor="let resource of paginatedResources(); trackBy: trackByPublicId"
+              *ngFor="let resource of resources(); trackBy: trackByPublicId"
               @fadeIn
               class="group transition-colors"
               [class.hover:bg-slate-700/30]="theme.isDark()"
@@ -988,7 +988,7 @@
             </tr>
 
             <!-- Empty State -->
-            <tr *ngIf="paginatedResources().length === 0 && filteredResources().length > 0">
+            <tr *ngIf="resources().length === 0 && totalItems() > 0">
               <td colspan="6" class="px-4 py-12 text-center">
                 <div
                   class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 border"
@@ -1039,7 +1039,7 @@
             </tr>
 
             <!-- Empty State (no results at all) -->
-            <tr *ngIf="filteredResources().length === 0">
+            <tr *ngIf="totalItems() === 0">
               <td colspan="6" class="px-4 py-16 text-center">
                 <div
                   class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border"
@@ -1100,7 +1100,7 @@
 
       <!-- Pagination -->
       <app-pagination
-        [totalItems]="filteredResources().length"
+        [totalItems]="totalItems()"
         [pageSize]="pageSize()"
         [pageSizeOptions]="pageSizeOptions"
         [currentPage]="currentPage()"

@@ -4,15 +4,17 @@ import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material.module';
 import { ProductListComponent } from './product-list/product-list.component';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
-import { ReusableComponentModule } from "../../shared/reusable-component/reusable-component.module";
+import { ReusableComponentModule } from '../../shared/reusable-component/reusable-component.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CloudinaryMediaGalleryModalComponent } from '../../shared/components/cloudinary-media-gallery/cloudinary-media-gallery-modal.component';
+import { LowStockDrawerComponent } from './low-stock-drawer/low-stock-drawer.component';
 
 @NgModule({
   declarations: [
     ProductListComponent,
     ProductDetailComponent,
     CloudinaryMediaGalleryModalComponent,
+    LowStockDrawerComponent,
   ],
   imports: [
     SharedModule,
@@ -22,4 +24,4 @@ import { CloudinaryMediaGalleryModalComponent } from '../../shared/components/cl
     ReusableComponentModule,
   ],
 })
-export class ProductsModule { }
+export class ProductsModule {}

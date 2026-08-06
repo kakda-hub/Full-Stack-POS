@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
@@ -24,34 +24,17 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingPO: any | null = null;
+
+  // Server-side pagination state
   purchaseOrders = signal<any[]>([]);
-  searchQuery = signal('');
-
-  // Sorting (fields must be in the backend sort allowlist)
-  sortBy = signal('createdAt');
-  sortDir = signal<SortDirection>('desc');
-
-  /** Filtered + sorted view (search runs client-side, sort mirrors the server). */
-  filteredPOs = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    let result = this.purchaseOrders();
-    if (query) {
-      result = result.filter(
-        (po) =>
-          (po.orderNumber || '').toLowerCase().includes(query) ||
-          (po.supplier?.name || '').toLowerCase().includes(query)
-      );
-    }
-    return this.sortPOs(result);
-  });
-
-  // Pagination
+  totalItems = signal(0);
   pageSize = signal(10);
   pageIndex = signal(0);
-  paginatedPOs = computed(() => {
-    const startIndex = this.pageIndex() * this.pageSize();
-    return this.filteredPOs().slice(startIndex, startIndex + this.pageSize());
-  });
+  searchQuery = signal('');
+
+  // Server-side sorting (fields must be in the backend sort allowlist)
+  sortBy = signal('createdAt');
+  sortDir = signal<SortDirection>('desc');
 
   /** Monotonic token that invalidates in-flight requests (stale-response guard). */
   private loadSeq = 0;
@@ -82,27 +65,41 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe((q) => {
         this.searchQuery.set(q);
-        this.pageIndex.set(0);
+        this.pageIndex.set(0); // Reset to first page on search
+        this.loadPOs();
       });
   }
 
+  /** Loads one server-side page using the standard list query params. */
   loadPOs() {
     this.isLoading.set(true);
     const seq = ++this.loadSeq;
     this.poService.getAll({
-      max: 100,
+      search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
+      offset: this.pageIndex() * this.pageSize(),
+      max: this.pageSize(),
     }).subscribe({
-      next: (data: any) => {
+      next: (res: any) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
+        const data = res?.data ?? [];
+        // After a delete, the current page may be empty — step back one page.
+        if (data.length === 0 && this.pageIndex() > 0) {
+          this.pageIndex.update(p => p - 1);
+          this.loadPOs();
+          return;
+        }
         this.purchaseOrders.set(data);
+        this.totalItems.set(res?.total ?? data.length);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
         console.error('Failed to load purchase orders', err);
+        this.purchaseOrders.set([]);
+        this.totalItems.set(0);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
@@ -119,23 +116,6 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     this.loadPOs();
   }
 
-  /** Client-side sort of the filtered subset (server sorts the fetched slice). */
-  private sortPOs(list: any[]): any[] {
-    const field = this.sortBy();
-    const dir = this.sortDir() === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      let cmp = 0;
-      switch (field) {
-        case 'orderNumber': cmp = (a.orderNumber || '').localeCompare(b.orderNumber || ''); break;
-        case 'createdAt': cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); break;
-        case 'total': cmp = Number(a.total ?? 0) - Number(b.total ?? 0); break;
-        case 'status': cmp = (a.status || '').localeCompare(b.status || ''); break;
-        default: cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      }
-      return cmp * dir;
-    });
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -143,6 +123,17 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
 
   onSearch(e: Event): void {
     this.searchSubject.next((e.target as HTMLInputElement).value);
+  }
+
+  onPageChange(page: number): void {
+    this.pageIndex.set(page - 1);
+    this.loadPOs();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.pageIndex.set(0); // changing page size resets the offset to 0
+    this.loadPOs();
   }
 
   onAdd(): void {

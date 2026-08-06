@@ -89,7 +89,11 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
 
   loadResources(): void {
     this.isLoading.set(true);
-    this.cloudinaryService.listResources(this.searchQuery()).subscribe({
+    // The gallery filters by category client-side, so request the full batch
+    // (max=500 mirrors the backend/Cloudinary ceiling).
+    this.cloudinaryService
+      .listResources({ search: this.searchQuery() || undefined, max: 500, sortBy: 'created_at', sort: 'desc' })
+      .subscribe({
       next: (res) => {
         // GET /cloudinary returns the flat standard envelope, so `data` is the
         // resources array itself.

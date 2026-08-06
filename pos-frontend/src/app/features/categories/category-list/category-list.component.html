@@ -32,8 +32,8 @@
   <div class="table-container">
     <app-dynamic-table
       [columns]="columns"
-      [rows]="paginatedCategories()"
-      [totalCount]="filteredCategories().length"
+      [rows]="categories()"
+      [totalCount]="totalItems()"
       [pageIndex]="pageIndex()"
       [pageSize]="pageSize()"
       [isLoading]="isLoading()"

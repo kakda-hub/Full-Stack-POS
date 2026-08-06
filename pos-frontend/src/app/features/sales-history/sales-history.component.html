@@ -118,7 +118,7 @@
           </svg>
         </div>
       </div>
-      <p class="kpi-value">{{ sales().length }}</p>
+      <p class="kpi-value">{{ totalItems() }}</p>
       <p class="kpi-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការសរុប' : 'Total Transactions' }}</p>
     </div>
 
@@ -176,7 +176,7 @@
         {{ lang.currentLang() === 'km' ? 'ប្រវត្តិការលក់' : 'Sales History' }}
       </h2>
       <span class="text-sm text-slate-400">
-        {{ filteredSales().length }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'records' }}{{ filteredSales().length !== sales().length ? ' / ' + sales().length + ' total' : '' }}
+        {{ totalItems() }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'records' }}
       </span>
     </div>
 
@@ -220,7 +220,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
-            <tr *ngFor="let sale of paginatedSales; trackBy: trackById" @fadeIn
+            <tr *ngFor="let sale of sales(); trackBy: trackById" @fadeIn
               (click)="openDetail(sale)"
               class="table-row"
               [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
@@ -252,7 +252,7 @@
               </td>
             </tr>
             <!-- Empty state (desktop) -->
-            <tr *ngIf="filteredSales().length === 0">
+            <tr *ngIf="totalItems() === 0">
               <td colspan="6" class="empty-state-cell">
                 <svg class="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -270,7 +270,7 @@
     <!-- ===== MOBILE: Sale Cards ===== -->
     <div class="sh-mobile-cards">
       <div
-        *ngFor="let sale of paginatedSales; trackBy: trackById"
+        *ngFor="let sale of sales(); trackBy: trackById"
         @fadeIn
         (click)="openDetail(sale)"
         class="sh-card"
@@ -315,7 +315,7 @@
       </div>
 
       <!-- Empty state (mobile) -->
-      <div *ngIf="filteredSales().length === 0" class="sh-cards-empty">
+      <div *ngIf="totalItems() === 0" class="sh-cards-empty">
         <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
         </svg>
@@ -326,7 +326,7 @@
     </div>
 
     <!-- Pagination (shared) -->
-    <div *ngIf="filteredSales().length > pageSize" class="pagination-bar">
+    <div *ngIf="totalItems() > pageSize" class="pagination-bar">
       <span class="pagination-info">
         {{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }} {{ currentPage() }}/{{ totalPages }}
       </span>

@@ -28,14 +28,17 @@ export class PurchaseOrderService {
     );
   }
 
-  /** Get all purchase orders (server-side paginated, defaults to max=100) */
-  getAll(query?: ListQuery): Observable<any[]> {
-    const params = buildListParams(query ?? { max: 100, sortBy: 'createdAt', sort: 'desc' });
+  /**
+   * Get one server-side page of purchase orders plus the envelope total.
+   * Standard offset-based list query: max/offset/sort/sortBy/search.
+   */
+  getAll(query?: ListQuery): Observable<{ data: any[]; total: number }> {
+    const params = buildListParams(query);
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map((res) => {
-        const data: any[] = res?.data ?? res ?? [];
-        return data.map((po: any) => this.mapPO(po));
-      }),
+      map((res) => ({
+        data: ((res?.data ?? []) as any[]).map((po: any) => this.mapPO(po)),
+        total: res?.total ?? 0,
+      })),
     );
   }
 

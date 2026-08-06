@@ -218,6 +218,30 @@ describe('SalesController (integration)', () => {
         { paymentMethod: 'aba' },
       );
     });
+
+    it('should pass the dateFrom/dateTo filters', async () => {
+      salesService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/sales?dateFrom=2026-08-01&dateTo=2026-08-31')
+        .expect(200);
+
+      expect(salesService.findAll).toHaveBeenCalledWith(
+        2,
+        'cashier',
+        { dateFrom: '2026-08-01', dateTo: '2026-08-31' },
+      );
+    });
+
+    it('should reject invalid date filters', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/sales?dateFrom=not-a-date')
+        .expect(400);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/sales?dateTo=31/08/2026')
+        .expect(400);
+    });
   });
 
   // ─── GET /api/v1/sales/:id ──────────────────────────────────────────────

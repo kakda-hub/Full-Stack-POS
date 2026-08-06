@@ -135,7 +135,13 @@ describe('UploadCloudinaryController (integration)', () => {
         .get('/cloudinary')
         .expect(200);
 
-      expect(cloudinaryService.listResources).toHaveBeenCalledWith(undefined);
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith({
+        search: undefined,
+        sortBy: undefined,
+        sort: 'desc',
+        offset: 0,
+        max: 10,
+      });
       // Flat contract: data is the array itself (no nested data.data.resources)
       expect(response.body).toMatchObject({
         success: true,
@@ -155,7 +161,13 @@ describe('UploadCloudinaryController (integration)', () => {
         .get('/cloudinary?search=pos-products')
         .expect(200);
 
-      expect(cloudinaryService.listResources).toHaveBeenCalledWith('pos-products');
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith({
+        search: 'pos-products',
+        sortBy: undefined,
+        sort: 'desc',
+        offset: 0,
+        max: 10,
+      });
     });
 
     it('should handle empty search query param gracefully', async () => {
@@ -166,7 +178,13 @@ describe('UploadCloudinaryController (integration)', () => {
         .expect(200);
 
       // Empty string is passed through; service treats it as "return all"
-      expect(cloudinaryService.listResources).toHaveBeenCalledWith('');
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith({
+        search: '',
+        sortBy: undefined,
+        sort: 'desc',
+        offset: 0,
+        max: 10,
+      });
     });
 
     it('should return a flat error envelope when the service fails', async () => {

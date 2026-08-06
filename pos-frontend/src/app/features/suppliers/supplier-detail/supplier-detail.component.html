@@ -6,9 +6,9 @@
       : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកផ្គត់ផ្គង់' : 'Add Supplier')"
   ></app-header-detail>
 
-  <mat-dialog-content class="px-3 !pb-2">
-    <div class="flex flex-col gap-5">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <mat-dialog-content class="dialog-content">
+    <div class="form-body">
+      <div class="form-grid">
         <app-input-field
           formControlName="name"
           [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកផ្គត់ផ្គង់' : 'Supplier Name'"
@@ -36,21 +36,23 @@
         ></app-input-field>
       </div>
 
-      <app-textarea
-        formControlName="address"
-        [placeholder]="lang.currentLang() === 'km' ? 'អាសយដ្ឋាន' : 'Address'"
-        [rows]="2"
-      ></app-textarea>
+      <div class="form-grid">
+        <app-textarea
+          formControlName="address"
+          [placeholder]="lang.currentLang() === 'km' ? 'អាសយដ្ឋាន' : 'Address'"
+          [rows]="2"
+        ></app-textarea>
 
-      <app-textarea
-        formControlName="notes"
-        [placeholder]="lang.currentLang() === 'km' ? 'កំណត់ចំណាំ' : 'Notes'"
-        [rows]="2"
-      ></app-textarea>
+        <app-textarea
+          formControlName="notes"
+          [placeholder]="lang.currentLang() === 'km' ? 'កំណត់ចំណាំ' : 'Notes'"
+          [rows]="2"
+        ></app-textarea>
+      </div>
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="w-full gap-3 px-6 pb-5 pt-1">
+  <mat-dialog-actions align="end" class="dialog-actions">
     <app-ui-button [variant]="'secondary'" [size]="'md'" mat-dialog-close type="button">{{
       'button.cancel' | translate
     }}</app-ui-button>

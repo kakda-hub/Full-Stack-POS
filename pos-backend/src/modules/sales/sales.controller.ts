@@ -39,6 +39,8 @@ export class SalesController {
   @ApiOperation({ summary: 'Get all sales (paginated)' })
   @ApiListQuery()
   @ApiQuery({ name: 'paymentMethod', required: false, enum: ['cash', 'aba', 'card'], description: 'Filter by payment method' })
+  @ApiQuery({ name: 'dateFrom', required: false, type: String, example: '2026-08-01', description: 'Start date (YYYY-MM-DD), inclusive' })
+  @ApiQuery({ name: 'dateTo', required: false, type: String, example: '2026-08-31', description: 'End date (YYYY-MM-DD), inclusive' })
   findAll(
     @CurrentUser('id') userId: number,
     @CurrentUser('role') role: string,

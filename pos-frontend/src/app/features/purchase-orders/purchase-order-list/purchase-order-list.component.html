@@ -103,9 +103,9 @@
               </th>
             </tr>
           </thead>
-          <tbody [@listAnimation]="paginatedPOs().length" class="divide-y divide-slate-100 dark:divide-slate-700/60">
+          <tbody [@listAnimation]="purchaseOrders().length" class="divide-y divide-slate-100 dark:divide-slate-700/60">
             <tr
-              *ngFor="let po of paginatedPOs(); trackBy: trackById"
+              *ngFor="let po of purchaseOrders(); trackBy: trackById"
               @fadeIn
               class="transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer"
               (click)="openView(po)"
@@ -181,7 +181,7 @@
     <!-- ===== MOBILE: Grid View ===== -->
     <div class="block md:hidden grid grid-cols-1 gap-4">
       <div
-        *ngFor="let po of paginatedPOs(); trackBy: trackById"
+        *ngFor="let po of purchaseOrders(); trackBy: trackById"
         @fadeIn
         class="rounded-xl border p-4 transition-all duration-200 bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700 shadow-sm cursor-pointer"
         (click)="openView(po)"
@@ -260,7 +260,7 @@
     </div>
 
     <!-- Empty state -->
-    <div *ngIf="filteredPOs().length === 0" class="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
+    <div *ngIf="purchaseOrders().length === 0" class="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
       <svg class="w-16 h-16 mb-4 opacity-40 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
@@ -271,10 +271,11 @@
 
     <!-- Pagination -->
     <app-pagination
-      [totalItems]="filteredPOs().length"
+      [totalItems]="totalItems()"
       [pageSize]="pageSize()"
       [currentPage]="pageIndex() + 1"
-      (pageChange)="pageIndex.set($event - 1)"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
     ></app-pagination>
   </div>
 </div>

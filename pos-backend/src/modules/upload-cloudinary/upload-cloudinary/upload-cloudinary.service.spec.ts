@@ -43,22 +43,23 @@ describe('UploadCloudinaryService', () => {
   });
 
   describe('listResources', () => {
-    it('should return all resources when search is undefined', async () => {
+    it('should return all resources when no query is given', async () => {
       const result = await service.listResources();
 
       expect(cloudinary.api.resources).toHaveBeenCalledWith({ max_results: 500 });
       expect(result.resources).toHaveLength(1);
+      expect(result.total_count).toBe(1);
     });
 
-    it('should return all resources when search is an empty string', async () => {
-      const result = await service.listResources('');
+    it('should return all resources when search is empty', async () => {
+      const result = await service.listResources({ search: '' });
 
       expect(cloudinary.api.resources).toHaveBeenCalledWith({ max_results: 500 });
       expect(result.resources).toHaveLength(1);
     });
 
     it('should return all resources when search is whitespace only', async () => {
-      const result = await service.listResources('   ');
+      const result = await service.listResources({ search: '   ' });
 
       expect(result.resources).toHaveLength(1);
     });
@@ -71,7 +72,7 @@ describe('UploadCloudinaryService', () => {
         ],
       });
 
-      const result = await service.listResources('ABC123');
+      const result = await service.listResources({ search: 'ABC123' });
 
       expect(result.resources).toHaveLength(1);
       expect(result.resources[0].public_id).toBe('pos-products/abc123');
@@ -85,29 +86,56 @@ describe('UploadCloudinaryService', () => {
         ],
       });
 
-      const result = await service.listResources('PNG');
+      const result = await service.listResources({ search: 'PNG' });
 
       expect(result.resources).toHaveLength(1);
       expect(result.resources[0].public_id).toBe('a/two');
     });
 
     it('should return no resources when nothing matches', async () => {
-      const result = await service.listResources('nonexistent-token');
+      const result = await service.listResources({ search: 'nonexistent-token' });
 
       expect(result.resources).toHaveLength(0);
     });
 
-    it('should fall back to the returned count when total_count is missing', async () => {
+    it('should apply offset/max slicing with a correct total', async () => {
       (cloudinary.api.resources as jest.Mock).mockResolvedValue({
         resources: [
-          { ...mockResource, public_id: 'pos-products/a' },
-          { ...mockResource, public_id: 'pos-general/b' },
+          { ...mockResource, public_id: 'a/1', format: 'jpg', created_at: '2025-01-01T00:00:00Z' },
+          { ...mockResource, public_id: 'a/2', format: 'png', created_at: '2025-01-02T00:00:00Z' },
+          { ...mockResource, public_id: 'a/3', format: 'webp', created_at: '2025-01-03T00:00:00Z' },
         ],
       });
 
-      const result = await service.listResources();
+      const result = await service.listResources({ offset: 1, max: 1, sortBy: 'created_at', sort: 'desc' });
 
-      expect(result.total_count).toBe(2);
+      // total is the full filtered count, data is the requested slice
+      expect(result.total_count).toBe(3);
+      expect(result.resources).toHaveLength(1);
+      expect(result.resources[0].public_id).toBe('a/2');
+    });
+
+    it('should ignore invalid sort fields and fall back to created_at desc', async () => {
+      (cloudinary.api.resources as jest.Mock).mockResolvedValue({
+        resources: [
+          { ...mockResource, public_id: 'a/1', created_at: '2025-01-01T00:00:00Z' },
+          { ...mockResource, public_id: 'a/2', created_at: '2025-01-02T00:00:00Z' },
+        ],
+      });
+
+      const result = await service.listResources({ sortBy: 'hacked', sort: 'desc' });
+
+      expect(result.resources[0].public_id).toBe('a/2'); // newest first
+    });
+
+    it('should clamp offset to 0 and max to the 500 ceiling', async () => {
+      (cloudinary.api.resources as jest.Mock).mockResolvedValue({
+        resources: [mockResource],
+      });
+
+      const result = await service.listResources({ offset: -5, max: 9999 });
+
+      expect(result.resources).toHaveLength(1);
     });
 
     it('should rethrow Cloudinary errors as HttpException', async () => {

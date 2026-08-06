@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ListQuery } from '../../../models/list-query';
+import { buildListParams } from './list-params';
 
 export interface CloudinaryResource {
   asset_id: string;
@@ -40,8 +42,13 @@ export class CloudinaryService {
 
   constructor(private http: HttpClient) {}
 
-  listResources(search?: string): Observable<CloudinaryApiResponse> {
-    const params = search ? new HttpParams().set('search', search) : undefined;
+  /**
+   * List Cloudinary resources using the standard offset-based list query
+   * (max/offset/sort/sortBy/search via HttpParams). Defaults: max=10, offset=0,
+   * sort=desc — GET /api/v1/cloudinary?max=10&offset=0&sort=desc
+   */
+  listResources(query?: ListQuery): Observable<CloudinaryApiResponse> {
+    const params = buildListParams(query);
     return this.http.get<CloudinaryApiResponse>(this.apiUrl, { params });
   }
 

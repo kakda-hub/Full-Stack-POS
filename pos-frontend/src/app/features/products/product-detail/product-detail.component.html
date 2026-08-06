@@ -54,7 +54,7 @@
             @for (url of imgUrls; track $index; let i = $index) {
               <div class="thumbnail-card" [class.primary]="i === 0">
                 <div class="thumbnail-image">
-                  <img [src]="url" [alt]="lang.currentLang() === 'km' ? 'រូបភាព' : 'Image'" loading="lazy" />
+                  <img [src]="url" [alt]="lang.currentLang() === 'km' ? 'រូបភាព' : 'Image'" loading="lazy" appImgFallback />
                   @if (i === 0) {
                     <div class="primary-badge">
                       <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
