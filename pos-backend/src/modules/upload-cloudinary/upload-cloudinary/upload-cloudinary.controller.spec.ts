@@ -128,17 +128,61 @@ describe('UploadCloudinaryController (integration)', () => {
 
   // ─── GET /cloudinary ────────────────────────────────────────────────────
   describe('GET /cloudinary', () => {
-    it('should list Cloudinary resources', async () => {
+    it('should return a flat envelope with resources, total and timestamp', async () => {
       cloudinaryService.listResources.mockResolvedValue(mockResources);
 
       const response = await request(app.getHttpServer())
         .get('/cloudinary')
         .expect(200);
 
-      expect(cloudinaryService.listResources).toHaveBeenCalled();
-      expect(response.body.success).toBe(true);
-      expect(response.body.data.success).toBe(true);
-      expect(response.body.data.data.resources).toHaveLength(1);
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith(undefined);
+      // Flat contract: data is the array itself (no nested data.data.resources)
+      expect(response.body).toMatchObject({
+        success: true,
+        statusCode: 200,
+        total: 1,
+      });
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].public_id).toBe('pos-products/abc123');
+      expect(typeof response.body.timestamp).toBe('string');
+    });
+
+    it('should pass the search query param to the service', async () => {
+      cloudinaryService.listResources.mockResolvedValue(mockResources);
+
+      await request(app.getHttpServer())
+        .get('/cloudinary?search=pos-products')
+        .expect(200);
+
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith('pos-products');
+    });
+
+    it('should handle empty search query param gracefully', async () => {
+      cloudinaryService.listResources.mockResolvedValue(mockResources);
+
+      await request(app.getHttpServer())
+        .get('/cloudinary?search=')
+        .expect(200);
+
+      // Empty string is passed through; service treats it as "return all"
+      expect(cloudinaryService.listResources).toHaveBeenCalledWith('');
+    });
+
+    it('should return a flat error envelope when the service fails', async () => {
+      cloudinaryService.listResources.mockRejectedValue({ status: 503 });
+
+      const response = await request(app.getHttpServer())
+        .get('/cloudinary')
+        .expect(503);
+
+      expect(response.body).toMatchObject({
+        success: false,
+        statusCode: 503,
+        total: 0,
+      });
+      expect(response.body.data).toEqual([]);
+      expect(typeof response.body.timestamp).toBe('string');
     });
   });
 

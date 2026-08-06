@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Transaction } from '../../../core/models';
+import { Transaction } from '../../../models';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';

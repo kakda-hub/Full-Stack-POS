@@ -6,15 +6,19 @@ import {
   Delete,
   Param,
   Body,
+  Query,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { UploadCloudinaryService } from './upload-cloudinary.service';
+import { SkipIntercept } from '../../../common/decorators/skip-intercept.decorator';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 
-@ApiTags('Cloudinary File Upload') 
-@Controller('cloudinary') 
+@ApiTags('Cloudinary File Upload')
+@Controller('cloudinary')
 export class UploadCloudinaryController {
   constructor(private readonly cloudinaryService: UploadCloudinaryService) { }
 
@@ -46,14 +50,33 @@ export class UploadCloudinaryController {
   }
 
   @Get()
+  @SkipIntercept()
   @ApiOperation({ summary: 'List recent Cloudinary resources' })
-  async list() {
-    const resources = await this.cloudinaryService.listResources();
-    return {
-      success: true,
-      statusCode: 200,
-      data: resources,
-    };
+  @ApiQuery({ name: 'search', required: false, description: 'Filter resources by public ID or format (case-insensitive). Omit or leave empty to return all records.' })
+  async list(
+    @Query('search') search?: string,
+    @Res({ passthrough: true }) res?: Response,
+  ) {
+    try {
+      const { resources, total_count } = await this.cloudinaryService.listResources(search);
+      return {
+        success: true,
+        statusCode: 200,
+        data: resources,
+        total: total_count,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      const statusCode = error?.status || 500;
+      if (res) res.status(statusCode);
+      return {
+        success: false,
+        statusCode,
+        data: [],
+        total: 0,
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 
   @Get(':publicId')

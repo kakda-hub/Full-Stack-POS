@@ -1,9 +1,10 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Product, Category } from '../models';
-import { ApiEndpointEnum } from '../models/enums/api-endpoint-enum';
+import { Product, Category } from '../../models';
+import { ApiEndpointEnum } from '../../enums/api-endpoint-enum';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
+import { buildListParams } from './api/list-params';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -59,7 +60,9 @@ export class ProductService {
 
   private loadProducts(): void {
     this._loading.set(true);
-    this.http.get<any>(this.apiUrl).pipe(
+    // Full catalog (up to max=100) so search/barcode lookup works client-side.
+    const params = buildListParams({ max: 100, sortBy: 'name', sort: 'asc' });
+    this.http.get<any>(this.apiUrl, { params }).pipe(
       map(res => {
         const rawProducts = res?.data ?? res ?? [];
         return rawProducts.map((p: any) => this.mapApiProduct(p));
@@ -77,7 +80,8 @@ export class ProductService {
   }
 
   private loadCategories(): void {
-    this.http.get<any>(this.categoriesApiUrl).pipe(
+    const params = buildListParams({ max: 100, sortBy: 'name', sort: 'asc' });
+    this.http.get<any>(this.categoriesApiUrl, { params }).pipe(
       map(res => {
         const rawCategories = res?.data ?? res ?? [];
         // Add "All" at the beginning

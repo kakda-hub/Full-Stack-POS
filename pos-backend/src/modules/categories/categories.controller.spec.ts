@@ -113,32 +113,36 @@ describe('CategoriesController (integration)', () => {
 
   // ─── GET /api/v1/categories ─────────────────────────────────────────────
   describe('GET /api/v1/categories', () => {
-    it('should return paginated categories', async () => {
+    it('should return paginated categories with the flat envelope', async () => {
       categoriesService.findAll.mockResolvedValue(mockPaginatedResult as any);
 
       const response = await request(app.getHttpServer())
         .get('/api/v1/categories')
         .expect(200);
 
-      expect(categoriesService.findAll).toHaveBeenCalledWith({
-        page: 1,
-        limit: 10,
-      });
+      expect(categoriesService.findAll).toHaveBeenCalledWith({});
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.total).toBe(1);
     });
 
-    it('should pass pagination parameters', async () => {
-      categoriesService.findAll.mockResolvedValue({ data: [], total: 0, page: 2, limit: 5 } as any);
+    it('should pass offset/max pagination parameters', async () => {
+      categoriesService.findAll.mockResolvedValue({ data: [], total: 0, page: 5, limit: 5 } as any);
 
       await request(app.getHttpServer())
-        .get('/api/v1/categories?page=2&limit=5')
+        .get('/api/v1/categories?offset=5&max=5')
         .expect(200);
 
       expect(categoriesService.findAll).toHaveBeenCalledWith({
-        page: 2,
-        limit: 5,
+        offset: 5,
+        max: 5,
       });
+    });
+
+    it('should reject an invalid sort direction', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/categories?sort=sideways')
+        .expect(400);
     });
   });
 

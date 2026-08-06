@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
-import { Customer } from '../../models';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
+import { ListQuery } from '../../../models/list-query';
+import { buildListParams } from './list-params';
+import { Customer } from '../../../models';
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
@@ -11,8 +13,9 @@ export class CustomerService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Customer[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  getAll(query?: ListQuery): Observable<Customer[]> {
+    const params = buildListParams(query ?? { max: 100, sortBy: 'name', sort: 'asc' });
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => res?.data ?? res)
     );
   }

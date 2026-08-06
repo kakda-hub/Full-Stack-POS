@@ -3,6 +3,7 @@ import { backdropAnimation, fadeIn, modalAnimation, pageTransition } from '../..
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { SaleService } from '../../core/services/api/sale.service';
+import { nextSort, SortDirection } from '../../shared/helpers/sort.helper';
 
 interface SaleItemDisplay {
   productName: string;
@@ -51,12 +52,19 @@ export class SalesHistoryComponent {
   currentPage = signal(1);
   pageSize = 15;
 
+  // Sorting (fields must be in the backend sort allowlist: createdAt, total, ...)
+  sortBy = signal('createdAt');
+  sortDir = signal<SortDirection>('desc');
+
   dateFrom = signal<string>('');
   dateTo = signal<string>('');
   activeQuickFilter = signal<string>('all');
   searchQuery = signal<string>('');
 
   selectedSale = signal<SaleDetail | null>(null);
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
 
   filteredSales = computed(() => {
     let result = this.sales();
@@ -83,7 +91,8 @@ export class SalesHistoryComponent {
       });
     }
 
-    return result;
+    // Apply the active column sort to the filtered subset
+    return this.sortSales(result);
   });
 
   totalRevenue = computed(() =>
@@ -112,9 +121,15 @@ export class SalesHistoryComponent {
   private fetchSales(): void {
     this.isLoading.set(true);
     this.error.set(null);
+    const seq = ++this.loadSeq;
 
-    this.saleService.getAllSales().subscribe({
+    this.saleService.getAllSales({
+      max: 100,
+      sortBy: this.sortBy(),
+      sort: this.sortDir(),
+    }).subscribe({
       next: (data: any[]) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
         this._rawSales = data || [];
         const mapped = (this._rawSales).map((sale: any) => this.mapSale(sale));
         // Sort by date descending (newest first)
@@ -123,6 +138,7 @@ export class SalesHistoryComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
         console.error('Failed to fetch sales', err);
         this.error.set(
           this.lang.currentLang() === 'km'
@@ -361,6 +377,33 @@ export class SalesHistoryComponent {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
+  }
+
+  /** Column header click: toggle asc/desc on the active column, else start asc. */
+  onSort(field: string): void {
+    // Date/total default to descending first (newest / highest first).
+    const next = nextSort(this.sortBy(), this.sortDir(), field, ['createdAt', 'total']);
+    this.sortBy.set(next.sortBy);
+    this.sortDir.set(next.sort);
+    this.currentPage.set(1);
+    this.fetchSales();
+  }
+
+  /** Client-side sort of the filtered subset (server sorts the fetched slice). */
+  private sortSales(list: SaleDisplay[]): SaleDisplay[] {
+    const field = this.sortBy();
+    const dir = this.sortDir() === 'asc' ? 1 : -1;
+    return [...list].sort((a, b) => {
+      let cmp = 0;
+      switch (field) {
+        case 'createdAt': cmp = a.date.getTime() - b.date.getTime(); break;
+        case 'cashierName': cmp = a.cashierName.localeCompare(b.cashierName); break;
+        case 'paymentMethod': cmp = a.paymentMethod.localeCompare(b.paymentMethod); break;
+        case 'total': cmp = a.total - b.total; break;
+        default: cmp = a.date.getTime() - b.date.getTime();
+      }
+      return cmp * dir;
+    });
   }
 
   refresh(): void {

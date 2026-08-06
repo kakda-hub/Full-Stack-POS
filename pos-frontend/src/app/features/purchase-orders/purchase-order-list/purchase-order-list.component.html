@@ -57,22 +57,46 @@
           <thead class="border-b bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-700">
             <tr>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'លេខបញ្ជាទិញ' : 'PO Number' }}
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'លេខបញ្ជាទិញ' : 'PO Number'"
+                  [field]="'orderNumber'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
                 {{ lang.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Supplier' }}
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date'"
+                  [field]="'createdAt'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
                 {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'Items' }}
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'សរុប' : 'Total'"
+                  [field]="'total'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'ស្ថានភាព' : 'Status' }}
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'ស្ថានភាព' : 'Status'"
+                  [field]="'status'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
                 {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}

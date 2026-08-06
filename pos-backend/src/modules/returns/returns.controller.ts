@@ -9,7 +9,8 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ReturnListQueryDto } from './dto/return-list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Returns')
 @ApiBearerAuth()
@@ -27,10 +28,10 @@ export class ReturnsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all returns (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  findAll(@Query() pagination?: PaginationDto) {
-    return this.returnsService.findAll(pagination ?? {});
+  @ApiListQuery()
+  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'approved', 'rejected'], description: 'Filter by status' })
+  findAll(@Query() query: ReturnListQueryDto) {
+    return this.returnsService.findAll(query);
   }
 
   @Get(':id')

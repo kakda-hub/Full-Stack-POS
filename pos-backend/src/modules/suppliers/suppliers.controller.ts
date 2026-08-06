@@ -4,11 +4,12 @@ import {
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto, UpdateSupplierDto } from './dto/supplier.dto';
+import { SupplierListQueryDto } from './dto/supplier-list-query.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Suppliers')
 @ApiBearerAuth()
@@ -26,17 +27,13 @@ export class SuppliersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all active suppliers (paginated)' })
-  @ApiQuery({ name: 'includeInactive', required: false, type: String })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  findAll(
-    @Query('includeInactive') includeInactive?: string,
-    @Query() pagination?: PaginationDto,
-  ) {
-    if (includeInactive === 'true') {
-      return this.suppliersService.findAllInactive(pagination ?? {});
+  @ApiListQuery()
+  @ApiQuery({ name: 'includeInactive', required: false, type: String, description: 'Include inactive suppliers' })
+  findAll(@Query() query: SupplierListQueryDto) {
+    if (query.includeInactive === 'true') {
+      return this.suppliersService.findAllInactive(query);
     }
-    return this.suppliersService.findAll(pagination ?? {});
+    return this.suppliersService.findAll(query);
   }
 
   @Get(':id')

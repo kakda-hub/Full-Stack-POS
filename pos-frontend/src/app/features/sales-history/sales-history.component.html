@@ -187,11 +187,36 @@
           <thead>
             <tr class="table-thead-row">
               <th class="th">#</th>
-              <th class="th">{{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}</th>
+              <th class="th">
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date'"
+                  [field]="'createdAt'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
+              </th>
+              <!-- Cashier not in the backend sales sort allowlist → not sortable -->
               <th class="th">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</th>
               <th class="th hidden md:table-cell">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
-              <th class="th">{{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}</th>
-              <th class="th text-right">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+              <th class="th">
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment'"
+                  [field]="'paymentMethod'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
+              </th>
+              <th class="th text-right">
+                <app-sort-header
+                  [label]="lang.currentLang() === 'km' ? 'សរុប' : 'Total'"
+                  [field]="'total'"
+                  [sortBy]="sortBy()"
+                  [sortDir]="sortDir()"
+                  (sort)="onSort($event)"
+                ></app-sort-header>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">

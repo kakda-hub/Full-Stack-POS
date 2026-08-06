@@ -52,9 +52,9 @@
     <div class="category-filters">
       <button
         *ngFor="let cat of productService.categories()"
-        (click)="productService.setCategory(cat.id)"
+        (click)="onCategorySelect(cat.id)"
         [class]="
-          cat.id === productService.selectedCategory()
+          cat.id === selectedCategory()
             ? 'category-btn category-btn--active'
             : 'category-btn'
         "
@@ -116,19 +116,43 @@
               {{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}
             </th>
             <th class="th th--left">
-              {{ lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name' }}
+              <app-sort-header
+                [label]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+                [field]="'name'"
+                [sortBy]="sortBy()"
+                [sortDir]="sortDir()"
+                (sort)="onSort($event)"
+              ></app-sort-header>
             </th>
             <th class="th th--left">
-              {{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }}
+              <app-sort-header
+                [label]="lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode'"
+                [field]="'barcode'"
+                [sortBy]="sortBy()"
+                [sortDir]="sortDir()"
+                (sort)="onSort($event)"
+              ></app-sort-header>
             </th>
             <th class="th th--left">
               {{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}
             </th>
             <th class="th th--right">
-              {{ lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price' }}
+              <app-sort-header
+                [label]="lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price'"
+                [field]="'price'"
+                [sortBy]="sortBy()"
+                [sortDir]="sortDir()"
+                (sort)="onSort($event)"
+              ></app-sort-header>
             </th>
             <th class="th th--right">
-              {{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }}
+              <app-sort-header
+                [label]="lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock'"
+                [field]="'stock'"
+                [sortBy]="sortBy()"
+                [sortDir]="sortDir()"
+                (sort)="onSort($event)"
+              ></app-sort-header>
             </th>
             <th class="th th--right">
               {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
@@ -136,19 +160,19 @@
           </tr>
         </thead>
         <tbody
-          [@listAnimation]="productService.filteredProducts().length"
+          [@listAnimation]="products().length"
           class="table-tbody"
         >
           <tr
             *ngFor="
-              let product of productService.filteredProducts();
+              let product of products();
               index as i;
               trackBy: trackById
             "
             @fadeIn
             class="table-row"
           >
-            <td class="td">{{ i + 1 }}</td>
+            <td class="td">{{ i + 1 + (currentPage() - 1) * pageSize() }}</td>
             <td class="td">
               @if (product.imgUrl) {
                 <img
@@ -221,7 +245,7 @@
               </div>
             </td>
           </tr>
-          <tr *ngIf="productService.filteredProducts().length === 0">
+          <tr *ngIf="products().length === 0">
             <td colspan="8" class="empty-state-cell">
               <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -240,10 +264,11 @@
       </table>
 
       <app-pagination
-        [totalItems]="productService.filteredProducts().length"
-        [pageSize]="10"
+        [totalItems]="totalItems()"
+        [pageSize]="pageSize()"
         [currentPage]="currentPage()"
         (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       >
       </app-pagination>
     </div>
@@ -251,7 +276,7 @@
     <!-- ===== MOBILE: Product Cards ===== -->
     <div class="pl-mobile-cards">
       <div
-        *ngFor="let product of productService.filteredProducts(); index as i; trackBy: trackById"
+        *ngFor="let product of products(); index as i; trackBy: trackById"
         @fadeIn
         class="pl-card"
         [class.pl-card--dark]="theme.isDark()"
@@ -259,7 +284,7 @@
         <!-- Card header: number + image -->
         <div class="pl-card-header">
           <div class="pl-card-header-left">
-            <span class="pl-card-number">#{{ i + 1 }}</span>
+            <span class="pl-card-number">#{{ i + 1 + (currentPage() - 1) * pageSize() }}</span>
             <span class="pl-card-title">{{ product.name }}</span>
             <span *ngIf="product.nameKm" class="pl-card-title-km">{{ product.nameKm }}</span>
             <span class="pl-card-price">${{ product.price.toFixed(2) }}</span>
@@ -329,7 +354,7 @@
       </div>
 
       <!-- Empty state (mobile) -->
-      <div *ngIf="productService.filteredProducts().length === 0" class="pl-cards-empty">
+      <div *ngIf="products().length === 0" class="pl-cards-empty">
         <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />

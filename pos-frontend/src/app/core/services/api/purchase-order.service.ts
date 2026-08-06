@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
+import { ListQuery } from '../../../models/list-query';
+import { buildListParams } from './list-params';
 import { parseNumericFields } from '../../../shared/helpers/number.helper';
 
 @Injectable({
@@ -26,9 +28,10 @@ export class PurchaseOrderService {
     );
   }
 
-  /** Get all purchase orders (paginated) */
-  getAll(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  /** Get all purchase orders (server-side paginated, defaults to max=100) */
+  getAll(query?: ListQuery): Observable<any[]> {
+    const params = buildListParams(query ?? { max: 100, sortBy: 'createdAt', sort: 'desc' });
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => {
         const data: any[] = res?.data ?? res ?? [];
         return data.map((po: any) => this.mapPO(po));

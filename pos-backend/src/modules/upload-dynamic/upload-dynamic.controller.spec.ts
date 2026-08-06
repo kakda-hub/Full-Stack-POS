@@ -139,17 +139,63 @@ describe('UploadDynamicController (integration)', () => {
 
   // ─── GET /api/v1/dynamicFileuploadS3 ────────────────────────────────────
   describe('GET /api/v1/dynamicFileuploadS3', () => {
-    it('should return all files', async () => {
-      uploadService.findAll.mockResolvedValue([mockFile]);
+    const mockPaginatedResult = {
+      data: [mockFile],
+      total: 1,
+      page: 1,
+      limit: 10,
+    };
+
+    it('should return the standard list envelope with defaults', async () => {
+      uploadService.findAll.mockResolvedValue(mockPaginatedResult as any);
 
       const response = await request(app.getHttpServer())
         .get('/api/v1/dynamicFileuploadS3')
         .expect(200);
 
-      expect(uploadService.findAll).toHaveBeenCalled();
+      expect(uploadService.findAll).toHaveBeenCalledWith({});
+      // Standard envelope: data is the flat array, total at the top level
       expect(response.body.success).toBe(true);
-      expect(response.body.data.data).toHaveLength(1);
-      expect(response.body.data.total).toBe(1);
+      expect(response.body.statusCode).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].id).toBe(1);
+      expect(response.body.total).toBe(1);
+      expect(response.body.timestamp).toBeDefined();
+    });
+
+    it('should pass search, sort and pagination params to the service', async () => {
+      uploadService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 10 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/dynamicFileuploadS3?search=invoice&sortBy=uploadDate&sort=desc&offset=0&max=10&destinationStorage=S3')
+        .expect(200);
+
+      expect(uploadService.findAll).toHaveBeenCalledWith({
+        search: 'invoice',
+        sortBy: 'uploadDate',
+        sort: 'desc',
+        offset: 0,
+        max: 10,
+        destinationStorage: 'S3',
+      });
+    });
+
+    it('should reject invalid sort direction', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/dynamicFileuploadS3?sort=invalid')
+        .expect(400);
+    });
+
+    it('should reject negative offset', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/dynamicFileuploadS3?offset=-1')
+        .expect(400);
+    });
+
+    it('should reject max above 100', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/dynamicFileuploadS3?max=1000')
+        .expect(400);
     });
   });
 

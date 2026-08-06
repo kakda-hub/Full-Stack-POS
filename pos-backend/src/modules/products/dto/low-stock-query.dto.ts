@@ -1,9 +1,9 @@
 import { IsOptional, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { ListQueryDto } from '../../../common/dto/list-query.dto';
 
-export class LowStockQueryDto extends PaginationDto {
+export class LowStockQueryDto extends ListQueryDto {
   @ApiPropertyOptional({
     description: 'Override threshold (default: uses per-product lowStockThreshold)',
     example: 5,

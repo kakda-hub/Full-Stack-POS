@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { Product } from '../../../core/models';
+import { Product } from '../../../models';
+import { nextSort, SortDirection } from '../../../shared/helpers/sort.helper';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { ProductService as CoreProductService } from '../../../core/services/product.service';
@@ -24,11 +25,48 @@ export class ProductListComponent implements OnInit, OnDestroy {
   showForm = false;
   isLoading = signal(true);
   editingProduct: Product | null = null;
+
+  // Server-side pagination state
+  products = signal<Product[]>([]);
+  totalItems = signal(0);
+  pageSize = signal(10);
   currentPage = signal(1);
+  searchQuery = signal('');
+  selectedCategory = signal('all');
+
+  // Server-side sorting (fields must be in the backend sort allowlist)
+  sortBy = signal('name');
+  sortDir = signal<SortDirection>('asc');
 
   onPageChange(page: number) {
     this.currentPage.set(page);
+    this.loadProducts();
   }
+
+  onPageSizeChange(size: number) {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.loadProducts();
+  }
+
+  onCategorySelect(id: string) {
+    this.selectedCategory.set(id);
+    this.currentPage.set(1);
+    this.loadProducts();
+  }
+
+  /** Column header click: toggle asc/desc on the active column, else start asc. */
+  onSort(field: string): void {
+    // Price/stock default to descending first (highest first); text fields to ascending.
+    const next = nextSort(this.sortBy(), this.sortDir(), field, ['price', 'stock']);
+    this.sortBy.set(next.sortBy);
+    this.sortDir.set(next.sort);
+    this.currentPage.set(1);
+    this.loadProducts();
+  }
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
   private defaultOption: MatDialogConfig = {
@@ -48,23 +86,78 @@ export class ProductListComponent implements OnInit, OnDestroy {
   ) {
     this.reusableDialogService.setDialogComponent(ProductDetailComponent);
     this.reusableDialogService.setDialogConfigOption(this.defaultOption);
-
-    effect(() => {
-      if (!this.productService.loading()) {
-        this.isLoading.set(false);
-        this.cdr.markForCheck();
-      }
-    });
   }
 
   ngOnInit(): void {
+    this.loadProducts();
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
-      .subscribe(q => this.productService.setSearch(q));
+      .subscribe(q => {
+        this.searchQuery.set(q.trim());
+        this.currentPage.set(1);
+        this.loadProducts();
+      });
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   onSearch(e: Event): void { this.searchSubject.next((e.target as HTMLInputElement).value); }
+
+  /** Loads one server-side page using the standard list query params. */
+  loadProducts(): void {
+    this.isLoading.set(true);
+    const seq = ++this.loadSeq;
+    const query: any = {
+      search: this.searchQuery() || undefined,
+      sortBy: this.sortBy(),
+      sort: this.sortDir(),
+      offset: (this.currentPage() - 1) * this.pageSize(),
+      max: this.pageSize(),
+    };
+    if (this.selectedCategory() !== 'all') {
+      query.categoryId = this.selectedCategory();
+    }
+
+    this.apiProductService.getProducts(query).subscribe({
+      next: (res) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        const data = res?.data ?? [];
+        // After a delete, the current page may be empty — step back one page.
+        if (data.length === 0 && this.currentPage() > 1) {
+          this.currentPage.update(p => p - 1);
+          this.loadProducts();
+          return;
+        }
+        this.products.set(data.map((p: any) => this.mapApiProduct(p)));
+        this.totalItems.set(res?.total ?? data.length);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        console.error('Failed to load products', err);
+        this.products.set([]);
+        this.totalItems.set(0);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private mapApiProduct(p: any): Product {
+    return {
+      id: String(p.id),
+      name: p.name,
+      nameKm: p.nameKh,
+      price: Number(p.price),
+      barcode: p.barcode,
+      category: String(p.categoryId),
+      stock: p.stock,
+      imgUrl: p.imgUrl,
+      lowStockThreshold: p.lowStockThreshold !== undefined ? Number(p.lowStockThreshold) : undefined,
+      expiryDate: p.expiryDate || undefined,
+      description: p.description,
+    };
+  }
 
   onAdd(): void {
     this.editingProduct = null;
@@ -90,7 +183,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       if (!confirmed) return;
       this.apiProductService.deleteProduct(p.id).subscribe({
         next: () => {
-          this.productService.refreshProducts();
+          this.loadProducts();
           this.alertService.warning(
             this.lang.currentLang() === 'km' ? `"${p.name}" ត្រូវបានលុបចោល` : `"${p.name}" has been deleted`,
             this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
@@ -112,7 +205,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     if (this.editingProduct) {
       this.apiProductService.updateProduct(Number(this.editingProduct.id), data).subscribe({
         next: () => {
-          this.productService.refreshProducts();
+          this.loadProducts();
           this.alertService.success(
             this.lang.currentLang() === 'km' ? 'ផលិតផលត្រូវបានធ្វើបច្ចុប្បន្នភាព' : 'Product updated successfully',
             this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Updated'
@@ -132,7 +225,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
     } else {
       this.apiProductService.createProduct(data).subscribe({
         next: () => {
-          this.productService.refreshProducts();
+          this.currentPage.set(1); // show the newly created record
+          this.loadProducts();
           this.alertService.success(
             this.lang.currentLang() === 'km' ? 'ផលិតផលថ្មីត្រូវបានបន្ថែម' : 'Product added successfully',
             this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Added'
@@ -174,7 +268,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.editingProduct = null;
         return;
       }
-      this.productService.refreshProducts();
+      const wasCreate = !this.editingProduct;
+      if (wasCreate) this.currentPage.set(1); // show the newly created record
+      this.loadProducts();
       const isEdit = !!this.editingProduct;
       this.alertService.success(
         this.lang.currentLang() === 'km'

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
 
 export interface KhqrResponse {
   qrString: string;

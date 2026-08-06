@@ -2,13 +2,14 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Category } from "./entities/category.entity";
-import { CreateCategoryDto, UpdateCategoryDto } from "./dto/category.dto";
-import { PaginationDto, PaginatedResult } from "../../common/dto/pagination.dto";
-import { paginate } from "../../common/helpers/pagination.helper";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
+import { Category } from './entities/category.entity';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
+import { ListQueryDto } from '../../common/dto/list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class CategoriesService {
@@ -28,9 +29,24 @@ export class CategoriesService {
     return this.categoryRepository.save(category);
   }
 
-  findAll(pagination?: PaginationDto): Promise<PaginatedResult<Category>> {
-    return paginate(this.categoryRepository, pagination ?? {}, {
-      order: { name: "ASC" },
+  findAll(query: ListQueryDto = {}): Promise<PaginatedResult<Category>> {
+    const search = query.search?.trim();
+    let where: FindOptionsWhere<Category> | FindOptionsWhere<Category>[] = {};
+    if (search) {
+      const like = Like(`%${search}%`);
+      where = [{ name: like }, { nameKh: like }];
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['name', 'nameKh'],
+      'name',
+      'ASC',
+    );
+
+    return paginate(this.categoryRepository, query, {
+      where,
+      order: { [sortBy]: sortDirection },
     });
   }
 

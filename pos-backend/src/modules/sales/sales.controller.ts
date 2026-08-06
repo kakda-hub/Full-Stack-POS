@@ -13,7 +13,8 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { SaleListQueryDto } from './dto/sale-list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Sales')
 @ApiBearerAuth()
@@ -36,14 +37,14 @@ export class SalesController {
   // GET /api/v1/sales  [admin sees all; cashier sees own]
   @Get()
   @ApiOperation({ summary: 'Get all sales (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiListQuery()
+  @ApiQuery({ name: 'paymentMethod', required: false, enum: ['cash', 'aba', 'card'], description: 'Filter by payment method' })
   findAll(
     @CurrentUser('id') userId: number,
     @CurrentUser('role') role: string,
-    @Query() pagination?: PaginationDto,
+    @Query() query: SaleListQueryDto,
   ) {
-    return this.salesService.findAll(userId, role, pagination ?? {});
+    return this.salesService.findAll(userId, role, query);
   }
 
   // GET /api/v1/sales/:id  [admin + cashier]

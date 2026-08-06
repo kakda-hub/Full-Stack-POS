@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
-import { DataResponse } from '../../models/data-response';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
+import { DataResponse } from '../../../models/data-response';
 import { DynamicHttp } from '../shared/dynamic-http.service';
 import { AbstractRest } from '../shared/abstract-rest.service';
 

@@ -20,6 +20,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
 import { AppIconComponent } from './components/app-icon/app-icon.component';
+import { SortHeaderComponent } from './components/sort-header/sort-header.component';
 
 const components = [ 
     UiAvatarComponent,
@@ -36,6 +37,7 @@ const components = [
     DateFormatPipe,
     FormatNumberPipe,
     PaginationComponent,
+    SortHeaderComponent,
 ]
 
 @NgModule({

@@ -5,11 +5,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto, AdjustStockDto } from './dto/product.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginate, paginateQuery } from '../../common/helpers/pagination.helper';
+import { ProductListQueryDto } from './dto/product-list-query.dto';
+import { LowStockQueryDto } from './dto/low-stock-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, paginateQuery, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class ProductsService {
@@ -29,12 +31,34 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  async findAll(includeInactive = false, pagination?: PaginationDto): Promise<PaginatedResult<Product>> {
-    const where = includeInactive ? {} : { isActive: true };
-    return paginate(this.productRepository, pagination ?? {}, {
+  async findAll(query: ProductListQueryDto = {}): Promise<PaginatedResult<Product>> {
+    const baseWhere: FindOptionsWhere<Product> = {};
+    if (query.includeInactive !== 'true') baseWhere.isActive = true;
+    if (query.categoryId !== undefined) baseWhere.categoryId = query.categoryId;
+
+    // Search matches name / nameKh / barcode (OR) combined with the base filters (AND)
+    const search = query.search?.trim();
+    let where: FindOptionsWhere<Product> | FindOptionsWhere<Product>[] = baseWhere;
+    if (search) {
+      const like = Like(`%${search}%`);
+      where = [
+        { ...baseWhere, name: like },
+        { ...baseWhere, nameKh: like },
+        { ...baseWhere, barcode: like },
+      ];
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['name', 'nameKh', 'barcode', 'price', 'stock', 'createdAt'],
+      'name',
+      'ASC',
+    );
+
+    return paginate(this.productRepository, query, {
       where,
       relations: ['category'],
-      order: { name: 'ASC' },
+      order: { [sortBy]: sortDirection },
     });
   }
 
@@ -64,23 +88,29 @@ export class ProductsService {
    * Get all products where stock is at or below their low-stock threshold.
    * Optionally override the threshold across all products via query param.
    */
-  async getLowStock(threshold?: number, pagination?: PaginationDto): Promise<PaginatedResult<Product>> {
+  async getLowStock(query: LowStockQueryDto = {}): Promise<PaginatedResult<Product>> {
     const queryBuilder = this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .where('product.isActive = :isActive', { isActive: true });
 
-    if (threshold !== undefined) {
+    if (query.threshold !== undefined) {
       // Use a global threshold override
-      queryBuilder.andWhere('product.stock <= :threshold', { threshold });
+      queryBuilder.andWhere('product.stock <= :threshold', { threshold: query.threshold });
     } else {
       // Use each product's own low_stock_threshold
       queryBuilder.andWhere('product.stock <= product.low_stock_threshold');
     }
 
-    queryBuilder.orderBy('product.stock', 'ASC');
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['name', 'price', 'stock', 'createdAt'],
+      'stock',
+      'ASC',
+    );
+    queryBuilder.orderBy(`product.${sortBy}`, sortDirection);
 
-    return paginateQuery(queryBuilder, pagination ?? {});
+    return paginateQuery(queryBuilder, query);
   }
 
   async update(id: number, dto: UpdateProductDto): Promise<Product> {

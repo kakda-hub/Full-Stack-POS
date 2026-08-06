@@ -1,8 +1,8 @@
 /* ==========================================================
-   Product Detail Component Styles
-   Extracted from inline Tailwind classes using @apply
-   Dark mode via Tailwind's `dark:` variant prefix
-   ========================================================== */
+    Product Detail Component Styles
+    Extracted from inline Tailwind classes using @apply
+    Dark mode via Tailwind's `dark:` variant prefix
+    ========================================================== */
 
 :host {
   display: block;
@@ -66,52 +66,105 @@ input[type="file"]:focus-visible + label {
   @apply w-4 h-4;
 }
 
-/* ─── Upload image area ─── */
-.upload-container {
-  @apply relative w-48 h-48 rounded-2xl border-2 border-dashed transition-all duration-300;
+/* ─── PRODUCT IMAGES SECTION ─── */
+.images-section {
+  @apply flex flex-col gap-3;
+}
+
+.images-section-header {
+  @apply flex items-center justify-between;
+}
+
+.images-section-title {
+  @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+}
+
+.browse-media-btn {
+  @apply flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer;
+  @apply bg-indigo-50 text-indigo-600 hover:bg-indigo-100;
+  @apply dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20;
+}
+
+/* ─── Thumbnail Grid ─── */
+.thumbnail-grid {
+  @apply grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2;
+}
+
+.thumbnail-card {
+  @apply relative rounded-xl border-2 border-transparent overflow-hidden cursor-pointer transition-all duration-200;
+  @apply bg-slate-100 dark:bg-slate-800;
+  @apply hover:border-indigo-300 dark:hover:border-indigo-500/50;
+
+  &.primary {
+    @apply border-indigo-400 dark:border-indigo-500;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  }
+}
+
+.thumbnail-image {
+  @apply relative aspect-square overflow-hidden;
+}
+
+.thumbnail-image img {
+  @apply w-full h-full object-cover;
+}
+
+.primary-badge {
+  @apply absolute top-1 left-1 w-5 h-5 flex items-center justify-center rounded-full;
+  @apply bg-amber-400 text-white;
+  @apply shadow-sm;
+}
+
+.thumbnail-actions {
+  @apply absolute bottom-0 left-0 right-0 flex items-center justify-end gap-0.5 p-1;
+  @apply bg-gradient-to-t from-black/60 via-transparent to-transparent;
+}
+
+.thumbnail-action-btn {
+  @apply w-5 h-5 flex items-center justify-center rounded-full transition-colors duration-200;
+  @apply text-white hover:bg-white/20;
+}
+
+.thumbnail-action-remove {
+  @apply text-rose-300 hover:bg-rose-500/80;
+}
+
+/* ─── Dropzone Card ─── */
+.upload-row {
+  @apply flex items-center gap-3;
+}
+
+.dropzone-card {
+  @apply relative w-full rounded-xl border-2 border-dashed transition-all duration-300;
   @apply overflow-hidden cursor-pointer;
   @apply bg-gradient-to-b from-slate-50 to-slate-100/60 border-slate-200;
   @apply dark:from-slate-800/60 dark:to-slate-800/30 dark:border-slate-700;
+  @apply h-20 flex items-center justify-center;
 
   &:hover {
     @apply border-indigo-400 shadow-lg shadow-indigo-500/5;
     @apply dark:border-indigo-500/50 dark:shadow-indigo-500/10;
-    transform: translateY(-2px);
   }
 
   &:active {
-    transform: translateY(0px) scale(0.99);
+    transform: scale(0.99);
   }
 
-  &::before {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none;
-    @apply bg-gradient-to-br from-indigo-500/5 to-transparent rounded-2xl;
-  }
-
-  &:hover::before {
-    @apply opacity-100;
+  &.uploading {
+    @apply border-indigo-300 bg-indigo-50/50;
   }
 }
 
-.upload-image {
-  @apply w-full h-full object-cover;
+.dropzone-empty {
+  @apply flex flex-col items-center gap-1;
 }
 
-.upload-overlay {
-  @apply absolute inset-0 flex flex-col items-center justify-center;
-  @apply opacity-0 group-hover:opacity-100 transition-all duration-300;
-  @apply bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
-.upload-empty-state {
-  @apply flex flex-col items-center justify-center w-full h-full p-4;
+.dropzone-uploading {
+  @apply flex items-center gap-2;
 }
 
 .upload-spinner {
-  @apply w-10 h-10 border-[3px] border-indigo-200 border-t-indigo-500 rounded-full animate-spin;
+  @apply w-5 h-5 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin;
   @apply dark:border-indigo-800 dark:border-t-indigo-400;
 }
 

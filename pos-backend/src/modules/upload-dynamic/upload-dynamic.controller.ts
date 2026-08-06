@@ -5,6 +5,7 @@ import {
   Delete,
   Put,
   Param,
+  Query,
   UseInterceptors,
   UploadedFile,
   Body,
@@ -13,6 +14,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadDynamicService } from './upload-dynamic.service';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { UploadListQueryDto } from '../upload/dto/upload-list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Dynamic File Upload (S3)')
 @Controller('dynamicFileuploadS3')
@@ -72,17 +75,10 @@ export class UploadDynamicController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all uploaded files' })
-  async findAll() {
-    const files = await this.uploadDynamicService.findAll();
-    return {
-      PID: null,
-      data: files,
-      error: null,
-      message: 'Files retrieved successfully.',
-      statusCode: '1',
-      total: files.length,
-    };
+  @ApiOperation({ summary: 'List uploaded files (server-side paginated)' })
+  @ApiListQuery()
+  async findAll(@Query() query: UploadListQueryDto) {
+    return this.uploadDynamicService.findAll(query);
   }
 
   @Get(':id')

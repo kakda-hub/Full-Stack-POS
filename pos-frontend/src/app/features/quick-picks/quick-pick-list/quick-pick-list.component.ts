@@ -4,7 +4,7 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { QuickPickService } from '../../../core/services/api/quick-pick.service';
-import { QuickPickItem } from '../../../core/models';
+import { QuickPickItem } from '../../../models';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 import { QuickPickDetailComponent } from '../quick-pick-detail/quick-pick-detail.component';

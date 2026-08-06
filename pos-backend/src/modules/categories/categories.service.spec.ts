@@ -78,7 +78,7 @@ describe('CategoriesService', () => {
 
   // ─── findAll ──────────────────────────────────────────────────────────────
   describe('findAll', () => {
-    it('should return paginated categories ordered by name ASC', async () => {
+    it('should return paginated categories ordered by name ASC by default', async () => {
       const categories = [mockCategory];
       repository.findAndCount.mockResolvedValue([categories, 1]);
 
@@ -88,17 +88,17 @@ describe('CategoriesService', () => {
         expect.objectContaining({
           order: { name: 'ASC' },
           skip: 0,
-          take: 10,
+          take: 20,
         }),
       );
       expect(result.data).toEqual(categories);
       expect(result.total).toBe(1);
     });
 
-    it('should apply pagination parameters', async () => {
+    it('should apply offset/max pagination at the database level', async () => {
       repository.findAndCount.mockResolvedValue([[], 0]);
 
-      await service.findAll({ page: 2, limit: 5 });
+      await service.findAll({ offset: 5, max: 5 });
 
       expect(repository.findAndCount).toHaveBeenCalledWith(
         expect.objectContaining({

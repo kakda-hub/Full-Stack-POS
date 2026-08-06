@@ -15,8 +15,9 @@ import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ListQueryDto } from '../../common/dto/list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Categories')
 @ApiBearerAuth()
@@ -38,12 +39,9 @@ export class CategoriesController {
   // GET /api/v1/categories  [all roles]
   @Get()
   @ApiOperation({ summary: 'Get all categories (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  findAll(
-    @Query() pagination?: PaginationDto,
-  ) {
-    return this.categoriesService.findAll(pagination ?? {});
+  @ApiListQuery()
+  findAll(@Query() query: ListQueryDto) {
+    return this.categoriesService.findAll(query);
   }
 
   // GET /api/v1/categories/:id  [all roles]

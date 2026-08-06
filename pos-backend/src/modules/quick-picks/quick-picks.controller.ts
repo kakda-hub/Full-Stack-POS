@@ -8,6 +8,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { QuickPickListQueryDto } from './dto/quick-pick-list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Quick Picks')
 @ApiBearerAuth()
@@ -25,10 +27,11 @@ export class QuickPicksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all active quick-pick items' })
-  @ApiQuery({ name: 'includeInactive', required: false, type: String })
-  findAll(@Query('includeInactive') includeInactive?: string) {
-    return this.quickPicksService.findAll(includeInactive === 'true');
+  @ApiOperation({ summary: 'Get all active quick-pick items (paginated)' })
+  @ApiListQuery()
+  @ApiQuery({ name: 'includeInactive', required: false, type: String, description: 'Include inactive items' })
+  findAll(@Query() query: QuickPickListQueryDto) {
+    return this.quickPicksService.findAll(query);
   }
 
   @UseGuards(RolesGuard)

@@ -10,7 +10,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { NavStateService, NavItem } from '../../core/services/nav-state.service';
 import { PendingCountService } from '../../core/services/pending-count.service';
 import { AlertService } from '../../core/services/alert.service';
-import { User } from '../../core/models';
+import { User } from '../../models';
 
 describe('AdminLayoutComponent — theme toggle & sidebar collapse', () => {
   let fixture: ComponentFixture<AdminLayoutComponent>;

@@ -98,7 +98,7 @@ describe('ProductsService', () => {
 
   // ─── findAll ──────────────────────────────────────────────────────────────
   describe('findAll', () => {
-    it('should return paginated active products by default', async () => {
+    it('should return paginated active products by default (max=20)', async () => {
       const products = [mockProduct];
       repository.findAndCount.mockResolvedValue([products, 1]);
 
@@ -108,24 +108,85 @@ describe('ProductsService', () => {
         expect.objectContaining({
           where: { isActive: true },
           skip: 0,
-          take: 10,
+          take: 20,
           order: { name: 'ASC' },
         }),
       );
       expect(result.data).toEqual(products);
       expect(result.total).toBe(1);
       expect(result.page).toBe(1);
-      expect(result.limit).toBe(10);
+      expect(result.limit).toBe(20);
     });
 
     it('should include inactive products when requested', async () => {
       repository.findAndCount.mockResolvedValue([[mockProduct], 1]);
 
-      await service.findAll(true);
+      await service.findAll({ includeInactive: 'true' });
 
       expect(repository.findAndCount).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {},
+        }),
+      );
+    });
+
+    it('should apply offset/max at the database level', async () => {
+      repository.findAndCount.mockResolvedValue([[mockProduct], 150]);
+
+      await service.findAll({ offset: 20, max: 5 });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: 20,
+          take: 5,
+        }),
+      );
+    });
+
+    it('should filter by category id', async () => {
+      repository.findAndCount.mockResolvedValue([[mockProduct], 1]);
+
+      await service.findAll({ categoryId: 2 });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { isActive: true, categoryId: 2 },
+        }),
+      );
+    });
+
+    it('should search across name/nameKh/barcode', async () => {
+      repository.findAndCount.mockResolvedValue([[mockProduct], 1]);
+
+      await service.findAll({ search: 'coca' });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.arrayContaining([expect.any(Object)]),
+        }),
+      );
+    });
+
+    it('should apply a valid sortBy/sort', async () => {
+      repository.findAndCount.mockResolvedValue([[mockProduct], 1]);
+
+      await service.findAll({ sortBy: 'price', sort: 'asc' });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          order: { price: 'ASC' },
+        }),
+      );
+    });
+
+    it('should fall back to the default sort for an invalid sortBy', async () => {
+      repository.findAndCount.mockResolvedValue([[mockProduct], 1]);
+
+      await service.findAll({ sortBy: 'password', sort: 'desc' });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          order: { name: 'ASC' },
         }),
       );
     });

@@ -4,6 +4,7 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
+import { nextSort, SortDirection } from '../../../shared/helpers/sort.helper';
 import { PurchaseOrderService } from '../../../core/services/api/purchase-order.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
@@ -24,7 +25,25 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingPO: any | null = null;
   purchaseOrders = signal<any[]>([]);
-  filteredPOs = signal<any[]>([]);
+  searchQuery = signal('');
+
+  // Sorting (fields must be in the backend sort allowlist)
+  sortBy = signal('createdAt');
+  sortDir = signal<SortDirection>('desc');
+
+  /** Filtered + sorted view (search runs client-side, sort mirrors the server). */
+  filteredPOs = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    let result = this.purchaseOrders();
+    if (query) {
+      result = result.filter(
+        (po) =>
+          (po.orderNumber || '').toLowerCase().includes(query) ||
+          (po.supplier?.name || '').toLowerCase().includes(query)
+      );
+    }
+    return this.sortPOs(result);
+  });
 
   // Pagination
   pageSize = signal(10);
@@ -34,6 +53,8 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     return this.filteredPOs().slice(startIndex, startIndex + this.pageSize());
   });
 
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
   private defaultOption: MatDialogConfig = {
@@ -60,29 +81,58 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
 
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe((q) => {
-        const query = q.toLowerCase().trim();
-        if (!query) {
-          this.filteredPOs.set(this.purchaseOrders());
-        } else {
-          this.filteredPOs.set(
-            this.purchaseOrders().filter(
-              (po) =>
-                (po.orderNumber || '').toLowerCase().includes(query) ||
-                (po.supplier?.name || '').toLowerCase().includes(query)
-            )
-          );
-        }
+        this.searchQuery.set(q);
         this.pageIndex.set(0);
       });
   }
 
   loadPOs() {
     this.isLoading.set(true);
-    this.poService.getAll().subscribe((data: any) => {
-      this.purchaseOrders.set(data);
-      this.filteredPOs.set(data);
-      this.isLoading.set(false);
-      this.cdr.markForCheck();
+    const seq = ++this.loadSeq;
+    this.poService.getAll({
+      max: 100,
+      sortBy: this.sortBy(),
+      sort: this.sortDir(),
+    }).subscribe({
+      next: (data: any) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        this.purchaseOrders.set(data);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        console.error('Failed to load purchase orders', err);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  /** Column header click: toggle asc/desc on the active column, else start asc. */
+  onSort(field: string): void {
+    // Date/total default to descending first (newest / highest first).
+    const next = nextSort(this.sortBy(), this.sortDir(), field, ['createdAt', 'total']);
+    this.sortBy.set(next.sortBy);
+    this.sortDir.set(next.sort);
+    this.pageIndex.set(0);
+    this.loadPOs();
+  }
+
+  /** Client-side sort of the filtered subset (server sorts the fetched slice). */
+  private sortPOs(list: any[]): any[] {
+    const field = this.sortBy();
+    const dir = this.sortDir() === 'asc' ? 1 : -1;
+    return [...list].sort((a, b) => {
+      let cmp = 0;
+      switch (field) {
+        case 'orderNumber': cmp = (a.orderNumber || '').localeCompare(b.orderNumber || ''); break;
+        case 'createdAt': cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); break;
+        case 'total': cmp = Number(a.total ?? 0) - Number(b.total ?? 0); break;
+        case 'status': cmp = (a.status || '').localeCompare(b.status || ''); break;
+        default: cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return cmp * dir;
     });
   }
 

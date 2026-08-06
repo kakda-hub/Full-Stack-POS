@@ -11,8 +11,9 @@ import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { Customer } from '../customers/entities/customer.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginateQuery } from '../../common/helpers/pagination.helper';
+import { SaleListQueryDto } from './dto/sale-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginateQuery, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class SalesService {
@@ -163,7 +164,7 @@ export class SalesService {
     }
   }
 
-  async findAll(userId?: number, role?: string, pagination?: PaginationDto): Promise<PaginatedResult<Sale>> {
+  async findAll(userId?: number, role?: string, query: SaleListQueryDto = {}): Promise<PaginatedResult<Sale>> {
     const queryBuilder = this.saleRepository
       .createQueryBuilder('sale')
       .leftJoinAndSelect('sale.items', 'items')
@@ -179,15 +180,38 @@ export class SalesService {
         'user.id',
         'user.name',
         'user.email',
-      ])
-      .orderBy('sale.createdAt', 'DESC');
+      ]);
 
     // Cashiers can only see their own sales
     if (role === 'cashier') {
       queryBuilder.where('sale.userId = :userId', { userId });
     }
 
-    return paginateQuery(queryBuilder, pagination ?? {});
+    // Resource-specific filter: payment method
+    if (query.paymentMethod) {
+      queryBuilder.andWhere('sale.paymentMethod = :paymentMethod', {
+        paymentMethod: query.paymentMethod,
+      });
+    }
+
+    // Search matches the cashier name or the sale id
+    const search = query.search?.trim();
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.name LIKE :q OR CAST(sale.id AS CHAR) LIKE :q)',
+        { q: `%${search}%` },
+      );
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['createdAt', 'subtotal', 'discount', 'total', 'paymentMethod'],
+      'createdAt',
+      'DESC',
+    );
+    queryBuilder.orderBy(`sale.${sortBy}`, sortDirection);
+
+    return paginateQuery(queryBuilder, query);
   }
 
   async findOne(id: number): Promise<Sale> {

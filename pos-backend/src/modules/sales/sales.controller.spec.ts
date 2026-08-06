@@ -184,29 +184,39 @@ describe('SalesController (integration)', () => {
       expect(salesService.findAll).toHaveBeenCalledWith(
         2, // userId from CurrentUser('id')
         'cashier', // role from CurrentUser('role')
-        {
-          page: 1,
-          limit: 10,
-        },
+        {},
       );
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.total).toBe(1);
     });
 
-    it('should pass pagination parameters', async () => {
-      salesService.findAll.mockResolvedValue({ data: [], total: 0, page: 2, limit: 5 } as any);
+    it('should pass offset/max pagination parameters', async () => {
+      salesService.findAll.mockResolvedValue({ data: [], total: 0, page: 5, limit: 5 } as any);
 
       await request(app.getHttpServer())
-        .get('/api/v1/sales?page=2&limit=5')
+        .get('/api/v1/sales?offset=20&max=5')
         .expect(200);
 
       expect(salesService.findAll).toHaveBeenCalledWith(
         2,
         'cashier',
-        { page: 2, limit: 5 },
+        { offset: 20, max: 5 },
       );
+    });
 
-      // Note: page/limit are transformed by ValidationPipe with enableImplicitConversion
+    it('should pass the paymentMethod filter', async () => {
+      salesService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/sales?paymentMethod=aba')
+        .expect(200);
+
+      expect(salesService.findAll).toHaveBeenCalledWith(
+        2,
+        'cashier',
+        { paymentMethod: 'aba' },
+      );
     });
   });
 

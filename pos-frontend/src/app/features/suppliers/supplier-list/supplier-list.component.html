@@ -14,11 +14,11 @@
     </div>
   </div>
 
-  <!-- Table -->
+  <!-- Table (server-side paginated: rows are the current API page) -->
   <app-dynamic-table
     [columns]="columns"
-    [rows]="paginatedSuppliers()"
-    [totalCount]="filteredSuppliers().length"
+    [rows]="suppliers()"
+    [totalCount]="totalItems()"
     [pageIndex]="pageIndex()"
     [pageSize]="pageSize()"
     [isLoading]="isLoading()"

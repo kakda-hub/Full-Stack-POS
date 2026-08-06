@@ -157,32 +157,46 @@ describe('UsersController (integration)', () => {
 
   // ─── GET /api/v1/users ──────────────────────────────────────────────────
   describe('GET /api/v1/users', () => {
-    it('should return paginated users', async () => {
+    it('should return paginated users with the flat envelope', async () => {
       usersService.findAll.mockResolvedValue(mockPaginatedResult as any);
 
       const response = await request(app.getHttpServer())
         .get('/api/v1/users')
         .expect(200);
 
-      expect(usersService.findAll).toHaveBeenCalledWith({
-        page: 1,
-        limit: 10,
-      });
+      expect(usersService.findAll).toHaveBeenCalledWith({});
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.total).toBe(1);
     });
 
-    it('should pass pagination parameters', async () => {
-      usersService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 5 } as any);
+    it('should pass offset/max pagination parameters', async () => {
+      usersService.findAll.mockResolvedValue({ data: [], total: 0, page: 5, limit: 5 } as any);
 
       await request(app.getHttpServer())
-        .get('/api/v1/users?page=1&limit=5')
+        .get('/api/v1/users?offset=5&max=5')
         .expect(200);
 
       expect(usersService.findAll).toHaveBeenCalledWith({
-        page: 1,
-        limit: 5,
+        offset: 5,
+        max: 5,
       });
+    });
+
+    it('should pass the role filter', async () => {
+      usersService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/users?role=cashier')
+        .expect(200);
+
+      expect(usersService.findAll).toHaveBeenCalledWith({ role: 'cashier' });
+    });
+
+    it('should reject a max above 100', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/users?max=1000')
+        .expect(400);
     });
   });
 

@@ -6,8 +6,9 @@ import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.en
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto } from './dto/purchase-order.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginateQuery } from '../../common/helpers/pagination.helper';
+import { PurchaseOrderListQueryDto } from './dto/purchase-order-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginateQuery, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class PurchaseOrdersService {
@@ -73,16 +74,37 @@ export class PurchaseOrdersService {
     });
   }
 
-  async findAll(pagination?: PaginationDto): Promise<PaginatedResult<PurchaseOrder>> {
+  async findAll(query: PurchaseOrderListQueryDto = {}): Promise<PaginatedResult<PurchaseOrder>> {
     const qb = this.poRepository
       .createQueryBuilder('po')
       .leftJoinAndSelect('po.supplier', 'supplier')
       .leftJoinAndSelect('po.orderedByUser', 'user')
       .leftJoinAndSelect('po.items', 'items')
-      .leftJoinAndSelect('items.product', 'product')
-      .orderBy('po.createdAt', 'DESC');
+      .leftJoinAndSelect('items.product', 'product');
 
-    return paginateQuery(qb, pagination ?? {});
+    // Resource-specific filter: status
+    if (query.status) {
+      qb.andWhere('po.status = :status', { status: query.status });
+    }
+
+    // Search matches order number, notes, or supplier name
+    const search = query.search?.trim();
+    if (search) {
+      qb.andWhere(
+        '(po.orderNumber LIKE :q OR po.notes LIKE :q OR supplier.name LIKE :q)',
+        { q: `%${search}%` },
+      );
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['createdAt', 'updatedAt', 'orderNumber', 'total', 'status'],
+      'createdAt',
+      'DESC',
+    );
+    qb.orderBy(`po.${sortBy}`, sortDirection);
+
+    return paginateQuery(qb, query);
   }
 
   async findOne(id: number): Promise<PurchaseOrder> {

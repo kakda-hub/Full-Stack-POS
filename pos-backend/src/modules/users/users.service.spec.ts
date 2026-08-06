@@ -104,7 +104,7 @@ describe('UsersService', () => {
 
   // ─── findAll ──────────────────────────────────────────────────────────────
   describe('findAll', () => {
-    it('should return paginated users without passwords', async () => {
+    it('should return paginated users without passwords (max=20, createdAt DESC)', async () => {
       const users = [mockUser];
       repository.findAndCount.mockResolvedValue([users, 1]);
 
@@ -114,10 +114,25 @@ describe('UsersService', () => {
         expect.objectContaining({
           select: ['id', 'name', 'email', 'role', 'isActive', 'avatarUrl', 'createdAt'],
           order: { createdAt: 'DESC' },
+          skip: 0,
+          take: 20,
         }),
       );
       expect(result.data).toEqual(users);
       expect(result.total).toBe(1);
+    });
+
+    it('should filter by role and apply sort', async () => {
+      repository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.findAll({ role: 'cashier', sortBy: 'name', sort: 'asc' });
+
+      expect(repository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { role: 'cashier' },
+          order: { name: 'ASC' },
+        }),
+      );
     });
   });
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface CloudinaryResource {
@@ -13,36 +13,36 @@ export interface CloudinaryResource {
   bytes: number;
   width: number;
   height: number;
+  asset_folder?: string;
+  display_name?: string;
   url: string;
   secure_url: string;
 }
 
+/**
+ * Flat standard envelope returned by GET /api/v1/cloudinary.
+ * The endpoint uses @SkipIntercept(), so `data` is the resources array itself
+ * (no nested data.data.resources wrapping).
+ */
 export interface CloudinaryApiResponse {
   success: boolean;
   statusCode: number;
-  data: {
-    success: boolean;
-    statusCode: number;
-    data: {
-      resources: CloudinaryResource[];
-      rate_limit_allowed?: number;
-      rate_limit_reset_at?: string;
-      rate_limit_remaining?: number;
-    };
-  };
+  data: CloudinaryResource[];
+  total?: number;
   timestamp?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CloudinaryService {
   private apiUrl = '/api/v1/cloudinary';
 
   constructor(private http: HttpClient) {}
 
-  listResources(): Observable<CloudinaryApiResponse> {
-    return this.http.get<CloudinaryApiResponse>(this.apiUrl);
+  listResources(search?: string): Observable<CloudinaryApiResponse> {
+    const params = search ? new HttpParams().set('search', search) : undefined;
+    return this.http.get<CloudinaryApiResponse>(this.apiUrl, { params });
   }
 
   uploadFile(file: File, folder: string = 'pos-general'): Observable<any> {
@@ -50,10 +50,6 @@ export class CloudinaryService {
     formData.append('file', file);
     formData.append('folder', folder);
     return this.http.post(`${this.apiUrl}/upload`, formData);
-  }
-
-  renameResource(oldPublicId: string, newPublicId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/rename`, { oldPublicId, newPublicId });
   }
 
   deleteResource(publicId: string): Observable<any> {

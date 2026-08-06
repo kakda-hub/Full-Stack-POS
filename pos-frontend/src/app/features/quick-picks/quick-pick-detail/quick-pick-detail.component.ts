@@ -5,7 +5,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { QuickPickService } from '../../../core/services/api/quick-pick.service';
-import { QuickPickItem } from '../../../core/models';
+import { QuickPickItem } from '../../../models';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({

@@ -8,8 +8,9 @@ import { Sale } from '../sales/entities/sale.entity';
 import { SaleItem } from '../sales/entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { CreateReturnDto } from './dto/return.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginateQuery } from '../../common/helpers/pagination.helper';
+import { ReturnListQueryDto } from './dto/return-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginateQuery, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class ReturnsService {
@@ -94,16 +95,36 @@ export class ReturnsService {
     }
   }
 
-  async findAll(pagination?: PaginationDto): Promise<PaginatedResult<Return>> {
+  async findAll(query: ReturnListQueryDto = {}): Promise<PaginatedResult<Return>> {
     const qb = this.returnRepository
       .createQueryBuilder('ret')
       .leftJoinAndSelect('ret.sale', 'sale')
       .leftJoinAndSelect('ret.processedByUser', 'user')
       .leftJoinAndSelect('ret.items', 'items')
-      .leftJoinAndSelect('items.product', 'product')
-      .orderBy('ret.createdAt', 'DESC');
+      .leftJoinAndSelect('items.product', 'product');
 
-    return paginateQuery(qb, pagination ?? {});
+    // Resource-specific filter: status
+    if (query.status) {
+      qb.andWhere('ret.status = :status', { status: query.status });
+    }
+
+    // Search matches the reason or the return id
+    const search = query.search?.trim();
+    if (search) {
+      qb.andWhere('(ret.reason LIKE :q OR CAST(ret.id AS CHAR) LIKE :q)', {
+        q: `%${search}%`,
+      });
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['createdAt', 'total', 'status'],
+      'createdAt',
+      'DESC',
+    );
+    qb.orderBy(`ret.${sortBy}`, sortDirection);
+
+    return paginateQuery(qb, query);
   }
 
   async findOne(id: number): Promise<Return> {

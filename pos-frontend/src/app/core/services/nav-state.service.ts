@@ -27,16 +27,16 @@ export class NavStateService {
     { label: 'Product', labelKm: 'ផលិតផល', route: '/products', icon: 'product' },
     { label: 'Categories', labelKm: 'ប្រភេទ', route: '/categories', icon: 'category' },
     {
-      label: 'Management',
+      label: 'Page Management',
       labelKm: 'គ្រប់គ្រង',
       route: '/settings',
-      icon: 'management',
+      icon: 'settings',
       subMenus: [
         // { label: 'Management Page', labelKm: 'គ្រប់គ្រង់ទំព័រ', route: '/management-page', icon: 'management' },
         { label: 'User Management', labelKm: 'ការគ្រប់គ្រងអ្នកប្រើ', route: '/user-management', icon: 'user' },
         { label: 'Permission', labelKm: 'ការអនុញ្ញាត', route: '/permission', icon: 'permission' },
         // { label: 'User Role', labelKm: 'តួនាទីអ្នកប្រើ', route: '/user-role', icon: 'role' },
-        // { label: 'Cloudinary File Upload', labelKm: 'ការផ្ទុកឯកសារ Cloudinary', route: '/cloudinary-file-upload', icon: 'cloudinary' },
+        { label: 'Cloudinary File Upload', labelKm: 'ការផ្ទុកឯកសារ Cloudinary', route: '/cloudinary-file-upload', icon: asAppIconName('cloudinary') },
       ],
     },
   ]);

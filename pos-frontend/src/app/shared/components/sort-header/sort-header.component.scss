@@ -1,0 +1,27 @@
+/* ==========================================================
+   Sortable Table Column Header
+   ========================================================== */
+
+.sort-btn {
+  @apply inline-flex items-center gap-1.5 font-semibold cursor-pointer select-none transition-colors duration-150;
+  @apply text-slate-600 dark:text-slate-300;
+  @apply hover:text-indigo-600 dark:hover:text-indigo-400;
+
+  /* Right-aligned columns inherit alignment from the parent th's text-align. */
+  &--active {
+    @apply text-indigo-600 dark:text-indigo-400;
+  }
+}
+
+.sort-label {
+  @apply whitespace-nowrap;
+}
+
+.sort-icon {
+  @apply w-3.5 h-3.5 shrink-0;
+}
+
+.sort-icon--idle {
+  @apply text-slate-300 dark:text-slate-600;
+  @apply group-hover:text-slate-400;
+}

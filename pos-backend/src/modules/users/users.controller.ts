@@ -13,11 +13,12 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserListQueryDto } from './dto/user-list-query.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -37,12 +38,10 @@ export class UsersController {
   // GET /api/v1/users
   @Get()
   @ApiOperation({ summary: 'Get all users (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  findAll(
-    @Query() pagination?: PaginationDto,
-  ) {
-    return this.usersService.findAll(pagination ?? {});
+  @ApiListQuery()
+  @ApiQuery({ name: 'role', required: false, enum: ['admin', 'cashier'], description: 'Filter by role' })
+  findAll(@Query() query: UserListQueryDto) {
+    return this.usersService.findAll(query);
   }
 
   // GET /api/v1/users/:id

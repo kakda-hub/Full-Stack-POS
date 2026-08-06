@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
@@ -11,6 +11,7 @@ import { ReusableDialogService } from '../../../core/services/dialogs/reusable-d
 import { SupplierDetailComponent } from '../supplier-detail/supplier-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { buildListParams } from '../../../core/services/api/list-params';
 
 @Component({
   selector: 'app-supplier-list',
@@ -22,8 +23,13 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 export class SupplierListComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   editingSupplier: any | null = null;
+
+  // Server-side pagination state
   suppliers = signal<any[]>([]);
-  filteredSuppliers = signal<any[]>([]);
+  totalItems = signal(0);
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  searchQuery = signal('');
 
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
@@ -33,14 +39,8 @@ export class SupplierListComponent implements OnInit, OnDestroy {
     { key: 'email', label: 'Email', labelKm: 'អ៊ីមែល', responsive: 'lg' },
   ];
 
-  // Pagination
-  pageSize = signal(10);
-  pageIndex = signal(0);
-  paginatedSuppliers = computed(() => {
-    const startIndex = this.pageIndex() * this.pageSize();
-    return this.filteredSuppliers().slice(startIndex, startIndex + this.pageSize());
-  });
-
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
   private defaultOption: MatDialogConfig = {
@@ -66,32 +66,46 @@ export class SupplierListComponent implements OnInit, OnDestroy {
 
     this.searchSubject.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe((q) => {
-        const query = q.toLowerCase().trim();
-        if (!query) {
-          this.filteredSuppliers.set(this.suppliers());
-        } else {
-          this.filteredSuppliers.set(
-            this.suppliers().filter(
-              (s) =>
-                (s.name || '').toLowerCase().includes(query) ||
-                (s.contactPerson || '').toLowerCase().includes(query) ||
-                (s.phone || '').includes(query) ||
-                (s.email || '').toLowerCase().includes(query)
-            )
-          );
-        }
+        this.searchQuery.set(q.trim());
         this.pageIndex.set(0);
+        this.loadSuppliers();
       });
   }
 
+  /** Loads one server-side page using the standard list query params. */
   loadSuppliers() {
     this.isLoading.set(true);
-    this.supplierService.list().subscribe((res: any) => {
-      const data = res.data || [];
-      this.suppliers.set(data);
-      this.filteredSuppliers.set(data);
-      this.isLoading.set(false);
-      this.cdr.markForCheck();
+    const seq = ++this.loadSeq;
+    const params = buildListParams({
+      search: this.searchQuery() || undefined,
+      sortBy: 'name',
+      sort: 'asc',
+      offset: this.pageIndex() * this.pageSize(),
+      max: this.pageSize(),
+    });
+    this.supplierService.list({ params }).subscribe({
+      next: (res: any) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        const data = res?.data ?? [];
+        // After a delete, the current page may be empty — step back one page.
+        if (data.length === 0 && this.pageIndex() > 0) {
+          this.pageIndex.update(p => p - 1);
+          this.loadSuppliers();
+          return;
+        }
+        this.suppliers.set(data);
+        this.totalItems.set(res?.total ?? data.length);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (seq !== this.loadSeq) return; // stale response — ignore
+        console.error('Failed to load suppliers', err);
+        this.suppliers.set([]);
+        this.totalItems.set(0);
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -107,6 +121,7 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   onPageChange(event: PageEvent) {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
+    this.loadSuppliers();
   }
 
   openEdit(s: any): void {
@@ -164,6 +179,8 @@ export class SupplierListComponent implements OnInit, OnDestroy {
         this.editingSupplier = null;
         return;
       }
+      const wasCreate = !this.editingSupplier;
+      if (wasCreate) this.pageIndex.set(0); // show the newly created record
       this.loadSuppliers();
       const isEdit = !!this.editingSupplier;
       this.alertService.success(

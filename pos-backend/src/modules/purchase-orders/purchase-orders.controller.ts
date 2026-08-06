@@ -9,7 +9,8 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { PurchaseOrderListQueryDto } from './dto/purchase-order-list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Purchase Orders')
 @ApiBearerAuth()
@@ -27,10 +28,10 @@ export class PurchaseOrdersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all purchase orders (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  findAll(@Query() pagination?: PaginationDto) {
-    return this.poService.findAll(pagination ?? {});
+  @ApiListQuery()
+  @ApiQuery({ name: 'status', required: false, enum: ['draft', 'ordered', 'partially_received', 'received', 'cancelled'], description: 'Filter by status' })
+  findAll(@Query() query: PurchaseOrderListQueryDto) {
+    return this.poService.findAll(query);
   }
 
   @Get('pending-count')

@@ -12,12 +12,13 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, AdjustStockDto } from './dto/product.dto';
+import { ProductListQueryDto } from './dto/product-list-query.dto';
 import { LowStockQueryDto } from './dto/low-stock-query.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Products')
 @ApiBearerAuth()
@@ -39,21 +40,19 @@ export class ProductsController {
   // GET /api/v1/products  [all roles]
   @Get()
   @ApiOperation({ summary: 'Get all products (paginated)' })
-  @ApiQuery({ name: 'includeInactive', required: false, type: String })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  findAll(
-    @Query('includeInactive') includeInactive?: string,
-    @Query() pagination?: PaginationDto,
-  ) {
-    return this.productsService.findAll(includeInactive === 'true', pagination ?? {});
+  @ApiListQuery()
+  @ApiQuery({ name: 'includeInactive', required: false, type: String, description: 'Include inactive products' })
+  @ApiQuery({ name: 'categoryId', required: false, type: Number, description: 'Filter by category id' })
+  findAll(@Query() query: ProductListQueryDto) {
+    return this.productsService.findAll(query);
   }
 
   // GET /api/v1/products/low-stock  [all roles]
   @Get('low-stock')
   @ApiOperation({ summary: 'Get all low-stock products (stock ≤ threshold)' })
+  @ApiListQuery()
   getLowStock(@Query() query: LowStockQueryDto) {
-    return this.productsService.getLowStock(query.threshold, query);
+    return this.productsService.getLowStock(query);
   }
 
   // GET /api/v1/products/barcode/:barcode  [all roles]

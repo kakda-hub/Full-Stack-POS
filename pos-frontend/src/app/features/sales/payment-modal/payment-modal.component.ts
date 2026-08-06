@@ -4,7 +4,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { CustomerService } from '../../../core/services/api/customer.service';
 import { KhqrService } from '../../../core/services/api/khqr.service';
-import { Customer } from '../../../core/models';
+import { Customer } from '../../../models';
 import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
 
 @Component({

@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { FileUpload } from './entities/upload.entity';
 import { v2 as cloudinary } from 'cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import * as streamifier from 'streamifier';
+import { UploadListQueryDto } from './dto/upload-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class UploadService {
@@ -83,5 +86,37 @@ export class UploadService {
       statusCode: '1',
       total: null,
     };
+  }
+
+  /**
+   * Server-side paginated list of uploaded file records.
+   * Search matches originalFileName / fileName / fileUrl (case-insensitive).
+   */
+  async findAll(query?: UploadListQueryDto): Promise<PaginatedResult<FileUpload>> {
+    const q = query?.search?.trim().toLowerCase();
+    const base: FindOptionsWhere<FileUpload> = { isDeleted: false };
+    if (query?.destinationStorage) {
+      base.destinationStorage = query.destinationStorage;
+    }
+
+    const where: FindOptionsWhere<FileUpload>[] = q
+      ? [
+          { ...base, originalFileName: Like(`%${q}%`) },
+          { ...base, fileName: Like(`%${q}%`) },
+          { ...base, fileUrl: Like(`%${q}%`) },
+        ]
+      : [base];
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['uploadDate', 'originalFileName', 'fileName', 'fileSize', 'id'],
+      'uploadDate',
+      'DESC',
+    );
+
+    return paginate(this.uploadRepository, query, {
+      where,
+      order: { [sortBy]: sortDirection },
+    });
   }
 }

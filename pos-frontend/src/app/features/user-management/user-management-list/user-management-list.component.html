@@ -60,8 +60,8 @@
             <th class="th th--right">{{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}</th>
           </tr>
         </thead>
-        <tbody [@listAnimation]="paginatedItems().length" class="table-tbody">
-          <tr *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="table-row">
+        <tbody [@listAnimation]="items().length" class="table-tbody">
+          <tr *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="table-row">
             <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
             <td class="td">
               <div class="flex items-center gap-3">
@@ -105,7 +105,7 @@
               </div>
             </td>
           </tr>
-          <tr *ngIf="paginatedItems().length === 0">
+          <tr *ngIf="items().length === 0">
             <td colspan="6" class="empty-state-cell">
               <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -119,16 +119,17 @@
       </table>
 
       <app-pagination
-        [totalItems]="filteredItems().length"
+        [totalItems]="totalItems()"
         [pageSize]="pageSize()"
         [currentPage]="pageIndex() + 1"
         (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       ></app-pagination>
     </div>
 
     <!-- ===== MOBILE: Cards ===== -->
     <div class="pl-mobile-cards">
-      <div *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
+      <div *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
         <div class="pl-card-header">
           <div class="flex items-center gap-3">
             <app-ui-avatar
@@ -172,7 +173,7 @@
           </button>
         </div>
       </div>
-      <div *ngIf="paginatedItems().length === 0" class="pl-cards-empty">
+      <div *ngIf="items().length === 0" class="pl-cards-empty">
         <p class="text-sm font-medium text-slate-400">
           {{ lang.currentLang() === 'km' ? 'គ្មានអ្នកប្រើ' : 'No users found' }}
         </p>

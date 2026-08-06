@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementR
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { Transaction, Product, CartItem, QuickPickItem } from '../../../core/models';
+import { Transaction, Product, CartItem, QuickPickItem } from '../../../models';
 import { AlertService } from '../../../core/services/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';

@@ -13,6 +13,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ListQueryDto } from '../../common/dto/list-query.dto';
+import { ApiListQuery } from '../../common/decorators/api-list-query.decorator';
 
 @ApiTags('Customers')
 @ApiBearerAuth()
@@ -30,9 +32,10 @@ export class CustomersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all active customers' })
-  findAll() {
-    return this.customersService.findAll();
+  @ApiOperation({ summary: 'Get all active customers (paginated)' })
+  @ApiListQuery()
+  findAll(@Query() query: ListQueryDto) {
+    return this.customersService.findAll(query);
   }
 
   @Get('phone/:phone')

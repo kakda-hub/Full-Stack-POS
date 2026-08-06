@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { IRequestOptions } from './abstract-rest.service';

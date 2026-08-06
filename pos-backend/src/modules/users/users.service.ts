@@ -4,13 +4,14 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
-import { paginate } from '../../common/helpers/pagination.helper';
+import { UserListQueryDto } from './dto/user-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class UsersService {
@@ -38,10 +39,31 @@ export class UsersService {
     return result;
   }
 
-  async findAll(pagination?: PaginationDto): Promise<PaginatedResult<Omit<User, 'password'>>> {
-    return paginate(this.userRepository, pagination ?? {}, {
+  async findAll(query: UserListQueryDto = {}): Promise<PaginatedResult<Omit<User, 'password'>>> {
+    const baseWhere: FindOptionsWhere<User> = {};
+    if (query.role) baseWhere.role = query.role as UserRole;
+
+    const search = query.search?.trim();
+    let where: FindOptionsWhere<User> | FindOptionsWhere<User>[] = baseWhere;
+    if (search) {
+      const like = Like(`%${search}%`);
+      where = [
+        { ...baseWhere, name: like },
+        { ...baseWhere, email: like },
+      ];
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['name', 'email', 'role', 'createdAt'],
+      'createdAt',
+      'DESC',
+    );
+
+    return paginate(this.userRepository, query, {
+      where,
       select: ['id', 'name', 'email', 'role', 'isActive', 'avatarUrl', 'createdAt'],
-      order: { createdAt: 'DESC' },
+      order: { [sortBy]: sortDirection },
     });
   }
 

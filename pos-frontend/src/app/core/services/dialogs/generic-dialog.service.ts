@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DialogConfig } from '../../models/enums/dialog-config.enum';
+import { DialogConfig } from '../../../enums/dialog-config.enum';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 

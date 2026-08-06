@@ -10,7 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlertService } from '../../../core/services/alert.service';
@@ -18,6 +18,7 @@ import { modalAnimation, backdropAnimation } from '../../../shared/animations/an
 import { ProductService } from '../../../core/services/api/product.service';
 import { CategoriesService } from '../../../core/services/api/categories.service';
 import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
+import { CloudinaryMediaGalleryModalComponent, MediaGalleryData } from '../../../shared/components/cloudinary-media-gallery/cloudinary-media-gallery-modal.component';
 
 @Component({
   selector: 'app-product-detail',
@@ -31,7 +32,6 @@ export class ProductDetailComponent implements OnInit {
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
-  /** Banner-level server error (e.g., network failure, unexpected error) */
   serverError = signal<string | null>(null);
 
   categories: any[] = [];
@@ -40,6 +40,18 @@ export class ProductDetailComponent implements OnInit {
 
   get product(): any | null {
     return this.data?.product ?? null;
+  }
+
+  get imgUrls(): string[] {
+    const val = this.form.get('imgUrls')?.value as string[] | undefined;
+    if (val && val.length > 0) return val;
+    const single = this.form.get('imgUrl')?.value as string | undefined;
+    if (single) return [single];
+    return [];
+  }
+
+  get primaryImgUrl(): string | undefined {
+    return this.imgUrls[0];
   }
 
   constructor(
@@ -51,6 +63,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     public theme: ThemeService,
     private http: HttpClient,
+    private dialog: MatDialog,
     private dialogRef: MatDialogRef<ProductDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { product?: any } | null,
   ) {}
@@ -59,7 +72,6 @@ export class ProductDetailComponent implements OnInit {
     this.initForm();
     this.getAllCategories();
 
-    // Auto-clear server-side field errors when the user edits the field
     this.form.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -75,6 +87,7 @@ export class ProductDetailComponent implements OnInit {
 
   private initForm() {
     const product = this.product;
+    const existingUrls = product?.imgUrls || (product?.imgUrl ? [product.imgUrl] : []);
     this.form = this.fb.group({
       name: [product?.name || '', [Validators.required, Validators.minLength(2)]],
       nameKh: [product?.nameKh || product?.nameKm || ''],
@@ -85,6 +98,7 @@ export class ProductDetailComponent implements OnInit {
       barcode: [product?.barcode || '', [Validators.required]],
       categoryId: [Number(product?.categoryId ?? product?.category) || '', [Validators.required]],
       imgUrl: [product?.imgUrl || ''],
+      imgUrls: [existingUrls],
       description: [product?.description || ''],
     });
   }
@@ -100,38 +114,85 @@ export class ProductDetailComponent implements OnInit {
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    this.uploadFile(file);
+  }
 
+  uploadFile(file: File): void {
     this.isUploading.set(true);
-
     this.cloudinaryService.uploadFile(file).subscribe({
       next: (res) => {
-        // Extract fileUrl from the nested response envelope
         const fileUrl =
-          res?.data?.data?.fileUrl ||          // { data: { data: { fileUrl } } }
-          res?.data?.data?.[0]?.fileUrl ||      // { data: { data: [{ fileUrl }] } }
-          res?.data?.fileUrl;                    // { data: { fileUrl } }
+          res?.data?.data?.fileUrl ||
+          res?.data?.data?.[0]?.fileUrl ||
+          res?.data?.fileUrl ||
+          res?.secure_url ||
+          res?.url;
 
         if (fileUrl) {
-          this.form.patchValue({ imgUrl: fileUrl });
+          const currentUrls = this.form.get('imgUrls')?.value as string[] || [];
+          const updated = [fileUrl, ...currentUrls];
+          this.form.patchValue({ imgUrls: updated, imgUrl: fileUrl });
           this.alertService.success(
             this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Image uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
           );
         }
         this.isUploading.set(false);
       },
-      error: (err) => {
-        console.error('Upload failed', err);
+      error: () => {
         this.alertService.error(
           this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Image upload failed',
-          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error'
+          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error',
         );
         this.isUploading.set(false);
       },
     });
   }
 
-  /** Clear all server-side errors on the form */
+  openGallery(): void {
+    const data: MediaGalleryData = {
+      selectedUrl: this.primaryImgUrl,
+    };
+    const galleryDialogRef = this.dialog.open(CloudinaryMediaGalleryModalComponent, {
+      panelClass: 'medium-dialog',
+      data,
+    });
+
+    galleryDialogRef.afterClosed().subscribe((url: string | null) => {
+      this.onGallerySelect(url);
+    });
+  }
+
+  onGallerySelect(url: string | null): void {
+    if (url) {
+      const currentUrls = this.form.get('imgUrls')?.value as string[] || [];
+      if (!currentUrls.includes(url)) {
+        const updated = [url, ...currentUrls];
+        this.form.patchValue({ imgUrls: updated, imgUrl: url });
+      } else {
+        this.form.patchValue({ imgUrl: url });
+      }
+    }
+  }
+
+  removeImage(index: number): void {
+    const currentUrls = this.form.get('imgUrls')?.value as string[] || [];
+    const updated = currentUrls.filter((_: string, i: number) => i !== index);
+    this.form.patchValue({ imgUrls: updated });
+    if (this.primaryImgUrl === undefined && updated.length > 0) {
+      this.form.patchValue({ imgUrl: updated[0] });
+    } else if (updated.length === 0) {
+      this.form.patchValue({ imgUrl: '' });
+    }
+  }
+
+  setPrimary(index: number): void {
+    const currentUrls = this.form.get('imgUrls')?.value as string[] || [];
+    if (index === 0) return;
+    const updated = [currentUrls[index], ...currentUrls.filter((_: string, i: number) => i !== index)];
+    this.form.patchValue({ imgUrls: updated });
+  }
+
   private clearServerErrors(): void {
     this.serverError.set(null);
     Object.keys(this.form.controls).forEach(key => {
@@ -143,12 +204,10 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  /** Map HTTP error to form field errors or banner error */
   private handleServerError(err: HttpErrorResponse): void {
     this.clearServerErrors();
 
     if (err.status === 409) {
-      // Conflict — e.g., duplicate barcode
       const msg = err.error?.message || err.message || '';
       if (msg.toLowerCase().includes('barcode')) {
         this.form.get('barcode')?.setErrors({ serverError: msg });
@@ -160,22 +219,18 @@ export class ProductDetailComponent implements OnInit {
     }
 
     if (err.status === 400 && Array.isArray(err.error?.message)) {
-      // Validation error from NestJS ValidationPipe
       const fieldMessages = err.error.message as string[];
       fieldMessages.forEach(msg => {
-        // Try to match field name from message like "name must be..."
         const matched = msg.match(/^(\w+)\s/);
         if (matched && this.form.get(matched[1])) {
           this.form.get(matched[1])?.setErrors({ serverError: msg });
         } else {
-          // General validation message
           this.serverError.update(prev => prev ? `${prev}\n${msg}` : msg);
         }
       });
       return;
     }
 
-    // Network or unexpected error
     const msg = err.error?.message || err.message || 'An unexpected error occurred';
     this.serverError.set(msg);
   }
@@ -189,9 +244,8 @@ export class ProductDetailComponent implements OnInit {
     this.isSaving.set(true);
     this.serverError.set(null);
 
-    // Strip empty strings from optional fields so they aren't sent to the API
     const payload = Object.fromEntries(
-      Object.entries(this.form.value).filter(([_, v]) => v !== '')
+      Object.entries(this.form.value).filter(([_, v]) => v !== '' && v !== null && v !== undefined),
     );
 
     const product = this.product;

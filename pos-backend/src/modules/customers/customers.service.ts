@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Customer } from './entities/customer.entity';
 import {
   CreateCustomerDto,
@@ -8,6 +8,9 @@ import {
   AddPointsDto,
   RedeemPointsDto,
 } from './dto/customer.dto';
+import { ListQueryDto } from '../../common/dto/list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class CustomersService {
@@ -27,10 +30,30 @@ export class CustomersService {
     return this.customerRepository.save(customer);
   }
 
-  async findAll(): Promise<Customer[]> {
-    return this.customerRepository.find({
-      where: { isActive: true },
-      order: { name: 'ASC' },
+  async findAll(query: ListQueryDto = {}): Promise<PaginatedResult<Customer>> {
+    const baseWhere: FindOptionsWhere<Customer> = { isActive: true };
+
+    const search = query.search?.trim();
+    let where: FindOptionsWhere<Customer> | FindOptionsWhere<Customer>[] = baseWhere;
+    if (search) {
+      const like = Like(`%${search}%`);
+      where = [
+        { ...baseWhere, name: like },
+        { ...baseWhere, phone: like },
+        { ...baseWhere, email: like },
+      ];
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['name', 'phone', 'email', 'totalSpent', 'totalPurchases', 'loyaltyPoints', 'createdAt'],
+      'name',
+      'ASC',
+    );
+
+    return paginate(this.customerRepository, query, {
+      where,
+      order: { [sortBy]: sortDirection },
     });
   }
 

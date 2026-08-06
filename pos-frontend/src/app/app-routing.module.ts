@@ -68,11 +68,11 @@ const routes: Routes = [
         loadChildren: () => import('./features/user-management/user-management.module').then((m) => m.UserManagementModule),
         data: { breadcrumb: 'User Management', labelKh: 'ការគ្រប់គ្រងអ្នកប្រើប្រាស់' }
       },
-      // {
-      //   path: 'cloudinary-file-upload', 
-      //   loadChildren: () => import('./features/cloudinary-file-upload/cloudinary-file-upload.module').then((m) => m.CloudinaryFileUploadModule),
-      //   data: { breadcrumb: 'Cloudinary File Upload', labelKh: 'ការផ្ទុកឯកសារ Cloudinary' }
-      // },
+      {
+        path: 'cloudinary-file-upload', 
+        loadChildren: () => import('./features/cloudinary-file-upload/cloudinary-file-upload.module').then((m) => m.CloudinaryFileUploadModule),
+        data: { breadcrumb: 'Cloudinary File Upload', labelKh: 'ការផ្ទុកឯកសារ Cloudinary' }
+      },
       // {
       //   path: 'user-role',
       //   loadChildren: () => import('./features/user-role/user-role.module').then((m) => m.UserRoleModule),

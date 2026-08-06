@@ -14,8 +14,6 @@ export interface ApiResponse<T> {
   statusCode: number;
   data: T;
   total?: number;
-  page?: number;
-  limit?: number;
   timestamp: string;
 }
 
@@ -41,7 +39,9 @@ export class ResponseInterceptor<T>
 
     return next.handle().pipe(
       map((data: any) => {
-        // Check if data is a paginated result (has data array + total + page + limit)
+        // Check if data is a paginated result ({ data, total, page, limit } as
+        // produced by the pagination helper). `page`/`limit` are kept in the
+        // payload only for detection — they are NOT emitted to the client.
         const isPaginated =
           data &&
           typeof data === 'object' &&
@@ -57,8 +57,6 @@ export class ResponseInterceptor<T>
             statusCode,
             data: data.data,
             total: data.total,
-            page: data.page,
-            limit: data.limit,
             timestamp: new Date().toISOString(),
           };
         }

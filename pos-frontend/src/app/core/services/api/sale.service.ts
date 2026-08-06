@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiEndpointEnum } from '../../models/enums/api-endpoint-enum';
+import { ApiEndpointEnum } from '../../../enums/api-endpoint-enum';
+import { ListQuery } from '../../../models/list-query';
+import { buildListParams } from './list-params';
 
 export interface CreateSaleItemDto {
   productId: number;
@@ -59,8 +61,9 @@ export class SaleService {
     };
   }
 
-  getAllSales(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  getAllSales(query?: ListQuery): Observable<any[]> {
+    const params = buildListParams(query ?? { max: 100, sortBy: 'createdAt', sort: 'desc' });
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => {
         const data = res?.data ?? res ?? [];
         return data.map((s: any) => this.mapSale(s));

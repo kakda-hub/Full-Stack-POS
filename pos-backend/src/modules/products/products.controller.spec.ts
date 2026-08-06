@@ -144,43 +144,82 @@ describe('ProductsController (integration)', () => {
 
   // ─── GET /api/v1/products ───────────────────────────────────────────────
   describe('GET /api/v1/products', () => {
-    it('should return paginated products', async () => {
+    it('should return the flat paginated envelope (no page/limit)', async () => {
       productsService.findAll.mockResolvedValue(mockPaginatedResult as any);
 
       const response = await request(app.getHttpServer())
         .get('/api/v1/products')
         .expect(200);
 
-      expect(productsService.findAll).toHaveBeenCalledWith(false, {
-        page: 1,
-        limit: 10,
-      });
+      expect(productsService.findAll).toHaveBeenCalledWith({});
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(1);
       expect(response.body.total).toBe(1);
+      expect(typeof response.body.timestamp).toBe('string');
+      expect(response.body.page).toBeUndefined();
+      expect(response.body.limit).toBeUndefined();
     });
 
     it('should pass includeInactive=true query param', async () => {
-      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 10 } as any);
+      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
 
       await request(app.getHttpServer())
         .get('/api/v1/products?includeInactive=true')
         .expect(200);
 
-      expect(productsService.findAll).toHaveBeenCalledWith(true, expect.any(Object));
+      expect(productsService.findAll).toHaveBeenCalledWith({ includeInactive: 'true' });
     });
 
-    it('should pass pagination params', async () => {
-      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 2, limit: 5 } as any);
+    it('should pass categoryId filter', async () => {
+      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
 
       await request(app.getHttpServer())
-        .get('/api/v1/products?page=2&limit=5')
+        .get('/api/v1/products?categoryId=2')
         .expect(200);
 
-      expect(productsService.findAll).toHaveBeenCalledWith(false, {
-        page: 2,
-        limit: 5,
+      expect(productsService.findAll).toHaveBeenCalledWith({ categoryId: 2 });
+    });
+
+    it('should pass offset/max pagination params', async () => {
+      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 5, limit: 5 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/products?offset=20&max=5')
+        .expect(200);
+
+      expect(productsService.findAll).toHaveBeenCalledWith({ offset: 20, max: 5 });
+    });
+
+    it('should pass search/sort params', async () => {
+      productsService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 } as any);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/products?search=coca&sortBy=name&sort=asc')
+        .expect(200);
+
+      expect(productsService.findAll).toHaveBeenCalledWith({
+        search: 'coca',
+        sortBy: 'name',
+        sort: 'asc',
       });
+    });
+
+    it('should reject an invalid sort direction', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/products?sort=invalid')
+        .expect(400);
+    });
+
+    it('should reject a negative offset', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/products?offset=-1')
+        .expect(400);
+    });
+
+    it('should reject a max above 100', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/products?max=1000')
+        .expect(400);
     });
   });
 

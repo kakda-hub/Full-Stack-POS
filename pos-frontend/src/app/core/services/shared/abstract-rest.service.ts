@@ -1,6 +1,6 @@
 import { HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DataResponse } from '../../models/data-response';
+import { DataResponse } from '../../../models/data-response';
 import { Observable } from 'rxjs';
 import { DynamicHttp } from './dynamic-http.service';
 

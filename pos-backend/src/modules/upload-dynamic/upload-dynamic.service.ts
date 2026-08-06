@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import * as path from 'path';
 import { FileUpload } from '../upload/entities/upload.entity';
+import { UploadListQueryDto } from '../upload/dto/upload-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
 
 @Injectable()
 export class UploadDynamicService {
@@ -73,10 +76,35 @@ export class UploadDynamicService {
     }
   }
 
-  async findAll() {
-    return await this.uploadRepository.find({
-      where: { isDeleted: false },
-      order: { uploadDate: 'DESC' },
+  /**
+   * Server-side paginated list of uploaded file records.
+   * Search matches originalFileName / fileName / fileUrl (case-insensitive).
+   */
+  async findAll(query?: UploadListQueryDto): Promise<PaginatedResult<FileUpload>> {
+    const q = query?.search?.trim().toLowerCase();
+    const base: FindOptionsWhere<FileUpload> = { isDeleted: false };
+    if (query?.destinationStorage) {
+      base.destinationStorage = query.destinationStorage;
+    }
+
+    const where: FindOptionsWhere<FileUpload>[] = q
+      ? [
+          { ...base, originalFileName: Like(`%${q}%`) },
+          { ...base, fileName: Like(`%${q}%`) },
+          { ...base, fileUrl: Like(`%${q}%`) },
+        ]
+      : [base];
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['uploadDate', 'originalFileName', 'fileName', 'fileSize', 'id'],
+      'uploadDate',
+      'DESC',
+    );
+
+    return paginate(this.uploadRepository, query, {
+      where,
+      order: { [sortBy]: sortDirection },
     });
   }
 

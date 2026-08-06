@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QuickPick } from './entities/quick-pick.entity';
 import { CreateQuickPickDto, UpdateQuickPickDto } from './dto/quick-pick.dto';
+import { QuickPickListQueryDto } from './dto/quick-pick-list-query.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { paginate, resolveSort } from '../../common/helpers/pagination.helper';
+import { Like, FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class QuickPicksService {
@@ -24,11 +28,30 @@ export class QuickPicksService {
     return this.quickPickRepository.save(item);
   }
 
-  async findAll(includeInactive = false): Promise<QuickPick[]> {
-    const where = includeInactive ? {} : { isActive: true };
-    return this.quickPickRepository.find({
+  async findAll(query: QuickPickListQueryDto = {}): Promise<PaginatedResult<QuickPick>> {
+    const baseWhere: FindOptionsWhere<QuickPick> =
+      query.includeInactive === 'true' ? {} : { isActive: true };
+
+    const search = query.search?.trim();
+    let where: FindOptionsWhere<QuickPick> | FindOptionsWhere<QuickPick>[] = baseWhere;
+    if (search) {
+      const like = Like(`%${search}%`);
+      where = [
+        { ...baseWhere, label: like },
+        { ...baseWhere, labelKh: like },
+      ];
+    }
+
+    const { sortBy, sortDirection } = resolveSort(
+      query,
+      ['label', 'labelKh', 'price', 'sortOrder', 'createdAt'],
+      'sortOrder',
+      'ASC',
+    );
+
+    return paginate(this.quickPickRepository, query, {
       where,
-      order: { sortOrder: 'ASC' },
+      order: { [sortBy]: sortDirection },
     });
   }
 
