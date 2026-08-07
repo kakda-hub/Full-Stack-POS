@@ -136,4 +136,18 @@ describe('AdminLayoutComponent — theme toggle & sidebar collapse', () => {
       expect(fixture.nativeElement.querySelector('.sidebar-section-label')).toBeTruthy();
     });
   });
+
+  describe('brand badge logo', () => {
+    function brandLogoImg(): HTMLImageElement {
+      return fixture.nativeElement.querySelector('.brand-content img') as HTMLImageElement;
+    }
+
+    it('renders the local mini-market-logo.png asset with an accessible alt text', () => {
+      const img = brandLogoImg();
+
+      expect(img).toBeTruthy();
+      expect(img.getAttribute('src')).toBe('assets/images/mini-market-logo.png');
+      expect(img.getAttribute('alt')).toBe('Mini Mart');
+    });
+  });
 });

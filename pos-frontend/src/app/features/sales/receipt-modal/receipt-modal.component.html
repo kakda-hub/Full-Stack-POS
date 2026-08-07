@@ -44,7 +44,12 @@
         <div class="hidden print:block text-center text-slate-300 text-xs mb-1">- - - - - - - - - - - - - - - -</div>
         <!-- Header -->
         <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="text-center space-y-1 pb-3 border-b border-dashed">
-          <h3 [class.text-indigo-400]="theme.isDark()" class="font-black text-base text-indigo-600">🏪 MiniMart Store</h3>
+          <img
+            class="w-16 h-16 mx-auto object-contain"
+            src="assets/images/mini-market-logo.png"
+            alt="MiniMart"
+          />
+          <h3 [class.text-indigo-400]="theme.isDark()" class="font-black text-base text-indigo-600">MiniMart Store</h3>
           <p [class.text-slate-300]="theme.isDark()" class="text-slate-400">Phnom Penh, Cambodia</p>
           <p [class.text-slate-300]="theme.isDark()" class="text-slate-400">Tel: +855 23 000 000</p>
         </div>
