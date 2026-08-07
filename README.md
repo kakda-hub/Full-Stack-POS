@@ -18,6 +18,12 @@
 
 ---
 
+## 🚀 Demo
+
+Try the live demo: **[https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard](https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard)**
+
+> 🔑 Login with `admin@pos.com` / `admin123` (Admin) or `cashier@pos.com` / `cashier123` (Cashier)
+
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
@@ -116,7 +122,7 @@ Full-Stack POS is a complete, enterprise-grade Point of Sale system built for mo
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | [https://pos-frontend.vercel.app](https://pos-frontend.vercel.app) |
+| **Frontend** | [https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard](https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard) |
 | **Backend API** | [https://full-stack-pos.onrender.com/api/v1](https://full-stack-pos.onrender.com/api/v1) |
 | **Swagger Docs** | [https://full-stack-pos.onrender.com/api/docs](https://full-stack-pos.onrender.com/api/docs) |
 

@@ -45,7 +45,7 @@ The app features real-time Khmer/English language switching, role-based route pr
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | [https://pos-frontend.vercel.app](https://pos-frontend.vercel.app) |
+| **Frontend** | [https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard](https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/dashboard) |
 
 ### Default Login Credentials
 
