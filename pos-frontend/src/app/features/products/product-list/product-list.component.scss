@@ -9,19 +9,36 @@
   @apply space-y-4;
 }
 
-/* ─── Header row ─── */
-.header-row {
-  @apply flex items-center justify-between;
+/* ─── Page Header ─── */
+.page-header {
+  @apply flex items-center justify-between gap-4;
 }
 
-/* ─── Filter bar ─── */
-.filters-bar {
-  @apply flex gap-2 sm:gap-3 flex-wrap;
+.page-header-left {
+  @apply flex items-center gap-3 min-w-0;
 }
 
-/* ─── Search input ─── */
+.page-title {
+  @apply text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight;
+}
+
+.low-stock-chip {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors duration-200;
+  @apply bg-amber-100 text-amber-800 hover:bg-amber-200;
+  @apply dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60;
+}
+
+.low-stock-chip-icon {
+  @apply w-3.5 h-3.5;
+}
+
+/* ─── Search & Filter Toolbar ─── */
+.toolbar {
+  @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3;
+}
+
 .search-wrapper {
-  @apply relative flex-1 min-w-48;
+  @apply relative w-full sm:w-72;
 }
 
 .search-icon {
@@ -29,25 +46,29 @@
 }
 
 .search-input {
-  @apply w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm;
+  @apply w-full h-10 pl-9 pr-4 border rounded-lg text-sm;
   @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
   @apply bg-white border-slate-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100;
 }
 
-/* ─── Category filter buttons ─── */
-.category-filters {
-  @apply flex gap-2 flex-wrap;
+.category-pills {
+  @apply flex items-center gap-2 overflow-x-auto w-full sm:w-auto py-1;
+  scrollbar-width: none;
 }
 
-.category-btn {
-  @apply px-3 py-2 rounded-xl text-sm font-medium transition-all;
-  @apply bg-white border border-slate-200 text-slate-600 hover:bg-slate-50;
-  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600;
+.category-pills::-webkit-scrollbar {
+  display: none;
+}
 
-  &--active {
-    @apply bg-indigo-600 text-white border-indigo-600 font-semibold;
-    @apply dark:bg-indigo-500 dark:border-indigo-500;
-  }
+.category-pill {
+  @apply px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all duration-200;
+  @apply bg-slate-100 text-slate-600 hover:bg-slate-200;
+  @apply dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600;
+}
+
+.category-pill--active {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+  @apply dark:bg-indigo-500 dark:hover:bg-indigo-600;
 }
 
 /* ─── Skeleton loading section ─── */
@@ -348,13 +369,4 @@
 /* Empty state */
 .pl-cards-empty {
   @apply px-4 py-16 text-center;
-}
-
-/* ─── Low stock button ─── */
-.low-stock-btn {
-  @apply inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-sm font-semibold rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
-}
-
-.low-stock-count {
-  @apply bg-white/25 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full border border-white/20;
 }

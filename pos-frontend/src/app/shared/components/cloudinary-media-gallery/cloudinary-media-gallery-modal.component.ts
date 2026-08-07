@@ -30,9 +30,12 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
   selectedUrl = signal('');
 
   resources = signal<CloudinaryResource[]>([]);
+  // Server-side total (API envelope `total`) used for page count.
+  totalItems = signal(0);
 
   // NOTE: values must match Cloudinary folder names (pos-* prefix) so the
-  // client-side category filter and upload folder stay consistent.
+  // category filter (mapped to the API search param) and upload folder stay
+  // consistent.
   categories = [
     { value: 'all', label: 'All' },
     { value: 'pos-banners', label: 'Banners' },
@@ -53,60 +56,47 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
     this.loadResources();
   }
 
-  get filteredResources(): CloudinaryResource[] {
-    const query = this.searchQuery().toLowerCase().trim();
-    const category = this.selectedCategory();
-
-    let filtered = this.resources();
-
-    if (query) {
-      filtered = filtered.filter(
-        (r) =>
-          r.public_id.toLowerCase().includes(query) ||
-          r.format.toLowerCase().includes(query) ||
-          (r.url || '').toLowerCase().includes(query),
-      );
-    }
-
-    if (category !== 'all') {
-      filtered = filtered.filter((r) => {
-        const folder = r.public_id.split('/')[0];
-        return folder === category;
-      });
-    }
-
-    return filtered;
-  }
-
-  get paginatedResources(): CloudinaryResource[] {
-    const start = (this.currentPage() - 1) * this.pageSize;
-    return this.filteredResources.slice(start, start + this.pageSize);
-  }
-
   get totalPages(): number {
-    return Math.max(1, Math.ceil(this.filteredResources.length / this.pageSize));
+    return Math.max(1, Math.ceil(this.totalItems() / this.pageSize));
   }
+
+  /** Monotonic token that invalidates in-flight requests (stale-response guard). */
+  private loadSeq = 0;
 
   loadResources(): void {
     this.isLoading.set(true);
-    // The gallery filters by category client-side, so request the full batch
-    // (max=500 mirrors the backend/Cloudinary ceiling).
+    const seq = ++this.loadSeq; // stale-response guard
+    // Server-side search: the typed query wins; otherwise the selected category
+    // folder (public_id prefix) narrows the request. Pagination is offset-based
+    // so the modal never bulk-loads the whole library (max = page size).
+    const search =
+      this.searchQuery().trim() ||
+      (this.selectedCategory() !== 'all' ? this.selectedCategory() : undefined);
     this.cloudinaryService
-      .listResources({ search: this.searchQuery() || undefined, max: 500, sortBy: 'created_at', sort: 'desc' })
+      .listResources({
+        search,
+        sortBy: 'created_at',
+        sort: 'desc',
+        offset: (this.currentPage() - 1) * this.pageSize,
+        max: this.pageSize,
+      })
       .subscribe({
-      next: (res) => {
-        // GET /cloudinary returns the flat standard envelope, so `data` is the
-        // resources array itself.
-        const resources = Array.isArray(res?.data) ? res.data : [];
-        this.resources.set(resources);
-        this.currentPage.set(1);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.resources.set([]);
-        this.isLoading.set(false);
-      },
-    });
+        next: (res) => {
+          if (seq !== this.loadSeq) return; // stale response — ignore
+          // GET /cloudinary returns the flat standard envelope, so `data` is the
+          // resources array itself.
+          const resources = Array.isArray(res?.data) ? res.data : [];
+          this.resources.set(resources);
+          this.totalItems.set(res?.total ?? resources.length);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          if (seq !== this.loadSeq) return; // stale response — ignore
+          this.resources.set([]);
+          this.totalItems.set(0);
+          this.isLoading.set(false);
+        },
+      });
   }
 
   onSearchInput(event: Event): void {
@@ -122,10 +112,12 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
   onCategoryChange(category: string): void {
     this.selectedCategory.set(category);
     this.currentPage.set(1);
+    this.loadResources();
   }
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
+    this.loadResources();
   }
 
   onSelect(resource: CloudinaryResource): void {

@@ -61,12 +61,10 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
   // Derived: KPI stats
   // totalFiles uses the envelope total (search-scoped, never the page length).
   totalFiles = computed(() => this.totalItems());
-  // totalSize / uniqueFormats are computed from a global stats snapshot
-  // (capped at the backend's 500-resource ceiling) so the cards stay accurate
-  // even though the table only shows one page.
-  statsResources = signal<CloudinaryResource[]>([]);
-  totalSize = computed(() => this.statsResources().reduce((sum, r) => sum + (r.bytes || 0), 0));
-  uniqueFormats = computed(() => new Set(this.statsResources().map((r) => r.format)).size);
+  // totalSize / uniqueFormats are computed from the current page so the page
+  // issues exactly one paginated request (no bulk max=500 fetch).
+  totalSize = computed(() => this.resources().reduce((sum, r) => sum + (r.bytes || 0), 0));
+  uniqueFormats = computed(() => new Set(this.resources().map((r) => r.format)).size);
   showingCount = computed(() => this.totalItems());
 
   // Server-side sort + offset-based pagination
@@ -182,7 +180,6 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
       map((res) => {
         if (seq !== this.loadSeq) return this.resources(); // stale response — ignore
         this.applyPage(res);
-        this.loadStats();
         return this.resources();
       }),
       catchError((err) => {
@@ -220,20 +217,6 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
     });
-  }
-
-  /**
-   * Global KPI snapshot (capped at the backend's 500 ceiling, search-scoped).
-   * Keeps the Total Size / Unique Formats cards accurate while the table
-   * paginates server-side.
-   */
-  private loadStats(): void {
-    this.cloudinaryService
-      .listResources({ search: this.searchQuery() || undefined, max: 500, sortBy: 'created_at', sort: 'desc' })
-      .subscribe({
-        next: (res) => this.statsResources.set(this.unwrapResources(res)),
-        error: () => this.statsResources.set([]),
-      });
   }
 
   // Upload
@@ -379,7 +362,6 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
           this.resources.update((list) => list.filter((r) => r.public_id !== resource.public_id));
           this.totalItems.update((t) => Math.max(0, t - 1));
           this.currentPage.set(1);
-          this.loadStats();
           this.alertService.success(
             this.lang.currentLang() === 'km'
               ? `ធនធាន "${resource.public_id}" ត្រូវបានលុបដោយជោគជ័យ`

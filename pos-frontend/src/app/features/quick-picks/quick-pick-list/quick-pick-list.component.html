@@ -60,8 +60,8 @@
             <th class="th th--right">{{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}</th>
           </tr>
         </thead>
-        <tbody [@listAnimation]="paginatedItems().length" class="table-tbody">
-          <tr *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="table-row">
+        <tbody [@listAnimation]="items().length" class="table-tbody">
+          <tr *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="table-row">
             <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
             <td class="td">
               <span class="text-2xl">{{ item.icon || '📦' }}</span>
@@ -89,7 +89,7 @@
               </div>
             </td>
           </tr>
-          <tr *ngIf="paginatedItems().length === 0">
+          <tr *ngIf="items().length === 0">
             <td colspan="7" class="empty-state-cell">
               <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
@@ -105,6 +105,7 @@
       <app-pagination
         [totalItems]="totalItems()"
         [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
         [currentPage]="pageIndex() + 1"
         (pageChange)="onPageChange($event)"
         (pageSizeChange)="onPageSizeChange($event)"
@@ -113,7 +114,7 @@
 
     <!-- ===== MOBILE: Cards ===== -->
     <div class="pl-mobile-cards">
-      <div *ngFor="let item of paginatedItems(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
+      <div *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
         <div class="pl-card-header">
           <div class="pl-card-header-left">
             <span class="text-2xl mr-2">{{ item.icon || '📦' }}</span>
@@ -143,7 +144,7 @@
           </button>
         </div>
       </div>
-      <div *ngIf="paginatedItems().length === 0" class="pl-cards-empty">
+      <div *ngIf="items().length === 0" class="pl-cards-empty">
         <p class="text-sm font-medium text-slate-400">
           {{ lang.currentLang() === 'km' ? 'គ្មានទំនិញរហ័ស' : 'No quick pick items' }}
         </p>

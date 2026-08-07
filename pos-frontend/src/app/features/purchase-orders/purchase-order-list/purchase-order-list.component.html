@@ -273,6 +273,7 @@
     <app-pagination
       [totalItems]="totalItems()"
       [pageSize]="pageSize()"
+      [pageSizeOptions]="pageSizeOptions"
       [currentPage]="pageIndex() + 1"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"

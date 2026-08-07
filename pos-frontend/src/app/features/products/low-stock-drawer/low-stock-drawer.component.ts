@@ -11,4 +11,10 @@ export class LowStockDrawerComponent {
   @Input() products: Product[] = [];
   @Input() getCategoryName: (categoryId: string) => string = () => '';
   @Output() close = new EventEmitter<void>();
+
+  get lowStockProducts(): Product[] {
+    return this.products.filter(
+      (product) => product.stock <= (product.lowStockThreshold ?? 10)
+    );
+  }
 }

@@ -128,10 +128,15 @@ export class UploadCloudinaryController {
     };
   }
 
-  @Delete(':publicId')
+  // Wildcard route so folder-prefixed public IDs (e.g. "pos-general/abc123")
+  // match instead of 404-ing on the extra path segment. path-to-regexp v8
+  // returns multi-segment wildcard captures as an array, so join them back
+  // into the full "folder/name" public ID before calling Cloudinary.
+  @Delete('*publicId')
   @ApiOperation({ summary: 'Delete a Cloudinary resource by public ID' })
-  async delete(@Param('publicId') publicId: string) {
-    const result = await this.cloudinaryService.deleteResource(publicId);
+  async delete(@Param('publicId') publicId: string | string[]) {
+    const id = Array.isArray(publicId) ? publicId.join('/') : publicId;
+    const result = await this.cloudinaryService.deleteResource(id);
     return {
       success: true,
       statusCode: 200,

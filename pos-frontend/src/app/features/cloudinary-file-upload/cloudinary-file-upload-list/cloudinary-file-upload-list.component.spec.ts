@@ -156,10 +156,11 @@ describe('CloudinaryFileUploadListComponent', () => {
       expect(component.totalItems()).toBe(sampleResources.length);
     });
 
-    it('also fetches a global stats snapshot (capped at 500) for the KPI cards', async () => {
+    it('issues exactly one paginated request (no bulk max=500 stats fetch)', async () => {
       await mount();
-      expect(cloudinaryMock.listResources).toHaveBeenCalledWith(
-        expect.objectContaining({ max: 500, sortBy: 'created_at' }),
+      expect(cloudinaryMock.listResources).toHaveBeenCalledTimes(1);
+      expect(cloudinaryMock.listResources).not.toHaveBeenCalledWith(
+        expect.objectContaining({ max: 500 }),
       );
     });
 

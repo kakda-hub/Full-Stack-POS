@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
@@ -27,11 +27,9 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
   items = signal<QuickPickItem[]>([]);
   totalItems = signal(0);
   pageSize = signal(10);
+  pageSizeOptions = [10, 25, 50, 100];
   pageIndex = signal(0);
   searchQuery = signal('');
-
-  /** Alias so the template keeps rendering the current page. */
-  paginatedItems = computed(() => this.items());
 
   /** Monotonic token that invalidates in-flight requests (stale-response guard). */
   private loadSeq = 0;

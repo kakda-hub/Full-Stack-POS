@@ -29,6 +29,7 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   purchaseOrders = signal<any[]>([]);
   totalItems = signal(0);
   pageSize = signal(10);
+  pageSizeOptions = [10, 25, 50, 100];
   pageIndex = signal(0);
   searchQuery = signal('');
 

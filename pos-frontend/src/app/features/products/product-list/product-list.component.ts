@@ -254,11 +254,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
     return 'stock-badge--ok';
   }
 
-  getCategoryName(categoryId: string): string {
-    const cat = this.productService.categories().find(c => c.id === categoryId);
+  getCategoryName = (categoryId: string): string => {
+    const categories = this.productService?.categories();
+    if (!categories) return categoryId;
+    const cat = categories.find(c => c.id === categoryId);
     if (!cat) return categoryId;
     return this.lang.currentLang() === 'km' && cat.nameKm ? cat.nameKm : cat.name;
-  }
+  };
 
   get lowStockProducts(): Product[] {
     return this.products().filter(

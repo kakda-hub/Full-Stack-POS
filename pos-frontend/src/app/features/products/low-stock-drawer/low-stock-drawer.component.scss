@@ -87,8 +87,37 @@
   @apply text-xs text-slate-500 font-medium mt-0.5;
 }
 
-.low-stock-item-stock {
-  @apply px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 text-amber-800 border border-amber-200/60 flex-shrink-0 shadow-sm;
+.low-stock-item-stock-badge {
+  @apply inline-block mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700;
+}
+
+.low-stock-item-action {
+  @apply flex-shrink-0;
+}
+
+.low-stock-toggle {
+  @apply relative inline-flex items-center cursor-pointer;
+}
+
+.low-stock-toggle input {
+  @apply sr-only;
+}
+
+.low-stock-toggle-slider {
+  @apply w-9 h-5 bg-slate-200 rounded-full relative transition-colors duration-200;
+}
+
+.low-stock-toggle input:checked + .low-stock-toggle-slider {
+  @apply bg-amber-500;
+}
+
+.low-stock-toggle-slider::before {
+  content: '';
+  @apply absolute top-[2px] left-[2px] w-4 h-4 bg-white border border-slate-300 rounded-full transition-transform duration-200;
+}
+
+.low-stock-toggle input:checked + .low-stock-toggle-slider::before {
+  transform: translateX(16px);
 }
 
 .low-stock-empty {

@@ -257,14 +257,27 @@ describe('UploadCloudinaryController (integration)', () => {
     });
   });
 
-  // ─── DELETE /cloudinary/:publicId ───────────────────────────────────────
-  describe('DELETE /cloudinary/:publicId', () => {
-    it('should delete a Cloudinary resource', async () => {
+  // ─── DELETE /cloudinary/*publicId ───────────────────────────────────────
+  describe('DELETE /cloudinary/*publicId', () => {
+    it('should delete a Cloudinary resource with a URL-encoded public ID', async () => {
       const deleteResult = { result: 'ok' };
       cloudinaryService.deleteResource.mockResolvedValue(deleteResult);
 
       const response = await request(app.getHttpServer())
         .delete('/cloudinary/pos-products%2Fabc123')
+        .expect(200);
+
+      expect(cloudinaryService.deleteResource).toHaveBeenCalledWith('pos-products/abc123');
+      expect(response.body.data.message).toBe('Resource deleted successfully');
+      expect(response.body.data.data.result).toBe('ok');
+    });
+
+    it('should delete a resource whose public ID contains a folder prefix (unencoded)', async () => {
+      const deleteResult = { result: 'ok' };
+      cloudinaryService.deleteResource.mockResolvedValue(deleteResult);
+
+      const response = await request(app.getHttpServer())
+        .delete('/cloudinary/pos-products/abc123')
         .expect(200);
 
       expect(cloudinaryService.deleteResource).toHaveBeenCalledWith('pos-products/abc123');
