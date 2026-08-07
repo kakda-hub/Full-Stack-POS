@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { fadeIn, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn } from '../../../shared/animations/animations';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { AlertService } from '../../../core/services/alert.service';
@@ -15,7 +15,7 @@ import { buildListParams } from '../../../core/services/api/list-params';
   selector: 'app-user-management-card',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, pageTransition],
+  animations: [fadeIn],
   templateUrl: './user-management-card.component.html',
   styleUrl: './user-management-card.component.scss',
 })

@@ -114,7 +114,6 @@
       >
         <tr
           *ngFor="let row of rows; let i = index; trackBy: trackById"
-          @fadeIn
           class="transition-colors duration-150 group"
           [class.hover:bg-slate-50]="!theme.isDark()"
           [class.hover:bg-slate-700]="theme.isDark()"

@@ -126,17 +126,16 @@ describe('CloudinarySignInComponent', () => {
   it('updates the model from DOM input events', () => {
     const username = fixture.nativeElement.querySelector('#username') as HTMLInputElement;
     const password = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
-    const remember = fixture.nativeElement.querySelector('#remember-me') as HTMLInputElement;
 
     username.value = 'dom_user';
     username.dispatchEvent(new Event('input'));
     password.value = 'dom_pw';
     password.dispatchEvent(new Event('input'));
-    remember.checked = false;
-    remember.dispatchEvent(new Event('change'));
 
     expect(component.username()).toBe('dom_user');
     expect(component.password()).toBe('dom_pw');
-    expect(component.remember()).toBe(false);
+    // "Stay signed in" is no longer exposed in the UI; it defaults to true
+    // (localStorage session) unless changed programmatically.
+    expect(component.remember()).toBe(true);
   });
 });

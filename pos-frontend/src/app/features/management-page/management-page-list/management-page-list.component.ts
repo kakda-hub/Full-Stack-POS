@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRe
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ManagementPage, ManagementPageService } from '../../../core/services/api/management-page.service';
@@ -13,7 +12,6 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-management-page-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './management-page-list.component.html',
   styleUrl: './management-page-list.component.scss',
 })

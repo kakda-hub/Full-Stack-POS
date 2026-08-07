@@ -51,7 +51,9 @@ describe('AppIconComponent — shared icon registry', () => {
     'purchase-order': 2,
     supplier: 3,
     management: 8,
-    settings: 4,
+    // Settings renders a single nested <svg> wrapper (heroicons gear) — the
+    // shape count here counts direct children of the root svg, so it's 1.
+    settings: 1,
     cart: 1,
     orders: 1,
     x: 1,

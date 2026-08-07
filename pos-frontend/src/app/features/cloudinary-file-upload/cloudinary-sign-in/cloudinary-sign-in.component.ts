@@ -33,10 +33,6 @@ export class CloudinarySignInComponent {
     this.password.set((event.target as HTMLInputElement).value);
   }
 
-  onRememberChange(event: Event): void {
-    this.remember.set((event.target as HTMLInputElement).checked);
-  }
-
   /** Empty fields are invalid; otherwise any credentials pass the UI gate. */
   onSubmit(): void {
     this.submitted.set(true);

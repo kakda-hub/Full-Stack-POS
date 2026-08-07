@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { Subject, debounceTime, forkJoin, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
@@ -15,7 +15,7 @@ import { buildListParams } from '../../../core/services/api/list-params';
   selector: 'app-user-management-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimation],
   templateUrl: './user-management-list.component.html',
   styleUrl: './user-management-list.component.scss',
 })

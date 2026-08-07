@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { LanguageService } from '../../../core/services/language.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -44,7 +44,7 @@ type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
   selector: 'app-reports',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, pageTransition, listAnimation],
+  animations: [fadeIn, listAnimation],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })

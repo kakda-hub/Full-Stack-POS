@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideAnimations, provideNoopAnimations } from '@angular/platform-browser/animations';
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -15,11 +15,21 @@ export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
 }
 
+/**
+ * Respect the OS "reduce motion" preference (Windows/macOS/etc.). When set,
+ * Angular animations (table staggers, modals, menus, …) are replaced with
+ * no-ops so nothing moves — complements the `prefers-reduced-motion` CSS
+ * block in styles.scss, which already disables CSS transitions/animations.
+ * Evaluated at bootstrap; a mid-session OS change requires a reload.
+ */
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+
 @NgModule({
   declarations: [App],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
     SharedModule,
@@ -33,7 +43,12 @@ export function HttpLoaderFactory(http: HttpClient) {
       defaultLanguage: 'en',
     }),
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [
+    // Runtime ternary is allowed here (unlike NgModule.imports, which the
+    // AOT compiler requires to be statically resolvable — NG1010).
+    prefersReducedMotion ? provideNoopAnimations() : provideAnimations(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [App],
 })
 export class AppModule {}

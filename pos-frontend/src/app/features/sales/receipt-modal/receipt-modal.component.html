@@ -82,8 +82,25 @@
 
         <!-- Items -->
         <div [class.border-slate-600]="theme.isDark()" [class.border-slate-200]="!theme.isDark()" class="py-2 border-b border-dashed space-y-1.5">
-          <div *ngFor="let item of transaction.items">
-            <div class="flex justify-between font-semibold">
+          <div *ngFor="let item of transaction.items" class="receipt-item flex items-start gap-1">
+            @let photo = item.product.imgUrl || photoResolver(item.product.category);
+            <!-- 28px thumbnail (also styled for the print window) -->
+            <div class="receipt-thumb-ph">
+              @if (photo) {
+                <img
+                  [src]="photo"
+                  [alt]="item.product.name"
+                  class="receipt-thumb w-7 h-7 object-cover rounded-[2px] shrink-0"
+                  loading="lazy"
+                />
+              } @else {
+                <svg class="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              }
+            </div>
+            <div class="receipt-item-body min-w-0 flex-1">
+              <div class="flex justify-between font-semibold">
               <span [class.text-slate-100]="theme.isDark()" class="flex-1 pr-2 truncate">{{ item.product.name }}</span>
               <span [class.text-slate-100]="theme.isDark()"
                 >${{
@@ -94,6 +111,7 @@
             <div [class.text-slate-400]="!theme.isDark()" class="flex justify-between pl-2 text-slate-500">
               <span>{{ item.quantity }} × ${{ item.product.price.toFixed(2) }}</span>
               <span *ngIf="item.discount > 0" class="text-emerald-600">-{{ item.discount }}%</span>
+              </div>
             </div>
           </div>
         </div>

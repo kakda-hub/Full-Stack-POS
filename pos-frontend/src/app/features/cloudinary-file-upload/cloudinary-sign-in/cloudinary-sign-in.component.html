@@ -139,25 +139,6 @@
           </p>
         </div>
 
-        <div class="flex items-center">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            [checked]="remember()"
-            (change)="onRememberChange($event)"
-            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
-          >
-          <label
-            for="remember-me"
-            class="ml-2 block text-sm cursor-pointer select-none"
-            [class.text-slate-400]="theme.isDark()"
-            [class.text-slate-600]="!theme.isDark()"
-          >
-            {{ lang.currentLang() === 'km' ? 'រក្សាការចូលប្រើ' : 'Stay signed in' }}
-          </label>
-        </div>
-
         <div>
           <button
             type="submit"

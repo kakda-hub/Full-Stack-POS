@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { backdropAnimation, fadeIn, modalAnimation, pageTransition } from '../../shared/animations/animations';
+import { backdropAnimation, fadeIn, modalAnimation } from '../../shared/animations/animations';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { SaleService } from '../../core/services/api/sale.service';
@@ -43,7 +43,7 @@ interface SaleDisplay {
   selector: 'app-sales-history',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [backdropAnimation, fadeIn, modalAnimation, pageTransition],
+  animations: [backdropAnimation, fadeIn, modalAnimation],
   templateUrl: './sales-history.component.html',
   styleUrl: './sales-history.component.scss',
 })

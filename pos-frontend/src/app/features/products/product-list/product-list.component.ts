@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimationSnappy } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { Product } from '../../../models';
 import { nextSort, SortDirection } from '../../../shared/helpers/sort.helper';
@@ -19,13 +19,15 @@ import { DialogConfig } from '../../../enums/dialog-config.enum';
   selector: 'app-product-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimationSnappy],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent implements OnInit, OnDestroy {
   showForm = false;
   isLoading = signal(true);
+  /** True after the first load completes — the skeleton only shows before this. */
+  hasLoadedOnce = signal(false);
   editingProduct: Product | null = null;
 
   isLowStockDrawerOpen = false;
@@ -136,6 +138,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         }
         this.products.set(data.map((p: any) => this.mapApiProduct(p)));
         this.totalItems.set(res?.total ?? data.length);
+        this.hasLoadedOnce.set(true);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
@@ -144,6 +147,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         console.error('Failed to load products', err);
         this.products.set([]);
         this.totalItems.set(0);
+        this.hasLoadedOnce.set(true);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },

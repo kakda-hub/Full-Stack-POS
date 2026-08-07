@@ -1,4 +1,4 @@
-<div @pageTransition class="space-y-4 sm:space-y-6">
+<div class="space-y-4 sm:space-y-6">
   <!-- Header -->
   <div class="header-row">
     <app-breadcrumb></app-breadcrumb>
@@ -61,7 +61,7 @@
           </tr>
         </thead>
         <tbody [@listAnimation]="items().length" class="table-tbody">
-          <tr *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="table-row">
+          <tr *ngFor="let item of items(); index as i; trackBy: trackById" class="table-row">
             <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
             <td class="td">
               <span class="text-2xl">{{ item.icon || '📦' }}</span>

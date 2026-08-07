@@ -43,6 +43,20 @@ export const listAnimation = trigger('listAnimation', [
   ]),
 ]);
 
+/**
+ * Faster variant of `listAnimation` for dense tables where pagination/sort
+ * reloads rows frequently (e.g. the Products table). Tighter stagger and a
+ * shorter fade keep the cascade snappy instead of dragging across the page.
+ */
+export const listAnimationSnappy = trigger('listAnimationSnappy', [
+  transition('* <=> *', [
+    query(':enter', [
+      style({ opacity: 0, transform: 'translateY(6px)' }),
+      stagger(20, animate('110ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))),
+    ], { optional: true }),
+  ]),
+]);
+
 export const cartItemAnimation = trigger('cartItemAnimation', [
   transition(':enter', [
     style({ opacity: 0, height: 0, transform: 'translateX(-10px)' }),
@@ -59,27 +73,6 @@ export const counterAnimation = trigger('counterAnimation', [
       style({ transform: 'scale(1.2)', offset: 0.5 }),
       style({ transform: 'scale(1)', offset: 1 }),
     ])),
-  ]),
-]);
-
-export const slideOut = trigger('slideOut', [
-  transition(':enter', [
-    style({ transform: 'translateY(0)', opacity: 1 }),
-    animate('200ms ease-in', style({ transform: 'translateY(-100%)', opacity: 0 })),
-  ]),
-]);
-
-export const slideIn = trigger('slideIn', [
-  transition(':enter', [
-    style({ transform: 'translateY(100%)', opacity: 0 }),
-    animate('200ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
-  ]),
-]);
-
-export const pageTransition = trigger('pageTransition', [
-  transition(':enter', [
-    style({ opacity: 0, transform: 'translateY(12px)' }),
-    animate('220ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
   ]),
 ]);
 

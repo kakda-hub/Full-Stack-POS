@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, OnDestroy, Output, signal, untracked } from '@angular/core';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';
+import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { CustomerService } from '../../../core/services/api/customer.service';
 import { KhqrService } from '../../../core/services/api/khqr.service';
 import { Customer } from '../../../models';
+import { CartItem } from '../../../models/cart-item.model';
 import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
 
 @Component({
@@ -15,10 +17,14 @@ import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
   templateUrl: './payment-modal.component.html',
   styleUrl: './payment-modal.component.scss',
 })
-export class PaymentModalComponent {
+export class PaymentModalComponent implements OnDestroy {
   @Input() total = 0;
   @Input() subtotal = 0;
   @Input() processing = false;
+  /** Cart contents for the order summary — each row shows a product thumbnail. */
+  @Input() items: CartItem[] = [];
+  /** Resolves a fallback photo by category for products without imgUrl. */
+  @Input() photoResolver: (category: string) => string | undefined = () => undefined;
   @Output() paid = new EventEmitter<{
     method: 'cash' | 'aba' | 'card';
     cashReceived?: number;
@@ -34,6 +40,17 @@ export class PaymentModalComponent {
   cashReceived = 0;
   private _change = signal(0);
   change = this._change.asReadonly();
+
+  // Amount Due / Change display values — tweened toward the computed values
+  // with rAF so the digits roll smoothly when points are redeemed or cash is
+  // typed (same treatment as the sales cart totals).
+  amountDueDisplay = signal(0);
+  changeDisplay = signal(0);
+  private amountDueRaf: { id: number | null } = { id: null };
+  private changeRaf: { id: number | null } = { id: null };
+  private reduceMotion = prefersReducedMotion();
+  /** True once the effect has snapped the displays to the initial values. */
+  private displayInitialised = false;
 
   // Customer state
   customerPhone = signal('');
@@ -114,6 +131,38 @@ export class PaymentModalComponent {
         this.customer.set(customer);
         this.customerNotFound.set(false);
       }
+    });
+
+    // Roll the displays toward their computed targets whenever they change.
+    // Writes happen inside untracked() so tween frames don't re-trigger this effect.
+    effect(() => {
+      const amountDue = this.effectiveTotal();
+      const change = this.change();
+      untracked(() => {
+        // First run: snap to the current values so the modal opens showing the
+        // correct amount — the @Input total is bound after the constructor, so
+        // seeding there would start the roll from $0.00 (or stay stuck at it).
+        if (!this.displayInitialised) {
+          this.amountDueDisplay.set(amountDue);
+          this.changeDisplay.set(change);
+          this.displayInitialised = true;
+          return;
+        }
+        if (this.reduceMotion) {
+          this.amountDueDisplay.set(amountDue);
+          this.changeDisplay.set(change);
+          return;
+        }
+        animatePrice(this.amountDueRaf, () => this.amountDueDisplay(), amountDue, v => this.amountDueDisplay.set(v));
+        animatePrice(this.changeRaf, () => this.changeDisplay(), change, v => this.changeDisplay.set(v));
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Stop any in-flight tweens so the rAF loop can't outlive the component.
+    [this.amountDueRaf, this.changeRaf].forEach(r => {
+      if (r.id !== null) cancelAnimationFrame(r.id);
     });
   }
 

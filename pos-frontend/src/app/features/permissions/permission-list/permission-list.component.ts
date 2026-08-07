@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { LanguageService } from '../../../core/services/language.service';
-import { fadeIn, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn } from '../../../shared/animations/animations';
 
 @Component({
   selector: 'app-permission-list',
   standalone: false,
-  animations: [fadeIn, pageTransition],
+  animations: [fadeIn],
   templateUrl: './permission-list.component.html',
   styleUrl: './permission-list.component.scss',
 })

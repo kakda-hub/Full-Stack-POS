@@ -1,5 +1,5 @@
 import { trigger, state, style, transition, animate, group } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, untracked, ViewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,7 +14,8 @@ import { ThemeService } from '../../../core/services/theme.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { QuickPickService } from '../../../core/services/api/quick-pick.service';
 import { SaleService, CreateSaleDto } from '../../../core/services/api/sale.service';
-import { fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation, cartItemAnimation, counterAnimation } from '../../../shared/animations/animations';
+import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
 
 // Sidebar specific animation
 const sidebarAnimation = trigger('sidebarAnimation', [
@@ -45,11 +46,11 @@ const drawerBackdrop = trigger('drawerBackdrop', [
   selector: 'app-C',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, slideOut, slideIn, pageTransition, sidebarAnimation, drawerSlide, drawerBackdrop],
+  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, sidebarAnimation, drawerSlide, drawerBackdrop],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
-export class SalesComponent implements OnInit {
+export class SalesComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   // Signal state for Sidebar
@@ -70,12 +71,21 @@ export class SalesComponent implements OnInit {
   // Quick Pick items
   quickPicks = signal<QuickPickItem[]>([]);
 
-  // Price slide animation state
-  showOldSubtotal = signal(false);
-  showOldTotal = signal(false);
-  prevSubtotalVal = 0;
-  prevTotalVal = 0;
-  private priceAnimTimeout: ReturnType<typeof setTimeout> | null = null;
+  // Price display values — tweened toward the cart totals with rAF so the
+  // digits roll smoothly on every change (no snapping, no overlap, and rapid
+  // +/- clicks just re-target the in-flight tween instead of restarting it).
+  subtotalDisplay = signal(0);
+  taxDisplay = signal(0);
+  totalDisplay = signal(0);
+  private subtotalRaf: { id: number | null } = { id: null };
+  private taxRaf: { id: number | null } = { id: null };
+  private totalRaf: { id: number | null } = { id: null };
+  /**
+   * Honours prefers-reduced-motion: when set, totals snap to the new value
+   * instead of rolling (the rAF tween bypasses Angular animations, so the
+   * global noop-animations swap in app.module.ts would not cover it).
+   */
+  private reduceMotion = prefersReducedMotion();
 
   private stockTimeout: ReturnType<typeof setTimeout> | null = null;
   private shakeTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -99,9 +109,10 @@ export class SalesComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreenSize();
     }
-    // Initialize price tracking before the effect to prevent animation on first render
-    this.prevSubtotalVal = this.cart.subtotal();
-    this.prevTotalVal = this.cart.total();
+    // Seed displayed prices with the current cart totals (no animation on load)
+    this.subtotalDisplay.set(this.cart.subtotal());
+    this.taxDisplay.set(this.cart.taxAmount());
+    this.totalDisplay.set(this.cart.total());
 
     // Sync loading state with ProductService API response
     effect(() => {
@@ -111,24 +122,26 @@ export class SalesComponent implements OnInit {
       }
     });
 
-    // Watch for price changes to trigger slide animation
+    // Watch the cart totals and roll the displayed values toward them.
+    // Writes to the display signals happen inside untracked() so the tween's
+    // own progress frames don't re-trigger this effect (each cart change
+    // re-targets the tween from wherever it currently is — buttery smooth).
     effect(() => {
       const sub = this.cart.subtotal();
+      const tax = this.cart.taxAmount();
       const tot = this.cart.total();
-      const subChanged = sub !== this.prevSubtotalVal;
-      const totChanged = tot !== this.prevTotalVal;
-      if (!subChanged && !totChanged) return;
-      // Show old values sliding out
-      this.showOldSubtotal.set(subChanged);
-      this.showOldTotal.set(totChanged);
-      if (this.priceAnimTimeout) clearTimeout(this.priceAnimTimeout);
-      this.priceAnimTimeout = setTimeout(() => {
-        this.showOldSubtotal.set(false);
-        this.showOldTotal.set(false);
-        this.prevSubtotalVal = sub;
-        this.prevTotalVal = tot;
-        this.priceAnimTimeout = null;
-      }, 200);
+      untracked(() => {
+        if (this.reduceMotion) {
+          // Reduced motion: snap to the new totals, no roll.
+          this.subtotalDisplay.set(sub);
+          this.taxDisplay.set(tax);
+          this.totalDisplay.set(tot);
+          return;
+        }
+        animatePrice(this.subtotalRaf, () => this.subtotalDisplay(), sub, v => this.subtotalDisplay.set(v));
+        animatePrice(this.taxRaf, () => this.taxDisplay(), tax, v => this.taxDisplay.set(v));
+        animatePrice(this.totalRaf, () => this.totalDisplay(), tot, v => this.totalDisplay.set(v));
+      });
     });
   }
 
@@ -142,6 +155,13 @@ export class SalesComponent implements OnInit {
     this.quickPickService.getAll().subscribe({
       next: (items) => this.quickPicks.set(items),
       error: () => this.quickPicks.set([]),
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Stop any in-flight price tweens so the rAF loop can't outlive the component.
+    [this.subtotalRaf, this.taxRaf, this.totalRaf].forEach(r => {
+      if (r.id !== null) cancelAnimationFrame(r.id);
     });
   }
 

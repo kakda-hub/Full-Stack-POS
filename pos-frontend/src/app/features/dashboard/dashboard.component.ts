@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { fadeIn, pageTransition } from '../../shared/animations/animations';
+import { fadeIn } from '../../shared/animations/animations';
 import { Product } from '../../models';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
@@ -33,7 +33,7 @@ interface SaleItem {
   selector: 'app-dashboard',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, pageTransition],
+  animations: [fadeIn],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

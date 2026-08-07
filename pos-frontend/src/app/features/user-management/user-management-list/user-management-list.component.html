@@ -1,4 +1,4 @@
-<div @pageTransition class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+<div class="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
   <!-- Header -->
   <div class="header-row">
     <app-breadcrumb></app-breadcrumb>
@@ -89,7 +89,7 @@
           </tr>
         </thead>
         <tbody [@listAnimation]="items().length" class="table-tbody">
-          <tr *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="table-row">
+          <tr *ngFor="let item of items(); index as i; trackBy: trackById" class="table-row">
             <td class="td">{{ i + 1 + pageIndex() * pageSize() }}</td>
             <td class="td">
               <div class="flex items-center gap-3">

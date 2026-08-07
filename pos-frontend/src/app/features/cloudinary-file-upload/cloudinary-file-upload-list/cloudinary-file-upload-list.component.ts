@@ -31,7 +31,7 @@ import { AlertService } from '../../../core/services/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LanguageService } from '../../../core/services/language.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { ListQuery } from '../../../models/list-query';
 
 type SortColumn = 'public_id' | 'format' | 'bytes' | 'created_at';
@@ -41,7 +41,7 @@ type SortDirection = 'asc' | 'desc';
   selector: 'app-cloudinary-file-upload-list',
   templateUrl: './cloudinary-file-upload-list.component.html',
   styleUrls: ['./cloudinary-file-upload-list.component.scss'],
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimation],
   standalone: false,
 })
 export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {

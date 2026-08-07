@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { LanguageService } from '../../../core/services/language.service';
@@ -17,7 +16,6 @@ import { buildListParams } from '../../../core/services/api/list-params';
   selector: 'app-supplier-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './supplier-list.component.html',
 })
 export class SupplierListComponent implements OnInit, OnDestroy {

@@ -1,4 +1,4 @@
-<div @pageTransition class="product-list-wrapper">
+<div class="product-list-wrapper">
   <!-- Page Header -->
   <div class="page-header">
     <div class="page-header-left">
@@ -59,8 +59,9 @@
     </div>
   </div>
 
-  <!-- Skeleton loading state -->
-  <div *ngIf="isLoading()" class="skeleton-section">
+  <!-- Skeleton loading state — only on the FIRST load. After that the table
+       stays mounted and just refreshes rows (no skeleton flash per keystroke). -->
+  <div *ngIf="isLoading() && !hasLoadedOnce()" class="skeleton-section">
     <div class="skeleton-table-wrapper">
       <table class="skeleton-table">
         <thead class="skeleton-thead">
@@ -98,8 +99,15 @@
     </div>
   </div>
 
-  <!-- ===== DESKTOP: Table ===== -->
-  <div class="table-container">
+  <!-- ===== DESKTOP: Table =====
+       Mounted permanently after the first load. Reloads (search/pagination/
+       category) keep the table in place — dimmed while fetching — and only
+       newly-arrived rows animate in via the @listAnimationSnappy stagger. -->
+  <div
+    *ngIf="hasLoadedOnce()"
+    class="table-container transition-opacity duration-200"
+    [class.opacity-50]="isLoading()"
+  >
     <div class="table-overflow">
       <table class="table">
         <thead class="table-thead">
@@ -154,8 +162,12 @@
             </th>
           </tr>
         </thead>
+        <!-- Bound to the array reference (not .length) so the stagger fires on
+             EVERY reload — otherwise same-count refreshes would skip the
+             animation. trackBy keeps existing rows unanimated; only new rows
+             stagger in. -->
         <tbody
-          [@listAnimation]="products().length"
+          [@listAnimationSnappy]="products()"
           class="table-tbody"
         >
           <tr
@@ -164,7 +176,6 @@
               index as i;
               trackBy: trackById
             "
-            @fadeIn
             class="table-row"
           >
             <td class="td">{{ i + 1 + (currentPage() - 1) * pageSize() }}</td>

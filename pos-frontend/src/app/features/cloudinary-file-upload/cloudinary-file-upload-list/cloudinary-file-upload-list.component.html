@@ -1,5 +1,4 @@
 <div
-  @pageTransition
   class="flex flex-col h-full"
   [class.bg-slate-900]="theme.isDark()"
   [class.bg-slate-50]="!theme.isDark()"
@@ -856,7 +855,6 @@
           >
             <tr
               *ngFor="let resource of resources(); trackBy: trackByPublicId"
-              @fadeIn
               class="group transition-colors"
               [class.hover:bg-slate-700/30]="theme.isDark()"
               [class.hover:bg-slate-50]="!theme.isDark()"
