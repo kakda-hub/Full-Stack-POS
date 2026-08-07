@@ -411,6 +411,96 @@
   @apply text-slate-400 dark:text-slate-500;
 }
 
+/* ─── Low Stock Alerts (mirrors low-stock drawer) ─── */
+.dash-lowstock-card {
+  overflow: hidden;
+}
+
+.dash-lowstock-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-2.5;
+}
+
+.dash-lowstock-item {
+  @apply relative flex items-center gap-3 p-3 rounded-2xl border border-amber-100/80 bg-gradient-to-r from-amber-50/80 to-orange-50/40 transition-all duration-200 hover:shadow-md hover:border-amber-200 hover:from-amber-50 hover:to-orange-50;
+}
+
+.dash-lowstock-item::before {
+  content: '';
+  @apply absolute left-0 top-3 bottom-3 w-1 rounded-full bg-amber-400 opacity-0 transition-opacity duration-200;
+}
+
+.dash-lowstock-item:hover::before {
+  @apply opacity-100;
+}
+
+.dash-lowstock-item--out {
+  @apply border-red-200/80 bg-gradient-to-r from-red-50/80 to-rose-50/40 hover:border-red-300 hover:from-red-50 hover:to-rose-50;
+}
+
+.dash-lowstock-item--out::before {
+  @apply bg-red-500;
+}
+
+.dash-lowstock-img-wrap {
+  @apply flex-shrink-0;
+}
+
+.dash-lowstock-img {
+  @apply w-12 h-12 object-cover rounded-xl border-2 border-white shadow-sm transition-all duration-300;
+}
+
+.dash-lowstock-item--out .dash-lowstock-img {
+  @apply grayscale opacity-80;
+}
+
+.dash-lowstock-info {
+  @apply flex-1 min-w-0;
+}
+
+.dash-lowstock-top {
+  @apply flex items-center gap-2;
+}
+
+.dash-lowstock-name {
+  @apply text-sm font-bold text-slate-900 dark:text-slate-100 truncate tracking-tight;
+}
+
+.dash-lowstock-badge {
+  @apply flex-shrink-0 inline-block text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700;
+}
+
+.dash-lowstock-badge--out {
+  @apply bg-red-100 text-red-600;
+}
+
+.dash-lowstock-meta {
+  @apply text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate;
+}
+
+.dash-lowstock-bar {
+  @apply mt-1.5 w-full h-1.5 rounded-full bg-slate-200/70 overflow-hidden;
+}
+
+.dash-lowstock-bar-fill {
+  @apply h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700 ease-out;
+}
+
+.dash-lowstock-bar-fill--out {
+  @apply bg-gradient-to-r from-red-400 to-rose-500;
+}
+
+.dash-lowstock-item--out .dash-lowstock-bar {
+  @apply bg-red-100;
+}
+
+.dash-lowstock-count {
+  @apply flex-shrink-0 text-sm font-black text-slate-800 dark:text-slate-200;
+}
+
+.dash-lowstock-count--out {
+  @apply text-red-600;
+}
+
 /* ─── Empty state ─── */
 .dash-empty {
   @apply flex flex-col items-center justify-center py-8 text-center;

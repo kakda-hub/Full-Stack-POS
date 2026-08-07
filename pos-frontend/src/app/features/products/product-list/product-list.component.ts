@@ -9,9 +9,11 @@ import { ProductService as CoreProductService } from '../../../core/services/pro
 import { ProductService as ApiProductService } from '../../../core/services/api/product.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
+import { PurchaseOrderDetailComponent } from '../../purchase-orders/purchase-order-detail/purchase-order-detail.component';
 import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { DialogConfig } from '../../../enums/dialog-config.enum';
 
 @Component({
   selector: 'app-product-list',
@@ -28,6 +30,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   isLowStockDrawerOpen = false;
   lowStockThreshold = 10;
+  /** Products with a stock-adjust request currently in flight. */
+  pendingStockAdjusts = signal<string[]>([]);
 
   // Server-side pagination state
   products = signal<Product[]>([]);
@@ -152,6 +156,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       name: p.name,
       nameKm: p.nameKh,
       price: Number(p.price),
+      costPrice: p.costPrice !== undefined ? Number(p.costPrice) : undefined,
       barcode: p.barcode,
       category: String(p.categoryId),
       stock: p.stock,
@@ -274,6 +279,57 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   closeLowStockDrawer(): void {
     this.isLowStockDrawerOpen = false;
+  }
+
+  /** Adjusts stock from the drawer with an optimistic update; refetches on failure. */
+  onStockAdjust(event: { product: Product; delta: number }): void {
+    const id = event.product.id;
+    // One in-flight request per product prevents server-side lost updates.
+    if (this.pendingStockAdjusts().includes(id)) return;
+
+    const current = this.products().find((p) => p.id === id);
+    const newStock = (current?.stock ?? event.product.stock) + event.delta;
+    if (newStock < 0) return;
+
+    // Optimistic update so the drawer reacts instantly.
+    this.products.update((list) =>
+      list.map((p) => (p.id === id ? { ...p, stock: newStock } : p))
+    );
+    this.pendingStockAdjusts.update((ids) => [...ids, id]);
+    this.cdr.markForCheck();
+
+    this.apiProductService.adjustStock(Number(id), event.delta).subscribe({
+      complete: () => {
+        this.pendingStockAdjusts.update((ids) => ids.filter((i) => i !== id));
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.pendingStockAdjusts.update((ids) => ids.filter((i) => i !== id));
+        console.error('Failed to adjust stock', err);
+        this.loadProducts(); // roll back to server truth
+        this.alertService.error(
+          this.lang.currentLang() === 'km'
+            ? 'ការកែស្តុកបរាជ័យ'
+            : 'Failed to adjust stock'
+        );
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  /** Opens the Purchase Order dialog pre-filled with the given product. */
+  onRestock(product: Product): void {
+    this.closeLowStockDrawer();
+    const dialogRef = this.dialog.open(PurchaseOrderDetailComponent, {
+      panelClass: DialogConfig.LARGE_DIALOG,
+      disableClose: true,
+      data: { preselectProduct: product },
+    });
+    // Refresh the list when the dialog closes with a saved order, so newly
+    // received stock appears immediately in the table and low-stock drawer.
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) this.loadProducts();
+    });
   }
 
   trackById(_: number, p: Product): string { return p.id; }

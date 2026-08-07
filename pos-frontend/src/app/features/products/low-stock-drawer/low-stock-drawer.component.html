@@ -33,22 +33,82 @@
         </p>
       </div>
 
-      <div *ngFor="let item of lowStockProducts" class="low-stock-item group">
+      <div
+        *ngFor="let item of lowStockProducts"
+        class="low-stock-item group"
+        [class.low-stock-item--out]="item.stock === 0"
+      >
         <div class="low-stock-item-img-wrap">
           <img [src]="item.imgUrl || 'assets/images/placeholder.svg'" alt="{{ item.name }}" class="low-stock-item-img" appImgFallback />
         </div>
         <div class="low-stock-item-info">
           <h4 class="low-stock-item-name">{{ item.name }}</h4>
           <p class="low-stock-item-meta">{{ getCategoryName(item.category) }} · ${{ item.price.toFixed(2) }}</p>
-          <span class="low-stock-item-stock-badge">
-            Stock: {{ item.stock }}
-          </span>
-        </div>
-        <div class="low-stock-item-action">
-          <label class="low-stock-toggle">
-            <input type="checkbox" [checked]="item.stock === 0" />
-            <span class="low-stock-toggle-slider"></span>
-          </label>
+          <div class="low-stock-item-stock-row">
+            <span
+              class="low-stock-item-stock-badge"
+              [class.low-stock-item-stock-badge--out]="item.stock === 0"
+            >
+              {{ item.stock === 0 ? 'Out of stock' : 'Low stock' }}
+            </span>
+            <div class="low-stock-item-stepper">
+              <button
+                type="button"
+                class="low-stock-item-step-btn"
+                aria-label="Decrease stock"
+                [disabled]="item.stock === 0 || isUpdating(item)"
+                (click)="adjustStock(item, -1)"
+              >−</button>
+              <span
+                class="low-stock-item-step-value"
+                [class.low-stock-item-step-value--out]="item.stock === 0"
+              >
+                @if (isUpdating(item)) {
+                  <svg
+                    class="low-stock-item-spinner"
+                    [class.low-stock-item-spinner--out]="item.stock === 0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                } @else {
+                  {{ item.stock }}
+                }
+              </span>
+              <button
+                type="button"
+                class="low-stock-item-step-btn"
+                aria-label="Increase stock"
+                [disabled]="isUpdating(item)"
+                (click)="adjustStock(item, 1)"
+              >+</button>
+            </div>
+          </div>
+          <div class="low-stock-item-bar">
+            <div
+              class="low-stock-item-bar-fill"
+              role="progressbar"
+              [attr.aria-valuenow]="stockPercent(item)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [class.low-stock-item-bar-fill--out]="item.stock === 0"
+              [style.width]="stockPercent(item) + '%'"
+            ></div>
+          </div>
+          <button
+            type="button"
+            class="low-stock-item-restock-btn"
+            [class.low-stock-item-restock-btn--out]="item.stock === 0"
+            (click)="restock.emit(item)"
+          >
+            <svg class="low-stock-item-restock-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            {{ item.stock === 0 ? 'Restock now' : 'Restock' }}
+          </button>
         </div>
       </div>
       <div *ngIf="lowStockProducts.length === 0" class="low-stock-empty">

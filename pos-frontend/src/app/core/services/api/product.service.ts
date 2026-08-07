@@ -58,6 +58,15 @@ export class ProductService {
   }
 
   /**
+   * Adjust product stock by a delta (positive = add, negative = subtract).
+   */
+  adjustStock(id: number, quantity: number): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/stock`, { quantity }).pipe(
+      map((res) => res?.data ?? res)
+    );
+  }
+
+  /**
    * Create a new product
    */
   createProduct(product: any): Observable<any> {

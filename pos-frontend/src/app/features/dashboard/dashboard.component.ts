@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { fadeIn, pageTransition } from '../../shared/animations/animations';
+import { Product } from '../../models';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -46,6 +47,9 @@ export class DashboardComponent implements OnInit {
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
   nearExpiryCount = computed(() => this.productService.nearExpiryProducts().length);
   totalProducts = computed(() => this.productService.products().length);
+
+  // ── Low stock list (mirrors the low-stock drawer styling) ────────────────
+  dashboardLowStock = computed(() => this.productService.lowStockProducts().slice(0, 8));
 
   // ── Computed greeting ──────────────────────────────────────────────────
   greeting = computed(() => {
@@ -148,6 +152,24 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+
+  // ── Low stock helpers ────────────────────────────────────────────────────
+  /** Percentage of the low-stock threshold remaining, clamped to 0-100. */
+  lowStockPercent(item: Product): number {
+    const threshold =
+      item.lowStockThreshold && item.lowStockThreshold > 0
+        ? item.lowStockThreshold
+        : 10;
+    return Math.max(0, Math.min(100, Math.round((item.stock / threshold) * 100)));
+  }
+
+  getCategoryName = (categoryId: string): string => {
+    const cat = this.productService
+      .categories()
+      .find((c) => c.id === categoryId);
+    if (!cat) return categoryId;
+    return this.lang.currentLang() === 'km' && cat.nameKm ? cat.nameKm : cat.name;
+  };
 
   // ── Navigation helpers ──────────────────────────────────────────────────
   goTo(route: string): void {

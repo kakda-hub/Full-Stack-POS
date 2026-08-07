@@ -19,7 +19,10 @@
     *ngIf="isLowStockDrawerOpen"
     [products]="products()"
     [getCategoryName]="getCategoryName"
-    (close)="closeLowStockDrawer()">
+    [updatingIds]="pendingStockAdjusts()"
+    (close)="closeLowStockDrawer()"
+    (restock)="onRestock($event)"
+    (stockAdjust)="onStockAdjust($event)">
   </app-low-stock-drawer>
 
   <!-- Search & Filter Toolbar -->

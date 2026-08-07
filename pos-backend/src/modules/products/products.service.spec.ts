@@ -30,15 +30,35 @@ describe('ProductsService', () => {
     saleItems: [],
   };
 
-  const mockRepository = () => ({
-    findOne: jest.fn(),
-    find: jest.fn(),
-    findAndCount: jest.fn(),
-    create: jest.fn(),
-    save: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  });
+  /** Chainable mock for repository.createQueryBuilder().update()...execute() */
+  const createUpdateQueryBuilder = () => {
+    const qb: any = {};
+    qb.update = jest.fn(() => qb);
+    qb.set = jest.fn(() => qb);
+    qb.setParameters = jest.fn(() => qb);
+    qb.where = jest.fn(() => qb);
+    qb.andWhere = jest.fn(() => qb);
+    qb.execute = jest.fn();
+    return qb;
+  };
+
+  const mockRepository = () => {
+    const updateQb = createUpdateQueryBuilder();
+    return {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      findAndCount: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      // Return the SAME builder instance so tests can configure its execute().
+      createQueryBuilder: jest.fn(() => updateQb),
+    };
+  };
+
+  /** Convenience: the query builder instance the repository returns. */
+  const updateQb = () => repository.createQueryBuilder() as any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -274,8 +294,8 @@ describe('ProductsService', () => {
   // ─── adjustStock ──────────────────────────────────────────────────────────
   describe('adjustStock', () => {
     it('should increase stock with positive quantity', async () => {
-      repository.findOne.mockResolvedValue(mockProduct);
-      repository.save.mockResolvedValue({ ...mockProduct, stock: 110 });
+      repository.findOne.mockResolvedValue({ ...mockProduct, stock: 110 });
+      updateQb().execute.mockResolvedValue({ affected: 1 });
 
       const result = await service.adjustStock(1, { quantity: 10 });
 
@@ -283,25 +303,53 @@ describe('ProductsService', () => {
     });
 
     it('should decrease stock with negative quantity', async () => {
-      const product = { ...mockProduct, stock: 50 };
-      repository.findOne.mockResolvedValue(product);
-      repository.save.mockResolvedValue({ ...product, stock: 40 });
+      repository.findOne.mockResolvedValue({ ...mockProduct, stock: 40 });
+      updateQb().execute.mockResolvedValue({ affected: 1 });
 
       const result = await service.adjustStock(1, { quantity: -10 });
 
       expect(result.stock).toBe(40);
     });
 
-    it('should throw BadRequestException when stock would go below 0', async () => {
+    it('should apply the delta atomically in a single guarded UPDATE', async () => {
+      repository.findOne.mockResolvedValue({ ...mockProduct, stock: 110 });
+      const qb = updateQb();
+      qb.execute.mockResolvedValue({ affected: 1 });
+
+      await service.adjustStock(1, { quantity: 10 });
+
+      expect(qb.update).toHaveBeenCalledWith(Product);
+      expect(qb.set).toHaveBeenCalledWith({ stock: expect.any(Function) });
+      expect(qb.setParameters).toHaveBeenCalledWith({ quantity: 10 });
+      expect(qb.where).toHaveBeenCalledWith('id = :id', { id: 1 });
+      expect(qb.andWhere).toHaveBeenCalledWith('stock + :quantity >= 0');
+    });
+
+    it('should treat a quantity of 0 as a no-op (not an error)', async () => {
       repository.findOne.mockResolvedValue(mockProduct);
 
-      await expect(service.adjustStock(1, { quantity: -200 })).rejects.toThrow(BadRequestException);
+      const result = await service.adjustStock(1, { quantity: 0 });
+
+      expect(result).toEqual(mockProduct);
+      expect(repository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when stock would go below 0', async () => {
+      repository.findOne.mockResolvedValue(mockProduct); // re-fetch for the message
+      updateQb().execute.mockResolvedValue({ affected: 0 });
+
+      await expect(service.adjustStock(1, { quantity: -200 })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when product not found', async () => {
       repository.findOne.mockResolvedValue(null);
+      updateQb().execute.mockResolvedValue({ affected: 0 });
 
-      await expect(service.adjustStock(999, { quantity: 10 })).rejects.toThrow(NotFoundException);
+      await expect(service.adjustStock(999, { quantity: 10 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
