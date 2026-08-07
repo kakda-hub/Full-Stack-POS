@@ -1,0 +1,181 @@
+<div
+  class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans transition-colors"
+  [class.bg-slate-950]="theme.isDark()"
+  [class.bg-slate-50]="!theme.isDark()"
+>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div
+      class="py-10 px-6 shadow-sm border sm:rounded-2xl sm:px-10 transition-colors"
+      [class.bg-slate-900]="theme.isDark()"
+      [class.border-slate-700]="theme.isDark()"
+      [class.bg-white]="!theme.isDark()"
+      [class.border-slate-200]="!theme.isDark()"
+    >
+      <!-- Branding -->
+      <div class="mb-8 text-center">
+        <div
+          class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          [class.bg-slate-800]="theme.isDark()"
+          [class.bg-slate-100]="!theme.isDark()"
+        >
+          <svg
+            class="w-6 h-6 text-sky-500"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 1.096A4.001 4.001 0 003 15z"
+            />
+          </svg>
+        </div>
+        <h3
+          class="text-xl font-semibold"
+          [class.text-slate-100]="theme.isDark()"
+          [class.text-slate-800]="!theme.isDark()"
+        >
+          {{ lang.currentLang() === 'km' ? 'ចូលប្រើប្រព័ន្ធ' : 'Sign In' }}
+        </h3>
+        <p
+          class="text-sm mt-1"
+          [class.text-slate-400]="theme.isDark()"
+          [class.text-slate-500]="!theme.isDark()"
+        >
+          {{
+            lang.currentLang() === 'km'
+              ? 'ចូលប្រើធនធាន និងផ្ទាំងគ្រប់គ្រង Cloudinary របស់អ្នក។'
+              : 'Access your Cloudinary assets and dashboard.'
+          }}
+        </p>
+      </div>
+
+      <form class="space-y-6" (ngSubmit)="onSubmit()" novalidate>
+        <div>
+          <label
+            for="username"
+            class="block text-sm font-medium"
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Username' }}
+          </label>
+          <div class="mt-1 relative">
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              placeholder="admin_user"
+              [value]="username()"
+              (input)="onUsernameInput($event)"
+              [class.border-rose-500]="usernameInvalid()"
+              [class.focus:ring-rose-500]="usernameInvalid()"
+              [class.border-slate-600]="!usernameInvalid() && theme.isDark()"
+              [class.bg-slate-800]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.placeholder-slate-500]="theme.isDark()"
+              [class.border-slate-200]="!usernameInvalid() && !theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.text-slate-900]="!theme.isDark()"
+              [class.placeholder-slate-300]="!theme.isDark()"
+              class="appearance-none block w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:border-transparent sm:text-sm transition-all"
+            >
+          </div>
+          <p
+            *ngIf="usernameInvalid()"
+            class="mt-1.5 text-xs font-medium text-rose-500"
+          >
+            {{
+              lang.currentLang() === 'km'
+                ? 'សូមបញ្ចូលឈ្មោះអ្នកប្រើរបស់អ្នក។'
+                : 'Please enter your username.'
+            }}
+          </p>
+        </div>
+
+        <div>
+          <label
+            for="password"
+            class="block text-sm font-medium"
+            [class.text-slate-300]="theme.isDark()"
+            [class.text-slate-700]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Password' }}
+          </label>
+          <div class="mt-1">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              placeholder="••••••••"
+              [value]="password()"
+              (input)="onPasswordInput($event)"
+              [class.border-rose-500]="passwordInvalid()"
+              [class.focus:ring-rose-500]="passwordInvalid()"
+              [class.border-slate-600]="!passwordInvalid() && theme.isDark()"
+              [class.bg-slate-800]="theme.isDark()"
+              [class.text-slate-200]="theme.isDark()"
+              [class.placeholder-slate-500]="theme.isDark()"
+              [class.border-slate-200]="!passwordInvalid() && !theme.isDark()"
+              [class.bg-white]="!theme.isDark()"
+              [class.text-slate-900]="!theme.isDark()"
+              [class.placeholder-slate-300]="!theme.isDark()"
+              class="appearance-none block w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:border-transparent sm:text-sm transition-all"
+            >
+          </div>
+          <p
+            *ngIf="passwordInvalid()"
+            class="mt-1.5 text-xs font-medium text-rose-500"
+          >
+            {{
+              lang.currentLang() === 'km'
+                ? 'សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក។'
+                : 'Please enter your password.'
+            }}
+          </p>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            [checked]="remember()"
+            (change)="onRememberChange($event)"
+            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
+          >
+          <label
+            for="remember-me"
+            class="ml-2 block text-sm cursor-pointer select-none"
+            [class.text-slate-400]="theme.isDark()"
+            [class.text-slate-600]="!theme.isDark()"
+          >
+            {{ lang.currentLang() === 'km' ? 'រក្សាការចូលប្រើ' : 'Stay signed in' }}
+          </label>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform active:scale-95"
+          >
+            {{ lang.currentLang() === 'km' ? 'ចូលទៅកាន់ Cloudinary' : 'Login to Cloudinary' }}
+          </button>
+        </div>
+      </form>
+
+      <p
+        class="mt-6 text-center text-xs"
+        [class.text-slate-500]="theme.isDark()"
+        [class.text-slate-400]="!theme.isDark()"
+      >
+        {{ lang.currentLang() === 'km' ? 'សុវត្ថិភាពដោយ' : 'Secured by' }}
+        <span class="font-semibold text-sky-500">Cloudinary</span>
+      </p>
+    </div>
+  </div>
+</div>

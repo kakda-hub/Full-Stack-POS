@@ -33,6 +33,27 @@
       </p>
     </div>
     <div class="flex items-center gap-3">
+      <!-- Signed-in user -->
+      <span
+        *ngIf="signedInAs"
+        class="hidden md:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border"
+        [class.bg-slate-700/60]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.text-slate-300]="theme.isDark()"
+        [class.bg-indigo-50]="!theme.isDark()"
+        [class.border-indigo-100]="!theme.isDark()"
+        [class.text-indigo-700]="!theme.isDark()"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        {{ signedInAs }}
+      </span>
       <!-- Refresh -->
       <button
         (click)="loadResources()"
@@ -62,6 +83,31 @@
           />
         </svg>
         {{ lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh' }}
+      </button>
+      <!-- Sign Out -->
+      <button
+        (click)="onSignOut()"
+        [matTooltip]="lang.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign out'"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium text-sm border"
+        [class.bg-slate-700]="theme.isDark()"
+        [class.hover:bg-rose-900/40]="theme.isDark()"
+        [class.text-slate-200]="theme.isDark()"
+        [class.border-slate-600]="theme.isDark()"
+        [class.bg-white]="!theme.isDark()"
+        [class.hover:bg-rose-50]="!theme.isDark()"
+        [class.text-slate-600]="!theme.isDark()"
+        [class.hover:text-rose-600]="!theme.isDark()"
+        [class.border-slate-300]="!theme.isDark()"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+        {{ lang.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}
       </button>
       <!-- Upload Toggle -->
       <button

@@ -20,11 +20,13 @@ import {
   takeUntil,
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import {
   CloudinaryService,
   CloudinaryResource,
   CloudinaryApiResponse,
 } from '../../../core/services/api/cloudinary.service';
+import { signOut, currentSession, CLOUDINARY_SIGN_IN_ROUTE } from '../cloudinary-session';
 import { AlertService } from '../../../core/services/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LanguageService } from '../../../core/services/language.service';
@@ -97,9 +99,15 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     private cloudinaryService: CloudinaryService,
     private alertService: AlertService,
     private dialog: MatDialog,
+    private router: Router,
   ) {}
 
+  /** Username of the active Cloudinary session ('' when signed out). */
+  signedInAs = '';
+
   ngOnInit(): void {
+    this.signedInAs = currentSession()?.username ?? '';
+
     // Single fetch pipeline: refresh triggers fetch instantly, search input is
     // debounced server-side. switchMap cancels any in-flight request so stale
     // responses can never overwrite newer ones.
@@ -217,6 +225,13 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
     });
+  }
+
+  // Sign out (clears the UI gate and returns to the sign-in page)
+  onSignOut(): void {
+    signOut();
+    this.signedInAs = '';
+    this.router.navigate([CLOUDINARY_SIGN_IN_ROUTE]);
   }
 
   // Upload

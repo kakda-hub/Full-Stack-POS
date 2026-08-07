@@ -3,6 +3,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { isSignedIn, signOut, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';
 
 import { CloudinaryFileUploadListComponent } from './cloudinary-file-upload-list.component';
 import {
@@ -36,6 +38,7 @@ describe('CloudinaryFileUploadListComponent', () => {
   const dialogMock = {
     open: vi.fn(() => ({ afterClosed: () => of(true) })),
   };
+  const routerMock = { navigate: vi.fn() };
 
   const sampleResources: CloudinaryResource[] = [
     {
@@ -106,6 +109,11 @@ describe('CloudinaryFileUploadListComponent', () => {
     vi.clearAllMocks();
     vi.stubGlobal('FileReader', FakeFileReader);
     mockListResponse();
+    // Open the UI gate so list tests exercise the fetch pipeline.
+    localStorage.setItem(
+      CLOUDINARY_SESSION_KEY,
+      JSON.stringify({ username: 'admin_user', signedInAt: new Date().toISOString() }),
+    );
 
     await TestBed.configureTestingModule({
       declarations: [CloudinaryFileUploadListComponent],
@@ -117,6 +125,7 @@ describe('CloudinaryFileUploadListComponent', () => {
         { provide: AlertService, useValue: alertMock },
         { provide: CloudinaryService, useValue: cloudinaryMock },
         { provide: MatDialog, useValue: dialogMock },
+        { provide: Router, useValue: routerMock },
       ],
     }).compileComponents();
 
@@ -125,6 +134,8 @@ describe('CloudinaryFileUploadListComponent', () => {
   });
 
   afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
     vi.unstubAllGlobals();
   });
 
@@ -144,6 +155,25 @@ describe('CloudinaryFileUploadListComponent', () => {
     input.value = value;
     input.dispatchEvent(new Event('input'));
   }
+
+  // ─── UI sign-in session (route gating lives in cloudinary-signed-in.guard) ─
+  describe('sign-in session', () => {
+    it('exposes the signed-in username after a valid session', async () => {
+      await mount();
+      expect(component.signedInAs).toBe('admin_user');
+    });
+
+    it('signs out: clears the session and navigates back to sign-in', async () => {
+      await mount();
+      expect(isSignedIn()).toBe(true);
+
+      component.onSignOut();
+
+      expect(isSignedIn()).toBe(false);
+      expect(component.signedInAs).toBe('');
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/cloudinary-file-upload/sign-in']);
+    });
+  });
 
   // ─── Initial load ─────────────────────────────────────────────────────────
   describe('initial load', () => {

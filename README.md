@@ -10,6 +10,9 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
+[![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-2-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
+[![Khmer/English](https://img.shields.io/badge/Khmer%20%7C%20English-bilingual-4285F4?style=for-the-badge&logo=googletranslate&logoColor=white)](https://github.com/ngx-translate/core)
 
 </div>
 
@@ -83,6 +86,12 @@ Full-Stack POS is a complete, enterprise-grade Point of Sale system built for mo
 ### 👤 Avatar & Profile Management (NEW!)
 - **User Avatar Uploads**: Profile picture upload and management for all users.
 - **Cloudinary & MinIO Support**: Multi-storage image hosting with automatic optimization and resizing.
+
+### ☁️ Cloudinary Media Manager (NEW!)
+
+- **UI Sign-In Gate**: The Cloudinary media manager is protected by its own lightweight sign-in screen at `/cloudinary-file-upload/sign-in`. It's a UI-only gate — real Cloudinary credentials stay configured server-side.
+- **Session Persistence**: "Stay signed in" keeps the session in `localStorage` (survives browser restarts); otherwise it uses `sessionStorage` (cleared when the tab closes). A **Sign Out** button on the list page clears the session and returns to sign-in.
+- **Full Media Management**: Upload with drag & drop and folder selection, server-side search/sort/pagination, KPI stats (total files, size, formats), image lightbox previews, and one-click copy of public IDs and URLs.
 
 ---
 
@@ -214,7 +223,7 @@ Full-Stack-POS/
 │   │   │   ├── permissions/              # Permission management
 │   │   │   ├── login/                    # Authentication screen
 │   │   │   ├── management-page/          # Dynamic page management
-│   │   │   ├── cloudinary-file-upload/   # File upload UI
+│   │   │   ├── cloudinary-file-upload/   # Cloudinary media manager (sign-in, upload, list)
 │   │   │   ├── suppliers/                # Supplier management
 │   │   │   ├── purchase-orders/          # Purchase order management
 │   │   │   ├── stock-movements/          # Stock movement tracking

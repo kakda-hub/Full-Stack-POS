@@ -6,9 +6,10 @@ import { CloudinaryFileUploadListComponent } from './cloudinary-file-upload-list
 
 import { SharedModule } from '../../shared/shared.module';
 import { MaterialModule } from '../../core/material/material.module';
+import { CloudinarySignInComponent } from './cloudinary-sign-in/cloudinary-sign-in.component';
 
 @NgModule({
-  declarations: [CloudinaryFileUploadListComponent],
+  declarations: [CloudinaryFileUploadListComponent, CloudinarySignInComponent],
   imports: [
     CommonModule, 
     CloudinaryFileUploadRoutingModule,

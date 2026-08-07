@@ -137,7 +137,7 @@ pos-frontend/
 │   │   │   ├── permissions/             # Permission management
 │   │   │   ├── dashboard/                # Admin interactive dashboard with KPIs
 │   │   │   ├── management-page/         # Dynamic navigation page management
-│   │   │   ├── cloudinary-file-upload/  # File upload UI
+│   │   │   ├── cloudinary-file-upload/  # Cloudinary media manager (sign-in, upload, list)
 │   │   │   ├── suppliers/                # Supplier management
 │   │   │   ├── purchase-orders/          # Purchase order management
 │   │   │   ├── stock-movements/          # Stock movement tracking
@@ -207,7 +207,7 @@ pos-frontend/
 | 👥 **Users** | User management with role assignments |
 | 🔐 **User Roles & Permissions** | Role configuration and permission management |
 | 📄 **Management Pages** | Dynamic navigation page management |
-| 🖼️ **File Uploads** | Cloudinary integration for image storage |
+| ☁️ **Cloudinary Media Manager** | Sign-in gated media manager — upload, search, sort, paginate & preview Cloudinary assets |
 | 🌐 **Language Manager** | Khmer/English translation interface |
 | 📦 **Suppliers** | Supplier directory with contact and address details |
 | 📋 **Purchase Orders** | Full PO lifecycle management (Draft → Received) |
@@ -240,7 +240,9 @@ pos-frontend/
 | `/permission` | PermissionsModule | Admin | Permission configuration |
 | `/management-page` | ManagementPageModule | Admin | Dynamic navigation pages |
 | `/dashboard` | DashboardModule | Admin | Admin interactive dashboard (NEW!) |
-| `/cloudinary-file-upload` | CloudinaryFileUploadModule | Admin | File upload interface |
+| `/cloudinary-file-upload` | CloudinaryFileUploadModule | Admin | Cloudinary media manager (redirects to sign-in) |
+| `/cloudinary-file-upload/sign-in` | CloudinaryFileUploadModule | Admin | Sign-in gate for the media manager |
+| `/cloudinary-file-upload/list` | CloudinaryFileUploadModule | Admin | Upload & manage media assets (signed-in) |
 | `/suppliers` | SuppliersModule | Admin | Supplier management |
 | `/purchase-orders` | PurchaseOrdersModule | Admin | Purchase order management |
 | `/stock-movements` | StockMovementsModule | Admin | Stock movement tracking |

@@ -84,6 +84,11 @@ export class CashierLayoutComponent implements OnInit, OnDestroy {
     return this.navState.navItems();
   }
 
+  /** Navigate back to the admin home (Dashboard) route */
+  goHome(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
   /** ── Top header dropdown handlers ── */
   toggleLangMenu() {
     this.langMenuOpen.update(v => !v);

@@ -594,6 +594,91 @@ Used by the admin layout to render dynamic sidebar navigation with role-based vi
 | `/upload-cloudinary` | Cloudinary | Cloudinary image upload |
 | `/upload-dynamic` | Configurable | Dynamic storage backend selection |
 
+### ☁️ Cloudinary `/cloudinary`
+
+Full media-management API backed by Cloudinary: upload, list (server-side paginated + searchable), fetch, rename, and delete resources.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| POST | `/cloudinary/upload` | ❌ | Upload a file (`multipart/form-data`: `file`, optional `folder`, default `pos-general`) |
+| GET | `/cloudinary` | ❌ | List resources — server-side search, sort, and pagination |
+| GET | `/cloudinary/:publicId` | ❌ | Get a single resource by public ID (URL-encode folder-prefixed IDs, e.g. `pos-products%2Fabc123`) |
+| PUT | `/cloudinary/rename` | ❌ | Rename / move a resource (body: `oldPublicId`, `newPublicId`) |
+| DELETE | `/cloudinary/:publicId` | ❌ | Delete a resource (wildcard route accepts folder-prefixed public IDs) |
+
+> **Auth:** The controller has no guards, so these endpoints are public. The frontend media manager additionally uses its own UI sign-in gate (`/cloudinary-file-upload/sign-in`); real Cloudinary credentials stay configured server-side.
+
+**Flat response envelope (⚠️ exception to the standard envelope):**
+
+`GET /cloudinary` is decorated with `@SkipIntercept()`, so it bypasses the global `ResponseInterceptor` and returns a **flat envelope where `data` is the resources array itself** (no nested `data.data.resources` wrapping):
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "data": [
+    {
+      "asset_id": "abc123",
+      "public_id": "pos-products/iced-americano",
+      "format": "jpg",
+      "version": 1719240000,
+      "resource_type": "image",
+      "type": "upload",
+      "created_at": "2026-01-01T00:00:00Z",
+      "bytes": 20480,
+      "width": 800,
+      "height": 600,
+      "asset_folder": "pos-products",
+      "display_name": "iced-americano",
+      "url": "https://res.cloudinary.com/demo/image/upload/v1/pos-products/iced-americano.jpg",
+      "secure_url": "https://res.cloudinary.com/demo/image/upload/v1/pos-products/iced-americano.jpg"
+    }
+  ],
+  "total": 128,
+  "timestamp": "2026-01-01T00:00:00.000Z"
+}
+```
+
+On error the same shape is returned with `success: false`, `data: []`, and `total: 0` (the HTTP status is passed through).
+
+**Query parameters (GET `/cloudinary`):**
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `search` | — | Case-insensitive filter on `public_id` or `format`; omit or leave empty for all records |
+| `sortBy` | `created_at` | Allowed: `public_id` \| `format` \| `bytes` \| `created_at` |
+| `sort` | `desc` | `asc` or `desc` |
+| `offset` | `0` | Zero-based offset |
+| `max` | `10` | Page size (max `500` — Cloudinary's single-call cap) |
+
+**POST `/cloudinary/upload`** — response (201):
+
+```json
+{
+  "success": true,
+  "statusCode": 201,
+  "message": "File uploaded successfully",
+  "data": {
+    "originalFileName": "menu.jpg",
+    "fileName": "pos-general/abc123.jpg",
+    "filePath": "pos-general",
+    "fileUrl": "https://res.cloudinary.com/demo/image/upload/v1/pos-general/abc123.jpg",
+    "fileExtension": "jpg",
+    "fileSize": 20480,
+    "uploadBy": "admin",
+    "destinationStorage": "CLOUDINARY",
+    "width": 800,
+    "height": 600,
+    "id": "asset-id",
+    "uploadType": "file-upload-type-general",
+    "isDeleted": false,
+    "uploadDate": "2026-01-01T00:00:00.000Z"
+  }
+}
+```
+
+The remaining endpoints (`GET /:publicId`, `PUT /rename`, `DELETE /:publicId`) return the standard envelope (`success`, `statusCode`, `data`, and optional `message`).
+
 ### 👥 Customers
 
 | Method | Endpoint | Auth | Description |
