@@ -1,0 +1,7 @@
+{
+  "git": {
+    "defaultBranch": "master",
+    "protectedBranches": ["main"],
+    "allowDirectPushToMain": false
+  }
+}

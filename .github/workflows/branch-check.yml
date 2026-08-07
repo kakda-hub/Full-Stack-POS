@@ -1,0 +1,15 @@
+name: Prevent Direct Main Pushes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  block-main-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject Direct Push
+        run: |
+          echo "Error: Direct pushes to 'main' are disabled. All changes must be made on 'master' or feature branches and submitted via Pull Request."
+          exit 1
