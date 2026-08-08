@@ -9,16 +9,12 @@ import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { fadeIn } from '../../shared/animations/animations';
-import { Product } from '../../models';
+import { Product, ReportSummary, TopProductEntry } from '../../models';
 import { LanguageService } from '../../services/shared/language.service';
 import { ThemeService } from '../../services/shared/theme.service';
 import { AuthService } from '../../services/shared/auth.service';
 import { ProductService } from '../../services/shared/product.service';
-import {
-  ReportService,
-  ReportSummary,
-  TopProductEntry,
-} from '../../services/report.service';
+import { ReportService } from '../../services/report.service';
 import { SaleService } from '../../services/sale.service';
 
 interface SaleItem {

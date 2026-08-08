@@ -7,11 +7,8 @@ import { Router } from '@angular/router';
 import { isSignedIn, signOut, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';
 
 import { CloudinaryFileUploadListComponent } from './cloudinary-file-upload-list.component';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-  CloudinaryApiResponse,
-} from '../../../services/cloudinary.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource, CloudinaryApiResponse } from '../../../models';
 import { AlertService } from '../../../services/shared/alert.service';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';

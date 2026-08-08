@@ -4,7 +4,8 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
-import { ManagementPage, ManagementPageService } from '../../../services/management-page.service';
+import { ManagementPage } from '../../../models';
+import { ManagementPageService } from '../../../services/management-page.service';
 import { ManagementPageDetailComponent } from '../management-page-detail/management-page-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 

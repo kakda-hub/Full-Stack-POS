@@ -4,11 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
-
-export interface KhqrResponse {
-  qrString: string;
-  md5: string;
-}
+import { KhqrResponse } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class KhqrService {

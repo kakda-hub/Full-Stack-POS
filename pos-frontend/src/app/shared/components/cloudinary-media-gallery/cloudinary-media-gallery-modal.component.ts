@@ -1,9 +1,7 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-} from '../../../services/cloudinary.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource } from '../../../models';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
 import { modalAnimation } from '../../../shared/animations/animations';

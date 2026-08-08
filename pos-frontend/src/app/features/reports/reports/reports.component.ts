@@ -3,14 +3,7 @@ import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ProductService } from '../../../services/shared/product.service';
 import { ThemeService } from '../../../services/shared/theme.service';
-import {
-  ReportService,
-  ReportSummary,
-  PaymentSummaryEntry,
-  DailyRevenueEntry,
-  TopProductEntry,
-  SalesByCashierEntry,
-} from '../../../services/report.service';
+import { ReportService } from '../../../services/report.service';
 import { SaleService } from '../../../services/sale.service';
 import {
   ApexChart,
@@ -25,6 +18,13 @@ import {
   ApexTheme,
 } from 'ng-apexcharts';
 import { SaleItem } from '../../../models/sale';
+import {
+  ReportSummary,
+  PaymentSummaryEntry,
+  DailyRevenueEntry,
+  TopProductEntry,
+  SalesByCashierEntry,
+} from '../../../models';
 
 type DateRangePreset = 'today' | 'week' | 'month' | 'custom';
 

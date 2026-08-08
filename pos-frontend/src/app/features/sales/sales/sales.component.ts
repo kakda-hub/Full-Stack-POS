@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementR
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { Transaction, Product, CartItem, QuickPickItem } from '../../../models';
+import { Transaction, Product, CartItem, QuickPickItem, CreateSaleDto } from '../../../models';
 import { AlertService } from '../../../services/shared/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../../services/shared/auth.service';
@@ -13,7 +13,7 @@ import { ProductService } from '../../../services/shared/product.service';
 import { ThemeService } from '../../../services/shared/theme.service';
 import { TransactionService } from '../../../services/shared/transaction.service';
 import { QuickPickService } from '../../../services/quick-pick.service';
-import { SaleService, CreateSaleDto } from '../../../services/sale.service';
+import { SaleService } from '../../../services/sale.service';
 import { fadeIn, listAnimation, cartItemAnimation, counterAnimation } from '../../../shared/animations/animations';
 import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
 

@@ -4,21 +4,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
 import { ListQuery } from '../models/list-query';
+import { CreateSaleDto } from '../models';
 import { buildListParams } from './list-params';
-
-export interface CreateSaleItemDto {
-  productId: number;
-  quantity: number;
-}
-
-export interface CreateSaleDto {
-  items: CreateSaleItemDto[];
-  discount?: number;
-  tax?: number;
-  paymentMethod?: 'cash' | 'aba' | 'card';
-  customerId?: number;
-  pointsRedeemed?: number;
-}
 
 @Injectable({
   providedIn: 'root',

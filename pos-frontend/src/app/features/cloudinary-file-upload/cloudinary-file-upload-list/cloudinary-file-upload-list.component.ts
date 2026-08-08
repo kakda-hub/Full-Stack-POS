@@ -21,11 +21,8 @@ import {
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-  CloudinaryApiResponse,
-} from '../../../services/cloudinary.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource, CloudinaryApiResponse } from '../../../models';
 import { signOut, currentSession, CLOUDINARY_SIGN_IN_ROUTE } from '../cloudinary-session';
 import { AlertService } from '../../../services/shared/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
