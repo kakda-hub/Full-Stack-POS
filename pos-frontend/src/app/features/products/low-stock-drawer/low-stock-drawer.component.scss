@@ -76,15 +76,17 @@
 }
 
 .low-stock-item-img {
-  @apply w-14 h-14 object-cover rounded-xl border-2 border-white shadow-sm transition-all duration-300;
+  @apply w-12 h-12 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1;
+  @apply dark:border-slate-700 dark:bg-slate-800;
 }
 
 .low-stock-item--out .low-stock-item-img {
-  @apply grayscale opacity-80;
+  @apply opacity-70 grayscale;
 }
 
 .low-stock-item-img--placeholder {
-  @apply w-14 h-14 flex items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50;
+  @apply w-12 h-12 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-100;
+  @apply dark:border-slate-700 dark:bg-slate-800;
 }
 
 .low-stock-item-info {

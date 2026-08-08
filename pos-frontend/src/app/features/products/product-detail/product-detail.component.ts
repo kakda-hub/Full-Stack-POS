@@ -149,6 +149,14 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  onImageChange(url: string): void {
+    this.onGallerySelect(url);
+  }
+
+  onImageRemove(): void {
+    this.form.patchValue({ imgUrl: '', imgUrls: [] });
+  }
+
   openGallery(): void {
     const data: MediaGalleryData = {
       selectedUrl: this.primaryImgUrl,

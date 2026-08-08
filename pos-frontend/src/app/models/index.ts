@@ -1,4 +1,5 @@
 export * from './user.model';
+export * from './user-role.model';
 export * from './product.model';
 export * from './cart-item.model';
 export * from './transaction.model';

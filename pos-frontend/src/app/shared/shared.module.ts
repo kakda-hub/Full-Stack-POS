@@ -19,6 +19,7 @@ import { ModalComponent } from './components/modal/modal.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
+import { ImageUploadAvatarComponent } from './components/image-upload-avatar/image-upload-avatar.component';
 import { AppIconComponent } from './components/app-icon/app-icon.component';
 import { SortHeaderComponent } from './components/sort-header/sort-header.component';
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
@@ -30,6 +31,7 @@ const components = [
     ModalComponent,
     ConfirmDialogComponent,
     AvatarUploadComponent,
+    ImageUploadAvatarComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,

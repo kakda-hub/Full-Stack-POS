@@ -112,6 +112,3 @@ export class DragDropUploadComponent implements ControlValueAccessor {
     this.onChange(null);
   }
 }
-
-
-// <app-drag-drop-upload formControlName="imgUrl"></app-drag-drop-upload>

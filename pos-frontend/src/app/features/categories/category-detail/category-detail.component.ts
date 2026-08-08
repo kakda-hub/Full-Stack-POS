@@ -3,10 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
-import { AlertService } from '../../../services/shared/alert.service';
 import { CategoriesService } from '../../../services/categories.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
-import { CloudinaryService } from '../../../services/cloudinary.service';
 
 @Component({
   selector: 'app-category-detail',
@@ -28,8 +26,6 @@ export class CategoryDetailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public lang: LanguageService,
-    private cloudinaryService: CloudinaryService,
-    private alertService: AlertService,
     private categoriesService: CategoriesService,
     public theme: ThemeService,
     private dialogRef: MatDialogRef<CategoryDetailComponent>,
@@ -47,37 +43,15 @@ export class CategoryDetailComponent implements OnInit {
   }
 
   onFileSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
+    // Handled by ImageUploadAvatarComponent
+  }
 
-    this.isUploading.set(true);
+  onImageChange(url: string): void {
+    this.form.patchValue({ imgUrl: url });
+  }
 
-    this.cloudinaryService.uploadFile(file).subscribe({
-      next: (res) => {
-        // Extract fileUrl from the nested response envelope
-        const fileUrl =
-          res?.data?.data?.fileUrl ||          // { data: { data: { fileUrl } } }
-          res?.data?.data?.[0]?.fileUrl ||      // { data: { data: [{ fileUrl }] } }
-          res?.data?.fileUrl;                    // { data: { fileUrl } }
-
-        if (fileUrl) {
-          this.form.patchValue({ imgUrl: fileUrl });
-          this.alertService.success(
-            this.lang.t('categories.imageUploaded'),
-            this.lang.t('confirm.success')
-          );
-        }
-        this.isUploading.set(false);
-      },
-      error: (err) => {
-        console.error('Upload failed', err);
-        this.alertService.error(
-          this.lang.t('categories.imageUploadFailed'),
-          this.lang.t('error.title')
-        );
-        this.isUploading.set(false);
-      },
-    });
+  onImageRemove(): void {
+    this.form.patchValue({ imgUrl: '' });
   }
 
   onSubmit(): void {
