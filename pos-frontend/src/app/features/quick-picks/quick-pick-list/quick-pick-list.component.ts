@@ -128,13 +128,10 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
   deleteItem(item: QuickPickItem): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `លុបទំនិញរហ័ស \"${item.label}\" មែនទេ?`
-            : `Delete quick pick \"${item.label}\"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('quickPicks.deleteQuestion', { name: item.label }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -143,20 +140,14 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
       this.quickPickService.delete(item.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `\"${item.label}\" ត្រូវបានលុបចោល`
-              : `\"${item.label}\" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('quickPicks.deleted', { name: item.label }),
+            this.lang.t('quickPicks.deletedTitle')
           );
           this.loadItems();
         },
         error: (err) => {
           console.error('Failed to delete quick pick', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការលុបបរាជ័យ'
-              : 'Failed to delete item'
-          );
+          this.alertService.error(this.lang.t('quickPicks.deleteFailed'));
         },
       });
     });
@@ -178,10 +169,10 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
       this.loadItems();
       const isEdit = !!this.editingItem;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `ទំនិញរហ័សត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Quick pick ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('quickPicks.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingItem = null;
     });

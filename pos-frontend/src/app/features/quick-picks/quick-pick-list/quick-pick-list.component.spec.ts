@@ -19,7 +19,7 @@ describe('QuickPickListComponent — server-side pagination', () => {
   let component: QuickPickListComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const langMock = { currentLang: () => 'en', t: (key: string) => key };
   const alertMock = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
   const quickPickServiceMock = { getPage: vi.fn(), delete: vi.fn() };
   const dialogMock = { open: vi.fn(() => ({ afterClosed: () => of(true) })) };

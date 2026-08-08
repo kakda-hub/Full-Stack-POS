@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 
@@ -8,14 +8,16 @@ import { ThemeService } from '../../../services/shared/theme.service';
 import { LanguageService } from '../../../services/shared/language.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { isSignedIn, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';
+import { createI18nMocks } from '../../../testing/i18n-mock';
 
 describe('CloudinarySignInComponent', () => {
   let fixture: ComponentFixture<CloudinarySignInComponent>;
   let component: CloudinarySignInComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const { langMock, translateServiceMock, setLang } = createI18nMocks();
   const routerMock = { navigate: vi.fn() };
 
   beforeEach(async () => {
@@ -26,11 +28,12 @@ describe('CloudinarySignInComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [CloudinarySignInComponent],
-      imports: [SharedModule, MaterialModule, NoopAnimationsModule],
+      imports: [SharedModule, MaterialModule, NoopAnimationsModule, TranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ThemeService, useValue: themeMock },
         { provide: LanguageService, useValue: langMock },
+        { provide: TranslateService, useValue: translateServiceMock },
         { provide: Router, useValue: routerMock },
       ],
     }).compileComponents();
@@ -107,7 +110,7 @@ describe('CloudinarySignInComponent', () => {
   it('renders Khmer copy when the language is Khmer', () => {
     // Switch the language first, then re-create the component so its initial
     // render is Khmer (a mid-test language swap trips zoneless NG0100).
-    langMock.currentLang = () => 'km';
+    setLang('km');
     fixture.destroy();
     fixture = TestBed.createComponent(CloudinarySignInComponent);
     component = fixture.componentInstance;

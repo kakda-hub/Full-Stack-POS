@@ -13,8 +13,8 @@
         (click)="refresh()"
         class="dash-btn-icon"
         [class.dash-spin]="isLoading()"
-        [title]="lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh'"
-        aria-label="Refresh data"
+        [title]="'dashboard.refresh' | translate"
+        [attr.aria-label]="'dashboard.refresh' | translate"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
@@ -29,7 +29,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" />
         </svg>
-        <span>{{ lang.currentLang() === 'km' ? 'របាយការណ៍ពេញ' : 'Full Reports' }}</span>
+        <span>{{ 'dashboard.fullReports' | translate }}</span>
       </button>
     </div>
   </div>
@@ -64,13 +64,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <span class="dash-kpi-badge dash-badge-indigo">{{ lang.currentLang() === 'km' ? 'ថ្ងៃនេះ' : 'Today' }}</span>
+          <span class="dash-kpi-badge dash-badge-indigo">{{ 'dashboard.today' | translate }}</span>
         </div>
         <p class="dash-kpi-value">${{ (summary()?.totalRevenue ?? 0).toFixed(2) }}</p>
-        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ចំណូលសរុប' : 'Total Revenue' }}</p>
+        <p class="dash-kpi-label">{{ 'dashboard.totalRevenue' | translate }}</p>
         <div class="dash-kpi-footer">
           <span class="dash-kpi-stat">{{ summary()?.averageOrderValue ? '$' + summary()!.averageOrderValue!.toFixed(2) : '$0.00' }}</span>
-          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? 'មធ្យម/ប្រតិបត្តិការ' : 'Avg / Order' }}</span>
+          <span class="dash-kpi-stat-label">{{ 'dashboard.avgPerOrder' | translate }}</span>
         </div>
       </div>
 
@@ -84,10 +84,10 @@
           </div>
         </div>
         <p class="dash-kpi-value">{{ summary()?.totalSales ?? 0 }}</p>
-        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'Transactions' }}</p>
+        <p class="dash-kpi-label">{{ 'dashboard.transactions' | translate }}</p>
         <div class="dash-kpi-footer">
           <span class="dash-kpi-stat">{{ recentEntries().length }}</span>
-          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការថ្មី' : 'Recent sales' }}</span>
+          <span class="dash-kpi-stat-label">{{ 'dashboard.recentSales' | translate }}</span>
         </div>
       </div>
 
@@ -101,10 +101,10 @@
           </div>
         </div>
         <p class="dash-kpi-value">{{ totalProducts() }}</p>
-        <p class="dash-kpi-label">{{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Total Products' }}</p>
+        <p class="dash-kpi-label">{{ 'dashboard.totalProducts' | translate }}</p>
         <div class="dash-kpi-footer">
           <span class="dash-kpi-stat">{{ (summary()?.totalSales ?? 0) > 0 ? (summary()!.totalRevenue! / summary()!.totalSales!).toFixed(2) : '0.00' }}</span>
-          <span class="dash-kpi-stat-label">{{ lang.currentLang() === 'km' ? '$/ប្រតិបត្តិការ' : 'Revenue / Sale' }}</span>
+          <span class="dash-kpi-stat-label">{{ 'dashboard.revenuePerSale' | translate }}</span>
         </div>
       </div>
 
@@ -116,17 +116,17 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <span class="dash-kpi-badge dash-badge-rose">{{ lang.currentLang() === 'km' ? 'ត្រូវការការយកចិត្តទុកដាក់' : 'Needs attention' }}</span>
+          <span class="dash-kpi-badge dash-badge-rose">{{ 'dashboard.needsAttention' | translate }}</span>
         </div>
         <div class="dash-alert-stack">
           <div class="dash-alert-item">
             <span class="dash-alert-value">{{ lowStockCount() }}</span>
-            <span class="dash-alert-label">{{ lang.currentLang() === 'km' ? 'ស្តុកទាប' : 'Low Stock' }}</span>
+            <span class="dash-alert-label">{{ 'dashboard.lowStock' | translate }}</span>
           </div>
           <div class="dash-alert-divider"></div>
           <div class="dash-alert-item">
             <span class="dash-alert-value">{{ nearExpiryCount() }}</span>
-            <span class="dash-alert-label">{{ lang.currentLang() === 'km' ? 'ជិតផុតកំណត់' : 'Near Expiry' }}</span>
+            <span class="dash-alert-label">{{ 'dashboard.nearExpiry' | translate }}</span>
           </div>
         </div>
       </div>
@@ -140,10 +140,10 @@
             <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            {{ lang.currentLang() === 'km' ? 'ដំណឹងស្តុកទាប' : 'Low Stock Alerts' }}
+            {{ 'dashboard.lowStockAlerts' | translate }}
           </h2>
           <button (click)="goTo('/products')" class="dash-text-link">
-            {{ lang.currentLang() === 'km' ? 'មើលទាំងអស់' : 'View all' }}
+            {{ 'dashboard.viewAll' | translate }}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path d="m9 18 6-6-6-6" />
             </svg>
@@ -166,7 +166,7 @@
                     class="dash-lowstock-badge"
                     [class.dash-lowstock-badge--out]="item.stock === 0"
                   >
-                    {{ item.stock === 0 ? 'Out of stock' : 'Low stock' }}
+                    {{ item.stock === 0 ? ('dashboard.outOfStock' | translate) : ('dashboard.lowStock' | translate) }}
                   </span>
                 </div>
                 <p class="dash-lowstock-meta">{{ getCategoryName(item.category) }} · ${{ item.price.toFixed(2) }}</p>
@@ -196,7 +196,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
-          {{ lang.currentLang() === 'km' ? 'សកម្មភាពរហ័ស' : 'Quick Actions' }}
+          {{ 'dashboard.quickActions' | translate }}
         </h2>
         <div class="dash-actions-grid">
           <button (click)="goTo('/sales')" class="dash-action-btn dash-action-sale">
@@ -206,8 +206,8 @@
               </svg>
             </div>
             <div>
-              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'លក់ទំនិញ' : 'New Sale' }}</p>
-              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'បង្កើតការលក់ថ្មី' : 'Create a new transaction' }}</p>
+              <p class="dash-action-label">{{ 'dashboard.newSale' | translate }}</p>
+              <p class="dash-action-desc">{{ 'dashboard.createTransaction' | translate }}</p>
             </div>
           </button>
 
@@ -218,8 +218,8 @@
               </svg>
             </div>
             <div>
-              <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'បន្ថែមផលិតផល' : 'Add Product' }}</p>
-              <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'បន្ថែមទំនិញចូលស្តុក' : 'Add new items to inventory' }}</p>
+              <p class="dash-action-label">{{ 'dashboard.addProduct' | translate }}</p>
+              <p class="dash-action-desc">{{ 'dashboard.addToInventory' | translate }}</p>
             </div>
           </button>
 
@@ -230,8 +230,8 @@
                </svg>
              </div>
              <div>
-               <p class="dash-action-label">{{ lang.currentLang() === 'km' ? 'មើលរបាយការណ៍' : 'View Reports' }}</p>
-               <p class="dash-action-desc">{{ lang.currentLang() === 'km' ? 'វិភាគប្រតិបត្តិការ' : 'Analyze sales performance' }}</p>
+               <p class="dash-action-label">{{ 'dashboard.viewReports' | translate }}</p>
+               <p class="dash-action-desc">{{ 'dashboard.analyzeSales' | translate }}</p>
              </div>
            </button>
          </div>
@@ -244,13 +244,13 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            {{ lang.currentLang() === 'km' ? 'សកម្មភាពថ្មី' : 'Recent Activity' }}
+            {{ 'dashboard.recentActivity' | translate }}
           </h2>
           <button
             (click)="goTo('/sales-history')"
             class="dash-text-link"
           >
-            {{ lang.currentLang() === 'km' ? 'មើលទាំងអស់' : 'View all' }}
+            {{ 'dashboard.viewAll' | translate }}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path d="m9 18 6-6-6-6" />
             </svg>
@@ -262,7 +262,7 @@
             <svg class="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            <p class="dash-empty-text">{{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការថ្ងៃនេះ' : 'No transactions today' }}</p>
+            <p class="dash-empty-text">{{ 'dashboard.noTransactionsToday' | translate }}</p>
           </div>
         }
 
@@ -293,7 +293,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><path d="M7 7h.01" />
           </svg>
-          {{ lang.currentLang() === 'km' ? 'ផលិតផលលក់ដាច់ជាងគេ' : 'Top Sellers' }}
+          {{ 'dashboard.topSellers' | translate }}
         </h2>
 
         @if (topProductEntries().length === 0) {
@@ -301,7 +301,7 @@
             <svg class="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><path d="M7 7h.01" />
             </svg>
-            <p class="dash-empty-text">{{ lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data available' }}</p>
+            <p class="dash-empty-text">{{ 'dashboard.noData' | translate }}</p>
           </div>
         }
 

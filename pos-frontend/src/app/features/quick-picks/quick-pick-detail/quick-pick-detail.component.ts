@@ -67,11 +67,7 @@ export class QuickPickDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save quick pick', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការរក្សាទុកបរាជ័យ'
-            : 'Failed to save quick pick'
-        );
+        this.alertService.error(this.lang.t('quickPicks.saveFailed'));
         this.isSaving.set(false);
       },
     });

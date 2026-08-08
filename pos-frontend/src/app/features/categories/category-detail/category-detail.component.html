@@ -2,8 +2,8 @@
   <app-header-detail
     [id]="id"
     [title]="id
-      ? (lang.currentLang() === 'km' ? 'កែប្រែប្រភេទ' : 'Edit Category')
-      : (lang.currentLang() === 'km' ? 'បន្ថែមប្រភេទ' : 'Add Category')"
+      ? ('categories.editTitle' | translate)
+      : ('categories.addTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -26,7 +26,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
               </svg>
               <span class="text-white text-xs font-bold">{{
-                lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
+                'categories.changeImage' | translate
               }}</span>
             </div>
           } @else {
@@ -34,7 +34,7 @@
               @if (isUploading()) {
                 <span class="upload-spinner"></span>
                 <span class="mt-3 text-xs font-medium text-slate-400 dark:text-slate-500">{{
-                  lang.currentLang() === 'km' ? 'កំពុងបង្ហោះ...' : 'Uploading...'
+                  'categories.uploading' | translate
                 }}</span>
               } @else {
                 <div class="flex flex-col items-center gap-1">
@@ -44,10 +44,10 @@
                     </svg>
                   </div>
                   <p class="text-sm font-bold text-slate-600 dark:text-slate-300">
-                    {{ lang.currentLang() === 'km' ? 'បង្ហោះរូបភាព' : 'Upload Image' }}
+                    {{ 'categories.uploadImage' | translate }}
                   </p>
                   <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500">
-                    {{ lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើសឯកសារ' : 'Click to browse files' }}
+                    {{ 'categories.clickToBrowse' | translate }}
                   </p>
                 </div>
               }
@@ -68,19 +68,19 @@
       <div class="form-grid">
         <app-input-field
           formControlName="name"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+          [placeholder]="'categories.name' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <app-input-field
           formControlName="nameKh"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះខ្មែរ' : 'Name (Khmer)'"
+          [placeholder]="'categories.nameKm' | translate"
         ></app-input-field>
       </div>
 
       <app-textarea
         formControlName="description"
-        [placeholder]="lang.currentLang() === 'km' ? 'ការពិពណ៌នា' : 'Description'"
+        [placeholder]="'categories.description' | translate"
         [rows]="3"
       ></app-textarea>
     </div>

@@ -85,10 +85,16 @@ export class PaymentModalComponent implements OnDestroy {
   private phoneSearch = new Subject<string>();
 
   methods = [
-    { id: 'cash' as const, label: 'Cash', labelKm: 'សាច់ប្រាក់', icon: '💵' },
-    { id: 'aba' as const, label: 'ABA', labelKm: 'ABA', icon: '📱' },
-    { id: 'card' as const, label: 'Card', labelKm: 'កាត', icon: '💳' },
+    { id: 'cash' as const, labelKey: 'payment.cash', icon: '💵' },
+    { id: 'aba' as const, labelKey: 'payment.aba', icon: '📱' },
+    { id: 'card' as const, labelKey: 'payment.card', icon: '💳' },
   ];
+
+  /** Resolve a payment method label for the current language. */
+  methodLabel(id: 'cash' | 'aba' | 'card'): string {
+    const m = this.methods.find(x => x.id === id);
+    return m ? this.lang.t(m.labelKey) : id;
+  }
 
   quickAmounts = computed(() => {
     const t = this.effectiveTotal();

@@ -34,7 +34,7 @@ export class ResetPasswordComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.token = params['token'] || '';
       if (!this.token) {
-        this.errorMessage = this.lang.currentLang() === 'km' ? 'មិនមានតំណភ្ជាប់ត្រឹមត្រូវទេ' : 'Invalid password reset link';
+        this.errorMessage = this.lang.t('resetPassword.invalidLink');
       }
     });
   }

@@ -171,10 +171,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     /** Human-readable label for the current user's role (localized) */
     userRoleLabel = computed(() => {
         const role = this.auth.currentUser()?.role;
-        if (this.langService.currentLang() === 'km') {
-            return role === 'admin' ? 'អ្នកគ្រប់គ្រង' : 'អ្នកគិតលុយ';
-        }
-        return role === 'admin' ? 'Admin' : 'Cashier';
+        if (role === 'admin') return this.langService.t('field.admin');
+        return this.langService.t('field.cashier');
     });
 
     /** Sign out: close menus, clear auth state, return to login, and confirm via toast */
@@ -182,9 +180,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.closeMenus();
         this.auth.logout();
         this.alertService.success(
-            this.langService.currentLang() === 'km'
-                ? 'បានចាកចេញដោយជោគជ័យ'
-                : 'Successfully logged out'
+            this.langService.t('layout.loggedOut')
         );
     }
 

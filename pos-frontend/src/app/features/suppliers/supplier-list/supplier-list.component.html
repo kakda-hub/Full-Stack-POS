@@ -4,7 +4,7 @@
 
     <div class="flex items-center gap-4">
       <mat-form-field class="form-field" subscriptSizing="dynamic">
-        <mat-label>{{ lang.currentLang() === 'km' ? 'ស្វែងរកអ្នកផ្គត់ផ្គង់...' : 'Search suppliers...' }}</mat-label>
+        <mat-label>{{ 'suppliers.search' | translate }}</mat-label>
         <input (input)="onSearch($event)" matInput>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>

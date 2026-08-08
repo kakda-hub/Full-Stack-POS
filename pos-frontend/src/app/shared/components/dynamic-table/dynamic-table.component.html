@@ -73,14 +73,14 @@
             [class.text-slate-400]="theme.isDark()"
             [class.text-slate-500]="!theme.isDark()"
           >
-            {{ lang.currentLang() === 'km' ? 'ល.រ' : 'No' }}
+            {{ 'common.no' | translate }}
           </th>
           <th
             class="px-4 py-3 text-center w-16 font-semibold text-xs uppercase tracking-wider"
             [class.text-slate-400]="theme.isDark()"
             [class.text-slate-500]="!theme.isDark()"
           >
-            {{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}
+            {{ 'common.image' | translate }}
           </th>
           <th
             *ngFor="let col of columns"
@@ -100,7 +100,7 @@
             [class.text-slate-400]="theme.isDark()"
             [class.text-slate-500]="!theme.isDark()"
           >
-            {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+            {{ 'common.actions' | translate }}
           </th>
         </tr>
       </thead>
@@ -203,7 +203,7 @@
             <div class="flex items-center justify-end gap-1.5">
               <button
                 type="button"
-                [title]="lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit'"
+                [title]="'common.edit' | translate"
                 (click)="onEdit.emit(row)"
                 class="p-1.5 rounded-lg"
                 [class.hover:bg-indigo-50]="!theme.isDark()"
@@ -220,7 +220,7 @@
               </button>
               <button
                 type="button"
-                [title]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+                [title]="'common.delete' | translate"
                 (click)="onDelete.emit(row)"
                 class="p-1.5 rounded-lg"
                 [class.hover:bg-rose-50]="!theme.isDark()"
@@ -256,7 +256,7 @@
               [class.text-slate-400]="!theme.isDark()"
               [class.text-slate-500]="theme.isDark()"
             >
-              {{ lang.currentLang() === 'km' ? 'រកមិនឃើញទិន្នន័យ' : 'No data found' }}
+              {{ 'common.noData' | translate }}
             </p>
           </td>
         </tr>
@@ -326,25 +326,25 @@
           type="button"
           (click)="onEdit.emit(row)"
           class="dt-card-action-btn dt-card-action-btn--edit"
-          [title]="lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit'"
+          [title]="'common.edit' | translate"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
-          <span class="dt-card-action-label">{{ lang.currentLang() === 'km' ? 'កែប្រែ' : 'Edit' }}</span>
+          <span class="dt-card-action-label">{{ 'common.edit' | translate }}</span>
         </button>
         <button
           type="button"
           (click)="onDelete.emit(row)"
           class="dt-card-action-btn dt-card-action-btn--delete"
-          [title]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+          [title]="'common.delete' | translate"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
-          <span class="dt-card-action-label">{{ lang.currentLang() === 'km' ? 'លុប' : 'Delete' }}</span>
+          <span class="dt-card-action-label">{{ 'common.delete' | translate }}</span>
         </button>
       </div>
     </div>
@@ -365,7 +365,7 @@
         [class.text-slate-400]="!theme.isDark()"
         [class.text-slate-500]="theme.isDark()"
       >
-        {{ lang.currentLang() === 'km' ? 'រកមិនឃើញទិន្នន័យ' : 'No data found' }}
+        {{ 'common.noData' | translate }}
       </p>
     </div>
   </div>

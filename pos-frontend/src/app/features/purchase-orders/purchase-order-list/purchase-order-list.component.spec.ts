@@ -21,7 +21,7 @@ describe('PurchaseOrderListComponent — server-side pagination', () => {
   let component: PurchaseOrderListComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const langMock = { currentLang: () => 'en', t: (key: string) => key };
   const alertMock = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
   const authMock = { currentUser: () => ({ id: '1' }) };
   const poServiceMock = { getAll: vi.fn(), receive: vi.fn(), cancel: vi.fn() };

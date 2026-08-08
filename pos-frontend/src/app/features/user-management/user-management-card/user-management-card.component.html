@@ -6,7 +6,7 @@
             <svg class="back-link__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'ត្រឡប់ទៅបញ្ជី' : 'Back to list' }}</span>
+            <span>{{ 'users.backToList' | translate }}</span>
           </a>
         </div>
         <app-ui-button [variant]="'primary'" [size]="'md'" (click)="onAdd()" type="button">
@@ -18,15 +18,15 @@
       <div class="grid grid-cols-3 gap-2 sm:gap-4">
         <div @fadeIn class="stat-card">
           <div class="stat-value">{{ totalUsers }}</div>
-          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកប្រើទាំងអស់' : 'Total Users' }}</div>
+          <div class="stat-label">{{ 'users.total' | translate }}</div>
         </div>
         <div @fadeIn class="stat-card">
           <div class="stat-value--indigo">{{ adminCount() }}</div>
-          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគ្រប់គ្រង' : 'Admins' }}</div>
+          <div class="stat-label">{{ 'users.admins' | translate }}</div>
         </div>
         <div @fadeIn class="stat-card">
           <div class="stat-value--emerald">{{ cashierCount() }}</div>
-          <div class="stat-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</div>
+          <div class="stat-label">{{ 'users.cashiers' | translate }}</div>
         </div>
       </div>
 

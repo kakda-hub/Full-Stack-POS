@@ -35,9 +35,9 @@ export class CategoryListComponent implements OnInit, OnDestroy {
 
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name', labelKm: 'ឈ្មោះ' },
-    { key: 'nameKh', label: 'Name (Khmer)', labelKm: 'ឈ្មោះ (ខ្មែរ)' },
-    { key: 'description', label: 'Description', labelKm: 'ការពិពណ៌នា', type: 'description', responsive: 'md' },
+    { key: 'name', labelKey: 'categories.name' },
+    { key: 'nameKh', labelKey: 'categories.nameKm' },
+    { key: 'description', labelKey: 'categories.description', type: 'description', responsive: 'md' },
   ];
 
   private destroy$ = new Subject<void>();
@@ -126,10 +126,10 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   deleteCategory(c: any): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message: this.lang.currentLang() === 'km' ? `លុប "${c.name}" មែនទេ?` : `Delete "${c.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('confirm.deleteQuestion', { name: c.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -138,16 +138,14 @@ export class CategoryListComponent implements OnInit, OnDestroy {
       this.categoriesService.delete(c.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km' ? `"${c.name}" ត្រូវបានលុបចោល` : `"${c.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('categories.deleted', { name: c.name }),
+            this.lang.t('confirm.deletedTitle')
           );
           this.loadCategories();
         },
         error: (err) => {
           console.error('Failed to delete category', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km' ? 'ការលុបប្រភេទបរាជ័យ' : 'Failed to delete category'
-          );
+          this.alertService.error(this.lang.t('categories.deleteFailed'));
         },
       });
     });
@@ -167,10 +165,10 @@ export class CategoryListComponent implements OnInit, OnDestroy {
       this.loadCategories();
       const isEdit = !!this.editingCategory;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `ប្រភេទត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Category ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('categories.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingCategory = null;
     });

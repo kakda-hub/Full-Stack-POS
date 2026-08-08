@@ -3,7 +3,7 @@
     [class.text-slate-300]="theme.isDark()"
     [class.text-slate-700]="!theme.isDark()"
     class="block text-sm font-semibold mb-1.5"
-    >{{ lang.currentLang() === 'km' ? labelKm : label }}</label
+    >{{ label }}</label
   >
   <div
     class="flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all overflow-hidden relative min-h-[8rem]"
@@ -24,9 +24,7 @@
           class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
         >
           <mat-icon class="text-white mb-1">upload</mat-icon>
-          <span class="text-white text-xs font-semibold">{{
-            lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
-          }}</span>
+          <span class="text-white text-xs font-semibold">{{ 'upload.changeImage' | translate }}</span>
           
           <button 
             type="button" 
@@ -60,7 +58,7 @@
           
           <div *ngIf="isUploading()" class="flex flex-col items-center">
             <span class="w-8 h-8 mb-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></span>
-            <p class="text-xs text-indigo-500 font-medium">Uploading...</p>
+            <p class="text-xs text-indigo-500 font-medium">{{ 'upload.uploading' | translate }}</p>
           </div>
 
           <ng-container *ngIf="!isUploading()">
@@ -69,17 +67,15 @@
               [class.text-slate-400]="theme.isDark()"
               [class.text-slate-500]="!theme.isDark()"
             >
-              <span class="font-semibold text-indigo-500">{{
-                lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើស' : 'Click to upload'
-              }}</span>
-              {{ lang.currentLang() === 'km' ? 'ឬអូសមកទីនេះ' : 'or drag and drop' }}
+              <span class="font-semibold text-indigo-500">{{ 'upload.clickToUpload' | translate }}</span>
+              {{ 'upload.orDrag' | translate }}
             </p>
             <p
               class="text-xs"
               [class.text-slate-500]="theme.isDark()"
               [class.text-slate-400]="!theme.isDark()"
             >
-              SVG, PNG, JPG or GIF
+              {{ 'upload.formats' | translate }}
             </p>
           </ng-container>
         </div>

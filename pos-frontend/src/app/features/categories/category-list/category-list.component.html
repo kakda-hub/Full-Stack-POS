@@ -19,10 +19,10 @@
         />
       </svg>
       <input
-        aria-label="Search"
+        [attr.aria-label]="'common.search' | translate"
         type="text"
         (input)="onSearch($event)"
-        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរក...' : 'Search ...'"
+        [placeholder]="'categories.search' | translate"
         class="search-input"
       />
     </div>

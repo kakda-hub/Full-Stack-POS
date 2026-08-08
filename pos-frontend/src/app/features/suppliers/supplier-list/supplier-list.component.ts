@@ -31,10 +31,10 @@ export class SupplierListComponent implements OnInit, OnDestroy {
 
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name', labelKm: 'ឈ្មោះ' },
-    { key: 'contactPerson', label: 'Contact Person', labelKm: 'អ្នកទំនាក់ទំនង', responsive: 'md' },
-    { key: 'phone', label: 'Phone', labelKm: 'ទូរស័ព្ទ', responsive: 'md' },
-    { key: 'email', label: 'Email', labelKm: 'អ៊ីមែល', responsive: 'lg' },
+    { key: 'name', labelKey: 'suppliers.name' },
+    { key: 'contactPerson', labelKey: 'suppliers.contactPerson', responsive: 'md' },
+    { key: 'phone', labelKey: 'suppliers.phone', responsive: 'md' },
+    { key: 'email', labelKey: 'suppliers.email', responsive: 'lg' },
   ];
 
   /** Monotonic token that invalidates in-flight requests (stale-response guard). */
@@ -130,13 +130,10 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   deleteSupplier(s: any): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `លុបអ្នកផ្គត់ផ្គង់ "${s.name}" មែនទេ?`
-            : `Delete supplier "${s.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('suppliers.deleteQuestion', { name: s.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -145,20 +142,14 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       this.supplierService.delete(s.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `អ្នកផ្គត់ផ្គង់ "${s.name}" ត្រូវបានលុបចោល`
-              : `Supplier "${s.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('suppliers.deleted', { name: s.name }),
+            this.lang.t('confirm.deletedTitle')
           );
           this.loadSuppliers();
         },
         error: (err) => {
           console.error('Failed to delete supplier', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការលុបអ្នកផ្គត់ផ្គង់បរាជ័យ'
-              : 'Failed to delete supplier'
-          );
+          this.alertService.error(this.lang.t('suppliers.deleteFailed'));
         },
       });
     });
@@ -182,10 +173,10 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       this.loadSuppliers();
       const isEdit = !!this.editingSupplier;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `អ្នកផ្គត់ផ្គង់ត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Supplier ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('suppliers.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingSupplier = null;
     });

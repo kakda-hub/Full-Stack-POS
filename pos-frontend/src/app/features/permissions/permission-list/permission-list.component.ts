@@ -11,14 +11,14 @@ import { fadeIn } from '../../../shared/animations/animations';
 })
 export class PermissionListComponent {
   permissions = [
-    { label: 'Access Sales', labelKm: 'ចូលប្រើការលក់', admin: true, cashier: true },
-    { label: 'Process Payments', labelKm: 'ដំណើរការទូទាត់', admin: true, cashier: true },
-    { label: 'View Reports', labelKm: 'មើលរបាយការណ៍', admin: true, cashier: false },
-    { label: 'Manage Products', labelKm: 'គ្រប់គ្រងផលិតផល', admin: true, cashier: false },
-    { label: 'Manage Users', labelKm: 'គ្រប់គ្រងអ្នកប្រើ', admin: true, cashier: false },
-    { label: 'Apply Discounts', labelKm: 'បញ្ចុះតម្លៃ', admin: true, cashier: true },
-    { label: 'Delete Transactions', labelKm: 'លុបប្រតិបត្តិការ', admin: true, cashier: false },
-    { label: 'Export Data', labelKm: 'នាំចេញទិន្នន័យ', admin: true, cashier: false },
+    { labelKey: 'permissions.accessSales', admin: true, cashier: true },
+    { labelKey: 'permissions.processPayments', admin: true, cashier: true },
+    { labelKey: 'permissions.viewReports', admin: true, cashier: false },
+    { labelKey: 'permissions.manageProducts', admin: true, cashier: false },
+    { labelKey: 'permissions.manageUsers', admin: true, cashier: false },
+    { labelKey: 'permissions.applyDiscounts', admin: true, cashier: true },
+    { labelKey: 'permissions.deleteTransactions', admin: true, cashier: false },
+    { labelKey: 'permissions.exportData', admin: true, cashier: false },
   ];
 
   constructor(public lang: LanguageService) { }

@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +14,8 @@ import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { createI18nMocks } from '../../../testing/i18n-mock';
 
 // NOTE: this app runs zoneless, so `fakeAsync`/`tick` are unavailable.
 // The component debounces searches by 300ms — tests use real timers instead.
@@ -25,7 +27,7 @@ describe('CloudinaryFileUploadListComponent', () => {
   let component: CloudinaryFileUploadListComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const { langMock, translateServiceMock } = createI18nMocks();
   const alertMock = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
   const cloudinaryMock = {
     listResources: vi.fn(),
@@ -114,11 +116,12 @@ describe('CloudinaryFileUploadListComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [CloudinaryFileUploadListComponent],
-      imports: [SharedModule, MaterialModule, NoopAnimationsModule],
+      imports: [SharedModule, MaterialModule, NoopAnimationsModule, TranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ThemeService, useValue: themeMock },
         { provide: LanguageService, useValue: langMock },
+        { provide: TranslateService, useValue: translateServiceMock },
         { provide: AlertService, useValue: alertMock },
         { provide: CloudinaryService, useValue: cloudinaryMock },
         { provide: MatDialog, useValue: dialogMock },

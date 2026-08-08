@@ -1,8 +1,9 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SharedModule } from '../../shared/shared.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CashierLayoutComponent } from './cashier-layout.component';
 import { AuthService } from '../../services/shared/auth.service';
 import { LanguageService } from '../../services/shared/language.service';
@@ -11,6 +12,7 @@ import { CartService } from '../../services/shared/cart.service';
 import { NavStateService, NavItem } from '../../services/shared/nav-state.service';
 import { AlertService } from '../../services/shared/alert.service';
 import { User } from '../../models';
+import { of } from 'rxjs';
 
 describe('CashierLayoutComponent — header brand badge', () => {
   let fixture: ComponentFixture<CashierLayoutComponent>;
@@ -36,7 +38,7 @@ describe('CashierLayoutComponent — header brand badge', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [CashierLayoutComponent],
-      imports: [SharedModule, RouterTestingModule.withRoutes([]), NoopAnimationsModule],
+      imports: [SharedModule, TranslateModule, RouterTestingModule.withRoutes([]), NoopAnimationsModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ThemeService, useValue: themeMock },
@@ -46,8 +48,9 @@ describe('CashierLayoutComponent — header brand badge', () => {
         },
         {
           provide: LanguageService,
-          useValue: { currentLang: () => 'en', switchLanguage: () => {}, toggle: () => {} },
+          useValue: { currentLang: () => 'en', switchLanguage: () => {}, toggle: () => {}, t: (key: string) => key },
         },
+        { provide: TranslateService, useValue: { instant: (key: string) => key, get: (key: string) => of(key), getCurrentLang: () => 'en', getFallbackLang: () => 'en', onTranslationChange: new EventEmitter(), onLangChange: new EventEmitter(), onFallbackLangChange: new EventEmitter() } as unknown as TranslateService },
         { provide: CartService, useValue: { itemCount: () => 0 } },
         {
           provide: NavStateService,

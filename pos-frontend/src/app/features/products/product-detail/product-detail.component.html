@@ -2,8 +2,8 @@
   <app-header-detail
     [id]="product?.id"
     [title]="product?.id
-      ? (lang.currentLang() === 'km' ? 'កែប្រែផលិតផល' : 'Edit Product')
-      : (lang.currentLang() === 'km' ? 'បន្ថែមផលិតផល' : 'Add Product')"
+      ? ('products.editTitle' | translate)
+      : ('products.addTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -21,7 +21,7 @@
             type="button"
             (click)="serverError.set(null)"
             class="error-dismiss-btn"
-            aria-label="Dismiss error"
+            [attr.aria-label]="'common.close' | translate"
           >
             <svg class="error-dismiss-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -34,7 +34,7 @@
       <div class="images-section">
         <div class="images-section-header">
           <h3 class="images-section-title">
-            {{ lang.currentLang() === 'km' ? 'រូបភាពផលិតផល' : 'Product Images' }}
+            {{ 'products.images' | translate }}
           </h3>
           <button
             type="button"
@@ -44,7 +44,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
-            {{ lang.currentLang() === 'km' ? 'រកមើលមេឌា' : 'Browse Media' }}
+            {{ 'products.browseMedia' | translate }}
           </button>
         </div>
 
@@ -54,7 +54,7 @@
             @for (url of imgUrls; track $index; let i = $index) {
               <div class="thumbnail-card" [class.primary]="i === 0">
                 <div class="thumbnail-image">
-                  <img [src]="url" [alt]="lang.currentLang() === 'km' ? 'រូបភាព' : 'Image'" loading="lazy" appImgFallback />
+                  <img [src]="url" [alt]="'products.image' | translate" loading="lazy" appImgFallback />
                   @if (i === 0) {
                     <div class="primary-badge">
                       <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@
                       type="button"
                       (click)="setPrimary(i)"
                       class="thumbnail-action-btn"
-                      [title]="lang.currentLang() === 'km' ? 'កំណត់ជារូបភាពដើម' : 'Set as primary'"
+                      [title]="'products.setPrimary' | translate"
                     >
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -80,7 +80,7 @@
                     type="button"
                     (click)="removeImage(i)"
                     class="thumbnail-action-btn thumbnail-action-remove"
-                    [title]="lang.currentLang() === 'km' ? 'លុប' : 'Remove'"
+                    [title]="'products.remove' | translate"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -102,14 +102,14 @@
             @if (isUploading()) {
               <div class="dropzone-uploading">
                 <span class="upload-spinner"></span>
-                <span class="text-xs text-slate-400">{{ lang.currentLang() === 'km' ? 'កំពុងបង្ហោះ...' : 'Uploading...' }}</span>
+                <span class="text-xs text-slate-400">{{ 'products.uploading' | translate }}</span>
               </div>
             } @else {
               <div class="dropzone-empty">
                 <svg class="w-6 h-6 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">+ {{ lang.currentLang() === 'km' ? 'បន្ថែម' : 'Add' }}</span>
+                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">+ {{ 'products.add' | translate }}</span>
               </div>
             }
             <input
@@ -128,18 +128,18 @@
       <div class="form-grid">
         <app-input-field
           formControlName="name"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+          [placeholder]="'products.name' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <app-input-field
           formControlName="nameKh"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះខ្មែរ' : 'Name (Khmer)'"
+          [placeholder]="'products.nameKm' | translate"
         ></app-input-field>
 
         <app-input-field
           formControlName="price"
-          [placeholder]="lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price'"
+          [placeholder]="'products.price' | translate"
           [isRequired]="true"
         >
           <span prefix class="text-slate-400 mr-1">$</span>
@@ -147,31 +147,31 @@
 
         <app-input-field
           formControlName="stock"
-          [placeholder]="lang.currentLang() === 'km' ? 'បរិមាណស្តុក' : 'Stock'"
+          [placeholder]="'products.stockPlaceholder' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <app-input-field
           formControlName="lowStockThreshold"
-          [placeholder]="lang.currentLang() === 'km' ? 'កម្រិតស្តុកទាប' : 'Low Stock Threshold'"
+          [placeholder]="'products.lowStockThreshold' | translate"
         >
           <span prefix class="text-slate-400 text-xs mr-1">⚠</span>
         </app-input-field>
 
         <app-input-field
           formControlName="expiryDate"
-          [placeholder]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទផុតកំណត់' : 'Expiry Date'"
+          [placeholder]="'products.expiryDate' | translate"
           type="date"
         ></app-input-field>
 
         <app-input-field
           formControlName="barcode"
-          [placeholder]="lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode'"
+          [placeholder]="'products.barcode' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <mat-form-field appearance="outline" class="w-full form-field-outline">
-          <mat-label>{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}</mat-label>
+          <mat-label>{{ 'products.category' | translate }}</mat-label>
           <mat-select formControlName="categoryId">
             @for (item of categories; track item.id) {
               <mat-option [value]="item.id">
@@ -191,7 +191,7 @@
       <app-textarea
         [rows]="2"
         formControlName="description"
-        [placeholder]="lang.currentLang() === 'km' ? 'ការពិពណ៌នា' : 'Description'"
+        [placeholder]="'products.description' | translate"
       ></app-textarea>
     </div>
   </mat-dialog-content>

@@ -63,8 +63,8 @@ export class CategoryDetailComponent implements OnInit {
         if (fileUrl) {
           this.form.patchValue({ imgUrl: fileUrl });
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Image uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+            this.lang.t('categories.imageUploaded'),
+            this.lang.t('confirm.success')
           );
         }
         this.isUploading.set(false);
@@ -72,8 +72,8 @@ export class CategoryDetailComponent implements OnInit {
       error: (err) => {
         console.error('Upload failed', err);
         this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Image upload failed',
-          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error'
+          this.lang.t('categories.imageUploadFailed'),
+          this.lang.t('error.title')
         );
         this.isUploading.set(false);
       },

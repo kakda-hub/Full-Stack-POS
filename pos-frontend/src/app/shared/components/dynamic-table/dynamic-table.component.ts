@@ -16,10 +16,12 @@ import { LanguageService } from '../../../services/shared/language.service';
 export interface TableColumn {
   /** Field key on the data item */
   key: string;
-  /** English header label */
-  label: string;
-  /** Khmer header label (optional) */
+  /** English header label (legacy — use labelKey for i18n) */
+  label?: string;
+  /** Khmer header label (optional, legacy) */
   labelKm?: string;
+  /** i18n key for the header label (takes precedence over label/labelKm) */
+  labelKey?: string;
   /** Cell type – controls how the cell is rendered */
   type?: 'text' | 'subtext' | 'image' | 'badge' | 'description';
   /** Secondary text field (shown beneath main text when type = 'subtext') */
@@ -103,7 +105,8 @@ export class DynamicTableComponent {
 
   /** Returns the label for a column in the active language */
   colLabel(col: TableColumn): string {
-    return this.lang.currentLang() === 'km' && col.labelKm ? col.labelKm : col.label;
+    if (col.labelKey) return this.lang.t(col.labelKey);
+    return this.lang.currentLang() === 'km' && col.labelKm ? col.labelKm : (col.label ?? '');
   }
 
   /** Extracts the primary display value from a row for a given column */

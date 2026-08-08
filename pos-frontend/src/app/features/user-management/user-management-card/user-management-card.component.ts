@@ -116,9 +116,7 @@ import { buildListParams } from '../../../services/list-params';
       error: (err: any) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
         console.error('Failed to load users', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'មិនអាចផ្ទុកអ្នកប្រើបានទេ' : 'Failed to load users'
-        );
+        this.alertService.error(this.lang.t('users.loadFailed'));
         this.users.set([]);
         this.totalItems.set(0);
         this.isLoading.set(false);
@@ -159,10 +157,10 @@ import { buildListParams } from '../../../services/list-params';
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message: this.lang.currentLang() === 'km' ? `លុប "${user.name}" មែនទេ?` : `Delete "${user.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('users.deleteQuestion', { name: user.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -174,15 +172,13 @@ import { buildListParams } from '../../../services/list-params';
           this.loadUsers();
           this.loadStats();
           this.alertService.warning(
-            this.lang.currentLang() === 'km' ? `"${user.name}" ត្រូវបានលុបចោល` : `"${user.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('users.deleted', { name: user.name }),
+            this.lang.t('users.deletedTitle')
           );
         },
         error: (err) => {
           console.error('Failed to delete user', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km' ? 'ការលុបអ្នកប្រើបរាជ័យ' : 'Failed to delete user'
-          );
+          this.alertService.error(this.lang.t('users.deleteFailed'));
         },
       });
     });
@@ -207,10 +203,10 @@ import { buildListParams } from '../../../services/list-params';
       this.loadStats();
       const isEdit = !!this.editingUser;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `អ្នកប្រើត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `User ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('users.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingUser = null;
     });

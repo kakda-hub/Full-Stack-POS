@@ -248,7 +248,7 @@ export class SalesComponent implements OnInit, OnDestroy {
 
   addToCart(product: Product): void {
     if (this.effectiveStock(product) <= 0) {
-      this.alertService.error('Out of stock');
+      this.alertService.error(this.langService.t('sales.outOfStockAlert'));
       // Shake animation on out-of-stock click
       this.shakingProductId.set(product.id);
       if (this.shakeTimeout) clearTimeout(this.shakeTimeout);
@@ -277,23 +277,17 @@ export class SalesComponent implements OnInit, OnDestroy {
   clearCart(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.langService.currentLang() === 'km' ? 'បញ្ជាក់ការសម្អាត' : 'Confirm Clear Cart',
-        message: this.langService.currentLang() === 'km'
-          ? 'តើអ្នកពិតជាចង់លុបទំនិញទាំងអស់ក្នុងកន្ត្រកមែនទេ?'
-          : 'Are you sure you want to remove all items from your cart?',
-        confirmLabel: this.langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear',
-        cancelLabel: this.langService.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.langService.t('sales.confirmClearTitle'),
+        message: this.langService.t('sales.confirmClearMessage'),
+        confirmLabel: this.langService.t('sales.clearLabel'),
+        cancelLabel: this.langService.t('common.cancel'),
       },
     });
 
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
       this.cart.clearCart();
-      this.alertService.warning(
-        this.langService.currentLang() === 'km'
-          ? 'បានសម្អាតកន្ត្រកទំនិញរួចរាល់'
-          : 'Cart has been cleared'
-      );
+      this.alertService.warning(this.langService.t('sales.cartCleared'));
     });
   }
 
@@ -331,11 +325,7 @@ export class SalesComponent implements OnInit, OnDestroy {
           this.isProcessingSale.set(false);
           this.cdr.markForCheck();
           console.error('Sale API error', err);
-          this.alertService.error(
-            this.langService.currentLang() === 'km'
-              ? 'ការលក់បរាជ័យ សូមព្យាយាមម្តងទៀត'
-              : 'Sale failed, please try again',
-          );
+          this.alertService.error(this.langService.t('sales.saleFailed'));
         },
       });
     } else {
@@ -373,11 +363,7 @@ export class SalesComponent implements OnInit, OnDestroy {
     this.cart.clearCart();
     this.showPayment = false;
     this.lastTransaction = txn;
-    this.alertService.success(
-      this.langService.currentLang() === 'km'
-        ? 'លក់ជោគជ័យ'
-        : 'Sale completed',
-    );
+    this.alertService.success(this.langService.t('sales.saleCompleted'));
     this.cdr.markForCheck();
   }
 

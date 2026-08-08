@@ -7,7 +7,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        <span class="ml-1">{{ lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh' }}</span>
+        <span class="ml-1">{{ 'salesHistory.refresh' | translate }}</span>
       </app-ui-button>
     </div>
   </div>
@@ -19,7 +19,7 @@
     </svg>
     <input
       type="text"
-      [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកតាមឈ្មោះអ្នកគិតប្រាក់ ឬលេខ ID...' : 'Search by cashier name or sale ID...'"
+      [placeholder]="'salesHistory.search' | translate"
       [value]="searchQuery()"
       (input)="onSearch($event)"
       class="search-input"
@@ -30,7 +30,7 @@
       (click)="clearSearch()"
       class="search-clear-btn"
       type="button"
-      [attr.aria-label]="lang.currentLang() === 'km' ? 'សម្អាតការស្វែងរក' : 'Clear search'"
+      [attr.aria-label]="'salesHistory.clearSearch' | translate"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -49,7 +49,7 @@
         class="quick-filter-btn"
         type="button"
       >
-        {{ lang.currentLang() === 'km' ? f.labelKm : f.label }}
+        {{ f.labelKey | translate }}
       </button>
     </div>
 
@@ -66,7 +66,7 @@
           class="date-input"
         />
       </div>
-      <span class="text-xs text-slate-400">{{ lang.currentLang() === 'km' ? 'ទៅ' : 'to' }}</span>
+      <span class="text-xs text-slate-400">{{ 'salesHistory.to' | translate }}</span>
       <!-- To date -->
       <div class="date-input-wrapper">
         <svg class="date-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@
         class="date-clear-btn"
         type="button"
       >
-        {{ lang.currentLang() === 'km' ? 'សម្អាត' : 'Clear' }}
+        {{ 'salesHistory.clear' | translate }}
       </button>
     </div>
   </div>
@@ -99,7 +99,7 @@
     </svg>
     <p class="text-rose-700 font-semibold">{{ error() }}</p>
     <button (click)="refresh()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-700 font-semibold underline">
-      {{ lang.currentLang() === 'km' ? 'ព្យាយាមម្តងទៀត' : 'Try again' }}
+      {{ 'salesHistory.tryAgain' | translate }}
     </button>
   </div>
 
@@ -119,7 +119,7 @@
         </div>
       </div>
       <p class="kpi-value">{{ totalItems() }}</p>
-      <p class="kpi-label">{{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការសរុប' : 'Total Transactions' }}</p>
+      <p class="kpi-label">{{ 'salesHistory.totalTransactions' | translate }}</p>
     </div>
 
     <div @fadeIn class="card card--hoverable">
@@ -131,7 +131,7 @@
         </div>
       </div>
       <p class="kpi-value">${{ totalRevenue().toFixed(2) }}</p>
-      <p class="kpi-label">{{ lang.currentLang() === 'km' ? 'ចំណូលសរុប' : 'Total Revenue' }}</p>
+      <p class="kpi-label">{{ 'salesHistory.totalRevenue' | translate }}</p>
     </div>
 
     <div @fadeIn class="card card--hoverable">
@@ -143,7 +143,7 @@
         </div>
       </div>
       <p class="kpi-value">{{ uniqueCashiers().length }}</p>
-      <p class="kpi-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashiers' }}</p>
+      <p class="kpi-label">{{ 'salesHistory.cashiers' | translate }}</p>
     </div>
 
     <div @fadeIn class="card card--hoverable">
@@ -155,7 +155,7 @@
         </div>
       </div>
       <p class="kpi-value">${{ averageOrderValue().toFixed(2) }}</p>
-      <p class="kpi-label">{{ lang.currentLang() === 'km' ? 'មធ្យមក្នុងមួយប្រតិបត្តិការ' : 'Avg Order Value' }}</p>
+      <p class="kpi-label">{{ 'salesHistory.avgOrderValue' | translate }}</p>
     </div>
   </div>
 
@@ -173,10 +173,10 @@
   <div *ngIf="!isLoading() && !error()" @fadeIn class="table-section">
     <div class="table-header-bar">
       <h2 class="table-title">
-        {{ lang.currentLang() === 'km' ? 'ប្រវត្តិការលក់' : 'Sales History' }}
+        {{ 'salesHistory.title' | translate }}
       </h2>
       <span class="text-sm text-slate-400">
-        {{ totalItems() }} {{ lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'records' }}
+        {{ totalItems() }} {{ 'salesHistory.records' | translate }}
       </span>
     </div>
 
@@ -189,7 +189,7 @@
               <th class="th">#</th>
               <th class="th">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date'"
+                  [label]="'salesHistory.date' | translate"
                   [field]="'createdAt'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -197,11 +197,11 @@
                 ></app-sort-header>
               </th>
               <!-- Cashier not in the backend sales sort allowlist → not sortable -->
-              <th class="th">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</th>
-              <th class="th hidden md:table-cell">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</th>
+              <th class="th">{{ 'salesHistory.cashier' | translate }}</th>
+              <th class="th hidden md:table-cell">{{ 'salesHistory.items' | translate }}</th>
               <th class="th">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment'"
+                  [label]="'salesHistory.payment' | translate"
                   [field]="'paymentMethod'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -210,7 +210,7 @@
               </th>
               <th class="th text-right">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'សរុប' : 'Total'"
+                  [label]="'salesHistory.total' | translate"
                   [field]="'total'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -223,7 +223,7 @@
             <tr *ngFor="let sale of sales(); trackBy: trackById" @fadeIn
               (click)="openDetail(sale)"
               class="table-row"
-              [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
+              [title]="'salesHistory.clickToView' | translate"
             >
               <td class="td-mono">#{{ sale.id }}</td>
               <td class="td">
@@ -238,7 +238,7 @@
               <td class="td hidden md:table-cell">
                 <div class="flex flex-col">
                   <span class="td-cell-primary">{{ sale.itemsList }}</span>
-                  <span class="td-cell-muted">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
+                  <span class="td-cell-muted">{{ sale.itemsCount }} {{ 'salesHistory.itemUnits' | translate }}</span>
                 </div>
               </td>
               <td class="td">
@@ -258,7 +258,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                 </svg>
                 <p class="text-sm font-medium" [class.text-slate-400]="!theme.isDark()" [class.text-slate-500]="theme.isDark()">
-                  {{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}
+                  {{ 'salesHistory.empty' | translate }}
                 </p>
               </td>
             </tr>
@@ -275,7 +275,7 @@
         (click)="openDetail(sale)"
         class="sh-card"
         [class.sh-card--dark]="theme.isDark()"
-        [title]="lang.currentLang() === 'km' ? 'ចុចដើម្បីមើលលម្អិត' : 'Click to view details'"
+        [title]="'salesHistory.clickToView' | translate"
       >
         <!-- Card header: ID + status badge -->
         <div class="sh-card-header">
@@ -295,21 +295,21 @@
         <!-- Card body -->
         <div class="sh-card-body">
           <div class="sh-card-field">
-            <span class="sh-card-label">{{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}</span>
+            <span class="sh-card-label">{{ 'salesHistory.cashier' | translate }}</span>
             <span class="sh-card-value">{{ sale.cashierName }}</span>
           </div>
           <div class="sh-card-field">
-            <span class="sh-card-label">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}</span>
+            <span class="sh-card-label">{{ 'salesHistory.items' | translate }}</span>
             <span class="sh-card-items">
               <span class="sh-card-items-text">{{ sale.itemsList || '—' }}</span>
-              <span class="sh-card-items-count">{{ sale.itemsCount }} {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'item(s)' }}</span>
+              <span class="sh-card-items-count">{{ sale.itemsCount }} {{ 'salesHistory.itemUnits' | translate }}</span>
             </span>
           </div>
         </div>
 
         <!-- Card footer: total -->
         <div class="sh-card-footer">
-          <span class="sh-card-total-label">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</span>
+          <span class="sh-card-total-label">{{ 'salesHistory.total' | translate }}</span>
           <span class="sh-card-total">${{ sale.total.toFixed(2) }}</span>
         </div>
       </div>
@@ -320,7 +320,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
         </svg>
         <p class="text-sm font-medium text-slate-400">
-          {{ lang.currentLang() === 'km' ? 'មិនទាន់មានប្រតិបត្តិការលក់ទេ' : 'No sales records yet' }}
+          {{ 'salesHistory.empty' | translate }}
         </p>
       </div>
     </div>
@@ -328,7 +328,7 @@
     <!-- Pagination (shared) -->
     <div *ngIf="totalItems() > pageSize" class="pagination-bar">
       <span class="pagination-info">
-        {{ lang.currentLang() === 'km' ? 'ទំព័រ' : 'Page' }} {{ currentPage() }}/{{ totalPages }}
+        {{ 'salesHistory.page' | translate }} {{ currentPage() }}/{{ totalPages }}
       </span>
       <div class="flex gap-2">
         <button
@@ -337,7 +337,7 @@
           class="pagination-btn"
           type="button"
         >
-          {{ lang.currentLang() === 'km' ? 'មុន' : 'Prev' }}
+          {{ 'salesHistory.prev' | translate }}
         </button>
         <button
           (click)="onPageChange(currentPage() + 1)"
@@ -345,7 +345,7 @@
           class="pagination-btn"
           type="button"
         >
-          {{ lang.currentLang() === 'km' ? 'បន្ទាប់' : 'Next' }}
+          {{ 'salesHistory.next' | translate }}
         </button>
       </div>
     </div>
@@ -358,11 +358,11 @@
       <!-- Modal Header -->
       <div class="modal-header">
         <h2 class="modal-title">
-        {{ lang.currentLang() === 'km' ? 'ព័ត៌មានលម្អិត' : 'Sale Details' }} #{{ selectedSale()?.id }}
+        {{ 'salesHistory.saleDetails' | translate }} #{{ selectedSale()?.id }}
       </h2>        <button
           (click)="closeDetail()"
           class="modal-close-btn"
-          [attr.aria-label]="lang.currentLang() === 'km' ? 'បិទ' : 'Close'"
+          [attr.aria-label]="'salesHistory.close' | translate"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -375,7 +375,7 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <span class="info-label">
-            {{ lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date' }}
+            {{ 'salesHistory.date' | translate }}
           </span>
           <p class="info-value">
             {{ selectedSale()?.date | date:'dd/MM/yyyy HH:mm' }}
@@ -383,7 +383,7 @@
         </div>
         <div>
           <span class="info-label">
-            {{ lang.currentLang() === 'km' ? 'អ្នកគិតប្រាក់' : 'Cashier' }}
+            {{ 'salesHistory.cashier' | translate }}
           </span>
           <p class="info-value">
             {{ selectedSale()?.cashierName }}
@@ -391,7 +391,7 @@
         </div>
         <div>
           <span class="info-label">
-            {{ lang.currentLang() === 'km' ? 'ការទូទាត់' : 'Payment' }}
+            {{ 'salesHistory.payment' | translate }}
           </span>
           <p class="mt-0.5">
             <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-lg capitalize inline-flex items-center gap-1 ' + getPaymentBadge(selectedSale()?.paymentMethod || '')">
@@ -402,10 +402,10 @@
         </div>
         <div>
           <span class="info-label">
-            {{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Items' }}
+            {{ 'salesHistory.items' | translate }}
           </span>
           <p class="info-value">
-            {{ selectedSale()?.items?.length || 0 }} {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'item(s)' }}
+            {{ selectedSale()?.items?.length || 0 }} {{ 'salesHistory.itemUnits' | translate }}
           </p>
         </div>
       </div>
@@ -413,17 +413,17 @@
       <!-- Items Table -->
       <div>
         <h3 class="font-bold text-sm mb-3" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">
-          {{ lang.currentLang() === 'km' ? 'បញ្ជីទំនិញ' : 'Order Items' }}
+          {{ 'salesHistory.orderItems' | translate }}
         </h3>
         <div class="overflow-hidden rounded-xl border" [class.border-slate-200]="!theme.isDark()" [class.border-slate-700]="theme.isDark()">
           <table class="w-full text-sm">
             <thead>
               <tr [class.bg-slate-50]="!theme.isDark()" [class.bg-slate-700/50]="theme.isDark()">
                 <th class="px-3 py-2 text-left font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">#</th>
-                <th class="px-3 py-2 text-left font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ទំនិញ' : 'Product' }}</th>
-                <th class="px-3 py-2 text-center font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'បរិមាណ' : 'Qty' }}</th>
-                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price' }}</th>
-                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</th>
+                <th class="px-3 py-2 text-left font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ 'salesHistory.product' | translate }}</th>
+                <th class="px-3 py-2 text-center font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ 'salesHistory.qty' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ 'salesHistory.price' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold text-xs" [class.text-slate-600]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">{{ 'salesHistory.total' | translate }}</th>
               </tr>
             </thead>
             <tbody class="divide-y" [class.divide-slate-100]="!theme.isDark()" [class.divide-slate-700/50]="theme.isDark()">
@@ -446,19 +446,19 @@
       <!-- Totals -->
       <div [class.bg-slate-50]="!theme.isDark()" [class.bg-slate-700/50]="theme.isDark()" class="rounded-xl p-4 space-y-2">
         <div class="flex justify-between text-sm">
-          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុបរង' : 'Subtotal' }}</span>
+          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ 'salesHistory.subtotal' | translate }}</span>
           <span class="font-semibold" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">${{ selectedSale()?.subtotal?.toFixed(2) }}</span>
         </div>
         <div *ngIf="selectedSale()?.discount" class="flex justify-between text-sm">
-          <span class="text-emerald-600">{{ lang.currentLang() === 'km' ? 'បញ្ចុះតម្លៃ' : 'Discount' }}</span>
+          <span class="text-emerald-600">{{ 'salesHistory.discount' | translate }}</span>
           <span class="font-semibold text-emerald-600">-${{ selectedSale()?.discount?.toFixed(2) }}</span>
         </div>
         <div *ngIf="selectedSale()?.tax" class="flex justify-between text-sm">
-          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'ពន្ធ' : 'Tax' }}</span>
+          <span [class.text-slate-500]="!theme.isDark()" [class.text-slate-400]="theme.isDark()">{{ 'salesHistory.tax' | translate }}</span>
           <span class="font-semibold" [class.text-slate-700]="!theme.isDark()" [class.text-slate-300]="theme.isDark()">${{ selectedSale()?.tax?.toFixed(2) }}</span>
         </div>
         <div class="flex justify-between text-base pt-2 border-t" [class.border-slate-200]="!theme.isDark()" [class.border-slate-600]="theme.isDark()">
-          <span class="font-black" [class.text-slate-800]="!theme.isDark()" [class.text-slate-200]="theme.isDark()">{{ lang.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+          <span class="font-black" [class.text-slate-800]="!theme.isDark()" [class.text-slate-200]="theme.isDark()">{{ 'salesHistory.grandTotal' | translate }}</span>
           <span class="font-black text-indigo-600">${{ selectedSale()?.total?.toFixed(2) }}</span>
         </div>
       </div>
@@ -473,7 +473,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          {{ lang.currentLang() === 'km' ? 'បោះពុម្ព' : 'Print Receipt' }}
+          {{ 'salesHistory.printReceipt' | translate }}
         </button>
         <button
           (click)="closeDetail()"
@@ -486,7 +486,7 @@
           class="flex-1 py-3 rounded-xl font-bold transition-colors text-sm"
           type="button"
         >
-          {{ lang.currentLang() === 'km' ? 'បិទ' : 'Close' }}
+          {{ 'salesHistory.close' | translate }}
         </button>
       </div>
     </div>

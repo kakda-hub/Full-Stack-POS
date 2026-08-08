@@ -133,16 +133,16 @@ export class ProductDetailComponent implements OnInit {
           const updated = [fileUrl, ...currentUrls];
           this.form.patchValue({ imgUrls: updated, imgUrl: fileUrl });
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Image uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
+            this.lang.t('categories.imageUploaded'),
+            this.lang.t('confirm.success'),
           );
         }
         this.isUploading.set(false);
       },
       error: () => {
         this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Image upload failed',
-          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error',
+          this.lang.t('categories.imageUploadFailed'),
+          this.lang.t('error.title'),
         );
         this.isUploading.set(false);
       },

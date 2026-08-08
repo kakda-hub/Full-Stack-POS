@@ -104,16 +104,12 @@ export class UserDetailDialogComponent implements OnInit {
         if (fileUrl) {
           this.avatarPreview.set(fileUrl);
           this.form.patchValue({ avatarUrl: fileUrl });
-          this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
-          );
+          this.alertService.success(this.lang.t('upload.avatarUploaded'));
         }
         this.isUploading.set(false);
       },
       error: () => {
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Avatar upload failed',
-        );
+        this.alertService.error(this.lang.t('upload.avatarUploadFailed'));
         this.isUploading.set(false);
       },
     });
@@ -144,17 +140,15 @@ export class UserDetailDialogComponent implements OnInit {
         if (fileUrl) {
           this.avatarPreview.set(fileUrl);
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Avatar uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
+            this.lang.t('upload.avatarUploaded'),
+            this.lang.t('confirm.success'),
           );
         }
         this.isUploading.set(false);
       },
       error: (err) => {
         console.error('Upload failed', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Avatar upload failed',
-        );
+        this.alertService.error(this.lang.t('upload.avatarUploadFailed'));
         this.isUploading.set(false);
       },
     });
@@ -199,11 +193,7 @@ export class UserDetailDialogComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save user', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការរក្សាទុកបរាជ័យ'
-            : 'Failed to save user',
-        );
+        this.alertService.error(this.lang.t('users.saveFailed'));
         this.isSaving.set(false);
       },
     });

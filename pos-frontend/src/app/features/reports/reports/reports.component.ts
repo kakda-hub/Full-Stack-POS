@@ -155,7 +155,7 @@ export class ReportsComponent implements OnInit {
   chartSeries = computed<{ name: string; data: number[] }[]>(() => {
     const entries = this.dailyRevenueEntries();
     return [{
-      name: this.lang.currentLang() === 'km' ? 'ចំណូល' : 'Revenue',
+      name: this.lang.t('reports.revenue'),
       data: entries.map((e) => e.revenue),
     }];
   });
@@ -186,8 +186,8 @@ export class ReportsComponent implements OnInit {
         csv: {
           filename: `daily-revenue-${new Date().toISOString().split('T')[0]}`,
           columnDelimiter: ',',
-          headerCategory: this.lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date',
-          headerValue: this.lang.currentLang() === 'km' ? 'ចំណូល' : 'Revenue',
+          headerCategory: this.lang.t('reports.date'),
+          headerValue: this.lang.t('reports.revenue'),
         },
         svg: {
           filename: `daily-revenue-${new Date().toISOString().split('T')[0]}`,
@@ -274,7 +274,7 @@ export class ReportsComponent implements OnInit {
         formatter: (val: number, opts?: any) => {
           const idx = opts?.dataPointIndex ?? 0;
           const salesCount = entries[idx]?.totalSales ?? 0;
-          const salesLabel = this.lang.currentLang() === 'km' ? 'ប្រតិបត្តិការ' : 'sales';
+          const salesLabel = this.lang.t('reports.sales');
           return `$${val.toFixed(2)} (${salesCount} ${salesLabel})`;
         },
       },
@@ -287,7 +287,7 @@ export class ReportsComponent implements OnInit {
   }));
 
   chartNoData = computed<ApexNoData>(() => ({
-    text: this.lang.currentLang() === 'km' ? 'គ្មានទិន្នន័យ' : 'No data for selected date range',
+    text: this.lang.t('reports.noDataRange'),
     align: 'center',
     verticalAlign: 'middle',
     style: { color: '#94a3b8', fontSize: '14px', fontFamily: 'inherit' },

@@ -154,20 +154,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     this.poService.receive(po.id, { receivedBy: userId }).subscribe({
       next: () => {
         this.alertService.success(
-          this.lang.currentLang() === 'km'
-            ? `លេខបញ្ជាទិញ ${po.orderNumber} ត្រូវបានទទួលដោយជោគជ័យ`
-            : `PO ${po.orderNumber} received successfully`,
-          this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+          this.lang.t('purchaseOrders.receivedSuccess', { number: po.orderNumber }),
+          this.lang.t('confirm.success')
         );
         this.loadPOs();
       },
       error: (err) => {
         console.error('Failed to receive PO', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការទទួលបញ្ជាទិញបរាជ័យ'
-            : 'Failed to receive purchase order'
-        );
+        this.alertService.error(this.lang.t('purchaseOrders.receiveFailed'));
       },
     });
   }
@@ -177,13 +171,10 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការបោះបង់' : 'Confirm Cancel',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `បោះបង់បញ្ជាទិញលេខ ${po.orderNumber} មែនទេ?`
-            : `Cancel PO "${po.orderNumber}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'ត្រលប់' : 'Back',
+        title: this.lang.t('purchaseOrders.confirmCancelTitle'),
+        message: this.lang.t('purchaseOrders.confirmCancelMessage', { number: po.orderNumber }),
+        confirmLabel: this.lang.t('purchaseOrders.cancel'),
+        cancelLabel: this.lang.t('button.back'),
       },
     });
 
@@ -192,20 +183,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       this.poService.cancel(po.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `បញ្ជាទិញលេខ ${po.orderNumber} ត្រូវបានបោះបង់`
-              : `PO ${po.orderNumber} has been cancelled`,
-            this.lang.currentLang() === 'km' ? 'បានបោះបង់' : 'Cancelled'
+            this.lang.t('purchaseOrders.cancelled', { number: po.orderNumber }),
+            this.lang.t('purchaseOrders.cancelledTitle')
           );
           this.loadPOs();
         },
         error: (err) => {
           console.error('Failed to cancel PO', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការបោះបង់បញ្ជាទិញបរាជ័យ'
-              : 'Failed to cancel purchase order'
-          );
+          this.alertService.error(this.lang.t('purchaseOrders.cancelFailed'));
         },
       });
     });
@@ -226,22 +211,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   /** Returns translated label for PO status */
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      draft: 'Draft',
-      ordered: 'Ordered',
-      partially_received: 'Partial',
-      received: 'Received',
-      cancelled: 'Cancelled',
+      draft: 'purchaseOrders.statusDraft',
+      ordered: 'purchaseOrders.statusOrdered',
+      partially_received: 'purchaseOrders.statusPartial',
+      received: 'purchaseOrders.statusReceived',
+      cancelled: 'purchaseOrders.statusCancelled',
     };
-    const kmLabels: Record<string, string> = {
-      draft: 'ព្រាង',
-      ordered: 'បានបញ្ជា',
-      partially_received: 'ទទួលខ្លះ',
-      received: 'បានទទួល',
-      cancelled: 'បានបោះបង់',
-    };
-    return this.lang.currentLang() === 'km'
-      ? kmLabels[status] || status
-      : labels[status] || status;
+    const key = labels[status] || '';
+    return key ? this.lang.t(key) : status;
   }
 
   /** Whether the given PO can be received */
@@ -270,10 +247,10 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       this.loadPOs();
       const isEdit = !!this.editingPO;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `បញ្ជាទិញត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Purchase Order ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('purchaseOrders.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingPO = null;
     });

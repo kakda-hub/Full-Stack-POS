@@ -184,10 +184,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
   deleteProduct(p: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message: this.lang.currentLang() === 'km' ? `លុប "${p.name}" មែនទេ?` : `Delete "${p.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('confirm.deleteQuestion', { name: p.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -197,16 +197,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
         next: () => {
           this.loadProducts();
           this.alertService.warning(
-            this.lang.currentLang() === 'km' ? `"${p.name}" ត្រូវបានលុបចោល` : `"${p.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('products.productDeleted', { name: p.name }),
+            this.lang.t('confirm.deletedTitle')
           );
           this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Failed to delete product', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km' ? 'ការលុបផលិតផលបរាជ័យ' : 'Failed to delete product'
-          );
+          this.alertService.error(this.lang.t('products.productDeleteFailed'));
           this.cdr.markForCheck();
         },
       });
@@ -219,8 +217,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
         next: () => {
           this.loadProducts();
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'ផលិតផលត្រូវបានធ្វើបច្ចុប្បន្នភាព' : 'Product updated successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Updated'
+            this.lang.t('products.productUpdated'),
+            this.lang.t('confirm.updated')
           );
           this.showForm = false;
           this.editingProduct = null;
@@ -228,9 +226,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Failed to update product', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km' ? 'ការកែប្រែផលិតផលបរាជ័យ' : 'Failed to update product'
-          );
+          this.alertService.error(this.lang.t('products.productUpdateFailed'));
           this.cdr.markForCheck();
         },
       });
@@ -240,17 +236,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.currentPage.set(1); // show the newly created record
           this.loadProducts();
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'ផលិតផលថ្មីត្រូវបានបន្ថែម' : 'Product added successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Added'
+            this.lang.t('products.productAdded'),
+            this.lang.t('confirm.added')
           );
           this.showForm = false;
           this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Failed to create product', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km' ? 'ការបន្ថែមផលិតផលបរាជ័យ' : 'Failed to create product'
-          );
+          this.alertService.error(this.lang.t('products.productCreateFailed'));
           this.cdr.markForCheck();
         },
       });
@@ -311,11 +305,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.pendingStockAdjusts.update((ids) => ids.filter((i) => i !== id));
         console.error('Failed to adjust stock', err);
         this.loadProducts(); // roll back to server truth
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការកែស្តុកបរាជ័យ'
-            : 'Failed to adjust stock'
-        );
+        this.alertService.error(this.lang.t('lowStock.adjustFailed'));
         this.cdr.markForCheck();
       },
     });
@@ -352,10 +342,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.loadProducts();
       const isEdit = !!this.editingProduct;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `ផលិតផលត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Product ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('products.productSaved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingProduct = null;
     });

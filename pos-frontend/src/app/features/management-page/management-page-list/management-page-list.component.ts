@@ -200,8 +200,8 @@ export class ManagementPageListComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
-        title: 'Delete Management Page',
-        message: `Are you sure you want to delete "${node.title}"?`
+        title: this.lang.t('managementPages.deletePage'),
+        message: this.lang.t('managementPages.deleteQuestion', { name: node.title })
       }
     });
 

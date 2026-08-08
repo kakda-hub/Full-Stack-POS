@@ -109,9 +109,7 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       error: (err) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
         console.error('Failed to load users', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'មិនអាចផ្ទុកអ្នកប្រើបានទេ' : 'Failed to load users'
-        );
+        this.alertService.error(this.lang.t('users.loadFailed'));
         this.items.set([]);
         this.totalItems.set(0);
         this.isLoading.set(false);
@@ -171,13 +169,10 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
   deleteItem(item: any): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `លុបអ្នកប្រើ "${item.name}" មែនទេ?`
-            : `Delete user "${item.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('users.deleteQuestion', { name: item.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -186,21 +181,15 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       this.userService.delete(Number(item.id)).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `"${item.name}" ត្រូវបានលុបចោល`
-              : `"${item.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('users.deleted', { name: item.name }),
+            this.lang.t('users.deletedTitle')
           );
           this.loadItems();
           this.loadStats();
         },
         error: (err) => {
           console.error('Failed to delete user', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការលុបបរាជ័យ'
-              : 'Failed to delete user'
-          );
+          this.alertService.error(this.lang.t('users.deleteFailed'));
         },
       });
     });
@@ -225,10 +214,10 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       this.loadStats();
       const isEdit = !!this.editingItem;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `អ្នកប្រើត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `User ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('users.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingItem = null;
     });

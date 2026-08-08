@@ -35,10 +35,10 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
   // category filter (mapped to the API search param) and upload folder stay
   // consistent.
   categories = [
-    { value: 'all', label: 'All' },
-    { value: 'pos-banners', label: 'Banners' },
-    { value: 'pos-general', label: 'General' },
-    { value: 'pos-products', label: 'Products' },
+    { value: 'all', labelKey: 'mediaGallery.all' },
+    { value: 'pos-banners', labelKey: 'mediaGallery.banners' },
+    { value: 'pos-general', labelKey: 'mediaGallery.general' },
+    { value: 'pos-products', labelKey: 'mediaGallery.products' },
   ];
 
   constructor(

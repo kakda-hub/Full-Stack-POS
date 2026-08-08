@@ -17,18 +17,14 @@
         [class.text-slate-100]="theme.isDark()"
         [class.text-slate-800]="!theme.isDark()"
       >
-        {{ lang.currentLang() === 'km' ? 'ឯកសារ Cloudinary' : 'Cloudinary Files' }}
+        {{ 'cloudinary.title' | translate }}
       </h1>
       <p
         class="text-sm mt-1"
         [class.text-slate-400]="theme.isDark()"
         [class.text-slate-500]="!theme.isDark()"
       >
-        {{
-          lang.currentLang() === 'km'
-            ? 'គ្រប់គ្រង និងមើលឯកសារប្រព័ន្ធផ្សព្វផ្សាយដែលបានផ្ទុកឡើង។'
-            : 'Manage and view your uploaded media assets.'
-        }}
+        {{ 'cloudinary.subtitle' | translate }}
       </p>
     </div>
     <div class="flex items-center gap-3">
@@ -81,12 +77,12 @@
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
           />
         </svg>
-        {{ lang.currentLang() === 'km' ? 'ធ្វើឱ្យស្រស់' : 'Refresh' }}
+        {{ 'cloudinary.refresh' | translate }}
       </button>
       <!-- Sign Out -->
       <button
         (click)="onSignOut()"
-        [matTooltip]="lang.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign out'"
+        [matTooltip]="'cloudinary.signOut' | translate"
         class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium text-sm border"
         [class.bg-slate-700]="theme.isDark()"
         [class.hover:bg-rose-900/40]="theme.isDark()"
@@ -106,7 +102,7 @@
             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
           />
         </svg>
-        {{ lang.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}
+        {{ 'cloudinary.signOut' | translate }}
       </button>
       <!-- Upload Toggle -->
       <button
@@ -151,15 +147,7 @@
             d="M6 18L18 6M6 6l12 12"
           />
         </svg>
-        {{
-          lang.currentLang() === 'km'
-            ? showUploadPanel
-              ? 'បិទ'
-              : 'ផ្ទុកឯកសារ'
-            : showUploadPanel
-              ? 'Close'
-              : 'Upload File'
-        }}
+        {{ showUploadPanel ? ('cloudinary.close' | translate) : ('cloudinary.uploadFile' | translate) }}
       </button>
     </div>
   </div>
@@ -181,7 +169,7 @@
         (change)="onFileSelected($event)"
         class="hidden"
         accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
-        [attr.aria-label]="lang.currentLang() === 'km' ? 'ជ្រើសរើសឯកសារ' : 'Choose file'"
+        [attr.aria-label]="'cloudinary.chooseFile' | translate"
       />
 
       <!-- Drag & Drop Zone -->
@@ -226,36 +214,22 @@
           [class.text-slate-200]="theme.isDark()"
           [class.text-slate-700]="!theme.isDark()"
         >
-          {{
-            lang.currentLang() === 'km'
-              ? isDragOver
-                ? 'ទម្លាក់ឯកសារនៅទីនេះ'
-                : 'អូស និងទម្លាក់ឯកសារនៅទីនេះ'
-              : isDragOver
-                ? 'Drop your file here'
-                : 'Drag & drop a file here'
-          }}
+          {{ isDragOver ? ('cloudinary.dropHere' | translate) : ('cloudinary.dragDrop' | translate) }}
         </p>
         <p
           class="text-sm mt-1"
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-400]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ឬ' : 'or' }}
-          <span class="text-indigo-500 font-medium">{{
-            lang.currentLang() === 'km' ? 'រកមើលពីកុំព្យូទ័ររបស់អ្នក' : 'browse from your computer'
-          }}</span>
+          {{ 'cloudinary.or' | translate }}
+          <span class="text-indigo-500 font-medium">{{ 'cloudinary.browseComputer' | translate }}</span>
         </p>
         <p
           class="text-xs mt-3"
           [class.text-slate-500]="theme.isDark()"
           [class.text-slate-400]="!theme.isDark()"
         >
-          {{
-            lang.currentLang() === 'km'
-              ? 'គាំទ្រ: រូបភាព, PDF, Word, Excel'
-              : 'Supports: Images, PDF, Word, Excel'
-          }}
+          {{ 'cloudinary.supports' | translate }}
         </p>
       </div>
 
@@ -281,7 +255,7 @@
             <img
               *ngIf="selectedFilePreview"
               [src]="selectedFilePreview"
-              [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+              [alt]="'cloudinary.preview' | translate"
               class="w-full h-full object-cover"
             />
             <svg
@@ -315,8 +289,7 @@
             >
               {{ formatBytes(selectedFile.size) }} &middot;
               {{
-                selectedFile.type ||
-                  (lang.currentLang() === 'km' ? 'ប្រភេទមិនស្គាល់' : 'Unknown type')
+                selectedFile.type || ('cloudinary.unknownType' | translate)
               }}
             </p>
             <!-- Folder Input -->
@@ -325,7 +298,7 @@
                 class="text-xs font-medium"
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-600]="!theme.isDark()"
-                >{{ lang.currentLang() === 'km' ? 'ថតឯកសារ:' : 'Folder:' }}</label
+                >{{ 'cloudinary.folder' | translate }}</label
               >
               <input
                 type="text"
@@ -357,7 +330,7 @@
               [class.text-slate-600]="!theme.isDark()"
               [class.border-slate-300]="!theme.isDark()"
             >
-              {{ lang.currentLang() === 'km' ? 'លុបចេញ' : 'Remove' }}
+              {{ 'cloudinary.remove' | translate }}
             </button>
             <button
               (click)="uploadFile()"
@@ -372,15 +345,7 @@
                 *ngIf="uploading"
                 class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
               ></div>
-              {{
-                lang.currentLang() === 'km'
-                  ? uploading
-                    ? 'កំពុងផ្ទុក...'
-                    : 'ផ្ទុក'
-                  : uploading
-                    ? 'Uploading...'
-                    : 'Upload'
-              }}
+              {{ uploading ? ('cloudinary.uploading' | translate) : ('cloudinary.upload' | translate) }}
             </button>
           </div>
         </div>
@@ -456,11 +421,7 @@
       <input
         type="text"
         (input)="onSearch($event)"
-        [placeholder]="
-          lang.currentLang() === 'km'
-            ? 'ស្វែងរកតាម Public ID ឬទម្រង់...'
-            : 'Search by public ID or format...'
-        "
+        [placeholder]="'cloudinary.search' | translate"
         class="w-full pl-9 pr-4 py-2 rounded-xl text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500 border"
         [class.bg-slate-700]="theme.isDark()"
         [class.border-slate-600]="theme.isDark()"
@@ -517,7 +478,7 @@
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-500]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ឯកសារសរុប' : 'Total Files' }}
+          {{ 'cloudinary.totalFiles' | translate }}
         </p>
       </div>
 
@@ -563,7 +524,7 @@
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-500]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ទំហំសរុប' : 'Total Size' }}
+          {{ 'cloudinary.totalSize' | translate }}
         </p>
       </div>
 
@@ -609,7 +570,7 @@
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-500]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ទម្រង់ឯកសារ' : 'File Formats' }}
+          {{ 'cloudinary.fileFormats' | translate }}
         </p>
       </div>
 
@@ -655,15 +616,7 @@
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-500]="!theme.isDark()"
         >
-          {{
-            lang.currentLang() === 'km'
-              ? searchQuery()
-                ? 'បានត្រង'
-                : 'កំពុងបង្ហាញ'
-              : searchQuery()
-                ? 'Filtered'
-                : 'Showing'
-          }}
+          {{ searchQuery() ? ('cloudinary.filtered' | translate) : ('cloudinary.showing' | translate) }}
         </p>
       </div>
     </div>
@@ -680,7 +633,7 @@
         [class.text-slate-400]="theme.isDark()"
         [class.text-slate-500]="!theme.isDark()"
       >
-        {{ lang.currentLang() === 'km' ? 'កំពុងផ្ទុកធនធាន...' : 'Loading resources...' }}
+        {{ 'cloudinary.loading' | translate }}
       </p>
     </div>
 
@@ -722,7 +675,7 @@
         [class.text-indigo-400]="theme.isDark()"
         [class.text-indigo-600]="!theme.isDark()"
       >
-        {{ lang.currentLang() === 'km' ? 'ព្យាយាមម្តងទៀត' : 'Try again' }}
+        {{ 'cloudinary.tryAgain' | translate }}
       </button>
     </div>
 
@@ -747,20 +700,14 @@
           [class.text-slate-200]="theme.isDark()"
           [class.text-slate-800]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ធនធានទាំងអស់' : 'All Resources' }}
+          {{ 'cloudinary.allResources' | translate }}
         </h2>
         <span
           class="text-xs"
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-400]="!theme.isDark()"
           >{{ totalItems() }}
-          {{
-            lang.currentLang() === 'km'
-              ? 'ឯកសារ'
-              : totalItems() === 1
-                ? 'file'
-                : 'files'
-          }}</span
+          {{ totalItems() === 1 ? ('cloudinary.file' | translate) : ('cloudinary.files' | translate) }}</span
         >
       </div>
 
@@ -780,7 +727,7 @@
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-500]="!theme.isDark()"
               >
-                {{ lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview' }}
+                {{ 'cloudinary.preview' | translate }}
               </th>
               <th
                 (click)="toggleSort('public_id')"
@@ -802,7 +749,7 @@
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-500]="!theme.isDark()"
               >
-                {{ lang.currentLang() === 'km' ? 'ទម្រង់' : 'Format' }}
+                {{ 'cloudinary.format' | translate }}
                 <span
                   class="ml-1 text-[10px]"
                   [class.text-indigo-400]="theme.isDark()"
@@ -816,7 +763,7 @@
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-500]="!theme.isDark()"
               >
-                {{ lang.currentLang() === 'km' ? 'ទំហំ' : 'Size' }}
+                {{ 'cloudinary.size' | translate }}
                 <span
                   class="ml-1 text-[10px]"
                   [class.text-indigo-400]="theme.isDark()"
@@ -830,7 +777,7 @@
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-500]="!theme.isDark()"
               >
-                {{ lang.currentLang() === 'km' ? 'បានផ្ទុកឡើងនៅ' : 'Uploaded At' }}
+                {{ 'cloudinary.uploadedAt' | translate }}
                 <span
                   class="ml-1 text-[10px]"
                   [class.text-indigo-400]="theme.isDark()"
@@ -843,7 +790,7 @@
                 [class.text-slate-300]="theme.isDark()"
                 [class.text-slate-500]="!theme.isDark()"
               >
-                {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+                {{ 'cloudinary.actions' | translate }}
               </th>
             </tr>
           </thead>
@@ -872,16 +819,14 @@
                   "
                   [title]="
                     resource.resource_type === 'image'
-                      ? lang.currentLang() === 'km'
-                        ? 'ចុចដើម្បីមើលជាមុន'
-                        : 'Click to preview'
+                      ? ('cloudinary.clickToPreview' | translate)
                       : ''
                   "
                 >
                   <img
                     *ngIf="resource.resource_type === 'image'"
                     [src]="resource.secure_url"
-                    [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+                    [alt]="'cloudinary.preview' | translate"
                     class="w-full h-full object-cover group-hover/preview:scale-110 transition-transform duration-200"
                   />
                   <svg
@@ -918,7 +863,7 @@
                     [class.hover:bg-slate-100]="!theme.isDark()"
                     [class.text-slate-400]="theme.isDark()"
                     [class.text-slate-400]="!theme.isDark()"
-                    [title]="lang.currentLang() === 'km' ? 'ចម្លង Public ID' : 'Copy Public ID'"
+                    [title]="'cloudinary.copyPublicId' | translate"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -965,7 +910,7 @@
                   <!-- Copy URL -->
                   <button
                     (click)="copyToClipboard(resource.secure_url, 'URL')"
-                    [matTooltip]="lang.currentLang() === 'km' ? 'ចម្លង URL' : 'Copy URL'"
+                    [matTooltip]="'cloudinary.copyUrl' | translate"
                     class="p-1.5 rounded-lg transition-colors"
                     [class.hover:bg-slate-600]="theme.isDark()"
                     [class.hover:bg-indigo-50]="!theme.isDark()"
@@ -985,7 +930,7 @@
                   <button
                     *ngIf="resource.resource_type === 'image'"
                     (click)="openPreview(resource.secure_url)"
-                    [matTooltip]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+                    [matTooltip]="'cloudinary.preview' | translate"
                     class="p-1.5 rounded-lg transition-colors"
                     [class.hover:bg-slate-600]="theme.isDark()"
                     [class.hover:bg-sky-50]="!theme.isDark()"
@@ -1011,7 +956,7 @@
                   <button
                     (click)="deleteResource(resource)"
                     [disabled]="deleting"
-                    [matTooltip]="lang.currentLang() === 'km' ? 'លុប' : 'Delete'"
+                    [matTooltip]="'cloudinary.delete' | translate"
                     class="p-1.5 rounded-lg transition-colors disabled:opacity-50"
                     [class.hover:bg-slate-600]="theme.isDark()"
                     [class.hover:bg-rose-50]="!theme.isDark()"
@@ -1062,22 +1007,14 @@
                   [class.text-slate-200]="theme.isDark()"
                   [class.text-slate-800]="!theme.isDark()"
                 >
-                  {{
-                    lang.currentLang() === 'km'
-                      ? 'គ្មានលទ្ធផលនៅទំព័រនេះទេ'
-                      : 'No results on this page'
-                  }}
+                  {{ 'cloudinary.noResultsPage' | translate }}
                 </h3>
                 <p
                   class="text-sm mt-1"
                   [class.text-slate-400]="theme.isDark()"
                   [class.text-slate-500]="!theme.isDark()"
                 >
-                  {{
-                    lang.currentLang() === 'km'
-                      ? 'សូមព្យាយាមទំព័រផ្សេង ឬកែប្រែទំហំទំព័រ។'
-                      : 'Try navigating to a different page or adjusting the page size.'
-                  }}
+                  {{ 'cloudinary.noResultsPageHint' | translate }}
                 </p>
               </td>
             </tr>
@@ -1113,28 +1050,14 @@
                   [class.text-slate-200]="theme.isDark()"
                   [class.text-slate-800]="!theme.isDark()"
                 >
-                  {{
-                    lang.currentLang() === 'km'
-                      ? 'រកមិនឃើញឯកសារ'
-                      : searchQuery()
-                        ? 'No matching files'
-                        : 'No files found'
-                  }}
+                  {{ searchQuery() ? ('cloudinary.noMatchingFiles' | translate) : ('cloudinary.noFiles' | translate) }}
                 </h3>
                 <p
                   class="text-sm mt-1 max-w-sm mx-auto"
                   [class.text-slate-400]="theme.isDark()"
                   [class.text-slate-500]="!theme.isDark()"
                 >
-                  {{
-                    lang.currentLang() === 'km'
-                      ? searchQuery()
-                        ? 'សូមសាកល្បងពាក្យស្វែងរកផ្សេងទៀត។'
-                        : 'សូមផ្ទុកឯកសារដើម្បីមើលវានៅទីនេះ។'
-                      : searchQuery()
-                        ? 'Try a different search term.'
-                        : 'Upload a file to see it listed here.'
-                  }}
+                  {{ searchQuery() ? ('cloudinary.noMatchingHint' | translate) : ('cloudinary.noFilesHint' | translate) }}
                 </p>
               </td>
             </tr>
@@ -1185,7 +1108,7 @@
       <!-- Image -->
       <img
         [src]="previewImage()"
-        [alt]="lang.currentLang() === 'km' ? 'មើលជាមុន' : 'Preview'"
+        [alt]="'cloudinary.preview' | translate"
         class="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
       />
       <!-- Copy URL -->
@@ -1209,7 +1132,7 @@
                 d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
               />
             </svg>
-            {{ lang.currentLang() === 'km' ? 'ចម្លង URL' : 'Copy URL' }}
+            {{ 'cloudinary.copyUrl' | translate }}
           </span>
         </button>
       </div>

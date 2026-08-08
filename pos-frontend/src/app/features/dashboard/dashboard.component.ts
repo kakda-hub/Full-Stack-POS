@@ -51,14 +51,13 @@ export class DashboardComponent implements OnInit {
   greeting = computed(() => {
     const hour = new Date().getHours();
     const name = this.auth.currentUser()?.name || '';
-    if (this.lang.currentLang() === 'km') {
-      if (hour < 12) return `អរុណសួស្តី ${name}`;
-      if (hour < 17) return `ទិវាសួស្តី ${name}`;
-      return `សាយ័ណ្ហសួស្តី ${name}`;
-    }
-    if (hour < 12) return `Good morning, ${name}`;
-    if (hour < 17) return `Good afternoon, ${name}`;
-    return `Good evening, ${name}`;
+    const key =
+      hour < 12
+        ? 'dashboard.greetingMorning'
+        : hour < 17
+          ? 'dashboard.greetingAfternoon'
+          : 'dashboard.greetingEvening';
+    return this.lang.t(key, { name });
   });
 
   // ── Date formatting helpers ─────────────────────────────────────────────

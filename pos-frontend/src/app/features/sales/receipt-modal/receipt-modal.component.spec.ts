@@ -2,10 +2,13 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { SharedModule } from '../../../shared/shared.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReceiptModalComponent } from './receipt-modal.component';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
 import { Transaction, CartItem, Product } from '../../../models';
+import { of } from 'rxjs';
+import { createI18nMocks } from '../../../testing/i18n-mock';
 
 describe('ReceiptModalComponent — branded receipt header', () => {
   let fixture: ComponentFixture<ReceiptModalComponent>;
@@ -46,11 +49,12 @@ describe('ReceiptModalComponent — branded receipt header', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ReceiptModalComponent],
-      imports: [SharedModule, NoopAnimationsModule],
+      imports: [SharedModule, TranslateModule, NoopAnimationsModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ThemeService, useValue: themeMock },
-        { provide: LanguageService, useValue: { currentLang: () => 'en' } },
+        { provide: LanguageService, useValue: createI18nMocks().langMock },
+        { provide: TranslateService, useValue: createI18nMocks().translateServiceMock },
       ],
     }).compileComponents();
 

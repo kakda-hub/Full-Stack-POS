@@ -119,11 +119,7 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
       error: (err) => {
         if (seq !== this.loadSeq) return; // stale response — ignore
         console.error('Failed to fetch sales', err);
-        this.error.set(
-          this.lang.currentLang() === 'km'
-            ? 'មិនអាចផ្ទុកប្រវត្តិការលក់បានទេ'
-            : 'Failed to load sales history'
-        );
+        this.error.set(this.lang.t('salesHistory.loadFailed'));
         this.sales.set([]);
         this.totalItems.set(0);
         this.isLoading.set(false);
@@ -162,12 +158,12 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     return {
       id: sale.id,
       date: new Date(sale.createdAt),
-      cashierName: sale?.user?.name ?? 'Unknown',
+      cashierName: sale?.user?.name ?? this.lang.t('reports.unknown'),
       itemsCount: items.length,
       itemsList: items
         .slice(0, 3)
         .map((i: any) => i?.product?.name ?? `#${i.productId}`)
-        .join(', ') + (items.length > 3 ? ` +${items.length - 3} more` : ''),
+        .join(', ') + (items.length > 3 ? ` +${items.length - 3} ${this.lang.t('salesHistory.more')}` : ''),
       paymentMethod: sale.paymentMethod ?? 'cash',
       subtotal: Number(sale.subtotal ?? 0),
       discount: Number(sale.discount ?? 0),
@@ -181,7 +177,7 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     return {
       id: sale.id,
       date: new Date(sale.createdAt),
-      cashierName: sale?.user?.name ?? 'Unknown',
+      cashierName: sale?.user?.name ?? this.lang.t('reports.unknown'),
       paymentMethod: sale.paymentMethod ?? 'cash',
       subtotal: Number(sale.subtotal ?? 0),
       discount: Number(sale.discount ?? 0),
@@ -232,10 +228,10 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   }
 
   quickFilters = [
-    { key: 'all', label: 'All Time', labelKm: 'ទាំងអស់' },
-    { key: 'today', label: 'Today', labelKm: 'ថ្ងៃនេះ' },
-    { key: 'week', label: 'This Week', labelKm: 'សប្តាហ៍នេះ' },
-    { key: 'month', label: 'This Month', labelKm: 'ខែនេះ' },
+    { key: 'all', labelKey: 'salesHistory.allTime' },
+    { key: 'today', labelKey: 'salesHistory.today' },
+    { key: 'week', labelKey: 'salesHistory.week' },
+    { key: 'month', labelKey: 'salesHistory.month' },
   ];
 
   onSearch(event: Event): void {
@@ -321,11 +317,11 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     `).join('');
 
     const discountHtml = sale.discount
-      ? `<div style="display: flex; justify-content: space-between; color: #059669;"><span>Discount</span><span> -$${sale.discount.toFixed(2)}</span></div>`
+      ? `<div style="display: flex; justify-content: space-between; color: #059669;"><span>${this.lang.t('receipt.discount')}</span><span> -$${sale.discount.toFixed(2)}</span></div>`
       : '';
 
     const taxHtml = sale.tax
-      ? `<div style="display: flex; justify-content: space-between;"><span>Tax</span><span> $${sale.tax.toFixed(2)}</span></div>`
+      ? `<div style="display: flex; justify-content: space-between;"><span>${this.lang.t('receipt.tax')}</span><span> $${sale.tax.toFixed(2)}</span></div>`
       : '';
 
     win.document.write(`
@@ -349,16 +345,16 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
       </style>
       </head><body>
         <div class="header">
-          <h3>MiniMart Store</h3>
-          <p>Phnom Penh, Cambodia</p>
-          <p>Tel: +855 23 000 000</p>
+          <h3>${this.lang.t('receipt.store')}</h3>
+          <p>${this.lang.t('receipt.address')}</p>
+          <p>${this.lang.t('receipt.tel')}</p>
         </div>
 
         <div class="meta">
-          <div class="row"><span class="label">Receipt</span><span style="font-weight: bold;">#${sale.id}</span></div>
-          <div class="row"><span class="label">Date</span><span>${sale.date.toLocaleDateString()} ${sale.date.toLocaleTimeString()}</span></div>
-          <div class="row"><span class="label">Cashier</span><span>${sale.cashierName}</span></div>
-          <div class="row"><span class="label">Payment</span><span style="text-transform: uppercase; font-weight: bold;">${sale.paymentMethod}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.receiptNo')}</span><span style="font-weight: bold;">#${sale.id}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.date')}</span><span>${sale.date.toLocaleDateString()} ${sale.date.toLocaleTimeString()}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.cashier')}</span><span>${sale.cashierName}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.payment')}</span><span style="text-transform: uppercase; font-weight: bold;">${sale.paymentMethod}</span></div>
         </div>
 
         <div class="items">
@@ -366,14 +362,14 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
         </div>
 
         <div class="totals">
-          <div class="total-row"><span>Subtotal</span><span>$${sale.subtotal.toFixed(2)}</span></div>
+          <div class="total-row"><span>${this.lang.t('receipt.subtotal')}</span><span>$${sale.subtotal.toFixed(2)}</span></div>
           ${discountHtml}
           ${taxHtml}
-          <div class="grand-total"><span>TOTAL</span><span>$${sale.total.toFixed(2)}</span></div>
+          <div class="grand-total"><span>${this.lang.t('receipt.total')}</span><span>$${sale.total.toFixed(2)}</span></div>
         </div>
 
         <div class="footer">
-          <p>Thank you! Please come again.</p>
+          <p>${this.lang.t('receipt.thankYou')}</p>
           <p style="margin-top:4px;">Powered by MiniMart</p>
         </div>
       </body></html>

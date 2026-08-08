@@ -11,10 +11,10 @@
           </svg>
         </span>
         <input
-          aria-label="Search"
+          [attr.aria-label]="'common.search' | translate"
           #searchInput
           type="text"
-          [placeholder]="langService.currentLang() === 'km' ? 'ស្វែងរក ឬស្កែន... (Ctrl+F)' : 'Search products or scan barcode... (Ctrl+F)'"
+          [placeholder]="'sales.search' | translate"
           (input)="onSearch($event)"
           (keydown.enter)="onBarcodeEnter($event)"
           class="block w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-100"
@@ -41,7 +41,7 @@
       @if (quickPicks().length > 0) {
         <div>
           <h2 class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] px-1">
-            {{ langService.currentLang() === 'km' ? 'ទំនិញគ្មានបាកូដ' : 'Quick Add Items' }}
+            {{ 'sales.quickAddItems' | translate }}
           </h2>
           <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
             @for (item of quickPicks(); track item.id) {
@@ -124,11 +124,11 @@
                 </span>
                 @if (avail > 0) {
                   <span class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                    {{ avail }} {{ langService.currentLang() === 'km' ? 'នៅស្តុក' : (avail === 1 ? 'in stock' : 'in stock') }}
+                    {{ avail }} {{ 'sales.inStock' | translate }}
                   </span>
                 } @else {
                   <span class="text-[10px] text-rose-500 dark:text-rose-400 uppercase tracking-widest">
-                    {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
+                    {{ 'sales.outOfStock' | translate }}
                   </span>
                 }
               </div>
@@ -153,9 +153,9 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-base font-black text-slate-800 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
+          <h2 class="text-base font-black text-slate-800 dark:text-slate-100">{{ 'sales.yourCart' | translate }}</h2>
           <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-            {{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : (cart.items().length === 1 ? 'Item' : 'Items') }}
+            {{ cart.items().length }} {{ cart.items().length === 1 ? ('sales.item' | translate) : ('sales.items' | translate) }}
           </p>
         </div>
       </div>
@@ -164,7 +164,7 @@
         (click)="clearCart()"
         class="text-xs text-rose-500 font-bold hover:text-rose-600 transition-colors"
       >
-        {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
+        {{ 'sales.clear' | translate }}
       </button>
     </div>
 
@@ -181,8 +181,8 @@
             <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
           </svg>
         </div>
-        <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</h3>
-        <p class="text-sm text-slate-400 dark:text-slate-500">{{ langService.currentLang() === 'km' ? 'ស្កែន ឬជ្រើសរើសទំនិញដើម្បីចាប់ផ្ដើម' : 'Scan a barcode or select an item from the grid to begin' }}</p>
+        <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">{{ 'sales.cartEmpty' | translate }}</h3>
+        <p class="text-sm text-slate-400 dark:text-slate-500">{{ 'sales.cartEmptyHint' | translate }}</p>
       </div>
 
       <!-- Cart Items List -->
@@ -218,7 +218,7 @@
                 type="button"
                 (click)="cart.removeItem(item.product.id)"
                 class="text-slate-300 dark:text-slate-500 hover:text-rose-500 transition-colors flex-shrink-0"
-                [title]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
+                [title]="'sales.removeItem' | translate"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -230,7 +230,7 @@
                 <button
                   (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
                   class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all motion-safe:active:scale-90"
-                  [title]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
+                  [title]="'sales.decreaseQuantity' | translate"
                 >
                   -
                 </button>
@@ -239,7 +239,7 @@
                   (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
                   [disabled]="item.quantity >= item.product.stock"
                   class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                  [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
+                  [title]="item.quantity >= item.product.stock ? ('sales.maxStock' | translate) : ('sales.increaseQuantity' | translate)"
                 >
                   +
                 </button>
@@ -257,18 +257,18 @@
     <div class="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-5 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
         <div class="space-y-3">
           <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
-            <span>{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
+            <span>{{ 'sales.subtotal' | translate }}</span>
             <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ subtotalDisplay().toFixed(2) }}</span>
           </div>
 
           <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
-            <span>{{ langService.currentLang() === 'km' ? 'អាករ' : 'Tax' }}</span>
+            <span>{{ 'sales.tax' | translate }}</span>
             <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ taxDisplay().toFixed(2) }}</span>
           </div>
 
           <div class="flex justify-between items-end pt-4 border-t border-slate-100 dark:border-slate-700">
             <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
-              {{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'Grand Total' }}
+              {{ 'sales.grandTotal' | translate }}
             </span>
             <span class="text-xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter tabular-nums">${{ totalDisplay().toFixed(2) }}</span>
           </div>
@@ -279,7 +279,7 @@
         (click)="showPayment = true"
         class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 motion-safe:active:scale-[0.98] flex items-center justify-center gap-2"
       >
-        {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
+        {{ 'sales.checkout' | translate }}
       </button>
     </div>
   </div>
@@ -298,8 +298,8 @@
           <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
         </div>
         <div class="text-sm">
-          <p class="font-semibold text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Cart' }}</p>
-          <p class="text-xs text-slate-400">{{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}</p>
+          <p class="font-semibold text-slate-800 dark:text-slate-200">{{ 'sales.cart' | translate }}</p>
+          <p class="text-xs text-slate-400">{{ cart.items().length }} {{ 'sales.itemUnits' | translate }}</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
@@ -335,14 +335,14 @@
       <!-- Drawer Header -->
       <div class="px-5 pb-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-3">
-          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
+          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base">{{ 'sales.yourCart' | translate }}</h2>
           @if (cart.items().length > 0) {
-            <span class="text-xs text-slate-400">({{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }})</span>
+            <span class="text-xs text-slate-400">({{ cart.items().length }} {{ 'sales.itemUnits' | translate }})</span>
           }
         </div>
         <div class="flex items-center gap-2">
           <button *ngIf="cart.items().length > 0" (click)="clearCart()" class="text-xs text-rose-500 font-bold hover:underline">
-            {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
+            {{ 'sales.clear' | translate }}
           </button>
           <button type="button" (click)="closeCartDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +358,7 @@
           <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
-          <p class="text-sm font-medium">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</p>
+          <p class="text-sm font-medium">{{ 'sales.cartEmpty' | translate }}</p>
         </div>
 
         <div
@@ -418,11 +418,11 @@
       <!-- Drawer Totals & Checkout -->
       <div class="p-5 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-3 flex-shrink-0 safe-area-bottom">
         <div class="flex justify-between items-center">
-          <span class="text-sm text-slate-500">{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
+          <span class="text-sm text-slate-500">{{ 'sales.subtotal' | translate }}</span>
           <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ subtotalDisplay().toFixed(2) }}</span>
         </div>
         <div class="flex justify-between items-center text-lg">
-          <span class="font-extrabold text-slate-900 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
+          <span class="font-extrabold text-slate-900 dark:text-slate-100">{{ 'receipt.total' | translate }}</span>
           <span class="font-black text-indigo-600 dark:text-indigo-400 tabular-nums">${{ totalDisplay().toFixed(2) }}</span>
         </div>
         <button
@@ -433,7 +433,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
           </svg>
-          {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
+          {{ 'sales.checkout' | translate }}
         </button>
       </div>
     </div>

@@ -1,9 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [title]="id
-      ? (lang.currentLang() === 'km' ? 'កែប្រែអ្នកប្រើ' : 'Edit User')
-      : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកប្រើ' : 'Add User')"
+    [title]="id ? ('users.editTitle' | translate) : ('users.addTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -22,7 +20,7 @@
       <div class="form-grid">
         <app-input-field
           formControlName="name"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+          [placeholder]="'users.name' | translate"
           [isRequired]="true"
         >
           <span prefix class="text-slate-400 mr-1">👤</span>
@@ -31,13 +29,13 @@
         <app-input-field
           formControlName="email"
           type="email"
-          [placeholder]="lang.currentLang() === 'km' ? 'អ៊ីមែល' : 'Email'"
+          [placeholder]="'users.email' | translate"
         >
           <span prefix class="text-slate-400 mr-1">✉</span>
         </app-input-field>
 
         <mat-form-field appearance="outline" class="w-full form-field-outline">
-          <mat-label>{{ lang.currentLang() === 'km' ? 'តួនាទី' : 'Role' }}</mat-label>
+          <mat-label>{{ 'users.role' | translate }}</mat-label>
           <mat-select formControlName="role">
             @for (role of roles; track role.value) {
               <mat-option [value]="role.value">{{ role.viewValue }}</mat-option>
@@ -51,7 +49,7 @@
         <app-input-field
           formControlName="password"
           type="password"
-          [placeholder]="lang.currentLang() === 'km' ? (id ? 'ពាក្យសម្ងាត់ថ្មី (ទុកចោល)' : 'ពាក្យសម្ងាត់') : (id ? 'New password (leave empty)' : 'Password')"
+          [placeholder]="id ? ('users.newPasswordHint' | translate) : ('users.password' | translate)"
           [isRequired]="!id"
         >
           <span prefix class="text-slate-400 mr-1">🔒</span>
@@ -61,10 +59,10 @@
       <!-- Active toggle -->
       <div class="flex items-center gap-3 px-1">
         <mat-slide-toggle formControlName="isActive" color="primary">
-          {{ lang.currentLang() === 'km' ? 'សកម្ម' : 'Active' }}
+          {{ 'users.active' | translate }}
         </mat-slide-toggle>
         <span class="text-sm text-slate-500 dark:text-slate-400">
-          {{ lang.currentLang() === 'km' ? 'អនុញ្ញាតឱ្យអ្នកប្រើចូលប្រើប្រព័ន្ធ' : 'Allow user to access the system' }}
+          {{ 'users.activeHint' | translate }}
         </span>
       </div>
     </div>

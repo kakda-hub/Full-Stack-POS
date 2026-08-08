@@ -25,6 +25,15 @@ export class LanguageService {
     this.switchLanguage(this._lang() === 'en' ? 'km' : 'en');
   }
 
+  /**
+   * Resolve a translation key in the current language (with optional
+   * interpolation params). Centralizes ngx-translate lookups for TS code
+   * (alerts, dialogs, column headers, etc.).
+   */
+  t(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params);
+  }
+
   private loadLang(): AppLanguage {
     return (localStorage.getItem('pos_lang') as AppLanguage) || 'en';
   }

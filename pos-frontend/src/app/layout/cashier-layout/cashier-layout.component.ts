@@ -23,7 +23,7 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
         <div>
           <app-ui-button [variant]="'secondary'" [size]="'md'" type="button" (click)="goHome()">
             <app-icon name="arrow-left" svgClass="w-4 h-4"></app-icon>
-            <span>{{ langService.currentLang() === 'km' ? 'ត្រឡប់ផ្ទះ' : 'Back Home' }}</span>
+            <span>{{ 'layout.backHome' | translate }}</span>
           </app-ui-button>
         </div>
       }
@@ -38,7 +38,7 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
           />
         </div>
         <h1 class="hidden sm:block text-lg font-extrabold tracking-tight text-slate-800 dark:text-white">
-          Mini Mart
+          {{ 'brand.title' | translate }}
         </h1>
         @if (cart.itemCount() > 0) {
           <span class="cart-count-badge" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
@@ -46,7 +46,7 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
       </div>
 
       <!-- Breadcrumbs -->
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <nav class="breadcrumbs" [attr.aria-label]="'nav.breadcrumb' | translate">
         @for (crumb of breadcrumbs(); track crumb; let last = $last) {
           <span class="breadcrumb-item" [class.breadcrumb-current]="last">{{ crumb }}</span>
           @if (!last) {
@@ -64,11 +64,11 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
           class="lang-pill"
           aria-haspopup="true"
           [attr.aria-expanded]="langMenuOpen()"
-          [title]="langService.currentLang() === 'en' ? 'Language' : 'ភាសា'"
+          [title]="'layout.language' | translate"
           type="button"
         >
           <img class="lang-flag-img" [src]="langService.currentLang() === 'en' ? 'assets/images/en-flag.png' : 'assets/images/kh-flag.png'" alt="" />
-          <span class="lang-label">{{ langService.currentLang() === 'en' ? 'ENGLISH' : 'ភាសាខ្មែរ' }}</span>
+          <span class="lang-label">{{ langService.currentLang() === 'en' ? ('layout.english' | translate) : ('layout.khmer' | translate) }}</span>
           <app-icon
             name="chevron-down"
             class="transition-transform duration-200"
@@ -114,9 +114,9 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
         (click)="theme.toggle()"
         class="topbar-icon-btn"
         [title]="theme.isDark()
-          ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
-          : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
-        [attr.aria-label]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+          ? ('layout.switchToLight' | translate)
+          : ('layout.switchToDark' | translate)"
+        [attr.aria-label]="theme.isDark() ? ('layout.switchToLight' | translate) : ('layout.switchToDark' | translate)"
         type="button"
       >
         @if (theme.isDark()) {
@@ -168,7 +168,7 @@ import { counterAnimation, themeRotate } from '../../shared/animations/animation
             <div class="dropdown-divider"></div>
             <button class="dropdown-item dropdown-item-danger" (click)="logout()" role="menuitem" type="button">
               <app-icon name="logout" svgClass="w-4 h-4 flex-shrink-0"></app-icon>
-              <span class="dropdown-item-label">{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}</span>
+              <span class="dropdown-item-label">{{ 'nav.signOut' | translate }}</span>
             </button>
           </div>
         }
@@ -575,23 +575,16 @@ export class CashierLayoutComponent implements OnInit, OnDestroy {
     this.closeMenus();
   }
 
-  /** Human-readable label for the current user's role (localized) */
-  userRoleLabel = computed(() => {
-    const role = this.auth.currentUser()?.role;
-    if (this.langService.currentLang() === 'km') {
-      return role === 'admin' ? 'អ្នកគ្រប់គ្រង' : 'អ្នកគិតលុយ';
-    }
-    return role === 'admin' ? 'Admin' : 'Cashier';
-  });
+  /** Human-readable label for the current user's role (localized) */    userRoleLabel = computed(() => {
+        const role = this.auth.currentUser()?.role;
+        if (role === 'admin') return this.langService.t('field.admin');
+        return this.langService.t('field.cashier');
+    });
 
   /** Sign out: close menus, clear auth state, return to login, and confirm via toast */
   logout() {
     this.closeMenus();
     this.auth.logout();
-    this.alertService.success(
-      this.langService.currentLang() === 'km'
-        ? 'បានចាកចេញដោយជោគជ័យ'
-        : 'Successfully logged out'
-    );
+    this.alertService.success(this.langService.t('layout.loggedOut'));
   }
 }

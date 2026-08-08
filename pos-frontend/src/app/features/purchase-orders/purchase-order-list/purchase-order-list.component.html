@@ -21,7 +21,7 @@
         aria-label="Search"
         type="text"
         (input)="onSearch($event)"
-        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកបញ្ជាទិញ...' : 'Search POs...'"
+        [placeholder]="'purchaseOrders.search' | translate"
         class="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white border-slate-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100"
       />
     </div>
@@ -58,7 +58,7 @@
             <tr>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'លេខបញ្ជាទិញ' : 'PO Number'"
+                  [label]="'purchaseOrders.poNumber' | translate"
                   [field]="'orderNumber'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -66,11 +66,11 @@
                 ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Supplier' }}
+                {{ 'purchaseOrders.supplier' | translate }}
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'កាលបរិច្ឆេទ' : 'Date'"
+                  [label]="'purchaseOrders.date' | translate"
                   [field]="'createdAt'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -78,11 +78,11 @@
                 ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'Items' }}
+                {{ 'purchaseOrders.items' | translate }}
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'សរុប' : 'Total'"
+                  [label]="'purchaseOrders.total' | translate"
                   [field]="'total'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -91,7 +91,7 @@
               </th>
               <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
                 <app-sort-header
-                  [label]="lang.currentLang() === 'km' ? 'ស្ថានភាព' : 'Status'"
+                  [label]="'purchaseOrders.status' | translate"
                   [field]="'status'"
                   [sortBy]="sortBy()"
                   [sortDir]="sortDir()"
@@ -99,7 +99,7 @@
                 ></app-sort-header>
               </th>
               <th class="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
-                {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+                {{ 'purchaseOrders.actions' | translate }}
               </th>
             </tr>
           </thead>
@@ -113,7 +113,7 @@
                 {{ po.orderNumber }}
               </td>
               <td class="px-4 py-3.5 text-slate-600 dark:text-slate-400">
-                {{ po.supplier?.name || 'N/A' }}
+                {{ po.supplier?.name || ('common.noData' | translate) }}
               </td>
               <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400">
                 {{ po.createdAt | date: 'mediumDate' }}
@@ -136,7 +136,7 @@
                     type="button"
                     class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700/60 transition-colors"
                     (click)="openView(po)"
-                    [title]="lang.currentLang() === 'km' ? 'មើល' : 'View'"
+                    [title]="'purchaseOrders.view' | translate"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -150,7 +150,7 @@
                     type="button"
                     class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40 transition-colors"
                     (click)="receivePO(po, $event)"
-                    [title]="lang.currentLang() === 'km' ? 'ទទួល' : 'Receive'"
+                    [title]="'purchaseOrders.receive' | translate"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -163,7 +163,7 @@
                     type="button"
                     class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 transition-colors"
                     (click)="cancelPO(po, $event)"
-                    [title]="lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel'"
+                    [title]="'purchaseOrders.cancel' | translate"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -198,21 +198,21 @@
         <div class="space-y-2">
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-400 uppercase tracking-wider font-semibold">
-              {{ lang.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Supplier' }}
+              {{ 'purchaseOrders.supplier' | translate }}
             </span>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ po.supplier?.name || 'N/A' }}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ po.supplier?.name || ('common.noData' | translate) }}</span>
           </div>
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-400 uppercase tracking-wider font-semibold">
-              {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'Items' }}
+              {{ 'purchaseOrders.items' | translate }}
             </span>
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
-              {{ po.items?.length || 0 }} {{ lang.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}
+              {{ po.items?.length || 0 }} {{ 'purchaseOrders.itemUnits' | translate }}
             </span>
           </div>
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-400 uppercase tracking-wider font-semibold">
-              {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}
+              {{ 'purchaseOrders.total' | translate }}
             </span>
             <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">{{ po.total | appNumber:'currency' }}</span>
           </div>
@@ -228,7 +228,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'មើល' : 'View' }}</span>
+            <span>{{ 'purchaseOrders.view' | translate }}</span>
           </button>
 
           <button
@@ -240,7 +240,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'ទទួល' : 'Receive' }}</span>
+            <span>{{ 'purchaseOrders.receive' | translate }}</span>
           </button>
 
           <button
@@ -252,7 +252,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel' }}</span>
+            <span>{{ 'purchaseOrders.cancel' | translate }}</span>
           </button>
         </div>
       </div>
@@ -264,7 +264,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
       <p class="text-sm font-medium">
-        {{ lang.currentLang() === 'km' ? 'គ្មានបញ្ជាទិញ' : 'No purchase orders found' }}
+        {{ 'purchaseOrders.empty' | translate }}
       </p>
     </div>
 

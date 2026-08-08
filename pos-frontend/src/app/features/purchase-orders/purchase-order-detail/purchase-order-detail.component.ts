@@ -192,11 +192,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to create purchase order', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការបង្កើតបញ្ជាទិញបរាជ័យ'
-            : 'Failed to create purchase order'
-        );
+        this.alertService.error(this.lang.t('purchaseOrders.createFailed'));
         this.isSaving.set(false);
       },
     });

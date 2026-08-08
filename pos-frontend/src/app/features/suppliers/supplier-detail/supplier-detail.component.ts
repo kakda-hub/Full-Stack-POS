@@ -69,11 +69,7 @@ export class SupplierDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save supplier', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការរក្សាទុកអ្នកផ្គត់ផ្គង់បរាជ័យ'
-            : 'Failed to save supplier'
-        );
+        this.alertService.error(this.lang.t('suppliers.saveFailed'));
         this.isSaving.set(false);
       },
     });
