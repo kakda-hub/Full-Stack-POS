@@ -109,7 +109,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
-  onSearch(e: Event): void { this.searchSubject.next((e.target as HTMLInputElement).value); }
+  onSearch(query: string): void { this.searchSubject.next(query); }
 
   /** Loads one server-side page using the standard list query params. */
   loadProducts(): void {

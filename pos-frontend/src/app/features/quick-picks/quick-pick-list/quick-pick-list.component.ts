@@ -105,8 +105,8 @@ export class QuickPickListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(e: Event): void {
-    this.searchSubject.next((e.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   onPageChange(page: number): void {

@@ -4,22 +4,12 @@
     <!-- Search & Category Bar -->
     <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800/60 px-3 sm:px-4 lg:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 space-y-4 sm:space-y-5 shadow-sm">
       <!-- Search -->
-      <div class="relative group">
-        <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-slate-400">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </span>
-        <input
-          [attr.aria-label]="'common.search' | translate"
-          #searchInput
-          type="text"
-          [placeholder]="'sales.search' | translate"
-          (input)="onSearch($event)"
-          (keydown.enter)="onBarcodeEnter($event)"
-          class="block w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-100"
-        />
-      </div>
+      <app-search-input
+        size="lg"
+        placeholder="sales.search"
+        (search)="onSearch($event)"
+        (enter)="onBarcodeEnter($event)"
+      ></app-search-input>
 
       <!-- Category Tabs -->
       <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">

@@ -1,5 +1,5 @@
 import { trigger, state, style, transition, animate, group } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, untracked, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, untracked } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -51,8 +51,6 @@ const drawerBackdrop = trigger('drawerBackdrop', [
   styleUrl: './sales.component.scss',
 })
 export class SalesComponent implements OnInit, OnDestroy {
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
-
   // Signal state for Sidebar
   isCartOpen = signal(true);
 
@@ -202,9 +200,8 @@ export class SalesComponent implements OnInit, OnDestroy {
     this.toggleCartSidebar();
   }
 
-  onSearch(event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
-    this.searchSubject.next(val);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   onBarcodeEnter(event: Event): void {

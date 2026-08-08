@@ -127,8 +127,8 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  onSearch(event: Event): void {
-    this.searchSubject.next((event.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   } /** Fresh fetch (refresh button, retry, after upload) using the active search term. */
   loadResources(): void {
     this.refreshSubject.next();

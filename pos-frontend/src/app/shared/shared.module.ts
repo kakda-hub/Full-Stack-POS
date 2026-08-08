@@ -20,6 +20,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { UiAvatarComponent } from './components/ui-avatar/ui-avatar.component';
 import { AvatarUploadComponent } from './components/avatar-upload/avatar-upload.component';
 import { ImageUploadAvatarComponent } from './components/image-upload-avatar/image-upload-avatar.component';
+import { SearchInputComponent } from './components/search-input/search-input.component';
 import { AppIconComponent } from './components/app-icon/app-icon.component';
 import { SortHeaderComponent } from './components/sort-header/sort-header.component';
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
@@ -32,6 +33,7 @@ const components = [
     ConfirmDialogComponent,
     AvatarUploadComponent,
     ImageUploadAvatarComponent,
+    SearchInputComponent,
     AlertComponent,
     AlertHostComponent,
     LoaderComponent,

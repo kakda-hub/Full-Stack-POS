@@ -234,8 +234,8 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     { key: 'month', labelKey: 'salesHistory.month' },
   ];
 
-  onSearch(event: Event): void {
-    this.searchSubject.next((event.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   clearSearch(): void {

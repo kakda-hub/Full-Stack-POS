@@ -2,29 +2,21 @@
   <!-- Header -->
   <div class="header-row">
     <app-breadcrumb></app-breadcrumb>
-    <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="openDialog()">
-      <span>{{ 'button.addNew' | translate }}</span>
-    </app-ui-button>
-  </div>
 
-  <!-- Filters -->
-  <div class="filters-bar">
-    <div class="search-wrapper">
-      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        [attr.aria-label]="'common.search' | translate"
-        type="text"
-        (input)="onSearch($event)"
-        [placeholder]="'categories.search' | translate"
-        class="search-input"
-      />
+    <div class="flex items-center gap-4">
+      <!-- Filters -->
+      <div class="filters-bar">
+        <app-search-input
+          class="flex-1 min-w-48"
+          placeholder="categories.search"
+          (search)="onSearch($event)"
+        ></app-search-input>
+      </div>
+
+      <!-- Add new button -->
+      <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="openDialog()">
+        <span>{{ 'button.addNew' | translate }}</span>
+      </app-ui-button>
     </div>
   </div>
 

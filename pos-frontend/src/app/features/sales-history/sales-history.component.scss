@@ -15,26 +15,6 @@
 }
 
 /* ─── Search input ─── */
-.search-wrapper {
-  @apply relative max-w-md;
-}
-
-.search-icon {
-  @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none;
-}
-
-.search-input {
-  @apply w-full pl-9 pr-8 py-2 rounded-lg border text-sm transition-colors;
-  @apply bg-white border-slate-200 text-slate-700 placeholder-slate-400;
-  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200;
-}
-
-.search-clear-btn {
-  @apply absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-600 transition-colors;
-  @apply hover:bg-slate-100;
-  @apply dark:hover:bg-slate-600;
-}
-
 /* ─── Filter bar ─── */
 .filters-bar {
   @apply flex flex-col sm:flex-row items-start sm:items-center gap-3;

@@ -110,7 +110,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
-  onSearch(e: Event): void { this.searchSubject.next((e.target as HTMLInputElement).value); }
+  onSearch(query: string): void { this.searchSubject.next(query); }
 
   onPageChange(event: PageEvent) {
     this.pageIndex.set(event.pageIndex);
