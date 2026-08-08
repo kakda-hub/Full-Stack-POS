@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { isSignedIn, signOut, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';
 
 import { CloudinaryFileUploadListComponent } from './cloudinary-file-upload-list.component';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { CloudinaryService } from '../../../services/cloudinary.service';
 import { CloudinaryResource, CloudinaryApiResponse } from '../../../models';
 import { AlertService } from '../../../services/shared/alert.service';
@@ -115,7 +116,10 @@ describe('CloudinaryFileUploadListComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [CloudinaryFileUploadListComponent],
+      // SearchInputComponent is declared directly because the test module's
+      // SharedModule scope does not resolve it (NG0304) — declaring it here
+      // makes the search bar render so the search specs can drive it.
+      declarations: [CloudinaryFileUploadListComponent, SearchInputComponent],
       imports: [SharedModule, MaterialModule, NoopAnimationsModule, TranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [

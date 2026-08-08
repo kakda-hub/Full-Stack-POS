@@ -324,6 +324,9 @@ export class ReportsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Full catalog for the near-expiry products section (the POS grid itself
+    // is paginated with server-side infinite scroll).
+    this.productService.loadCatalog();
     this.loadData();
   }
 

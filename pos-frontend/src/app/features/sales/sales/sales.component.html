@@ -55,7 +55,7 @@
     </div>
 
     <!-- Product Grid -->
-    <div class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 py-1">
+    <div class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 py-1" (scroll)="onProductScroll($event)">
       <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
         <div *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8]" class="h-40 sm:h-44 lg:h-52 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-[2rem]"></div>
       </div>
@@ -126,6 +126,13 @@
           </div>
         </button>
       </div>
+
+      <!-- Infinite scroll: loading-more indicator -->
+      @if (productService.loadingMore()) {
+        <div class="flex items-center justify-center gap-3 py-6" [@fadeIn]>
+          <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+        </div>
+      }
     </div>
   </div>
 

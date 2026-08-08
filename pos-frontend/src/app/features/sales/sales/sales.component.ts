@@ -204,14 +204,43 @@ export class SalesComponent implements OnInit, OnDestroy {
     this.searchSubject.next(query);
   }
 
+  /**
+   * Infinite scroll: when the product-grid container nears the bottom, request
+   * the next page. `ProductService.loadMore()` guards against duplicate or
+   * out-of-range requests.
+   */
+  onProductScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    const threshold = 300; // px from the bottom
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
+      this.productService.loadMore();
+    }
+  }
+
   onBarcodeEnter(event: Event): void {
-    const val = (event.target as HTMLInputElement).value.trim();
+    const input = event.target as HTMLInputElement;
+    const val = input.value.trim();
     const product = this.productService.findByBarcode(val);
     if (product) {
       this.addToCart(product);
-      (event.target as HTMLInputElement).value = '';
+      input.value = '';
       this.productService.setSearch('');
+      return;
     }
+    // Product is not in the loaded pages (grid is paginated) — fall back to a
+    // targeted server lookup so scanning still works for the full catalog.
+    this.productService.findByBarcodeFromServer(val).subscribe({
+      next: (found) => {
+        if (found) {
+          this.addToCart(found);
+          input.value = '';
+          this.productService.setSearch('');
+        }
+      },
+      error: (err) => {
+        console.error('Barcode lookup failed', val, err);
+      },
+    });
   }
 
   /** Compute remaining stock after deducting cart quantities */

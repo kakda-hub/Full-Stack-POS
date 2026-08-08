@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
   // ── Computed KPIs ──────────────────────────────────────────────────────
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
   nearExpiryCount = computed(() => this.productService.nearExpiryProducts().length);
-  totalProducts = computed(() => this.productService.products().length);
+  totalProducts = computed(() => this.productService.catalogProducts().length);
 
   // ── Low stock list (mirrors the low-stock drawer styling) ────────────────
   dashboardLowStock = computed(() => this.productService.lowStockProducts().slice(0, 8));
@@ -115,6 +115,9 @@ export class DashboardComponent implements OnInit {
   // ── Data fetching ─────────────────────────────────────────────────────────
   private loadData(): void {
     this.isLoading.set(true);
+
+    // Full catalog for the KPI cards (low-stock / near-expiry / total count).
+    this.productService.loadCatalog();
 
     const today = new Date().toISOString().split('T')[0];
 
