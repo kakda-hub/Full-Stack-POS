@@ -31,8 +31,8 @@ export class CategoriesService extends AbstractRest {
   /**
    * Backend uses @Patch, so override update to use PATCH instead of PUT
    */
-  override update(id: number, body: any): Observable<DataResponse> {
-    return this.http.patch<DataResponse>(`${this.getUrl()}/${id}`, body);
+  override update(id: number, body: any, options?: IRequestOptions): Observable<DataResponse> {
+    return this.patch(id, body, options);
   }
 
 }

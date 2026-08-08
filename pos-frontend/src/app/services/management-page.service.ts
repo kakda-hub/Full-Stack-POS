@@ -4,7 +4,7 @@ import { ApiEndpointEnum } from '../enums/api-endpoint-enum';
 import { DataResponse } from '../models/data-response';
 import { ManagementPage } from '../models';
 import { DynamicHttp } from './shared/dynamic-http.service';
-import { AbstractRest } from './shared/abstract-rest.service';
+import { AbstractRest, IRequestOptions } from './shared/abstract-rest.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class ManagementPageService extends AbstractRest {
     return ApiEndpointEnum.MANAGEMENT;
   }
 
-  override update(id: number, body: any): Observable<DataResponse> {
-    return this.http.patch<DataResponse>(`${this.getUrl()}/${id}`, body);
+  override update(id: number, body: any, options?: IRequestOptions): Observable<DataResponse> {
+    return this.patch(id, body, options);
   }
 }

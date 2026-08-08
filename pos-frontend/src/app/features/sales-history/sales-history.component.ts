@@ -5,39 +5,8 @@ import { ThemeService } from '../../services/shared/theme.service';
 import { SaleService } from '../../services/sale.service';
 import { nextSort, SortDirection } from '../../shared/helpers/sort.helper';
 import { ListQuery } from '../../models/list-query';
+import { SaleDetail, SaleDisplay } from '../../models/sales-history.model';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-
-interface SaleItemDisplay {
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  lineTotal: number;
-}
-
-interface SaleDetail {
-  id: number;
-  date: Date;
-  cashierName: string;
-  paymentMethod: string;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-  items: SaleItemDisplay[];
-}
-
-interface SaleDisplay {
-  id: number;
-  date: Date;
-  cashierName: string;
-  itemsCount: number;
-  itemsList: string;
-  paymentMethod: string;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-}
 
 @Component({
   selector: 'app-sales-history',

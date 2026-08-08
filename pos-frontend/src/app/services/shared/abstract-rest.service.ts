@@ -58,6 +58,14 @@ export abstract class AbstractRest {
     );
   }
 
+  public patch(id: number, body: any, options?: IRequestOptions): Observable<DataResponse> {
+    return this.httpCore.patch<DataResponse>(
+      `${this.url}/${id}`,
+      body,
+      this.mapBaseHeaders(options)
+    );
+  }
+
   public delete(id: number, options?: IRequestOptions): Observable<DataResponse> {
     return this.httpCore.delete<DataResponse>(
       `${this.url}/${id}`,
