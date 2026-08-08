@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { CategoriesService } from '../../../core/services/api/categories.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { CategoriesService } from '../../../services/categories.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
-import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 
 @Component({
   selector: 'app-category-detail',

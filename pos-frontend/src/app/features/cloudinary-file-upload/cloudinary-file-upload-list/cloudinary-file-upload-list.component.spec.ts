@@ -11,10 +11,10 @@ import {
   CloudinaryService,
   CloudinaryResource,
   CloudinaryApiResponse,
-} from '../../../core/services/api/cloudinary.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+} from '../../../services/cloudinary.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
 

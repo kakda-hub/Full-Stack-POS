@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { AlertService } from '../../../core/services/alert.service';
+import { AlertService } from '../../../services/shared/alert.service';
 
 @Component({
   selector: 'app-alert-host',

@@ -1,12 +1,12 @@
 import { Component, signal, computed, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
-import { LanguageService, AppLanguage } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { NavStateService, NavItem } from '../../core/services/nav-state.service';
-import { PendingCountService } from '../../core/services/pending-count.service';
-import { AlertService } from '../../core/services/alert.service';
+import { AuthService } from '../../services/shared/auth.service';
+import { LanguageService, AppLanguage } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { NavStateService, NavItem } from '../../services/shared/nav-state.service';
+import { PendingCountService } from '../../services/shared/pending-count.service';
+import { AlertService } from '../../services/shared/alert.service';
 import { fadeIn, themeRotate } from '../../shared/animations/animations';
 
 @Component({

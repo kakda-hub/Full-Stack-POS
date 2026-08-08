@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
 import { signIn } from '../cloudinary-session';
 
 @Component({

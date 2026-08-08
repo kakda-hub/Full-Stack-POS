@@ -7,12 +7,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ProductListComponent } from './product-list.component';
-import { ProductService as CoreProductService } from '../../../core/services/product.service';
-import { ProductService as ApiProductService } from '../../../core/services/api/product.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { ProductService as CoreProductService } from '../../../services/shared/product.service';
+import { ProductService as ApiProductService } from '../../../services/product.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { MaterialModule } from '../../../core/material/material.module';
 
 describe('ProductListComponent — skeleton/table swap on category select', () => {

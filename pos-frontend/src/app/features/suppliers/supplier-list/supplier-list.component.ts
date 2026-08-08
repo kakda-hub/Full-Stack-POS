@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { SupplierService } from '../../../core/services/api/supplier.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { SupplierService } from '../../../services/supplier.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '../../../shared/components/dynamic-table/dynamic-table.component';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { SupplierDetailComponent } from '../supplier-detail/supplier-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { buildListParams } from '../../../core/services/api/list-params';
+import { buildListParams } from '../../../services/list-params';
 
 @Component({
   selector: 'app-supplier-list',

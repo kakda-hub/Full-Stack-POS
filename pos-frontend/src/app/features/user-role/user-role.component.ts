@@ -1,8 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { AlertService } from '../../core/services/alert.service';
-import { UserService } from '../../core/services/api/user.service';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { AlertService } from '../../services/shared/alert.service';
+import { UserService } from '../../services/user.service';
 
 interface UserRoleItem {
   id: number;

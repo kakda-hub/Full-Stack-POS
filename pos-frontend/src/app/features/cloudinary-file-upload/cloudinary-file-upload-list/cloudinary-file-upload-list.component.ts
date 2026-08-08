@@ -25,12 +25,12 @@ import {
   CloudinaryService,
   CloudinaryResource,
   CloudinaryApiResponse,
-} from '../../../core/services/api/cloudinary.service';
+} from '../../../services/cloudinary.service';
 import { signOut, currentSession, CLOUDINARY_SIGN_IN_ROUTE } from '../cloudinary-session';
-import { AlertService } from '../../../core/services/alert.service';
+import { AlertService } from '../../../services/shared/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { ListQuery } from '../../../models/list-query';
 

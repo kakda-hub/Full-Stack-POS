@@ -4,12 +4,12 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SharedModule } from '../../shared/shared.module';
 import { CashierLayoutComponent } from './cashier-layout.component';
-import { AuthService } from '../../core/services/auth.service';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { CartService } from '../../core/services/cart.service';
-import { NavStateService, NavItem } from '../../core/services/nav-state.service';
-import { AlertService } from '../../core/services/alert.service';
+import { AuthService } from '../../services/shared/auth.service';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { CartService } from '../../services/shared/cart.service';
+import { NavStateService, NavItem } from '../../services/shared/nav-state.service';
+import { AlertService } from '../../services/shared/alert.service';
 import { User } from '../../models';
 
 describe('CashierLayoutComponent — header brand badge', () => {

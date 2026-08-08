@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LanguageService } from '../../../core/services/language.service';
+import { LanguageService } from '../../../services/shared/language.service';
 
 @Component({
   selector: 'app-reset-password',

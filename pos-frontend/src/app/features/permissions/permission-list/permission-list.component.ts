@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LanguageService } from '../../../core/services/language.service';
+import { LanguageService } from '../../../services/shared/language.service';
 import { fadeIn } from '../../../shared/animations/animations';
 
 @Component({

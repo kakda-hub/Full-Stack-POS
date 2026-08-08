@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { QuickPickService } from '../../../core/services/api/quick-pick.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { QuickPickService } from '../../../services/quick-pick.service';
 import { QuickPickItem } from '../../../models';
-import { ThemeService } from '../../../core/services/theme.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { QuickPickDetailComponent } from '../quick-pick-detail/quick-pick-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { backdropAnimation, fadeIn, modalAnimation } from '../../shared/animations/animations';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { SaleService } from '../../core/services/api/sale.service';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { SaleService } from '../../services/sale.service';
 import { nextSort, SortDirection } from '../../shared/helpers/sort.helper';
 import { ListQuery } from '../../models/list-query';
 import { Subject, debounceTime, takeUntil } from 'rxjs';

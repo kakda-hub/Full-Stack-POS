@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { Subject, debounceTime, forkJoin, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { UserService } from '../../../core/services/api/user.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { UserService } from '../../../services/user.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { UserDetailDialogComponent } from '../../../shared/user-detail-dialog/user-detail-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { buildListParams } from '../../../core/services/api/list-params';
+import { buildListParams } from '../../../services/list-params';
 
 @Component({
   selector: 'app-user-management-list',

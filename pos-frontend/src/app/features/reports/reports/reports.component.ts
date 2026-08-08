@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import { fadeIn, listAnimation } from '../../../shared/animations/animations';
-import { LanguageService } from '../../../core/services/language.service';
-import { ProductService } from '../../../core/services/product.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ProductService } from '../../../services/shared/product.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import {
   ReportService,
   ReportSummary,
@@ -10,8 +10,8 @@ import {
   DailyRevenueEntry,
   TopProductEntry,
   SalesByCashierEntry,
-} from '../../../core/services/api/report.service';
-import { SaleService } from '../../../core/services/api/sale.service';
+} from '../../../services/report.service';
+import { SaleService } from '../../../services/sale.service';
 import {
   ApexChart,
   ApexXAxis,

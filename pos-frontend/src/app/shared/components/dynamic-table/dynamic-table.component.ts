@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { fadeIn, listAnimation } from '../../animations/animations';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
 
 /** Column definition for DynamicTableComponent */
 export interface TableColumn {

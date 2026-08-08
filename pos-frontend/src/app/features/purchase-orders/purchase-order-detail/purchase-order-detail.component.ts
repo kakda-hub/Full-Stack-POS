@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { PurchaseOrderService } from '../../../core/services/api/purchase-order.service';
-import { SupplierService } from '../../../core/services/api/supplier.service';
-import { ProductService } from '../../../core/services/api/product.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { PurchaseOrderService } from '../../../services/purchase-order.service';
+import { SupplierService } from '../../../services/supplier.service';
+import { ProductService } from '../../../services/product.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({

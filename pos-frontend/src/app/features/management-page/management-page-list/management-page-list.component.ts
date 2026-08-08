@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRe
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { ManagementPage, ManagementPageService } from '../../../core/services/api/management-page.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { ManagementPage, ManagementPageService } from '../../../services/management-page.service';
 import { ManagementPageDetailComponent } from '../management-page-detail/management-page-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 

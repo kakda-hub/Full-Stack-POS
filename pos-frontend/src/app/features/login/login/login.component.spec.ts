@@ -6,9 +6,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { SharedModule } from '../../../shared/shared.module';
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../../core/services/auth.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../services/shared/auth.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { User } from '../../../models';
 
 describe('LoginComponent — brand panel', () => {

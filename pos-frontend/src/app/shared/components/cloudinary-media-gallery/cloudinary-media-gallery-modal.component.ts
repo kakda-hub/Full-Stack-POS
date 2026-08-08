@@ -3,9 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {
   CloudinaryService,
   CloudinaryResource,
-} from '../../../core/services/api/cloudinary.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+} from '../../../services/cloudinary.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { modalAnimation } from '../../../shared/animations/animations';
 
 export interface MediaGalleryData {

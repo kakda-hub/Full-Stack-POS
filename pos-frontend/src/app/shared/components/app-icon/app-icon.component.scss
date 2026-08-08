@@ -1,5 +1,6 @@
-/* The icon renders a stroke-based SVG; sizing/colors are applied via the
-   `svgClass` input (Tailwind utilities).
+/* The icon is painted as a CSS mask over a currentColor background, so it
+   inherits every color utility (text-*, dark:*, hover states) exactly like
+   the previous inline SVG did - only the shape comes from the asset file.
 
    display:inline-flex makes the host element *transformable* so animations
    bound on <app-icon> (e.g. the layout's @themeRotate spin-in) render even
@@ -11,16 +12,17 @@
   justify-content: center;
 }
 
-/* ── Interaction rule the cashier layout previously expressed via a scoped
-      class on the raw <svg> (which view encapsulation keeps from reaching
-      this inner svg). Preserved here with a :host-context equivalent.
-      Note: the language-pill chevron rotation is NOT here — it is bound as
-      [class.rotate-180] on the host in the layout templates so it only
-      affects the chevron, not other icons inside open dropdowns. ── */
+.app-icon-mask {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask: var(--app-icon-mask, none);
+  mask: var(--app-icon-mask, none);
+}
 
 /* Cashier breadcrumb separators hide on small screens */
 @media (max-width: 639px) {
-  :host-context(.breadcrumbs) svg {
+  :host-context(.breadcrumbs) .app-icon-mask {
     display: none;
   }
 }

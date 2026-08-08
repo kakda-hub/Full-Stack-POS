@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ThemeService } from '../../core/services/theme.service';
+import { ThemeService } from '../../services/shared/theme.service';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 

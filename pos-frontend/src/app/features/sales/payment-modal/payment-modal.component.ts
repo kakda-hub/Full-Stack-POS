@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, OnDestroy, Output, signal, untracked } from '@angular/core';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';
 import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { CustomerService } from '../../../core/services/api/customer.service';
-import { KhqrService } from '../../../core/services/api/khqr.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { CustomerService } from '../../../services/customer.service';
+import { KhqrService } from '../../../services/khqr.service';
 import { Customer } from '../../../models';
 import { CartItem } from '../../../models/cart-item.model';
 import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';

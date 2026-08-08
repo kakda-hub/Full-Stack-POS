@@ -4,8 +4,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 
 import { CloudinarySignInComponent } from './cloudinary-sign-in.component';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
 import { isSignedIn, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';

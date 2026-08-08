@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { ThemeService } from '../../../core/services/theme.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 
 export type SkeletonVariant =
   | 'text'

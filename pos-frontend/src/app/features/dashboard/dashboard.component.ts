@@ -10,16 +10,16 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { fadeIn } from '../../shared/animations/animations';
 import { Product } from '../../models';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ProductService } from '../../core/services/product.service';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { AuthService } from '../../services/shared/auth.service';
+import { ProductService } from '../../services/shared/product.service';
 import {
   ReportService,
   ReportSummary,
   TopProductEntry,
-} from '../../core/services/api/report.service';
-import { SaleService } from '../../core/services/api/sale.service';
+} from '../../services/report.service';
+import { SaleService } from '../../services/sale.service';
 
 interface SaleItem {
   id: number;

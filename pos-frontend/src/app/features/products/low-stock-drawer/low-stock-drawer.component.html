@@ -39,7 +39,7 @@
         [class.low-stock-item--out]="item.stock === 0"
       >
         <div class="low-stock-item-img-wrap">
-          <img [src]="item.imgUrl || 'assets/images/placeholder.svg'" alt="{{ item.name }}" class="low-stock-item-img" appImgFallback />
+          <img [src]="item.imgUrl || 'assets/icons/placeholder.svg'" alt="{{ item.name }}" class="low-stock-item-img" appImgFallback />
         </div>
         <div class="low-stock-item-info">
           <h4 class="low-stock-item-name">{{ item.name }}</h4>
