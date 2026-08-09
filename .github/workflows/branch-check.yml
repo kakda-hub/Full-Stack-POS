@@ -1,0 +1,25 @@
+name: Prevent Direct Main Pushes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  block-main-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject Direct Push (allow automated merge only)
+        env:
+          COMMIT_AUTHORS: ${{ join(github.event.commits.*.author.name, ',') }}
+        run: |
+          # The automated master -> main merge workflow
+          # (.github/workflows/merge-master-to-main.yml) pushes commits authored
+          # by "github-actions[bot]" and is the sanctioned way to update main.
+          # Direct human pushes to main remain forbidden.
+          if [[ "$COMMIT_AUTHORS" == *"github-actions[bot]"* ]]; then
+            echo "Automated master -> main merge detected; allowed."
+            exit 0
+          fi
+          echo "Error: Direct pushes to 'main' are disabled. All changes must be made on 'master' or feature branches and submitted via Pull Request."
+          exit 1
