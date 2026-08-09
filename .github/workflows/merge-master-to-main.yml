@@ -1,0 +1,47 @@
+name: Merge master into main
+
+# Runs the sanctioned master -> main merge workflow
+# (scripts/merge-master-to-main.ps1), which keeps master-only paths
+# (seed-products.sql, run-sql-seed.js, reset-migration.js, test/, src/database/)
+# at main's own version while merging all other application changes normally.
+
+on:
+  # Merge as soon as master receives new commits.
+  push:
+    branches:
+      - master
+  # Daily safety-net sync (UTC) in case master changed via means other than a
+  # push to the branch (e.g. PR merges on GitHub). Scheduled runs use the
+  # workflow file from the default branch.
+  schedule:
+    - cron: '0 6 * * *'
+  # Allow triggering manually from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never run two merges at once (e.g. schedule overlapping a push event).
+concurrency:
+  group: merge-master-to-main
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          # The merge script compares and merges branch tips, so it needs all
+          # history and all remote branches (not a shallow single-branch clone).
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge master into main (protects master-only paths)
+        run: powershell -ExecutionPolicy Bypass -File ./scripts/merge-master-to-main.ps1
