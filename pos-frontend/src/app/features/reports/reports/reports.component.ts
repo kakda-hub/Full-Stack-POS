@@ -63,7 +63,21 @@ export class ReportsComponent implements OnInit {
   dailyRevenue = signal<DailyRevenueEntry[]>([]);
   topProducts = signal<TopProductEntry[]>([]);
   salesByCashier = signal<SalesByCashierEntry[]>([]);
-  sales = signal<SaleItem[]>([]);
+
+  // Recent-transactions history (server-side paginated)
+  sales = signal<SaleItem[]>([]); // desktop table: current page
+  mobileSales = signal<SaleItem[]>([]); // mobile cards: appended via infinite scroll
+  /** Newest page (page 1) snapshot for the "Recent Transactions" widget —
+   * stays on the newest transactions even when the history table is paged. */
+  recentSales = signal<SaleItem[]>([]);
+  salesTotal = signal(0);
+  salesPage = signal(1);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+  /** Stale-response guard for the paginated sales fetches. */
+  private salesSeq = 0;
+  /** Rows per page for the history section (matches the old slice(0, 20)). */
+  readonly salesPageSize = 20;
 
   // Computed date range strings
   dateRange = computed(() => {
@@ -371,16 +385,98 @@ export class ReportsComponent implements OnInit {
       error: () => this.salesByCashier.set([]),
     });
 
-    this.saleService.getAllSales().subscribe({
+    // Recent transactions — server-side paginated: the desktop table shows the
+    // current page, the mobile cards append pages via infinite scroll.
+    this.fetchSalesPage(1, false);
+  }
+
+  /**
+   * Fetches one server-side page of transactions for the history section.
+   *
+   * `append = false` (initial load, date-range change, desktop pagination)
+   * replaces the list. `append = true` (mobile infinite scroll) fetches the
+   * next page at the current appended length and merges it into `mobileSales`.
+   */
+  private fetchSalesPage(page: number, append: boolean): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
+    const seq = ++this.salesSeq;
+    const { from, to } = this.dateRange();
+    const offset = append
+      ? this.mobileSales().length
+      : (page - 1) * this.salesPageSize;
+
+    this.saleService.getSalesPage({
+      sortBy: 'createdAt',
+      sort: 'desc',
+      offset,
+      max: this.salesPageSize,
+      dateFrom: from,
+      dateTo: to,
+    }).subscribe({
       next: (res) => {
-        this.sales.set(Array.isArray(res) ? res : []);
+        if (seq !== this.salesSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
+        const pageData = res.data as SaleItem[];
+
+        if (append) {
+          this.mobileSales.update(list => {
+            const seen = new Set(list.map(s => s.id));
+            return [...list, ...pageData.filter((s: any) => !seen.has(s.id))];
+          });
+          this.hasMore.set(res.data.length > 0 && this.mobileSales().length < res.total);
+          this.isLoadingMore.set(false);
+          return;
+        }
+
+        this.sales.set(pageData);
+        this.mobileSales.set(pageData);
+        this.salesTotal.set(res.total);
+        this.salesPage.set(page);
+        this.hasMore.set(res.data.length > 0 && res.data.length < res.total);
+        // Keep the "Recent Transactions" widget on the newest page even after
+        // the history table is paged (page 1 snapshot).
+        if (page === 1) {
+          this.recentSales.set(pageData);
+        }
         this.isLoading.set(false);
       },
       error: () => {
+        if (seq !== this.salesSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+          return;
+        }
         this.sales.set([]);
+        this.mobileSales.set([]);
+        this.recentSales.set([]);
+        this.salesTotal.set(0);
+        this.hasMore.set(false);
         this.isLoading.set(false);
       },
     });
+  }
+
+  /** Mobile infinite scroll: append the next page of transactions. */
+  loadMoreSales(): void {
+    this.fetchSalesPage(this.salesPage(), true);
+  }
+
+  /** Desktop history pagination (page is 1-based). */
+  onSalesPageChange(page: number): void {
+    this.fetchSalesPage(page, false);
   }
 
   getDaysUntilExpiry(expiryDate: string): number {

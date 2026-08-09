@@ -4,8 +4,6 @@ import {
   EventEmitter,
   Input,
   Output,
-  signal,
-  computed,
 } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { fadeIn, listAnimation } from '../../animations/animations';
@@ -62,6 +60,25 @@ export class DynamicTableComponent {
   /** Available page-size options */
   @Input() pageSizeOptions: number[] = [5, 10, 25, 100];
 
+  /**
+   * Mobile-only infinite scroll. When enabled, the mobile card layout appends
+   * pages via the `loadMore` output instead of the paginator (which is hidden
+   * on mobile). The desktop table keeps its server-side pagination untouched.
+   */
+  @Input() infiniteScrollOnMobile = false;
+
+  /**
+   * Appended rows rendered by the mobile card layout (infinite scroll mode).
+   * Falls back to `rows` when not provided, so existing consumers are unchanged.
+   */
+  @Input() mobileRows: any[] | null = null;
+
+  /** Whether more pages exist (drives when `loadMore` may fire). */
+  @Input() hasMore = true;
+
+  /** Whether the next page is currently being fetched (shows a spinner). */
+  @Input() isLoadingMore = false;
+
   /** Emitted when the user clicks the Edit button for a row */
   @Output() onEdit = new EventEmitter<any>();
 
@@ -71,6 +88,9 @@ export class DynamicTableComponent {
   /** Emitted when the paginator page changes */
   @Output() pageChange = new EventEmitter<PageEvent>();
 
+  /** Emitted when the mobile cards are scrolled near the bottom (infinite scroll). */
+  @Output() loadMore = new EventEmitter<void>();
+
   /** Skeleton row placeholders */
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
@@ -78,6 +98,14 @@ export class DynamicTableComponent {
     public theme: ThemeService,
     public lang: LanguageService,
   ) {}
+
+  /**
+   * Rows shown by the mobile card layout. In infinite-scroll mode the parent
+   * passes the appended list via `mobileRows`; otherwise the current page.
+   */
+  get mobileCardRows(): any[] {
+    return this.infiniteScrollOnMobile && this.mobileRows ? this.mobileRows : this.rows;
+  }
 
   rowNumber(index: number): number {
     return this.pageIndex * this.pageSize + index + 1;

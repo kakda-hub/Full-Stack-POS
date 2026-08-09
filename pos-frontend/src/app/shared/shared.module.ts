@@ -24,6 +24,7 @@ import { SearchInputComponent } from './components/search-input/search-input.com
 import { AppIconComponent } from './components/app-icon/app-icon.component';
 import { SortHeaderComponent } from './components/sort-header/sort-header.component';
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
+import { InfiniteScrollDirective } from './directives/infinite-scroll.directive';
 
 const components = [ 
     UiAvatarComponent,
@@ -58,6 +59,7 @@ const components = [
     MatDialogModule,
     MatPaginatorModule,
     ImgFallbackDirective,
+    InfiniteScrollDirective,
   ],
   exports: [
     CommonModule,
@@ -67,6 +69,7 @@ const components = [
     RouterModule,
     ...components,
     ImgFallbackDirective,
+    InfiniteScrollDirective,
   ],
 })
 export class SharedModule { }

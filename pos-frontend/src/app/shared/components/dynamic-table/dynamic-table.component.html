@@ -49,6 +49,10 @@
 ───────────────────────────────────────── -->
 <div
   *ngIf="!isLoading"
+  [appInfiniteScroll]="infiniteScrollOnMobile"
+  [appInfiniteScrollHasMore]="hasMore"
+  [appInfiniteScrollLoading]="isLoadingMore"
+  (appInfiniteScrollLoad)="loadMore.emit()"
   class="rounded-2xl border overflow-hidden shadow-sm"
   [class.bg-white]="!theme.isDark()"
   [class.border-slate-200]="!theme.isDark()"
@@ -267,7 +271,7 @@
   <!-- ===== MOBILE: Card Layout ===== -->
   <div class="dt-cards">
     <div
-      *ngFor="let row of rows; let i = index; trackBy: trackById"
+      *ngFor="let row of mobileCardRows; let i = index; trackBy: trackById"
       @fadeIn
       class="dt-card"
       [class.dt-card--dark]="theme.isDark()"
@@ -350,7 +354,7 @@
     </div>
 
     <!-- Empty state (mobile) -->
-    <div *ngIf="rows.length === 0" class="dt-cards-empty">
+    <div *ngIf="mobileCardRows.length === 0" class="dt-cards-empty">
       <svg
         class="w-16 h-16 mx-auto mb-3 opacity-30"
         [class.text-slate-400]="!theme.isDark()"
@@ -368,15 +372,37 @@
         {{ 'common.noData' | translate }}
       </p>
     </div>
+
+    <!-- Infinite scroll: loading-more indicator (mobile only) -->
+    @if (infiniteScrollOnMobile && isLoadingMore) {
+      <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+        <span
+          class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"
+        ></span>
+      </div>
+    }
+
+    <!-- End of list (mobile only) -->
+    @if (infiniteScrollOnMobile && !hasMore && mobileCardRows.length > 0) {
+      <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+        <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+        <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+          {{ 'common.endOfList' | translate }}
+        </span>
+        <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+      </div>
+    }
   </div>
 
-  <!-- Paginator -->
-  <app-pagination
-    [totalItems]="totalCount"
-    [pageSize]="pageSize"
-    [currentPage]="pageIndex + 1"
-    [pageSizeOptions]="pageSizeOptions"
-    (pageChange)="onPageChange($event)"
-    (pageSizeChange)="onPageSizeChange($event)"
-  ></app-pagination>
+  <!-- Paginator (hidden on mobile when infinite scroll replaces it) -->
+  <div [ngClass]="infiniteScrollOnMobile ? 'hidden md:block' : ''">
+    <app-pagination
+      [totalItems]="totalCount"
+      [pageSize]="pageSize"
+      [currentPage]="pageIndex + 1"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
+  </div>
 </div>

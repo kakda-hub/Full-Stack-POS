@@ -148,9 +148,15 @@
       ></app-pagination>
     </div>
 
-    <!-- ===== MOBILE: Cards ===== -->
-    <div class="pl-mobile-cards">
-      <div *ngFor="let item of items(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
+    <!-- ===== MOBILE: Cards (infinite scroll) ===== -->
+    <div
+      class="pl-mobile-cards"
+      [appInfiniteScroll]="true"
+      [appInfiniteScrollHasMore]="hasMore()"
+      [appInfiniteScrollLoading]="isLoadingMore()"
+      (appInfiniteScrollLoad)="loadMoreItems()"
+    >
+      <div *ngFor="let item of mobileItems(); index as i; trackBy: trackById" @fadeIn class="pl-card" [class.pl-card--dark]="theme.isDark()">
         <div class="pl-card-header">
           <div class="flex items-center gap-3">
             <app-ui-avatar
@@ -194,7 +200,25 @@
           </button>
         </div>
       </div>
-      <div *ngIf="items().length === 0" class="pl-cards-empty">
+      <!-- Infinite scroll: loading-more indicator -->
+      @if (isLoadingMore()) {
+        <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+          <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+        </div>
+      }
+
+      <!-- End of list -->
+      @if (!hasMore() && mobileItems().length > 0) {
+        <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+            {{ 'common.endOfList' | translate }}
+          </span>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+        </div>
+      }
+
+      <div *ngIf="mobileItems().length === 0" class="pl-cards-empty">
         <p class="text-sm font-medium text-slate-400">
           {{ 'users.empty' | translate }}
         </p>

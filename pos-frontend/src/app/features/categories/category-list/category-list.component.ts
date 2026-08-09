@@ -30,6 +30,11 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   pageIndex = signal(0);
   searchQuery = signal('');
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileCategories = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   /** Monotonic token that invalidates in-flight requests (stale-response guard). */
   private loadSeq = 0;
 
@@ -71,21 +76,52 @@ export class CategoryListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadCategories() {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, delete, save) replaces the
+   * list. `append = true` (mobile infinite scroll) fetches the next page at
+   * the current appended length and merges it into `mobileCategories`.
+   */
+  loadCategories(append = false) {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileCategories().length
+      : this.pageIndex() * this.pageSize();
     const params = buildListParams({
       search: this.searchQuery() || undefined,
       sortBy: 'name',
       sort: 'asc',
-      offset: this.pageIndex() * this.pageSize(),
+      offset,
       max: this.pageSize(),
     });
     this.categoriesService.list({ params }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          this.mobileCategories.update(list => {
+            const seen = new Set(list.map((c: any) => c.id));
+            return [...list, ...data.filter((c: any) => !seen.has(c.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobileCategories().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
         // After a delete, the current page may be empty — step back one page.
         if (data.length === 0 && this.pageIndex() > 0) {
           this.pageIndex.update(p => p - 1);
@@ -93,19 +129,37 @@ export class CategoryListComponent implements OnInit, OnDestroy {
           return;
         }
         this.categories.set(data);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobileCategories.set(data);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load categories', err);
-        this.categories.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.categories.set([]);
+          this.mobileCategories.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of categories. */
+  loadMoreCategories(): void {
+    this.loadCategories(true);
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }

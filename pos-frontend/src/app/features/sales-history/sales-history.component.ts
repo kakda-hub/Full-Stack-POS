@@ -25,6 +25,11 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   currentPage = signal(1);
   pageSize = 15;
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileSales = signal<SaleDisplay[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   // Sorting (fields must be in the backend sort allowlist: createdAt, total, ...)
   sortBy = signal('createdAt');
   sortDir = signal<SortDirection>('desc');
@@ -81,31 +86,62 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   }
 
   /** Standard offset-based list query: max/offset/sort/sortBy/search/date range. */
-  private buildQuery(): ListQuery {
+  private buildQuery(offset: number): ListQuery {
     return {
       search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
-      offset: (this.currentPage() - 1) * this.pageSize,
+      offset,
       max: this.pageSize,
       dateFrom: this.dateFrom() || undefined,
       dateTo: this.dateTo() || undefined,
     };
   }
 
-  /** Fetches one server-side page and keeps the raw rows for the detail modal. */
-  private fetchPage(): void {
-    this.isLoading.set(true);
+  /**
+   * Fetches one server-side page and keeps the raw rows for the detail modal.
+   *
+   * `append = false` (desktop pagination, search, sort, filters) replaces the
+   * list. `append = true` (mobile infinite scroll) fetches the next page at
+   * the current appended length and merges it into `mobileSales`.
+   */
+  private fetchPage(append = false): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileSales().length
+      : (this.currentPage() - 1) * this.pageSize;
 
-    this.saleService.getSalesPage(this.buildQuery()).subscribe({
+    this.saleService.getSalesPage(this.buildQuery(offset)).subscribe({
       next: (res) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          const page = data.map((sale: any) => this.mapSale(sale));
+          this.mobileSales.update(list => {
+            const seen = new Set(list.map(s => s.id));
+            return [...list, ...page.filter(s => !seen.has(s.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobileSales().length < total);
+          this.isLoadingMore.set(false);
+          return;
+        }
+
         // After a delete (or concurrent data shrink) the current page may be
         // empty while more records exist — step back one page.
-        if (data.length === 0 && this.currentPage() > 1 && (res?.total ?? 0) > 0) {
+        if (data.length === 0 && this.currentPage() > 1 && total > 0) {
           this.currentPage.update((p) => p - 1);
           this.fetchPage();
           return;
@@ -113,18 +149,36 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
         this._rawSales = data;
         const mapped = data.map((sale: any) => this.mapSale(sale));
         this.sales.set(mapped);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobileSales.set(mapped);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to fetch sales', err);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+          return;
+        }
         this.error.set(this.lang.t('salesHistory.loadFailed'));
         this.sales.set([]);
+        this.mobileSales.set([]);
         this.totalItems.set(0);
+        this.hasMore.set(false);
         this.isLoading.set(false);
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of sales. */
+  loadMoreSales(): void {
+    this.fetchPage(true);
   }
 
   /**

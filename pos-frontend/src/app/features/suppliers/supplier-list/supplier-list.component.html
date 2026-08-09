@@ -18,12 +18,17 @@
   <app-dynamic-table
     [columns]="columns"
     [rows]="suppliers()"
+    [mobileRows]="mobileSuppliers()"
     [totalCount]="totalItems()"
     [pageIndex]="pageIndex()"
     [pageSize]="pageSize()"
     [isLoading]="isLoading()"
+    [infiniteScrollOnMobile]="true"
+    [hasMore]="hasMore()"
+    [isLoadingMore]="isLoadingMore()"
     (onEdit)="openEdit($event)"
     (onDelete)="deleteSupplier($event)"
     (pageChange)="onPageChange($event)"
+    (loadMore)="loadMoreSuppliers()"
   ></app-dynamic-table>
 </div>

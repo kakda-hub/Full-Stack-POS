@@ -33,6 +33,11 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   pageIndex = signal(0);
   searchQuery = signal('');
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobilePurchaseOrders = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   // Server-side sorting (fields must be in the backend sort allowlist)
   sortBy = signal('createdAt');
   sortDir = signal<SortDirection>('desc');
@@ -71,20 +76,50 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadPOs() {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, sort, delete, save) replaces
+   * the list. `append = true` (mobile infinite scroll) fetches the next page
+   * at the current appended length and merges it into `mobilePurchaseOrders`.
+   */
+  loadPOs(append = false) {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
     this.poService.getAll({
       search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
-      offset: this.pageIndex() * this.pageSize(),
+      offset: append
+        ? this.mobilePurchaseOrders().length
+        : this.pageIndex() * this.pageSize(),
       max: this.pageSize(),
     }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          this.mobilePurchaseOrders.update(list => {
+            const seen = new Set(list.map((po: any) => po.id));
+            return [...list, ...data.filter((po: any) => !seen.has(po.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobilePurchaseOrders().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
         // After a delete, the current page may be empty — step back one page.
         if (data.length === 0 && this.pageIndex() > 0) {
           this.pageIndex.update(p => p - 1);
@@ -92,19 +127,37 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
           return;
         }
         this.purchaseOrders.set(data);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobilePurchaseOrders.set(data);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load purchase orders', err);
-        this.purchaseOrders.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.purchaseOrders.set([]);
+          this.mobilePurchaseOrders.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of purchase orders. */
+  loadMorePOs(): void {
+    this.loadPOs(true);
   }
 
   /** Column header click: toggle asc/desc on the active column, else start asc. */

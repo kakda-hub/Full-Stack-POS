@@ -25,13 +25,18 @@
     <app-dynamic-table
       [columns]="columns"
       [rows]="categories()"
+      [mobileRows]="mobileCategories()"
       [totalCount]="totalItems()"
       [pageIndex]="pageIndex()"
       [pageSize]="pageSize()"
       [isLoading]="isLoading()"
+      [infiniteScrollOnMobile]="true"
+      [hasMore]="hasMore()"
+      [isLoadingMore]="isLoadingMore()"
       (onEdit)="openEdit($event)"
       (onDelete)="deleteCategory($event)"
       (pageChange)="onPageChange($event)"
+      (loadMore)="loadMoreCategories()"
     ></app-dynamic-table>
   </div>
 </div>

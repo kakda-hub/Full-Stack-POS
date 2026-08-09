@@ -651,7 +651,8 @@
     "image": "Image",
     "actions": "Actions",
     "noData": "No data found",
-    "required": "is required"
+    "required": "is required",
+    "endOfList": "End of list"
   },
   "button": {
     "addNew": "Add New",

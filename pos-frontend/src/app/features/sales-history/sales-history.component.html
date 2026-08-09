@@ -251,10 +251,16 @@
       </div>
     </div>
 
-    <!-- ===== MOBILE: Sale Cards ===== -->
-    <div class="sh-mobile-cards">
+    <!-- ===== MOBILE: Sale Cards (infinite scroll) ===== -->
+    <div
+      class="sh-mobile-cards"
+      [appInfiniteScroll]="true"
+      [appInfiniteScrollHasMore]="hasMore()"
+      [appInfiniteScrollLoading]="isLoadingMore()"
+      (appInfiniteScrollLoad)="loadMoreSales()"
+    >
       <div
-        *ngFor="let sale of sales(); trackBy: trackById"
+        *ngFor="let sale of mobileSales(); trackBy: trackById"
         @fadeIn
         (click)="openDetail(sale)"
         class="sh-card"
@@ -298,6 +304,17 @@
         </div>
       </div>
 
+      <!-- End of list -->
+      @if (!hasMore() && mobileSales().length > 0) {
+        <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+            {{ 'common.endOfList' | translate }}
+          </span>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+        </div>
+      }
+
       <!-- Empty state (mobile) -->
       <div *ngIf="totalItems() === 0" class="sh-cards-empty">
         <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,8 +326,16 @@
       </div>
     </div>
 
-    <!-- Pagination (shared) -->
-    <div *ngIf="totalItems() > pageSize" class="pagination-bar">
+    <!-- Infinite scroll: loading-more indicator (mobile) -->
+    @if (isLoadingMore()) {
+      <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+        <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+      </div>
+    }
+
+    <!-- Pagination (desktop only — mobile uses infinite scroll) -->
+    <div *ngIf="totalItems() > pageSize" class="hidden md:block">
+    <div class="pagination-bar">
       <span class="pagination-info">
         {{ 'salesHistory.page' | translate }} {{ currentPage() }}/{{ totalPages }}
       </span>
@@ -332,6 +357,7 @@
           {{ 'salesHistory.next' | translate }}
         </button>
       </div>
+    </div>
     </div>
   </div>
 </div>

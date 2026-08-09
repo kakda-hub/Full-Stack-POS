@@ -28,6 +28,11 @@ import { buildListParams } from '../../../services/list-params';
   isLoading = signal(true);
   editingUser: any | null = null;
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileUsers = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   // Stats (computed server-side via role-filtered totals)
   adminCount = signal(0);
   cashierCount = signal(0);
@@ -78,27 +83,40 @@ import { buildListParams } from '../../../services/list-params';
     this.destroy$.complete();
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  private loadUsers(): void {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, delete, save) replaces the list.
+   * `append = true` (mobile infinite scroll) fetches the next page at the
+   * current appended length and merges it into `mobileUsers`.
+   */
+  private loadUsers(append = false): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileUsers().length
+      : (this.currentPage() - 1) * this.pageSize();
     const params = buildListParams({
       sortBy: 'name',
       sort: 'asc',
-      offset: (this.currentPage() - 1) * this.pageSize(),
+      offset,
       max: this.pageSize(),
     });
     this.userService.list({ params }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
-        const raw = res?.data ?? [];
-        // After a delete, the current page may be empty — step back one page.
-        if (raw.length === 0 && this.currentPage() > 1) {
-          this.currentPage.update(p => p - 1);
-          this.loadUsers();
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
           return;
         }
-        const mapped = raw.map((u: any) => ({
+        const raw = res?.data ?? [];
+        const total = res?.total ?? raw.length;
+        const mapUser = (u: any) => ({
           id: String(u.id),
           name: u.name,
           username: u.email?.split('@')[0] || u.name?.toLowerCase().replace(/\s+/g, '.') || '',
@@ -107,22 +125,60 @@ import { buildListParams } from '../../../services/list-params';
           status: u.isActive ? 'active' : 'inactive',
           avatarUrl: u.avatarUrl || '',
           lastLogin: u.lastLogin || u.updatedAt || null,
-        }));
+        });
+
+        if (append) {
+          const page = raw.map(mapUser);
+          this.mobileUsers.update(list => {
+            const seen = new Set(list.map((u: any) => u.id));
+            return [...list, ...page.filter((u: any) => !seen.has(u.id))];
+          });
+          this.hasMore.set(raw.length > 0 && this.mobileUsers().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
+        // After a delete, the current page may be empty — step back one page.
+        if (raw.length === 0 && this.currentPage() > 1) {
+          this.currentPage.update(p => p - 1);
+          this.loadUsers();
+          return;
+        }
+        const mapped = raw.map(mapUser);
         this.users.set(mapped);
-        this.totalItems.set(res?.total ?? raw.length);
+        this.mobileUsers.set(mapped);
+        this.totalItems.set(total);
+        this.hasMore.set(raw.length > 0 && raw.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load users', err);
         this.alertService.error(this.lang.t('users.loadFailed'));
-        this.users.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.users.set([]);
+          this.mobileUsers.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of users. */
+  loadMoreUsers(): void {
+    this.loadUsers(true);
   }
 
   /**
@@ -147,12 +203,17 @@ import { buildListParams } from '../../../services/list-params';
   }
 
   onEdit(id: string) {
-    this.editingUser = this.users().find(u => u.id === id) || null;
+    this.editingUser =
+      this.users().find(u => u.id === id) ||
+      this.mobileUsers().find(u => u.id === id) ||
+      null;
     this.openDialog();
   }
 
   onDelete(id: string) {
-    const user = this.users().find(u => u.id === id);
+    const user =
+      this.users().find(u => u.id === id) ||
+      this.mobileUsers().find(u => u.id === id);
     if (!user) return;
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {

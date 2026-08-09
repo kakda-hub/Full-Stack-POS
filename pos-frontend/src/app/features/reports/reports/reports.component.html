@@ -257,11 +257,11 @@
     <h2 class="font-bold mb-4" [class.text-slate-800]="!theme.isDark()" [class.text-slate-100]="theme.isDark()">
       {{ 'reports.recent' | translate }}
     </h2>
-    <div *ngIf="sales().length === 0" class="text-center py-8 text-slate-400 text-sm">
+    <div *ngIf="recentSales().length === 0" class="text-center py-8 text-slate-400 text-sm">
       {{ 'reports.noTransactionsToday' | translate }}
     </div>
-    <div [@listAnimation]="sales().length" class="space-y-2">
-      <div *ngFor="let txn of sales().slice(0, 8); trackBy: trackById"
+    <div [@listAnimation]="recentSales().length" class="space-y-2">
+      <div *ngFor="let txn of recentSales().slice(0, 8); trackBy: trackById"
         [class.hover:bg-slate-700]="theme.isDark()" [class.hover:bg-slate-50]="!theme.isDark()" class="flex items-center gap-3 p-3 rounded-xl transition-colors">
         <div class="text-lg">{{ getPaymentIcon(txn.paymentMethod) }}</div>
         <div class="flex-1 min-w-0">
@@ -297,7 +297,7 @@
                 </tr>
               </thead>
               <tbody [class.divide-slate-700]="theme.isDark()" [class.divide-slate-50]="!theme.isDark()" class="divide-y">
-                <tr *ngFor="let txn of sales().slice(0, 20); trackBy: trackById"
+                <tr *ngFor="let txn of sales(); trackBy: trackById"
                   [class.hover:bg-slate-700]="theme.isDark()"
                   [class.hover:bg-slate-50]="!theme.isDark()"
                   class="transition-colors">
@@ -323,10 +323,16 @@
           </div>
         </div>
 
-        <!-- MOBILE: Transaction Cards -->
-        <div class="rpt-mobile-cards">
+        <!-- MOBILE: Transaction Cards (infinite scroll) -->
+        <div
+          class="rpt-mobile-cards"
+          [appInfiniteScroll]="true"
+          [appInfiniteScrollHasMore]="hasMore()"
+          [appInfiniteScrollLoading]="isLoadingMore()"
+          (appInfiniteScrollLoad)="loadMoreSales()"
+        >
           <div
-            *ngFor="let txn of sales().slice(0, 20); trackBy: trackById"
+            *ngFor="let txn of mobileSales(); trackBy: trackById"
             @fadeIn
             class="rpt-txn-card"
             [class.rpt-txn-card--dark]="theme.isDark()"
@@ -355,11 +361,40 @@
               <span class="rpt-txn-card-total" [class.text-indigo-400]="theme.isDark()" [class.text-indigo-700]="!theme.isDark()">${{ txn.total.toFixed(2) }}</span>
             </div>
           </div>
-          <div *ngIf="sales().length === 0" class="rpt-cards-empty">
+          <!-- Infinite scroll: loading-more indicator -->
+          @if (isLoadingMore()) {
+            <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+              <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+            </div>
+          }
+
+          <!-- End of list -->
+          @if (!hasMore() && mobileSales().length > 0) {
+            <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+              <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+              <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                {{ 'common.endOfList' | translate }}
+              </span>
+              <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+            </div>
+          }
+
+          <div *ngIf="mobileSales().length === 0" class="rpt-cards-empty">
             <p class="text-sm text-slate-400 text-center py-12">
               {{ 'reports.noTransactionsYet' | translate }}
             </p>
           </div>
+        </div>
+
+        <!-- Pagination (desktop only — mobile uses infinite scroll) -->
+        <div class="hidden md:block border-t" [class.border-slate-700]="theme.isDark()" [class.border-slate-100]="!theme.isDark()">
+          <app-pagination
+            [totalItems]="salesTotal()"
+            [pageSize]="salesPageSize"
+            [pageSizeOptions]="[salesPageSize]"
+            [currentPage]="salesPage()"
+            (pageChange)="onSalesPageChange($event)"
+          ></app-pagination>
         </div>
       </div>
     </div>

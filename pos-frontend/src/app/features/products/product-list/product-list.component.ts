@@ -43,6 +43,11 @@ export class ProductListComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   selectedCategory = signal('all');
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileProducts = signal<Product[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   // Server-side sorting (fields must be in the backend sort allowlist)
   sortBy = signal('name');
   sortDir = signal<SortDirection>('asc');
@@ -111,15 +116,28 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   onSearch(query: string): void { this.searchSubject.next(query); }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadProducts(): void {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, sort, category, delete, save)
+   * replaces the list. `append = true` (mobile infinite scroll) fetches the
+   * next page at the current appended length and merges it into `mobileProducts`.
+   */
+  loadProducts(append = false): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
     const query: any = {
       search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
-      offset: (this.currentPage() - 1) * this.pageSize(),
+      offset: append
+        ? this.mobileProducts().length
+        : (this.currentPage() - 1) * this.pageSize(),
       max: this.pageSize(),
     };
     if (this.selectedCategory() !== 'all') {
@@ -128,30 +146,67 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
     this.apiProductService.getProducts(query).subscribe({
       next: (res) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          const page = data.map((p: any) => this.mapApiProduct(p));
+          this.mobileProducts.update(list => {
+            const seen = new Set(list.map(p => p.id));
+            return [...list, ...page.filter(p => !seen.has(p.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobileProducts().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
         // After a delete, the current page may be empty — step back one page.
         if (data.length === 0 && this.currentPage() > 1) {
           this.currentPage.update(p => p - 1);
           this.loadProducts();
           return;
         }
-        this.products.set(data.map((p: any) => this.mapApiProduct(p)));
-        this.totalItems.set(res?.total ?? data.length);
+        const page = data.map((p: any) => this.mapApiProduct(p));
+        this.products.set(page);
+        this.mobileProducts.set(page);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.hasLoadedOnce.set(true);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load products', err);
-        this.products.set([]);
-        this.totalItems.set(0);
-        this.hasLoadedOnce.set(true);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.products.set([]);
+          this.mobileProducts.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.hasLoadedOnce.set(true);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of products. */
+  loadMoreProducts(): void {
+    this.loadProducts(true);
   }
 
   private mapApiProduct(p: any): Product {

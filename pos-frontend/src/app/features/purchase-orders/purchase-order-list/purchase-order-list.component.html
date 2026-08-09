@@ -170,10 +170,16 @@
       </div>
     </div>
 
-    <!-- ===== MOBILE: Grid View ===== -->
-    <div class="block md:hidden grid grid-cols-1 gap-4">
+    <!-- ===== MOBILE: Grid View (infinite scroll) ===== -->
+    <div
+      class="block md:hidden grid grid-cols-1 gap-4"
+      [appInfiniteScroll]="true"
+      [appInfiniteScrollHasMore]="hasMore()"
+      [appInfiniteScrollLoading]="isLoadingMore()"
+      (appInfiniteScrollLoad)="loadMorePOs()"
+    >
       <div
-        *ngFor="let po of purchaseOrders(); trackBy: trackById"
+        *ngFor="let po of mobilePurchaseOrders(); trackBy: trackById"
         @fadeIn
         class="rounded-xl border p-4 transition-all duration-200 bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700 shadow-sm cursor-pointer"
         (click)="openView(po)"
@@ -249,6 +255,17 @@
           </button>
         </div>
       </div>
+
+      <!-- End of list -->
+      @if (!hasMore() && mobilePurchaseOrders().length > 0) {
+        <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+            {{ 'common.endOfList' | translate }}
+          </span>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+        </div>
+      }
     </div>
 
     <!-- Empty state -->
@@ -261,14 +278,23 @@
       </p>
     </div>
 
-    <!-- Pagination -->
-    <app-pagination
-      [totalItems]="totalItems()"
-      [pageSize]="pageSize()"
-      [pageSizeOptions]="pageSizeOptions"
-      [currentPage]="pageIndex() + 1"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)"
-    ></app-pagination>
+    <!-- Infinite scroll: loading-more indicator (mobile) -->
+    @if (isLoadingMore()) {
+      <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+        <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+      </div>
+    }
+
+    <!-- Pagination (desktop only — mobile uses infinite scroll) -->
+    <div class="hidden md:block">
+      <app-pagination
+        [totalItems]="totalItems()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
+        [currentPage]="pageIndex() + 1"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
+    </div>
   </div>
 </div>
