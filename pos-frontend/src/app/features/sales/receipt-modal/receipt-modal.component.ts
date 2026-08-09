@@ -1,8 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Transaction } from '../../../models';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ThemeService } from '../../../services/shared/theme.service';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';
+
+export interface ReceiptDialogData {
+  transaction: Transaction;
+  photoResolver: (category: string) => string | undefined;
+}
 
 @Component({
   selector: 'app-receipt-modal',
@@ -13,14 +19,18 @@ import { backdropAnimation, modalAnimation } from '../../../shared/animations/an
   styleUrl: './receipt-modal.component.scss',
 })
 export class ReceiptModalComponent {
-  @Input() transaction!: Transaction;
-  @Input() photoResolver: (category: string) => string | undefined = () => undefined;
-  @Output() close = new EventEmitter<void>();
+  transaction: Transaction;
+  photoResolver: (category: string) => string | undefined = () => undefined;
 
   constructor(
     public lang: LanguageService,
     public theme: ThemeService,
-  ) {}
+    private dialogRef: MatDialogRef<ReceiptModalComponent>,
+    @Inject(MAT_DIALOG_DATA) data: ReceiptDialogData,
+  ) {
+    this.transaction = data.transaction;
+    this.photoResolver = data.photoResolver;
+  }
 
   printReceipt(): void {
     const content = document.getElementById('receipt-print');
@@ -47,5 +57,9 @@ export class ReceiptModalComponent {
     `);
     win.document.close();
     win.print();
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 }

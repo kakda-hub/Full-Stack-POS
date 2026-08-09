@@ -1,52 +1,28 @@
-import { trigger, state, style, transition, animate, group } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, untracked } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { Transaction, Product, CartItem, QuickPickItem, CreateSaleDto } from '../../../models';
+import { Transaction, Product, QuickPickItem, CreateSaleDto } from '../../../models';
 import { AlertService } from '../../../services/shared/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../../services/shared/auth.service';
 import { CartService } from '../../../services/shared/cart.service';
 import { LanguageService } from '../../../services/shared/language.service';
 import { ProductService } from '../../../services/shared/product.service';
-import { ThemeService } from '../../../services/shared/theme.service';
 import { TransactionService } from '../../../services/shared/transaction.service';
 import { QuickPickService } from '../../../services/quick-pick.service';
 import { SaleService } from '../../../services/sale.service';
-import { fadeIn, listAnimation, cartItemAnimation, counterAnimation } from '../../../shared/animations/animations';
+import { PaymentModalComponent, PaymentDialogData } from '../payment-modal/payment-modal.component';
+import { ReceiptModalComponent, ReceiptDialogData } from '../receipt-modal/receipt-modal.component';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
-
-// Sidebar specific animation
-const sidebarAnimation = trigger('sidebarAnimation', [
-  state('open', style({ width: '*', opacity: 1, visibility: 'visible' })),
-  state('closed', style({ width: '0', opacity: 0, visibility: 'hidden', margin: '0', padding: '0', border: '0' })),
-  transition('open <=> closed', [animate('300ms cubic-bezier(0.4, 0, 0.2, 1)')])
-]);
-
-// Mobile bottom drawer animations
-const drawerSlide = trigger('drawerSlide', [
-  state('closed', style({ transform: 'translateY(100%)' })),
-  state('open', style({ transform: 'translateY(0)' })),
-  transition('closed => open', [
-    animate('350ms cubic-bezier(0.32, 0.72, 0, 1)')
-  ]),
-  transition('open => closed', [
-    animate('250ms cubic-bezier(0.4, 0, 0.2, 1)')
-  ])
-]);
-
-const drawerBackdrop = trigger('drawerBackdrop', [
-  state('closed', style({ opacity: 0, pointerEvents: 'none' as const })),
-  state('open', style({ opacity: 1, pointerEvents: 'auto' as const })),
-  transition('closed <=> open', [animate('250ms ease')])
-]);
+import { DialogConfig } from '../../../enums/dialog-config.enum';
 
 @Component({
   selector: 'app-C',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, cartItemAnimation, counterAnimation, sidebarAnimation, drawerSlide, drawerBackdrop],
+  animations: [fadeIn, listAnimation],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
@@ -59,10 +35,7 @@ export class SalesComponent implements OnInit, OnDestroy {
   private mobileBreakpoint = 768;
   isCartDrawerOpen = signal(false);
 
-  showPayment = false;
   isLoadingProducts = signal(true);
-  isProcessingSale = signal(false);
-  lastTransaction: Transaction | null = null;
   lastAddedId = signal<string | null>(null);
   shakingProductId = signal<string | null>(null);
 
@@ -92,10 +65,9 @@ export class SalesComponent implements OnInit, OnDestroy {
   constructor(
     public cart: CartService,
     public productService: ProductService,
-    public auth: AuthService,
-    public langService: LanguageService,
+    private auth: AuthService,
+    private langService: LanguageService,
     private transactionService: TransactionService,
-    public theme: ThemeService,
     private alertService: AlertService,
     private cdr: ChangeDetectorRef,
     private quickPickService: QuickPickService,
@@ -300,6 +272,41 @@ export class SalesComponent implements OnInit, OnDestroy {
     if (!this.isCartOpen()) this.isCartOpen.set(true);
   }
 
+  /** Opens the payment dialog (MatDialog) with the current cart snapshot. */
+  openPaymentModal(): void {
+    const dialogRef = this.dialog.open(PaymentModalComponent, {
+      panelClass: DialogConfig.SMALL_DIALOG,
+      width: '28rem',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        total: this.cart.total(),
+        subtotal: this.cart.subtotal(),
+        processing: false,
+        items: this.cart.items(),
+        photoResolver: this.getProductPhoto,
+      } satisfies PaymentDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (!result) return;
+      this.onPaymentComplete(result);
+    });
+  }
+
+  /** Shows the receipt for a completed sale via MatDialog. */
+  private openReceiptModal(transaction: Transaction): void {
+    this.dialog.open(ReceiptModalComponent, {
+      panelClass: DialogConfig.SMALL_DIALOG,
+      width: '24rem',
+      maxWidth: '95vw',
+      data: {
+        transaction,
+        photoResolver: this.getProductPhoto,
+      } satisfies ReceiptDialogData,
+    });
+  }
+
   clearCart(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -339,16 +346,13 @@ export class SalesComponent implements OnInit, OnDestroy {
       };
 
       // Persist to backend first
-      this.isProcessingSale.set(true);
       this.cdr.markForCheck();
 
       this.saleService.createSale(dto).subscribe({
         next: () => {
-          this.isProcessingSale.set(false);
           this.completeSaleLocally(data, effectiveTotal);
         },
         error: (err) => {
-          this.isProcessingSale.set(false);
           this.cdr.markForCheck();
           console.error('Sale API error', err);
           this.alertService.error(this.langService.t('sales.saleFailed'));
@@ -362,7 +366,7 @@ export class SalesComponent implements OnInit, OnDestroy {
 
   /**
    * Complete the sale locally: save to localStorage, reduce local stock,
-   * clear cart, and show the receipt modal.
+   * clear cart, and show the receipt dialog.
    */
   private completeSaleLocally(data: any, effectiveTotal: number): void {
     const txn = this.transactionService.saveTransaction(
@@ -387,10 +391,8 @@ export class SalesComponent implements OnInit, OnDestroy {
       }
     });
     this.cart.clearCart();
-    this.showPayment = false;
-    this.lastTransaction = txn;
+    this.openReceiptModal(txn);
     this.alertService.success(this.langService.t('sales.saleCompleted'));
-    this.cdr.markForCheck();
   }
 
   /** Check if a product is already in the cart (for selected-state highlighting) */
@@ -404,31 +406,6 @@ export class SalesComponent implements OnInit, OnDestroy {
   }
 
   trackById(_: number, p: Product): string { return p.id; }
-  trackByProductId(_: number, item: CartItem): string { return item.product.id; }
-
-  getProductColor(category: string): string {
-    const map: Record<string, string> = {
-      beverages: 'bg-blue-50 text-blue-500',
-      food: 'bg-orange-50 text-orange-500',
-      snacks: 'bg-yellow-50 text-yellow-500',
-      dairy: 'bg-green-50 text-green-500',
-    };
-    return map[category] || 'bg-slate-50';
-  }
-
-  getCategoryEmoji(category: string): string {
-    const map: Record<string, string> = { beverages: '🥤', food: '🍱', snacks: '🍿', dairy: '🥛' };
-    return map[category] || '📦';
-  }
-
-  /** Remove loading state once image loads */
-  onImgLoad(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    const container = img.closest('.img-container');
-    if (container) {
-      container.classList.remove('img-loading');
-    }
-  }
 
   getProductPhoto(category: string): string {
     const map: Record<string, string> = {

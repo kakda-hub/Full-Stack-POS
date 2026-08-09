@@ -1,0 +1,20 @@
+/* ==========================================================
+   RightCartSidebarComponent Styles
+   ========================================================== */
+
+/* ─── Mobile Bottom Peek Bar ─── */
+.mobile-peek-bar {
+  transition: transform 0.2s ease;
+}
+
+/* ─── Safe area padding for notched phones ─── */
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+
+/* ─── Accessibility: Respect reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-peek-bar {
+    transition: none;
+  }
+}

@@ -1,17 +1,11 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div
-    @backdropAnimation
-    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-    (click)="cancel.emit()"
-  ></div>
-  <div
-    @modalAnimation
-    [class.bg-slate-800]="theme.isDark()"
-    [class.bg-white]="!theme.isDark()"
-    [class.border-slate-700/60]="theme.isDark()"
-    [class.border-slate-100/50]="!theme.isDark()"
-    class="relative rounded-[2rem] shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto border"
-  >
+<div
+  @modalAnimation
+  [class.bg-slate-800]="theme.isDark()"
+  [class.bg-white]="!theme.isDark()"
+  [class.border-slate-700/60]="theme.isDark()"
+  [class.border-slate-100/50]="!theme.isDark()"
+  class="rounded-[2rem] shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto border"
+>
     <div
       [class.border-slate-700]="theme.isDark()"
       [class.border-slate-100]="!theme.isDark()"
@@ -23,7 +17,7 @@
         {{ 'payment.title' | translate }}
       </h2>
       <button
-        (click)="cancel.emit()"
+        (click)="cancel()"
         [class.hover:bg-slate-700]="theme.isDark()"
         [class.hover:bg-slate-100]="!theme.isDark()"
         class="p-2 rounded-full text-slate-400 hover:text-slate-600 transition-all"
@@ -472,4 +466,3 @@
       </button>
     </div>
   </div>
-</div>

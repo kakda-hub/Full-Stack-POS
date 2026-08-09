@@ -1,17 +1,11 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div
-    @backdropAnimation
-    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-    (click)="close.emit()"
-  ></div>
-  <div
-    @modalAnimation
-    [class.bg-slate-800]="theme.isDark()"
-    [class.bg-white]="!theme.isDark()"
-    [class.border-slate-700/60]="theme.isDark()"
-    [class.border-slate-100/50]="!theme.isDark()"
-    class="relative rounded-[2rem] shadow-2xl w-full max-w-sm border"
-  >
+<div
+  @modalAnimation
+  [class.bg-slate-800]="theme.isDark()"
+  [class.bg-white]="!theme.isDark()"
+  [class.border-slate-700/60]="theme.isDark()"
+  [class.border-slate-100/50]="!theme.isDark()"
+  class="relative rounded-[2rem] shadow-2xl w-full max-w-sm border"
+>
     <div
       [class.border-slate-700]="theme.isDark()"
       [class.border-slate-100]="!theme.isDark()"
@@ -21,7 +15,7 @@
         {{ 'receipt.title' | translate }}
       </h2>
       <button
-        (click)="close.emit()"
+        (click)="close()"
         [class.hover:bg-slate-700]="theme.isDark()"
         [class.hover:bg-slate-100]="!theme.isDark()"
         class="p-2 rounded-full text-slate-400 hover:text-slate-600 transition-all"
@@ -203,7 +197,7 @@
           {{ 'receipt.print' | translate }}
         </button>
         <button
-          (click)="close.emit()"
+          (click)="close()"
           class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-[1.5rem] transition-all shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 cursor-pointer receipt-action-btn new-sale-btn"
         >
           {{ 'receipt.newSale' | translate }}
@@ -211,4 +205,3 @@
       </div>
     </div>
   </div>
-</div>
