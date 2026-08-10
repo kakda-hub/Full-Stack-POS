@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../services/shared/auth.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { fadeIn } from '../../../shared/animations/animations';
 
 @Component({

@@ -1,11 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Inject, OnDestroy, signal, untracked } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { CustomerService } from '../../../core/services/api/customer.service';
-import { KhqrService } from '../../../core/services/api/khqr.service';
+import { animatePrice, prefersReducedMotion } from '../../../shared/helpers/price-tween.helper';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { CustomerService } from '../../../services/customer.service';
+import { KhqrService } from '../../../services/khqr.service';
 import { Customer } from '../../../models';
+import { CartItem } from '../../../models/cart-item.model';
 import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
+
+export interface PaymentDialogData {
+  total: number;
+  subtotal: number;
+  processing: boolean;
+  items: CartItem[];
+  photoResolver: (category: string) => string | undefined;
+}
 
 @Component({
   selector: 'app-payment-modal',
@@ -15,27 +26,25 @@ import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
   templateUrl: './payment-modal.component.html',
   styleUrl: './payment-modal.component.scss',
 })
-export class PaymentModalComponent {
-  @Input() total = 0;
-  @Input() subtotal = 0;
-  @Input() processing = false;
-  @Output() paid = new EventEmitter<{
-    method: 'cash' | 'aba' | 'card';
-    cashReceived?: number;
-    customerId?: number;
-    customerName?: string;
-    pointsEarned?: number;
-    pointsRedeemed?: number;
-    loyaltyDiscount?: number;
-  }>();
-  @Output() cancel = new EventEmitter<void>();
+export class PaymentModalComponent implements OnDestroy {
+  total = 0;
+  subtotal = 0;
+  processing = false;
+  items: CartItem[] = [];
+  photoResolver: (category: string) => string | undefined = () => undefined;
 
   selectedMethod = signal<'cash' | 'aba' | 'card'>('cash');
   cashReceived = 0;
   private _change = signal(0);
   change = this._change.asReadonly();
 
-  // Customer state
+  amountDueDisplay = signal(0);
+  changeDisplay = signal(0);
+  private amountDueRaf: { id: number | null } = { id: null };
+  private changeRaf: { id: number | null } = { id: null };
+  private reduceMotion = prefersReducedMotion();
+  private displayInitialised = false;
+
   customerPhone = signal('');
   customer = signal<Customer | null>(null);
   customerSearching = signal(false);
@@ -44,12 +53,10 @@ export class PaymentModalComponent {
   pointsToRedeem = signal(0);
   showRedeemInput = signal(false);
 
-  // KHQR state
   qrImage = signal<string | null>(null);
   qrLoading = signal(false);
   qrError = signal(false);
 
-  // Computed values
   loyaltyDiscount = computed(() => {
     if (!this.customer()) return 0;
     const pts = this.pointsToRedeem();
@@ -68,10 +75,15 @@ export class PaymentModalComponent {
   private phoneSearch = new Subject<string>();
 
   methods = [
-    { id: 'cash' as const, label: 'Cash', labelKm: 'សាច់ប្រាក់', icon: '💵' },
-    { id: 'aba' as const, label: 'ABA', labelKm: 'ABA', icon: '📱' },
-    { id: 'card' as const, label: 'Card', labelKm: 'កាត', icon: '💳' },
+    { id: 'cash' as const, labelKey: 'payment.cash', icon: '💵' },
+    { id: 'aba' as const, labelKey: 'payment.aba', icon: '📱' },
+    { id: 'card' as const, labelKey: 'payment.card', icon: '💳' },
   ];
+
+  methodLabel(id: 'cash' | 'aba' | 'card'): string {
+    const m = this.methods.find(x => x.id === id);
+    return m ? this.lang.t(m.labelKey) : id;
+  }
 
   quickAmounts = computed(() => {
     const t = this.effectiveTotal();
@@ -84,7 +96,15 @@ export class PaymentModalComponent {
     public theme: ThemeService,
     private customerService: CustomerService,
     private khqrService: KhqrService,
+    private dialogRef: MatDialogRef<PaymentModalComponent>,
+    @Inject(MAT_DIALOG_DATA) data: PaymentDialogData,
   ) {
+    this.total = data.total;
+    this.subtotal = data.subtotal;
+    this.processing = data.processing;
+    this.items = data.items;
+    this.photoResolver = data.photoResolver;
+
     this.phoneSearch.pipe(
       debounceTime(500),
       switchMap(phone => {
@@ -115,6 +135,32 @@ export class PaymentModalComponent {
         this.customerNotFound.set(false);
       }
     });
+
+    effect(() => {
+      const amountDue = this.effectiveTotal();
+      const change = this.change();
+      untracked(() => {
+        if (!this.displayInitialised) {
+          this.amountDueDisplay.set(amountDue);
+          this.changeDisplay.set(change);
+          this.displayInitialised = true;
+          return;
+        }
+        if (this.reduceMotion) {
+          this.amountDueDisplay.set(amountDue);
+          this.changeDisplay.set(change);
+          return;
+        }
+        animatePrice(this.amountDueRaf, () => this.amountDueDisplay(), amountDue, v => this.amountDueDisplay.set(v));
+        animatePrice(this.changeRaf, () => this.changeDisplay(), change, v => this.changeDisplay.set(v));
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    [this.amountDueRaf, this.changeRaf].forEach(r => {
+      if (r.id !== null) cancelAnimationFrame(r.id);
+    });
   }
 
   onPhoneSearch(value: string): void {
@@ -138,16 +184,12 @@ export class PaymentModalComponent {
     this.showRedeemInput.set(false);
   }
 
-  /** Track the last amount that was used for QR generation */
   private lastQrAmount = 0;
 
-  /** Generate KHQR when ABA is selected */
   generateKhqr(): void {
     if (this.selectedMethod() !== 'aba') return;
     const amount = this.effectiveTotal();
     if (amount <= 0) return;
-
-    // Skip if amount hasn't changed and QR already generated
     if (amount === this.lastQrAmount && this.qrImage()) return;
 
     this.lastQrAmount = amount;
@@ -158,7 +200,6 @@ export class PaymentModalComponent {
     this.khqrService.generate(amount, `TXN-${Date.now()}`).subscribe({
       next: async (res) => {
         try {
-          // Render QR code on the client side from the raw qrString
           const dataUrl = await this.khqrService.generateQrDataUrl(res.qrString);
           this.qrImage.set(dataUrl);
         } catch {
@@ -188,7 +229,6 @@ export class PaymentModalComponent {
     this.pointsToRedeem.set(Math.min(Math.max(0, pts), max));
   }
 
-  /** Watch for method changes to trigger QR generation */
   onMethodChange(method: 'cash' | 'aba' | 'card'): void {
     this.selectedMethod.set(method);
     if (method === 'aba') {
@@ -219,7 +259,7 @@ export class PaymentModalComponent {
     const disc = this.loyaltyDiscount();
     const ptsEarned = this.pointsEarned();
 
-    this.paid.emit({
+    this.dialogRef.close({
       method: this.selectedMethod(),
       cashReceived: this.selectedMethod() === 'cash' ? this.cashReceived : undefined,
       customerId: customer?.id,
@@ -228,5 +268,9 @@ export class PaymentModalComponent {
       pointsRedeemed: ptsRedeemed > 0 ? ptsRedeemed : undefined,
       loyaltyDiscount: disc > 0 ? disc : undefined,
     });
+  }
+
+  cancel(): void {
+    this.dialogRef.close();
   }
 }

@@ -1,9 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [title]="id
-      ? (lang.currentLang() === 'km' ? 'កែប្រែទំនិញរហ័ស' : 'Edit Quick Pick')
-      : (lang.currentLang() === 'km' ? 'បន្ថែមទំនិញរហ័ស' : 'Add Quick Pick')"
+    [title]="id ? ('quickPicks.editTitle' | translate) : ('quickPicks.addTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -11,7 +9,7 @@
       <div class="form-grid">
         <app-input-field
           formControlName="label"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Label'"
+          [placeholder]="'quickPicks.label' | translate"
           [isRequired]="true"
         >
           <span prefix class="text-slate-400 mr-1">⚡</span>
@@ -19,12 +17,12 @@
 
         <app-input-field
           formControlName="labelKh"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះខ្មែរ' : 'Label (Khmer)'"
+          [placeholder]="'quickPicks.labelKhmerPlaceholder' | translate"
         ></app-input-field>
 
         <app-input-field
           formControlName="price"
-          [placeholder]="lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price'"
+          [placeholder]="'quickPicks.price' | translate"
           [isRequired]="true"
         >
           <span prefix class="text-slate-400 mr-1">$</span>
@@ -32,14 +30,14 @@
 
         <app-input-field
           formControlName="icon"
-          [placeholder]="lang.currentLang() === 'km' ? 'រូបតំណាង (emoji)' : 'Icon (emoji)'"
+          [placeholder]="'quickPicks.iconEmoji' | translate"
         >
           <span prefix class="text-slate-400 mr-1">🎨</span>
         </app-input-field>
 
         <app-input-field
           formControlName="sortOrder"
-          [placeholder]="lang.currentLang() === 'km' ? 'លំដាប់' : 'Sort Order'"
+          [placeholder]="'quickPicks.sortOrder' | translate"
           type="number"
         ></app-input-field>
       </div>

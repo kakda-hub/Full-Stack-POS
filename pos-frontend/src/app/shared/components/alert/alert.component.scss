@@ -1,0 +1,89 @@
+.alert-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border-width: 1px;
+  box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  backdrop-filter: blur(12px);
+  min-width: 280px;
+  max-width: 420px;
+}
+
+/* ---- Success ---- */
+.alert-success {
+  background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(5,150,105,0.08) 100%);
+  border-color: rgba(16,185,129,0.35);
+}
+.dark .alert-success {
+  background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.10) 100%);
+  border-color: rgba(16,185,129,0.30);
+}
+
+/* ---- Error ---- */
+.alert-error {
+  background: linear-gradient(135deg, rgba(239,68,68,0.10) 0%, rgba(220,38,38,0.07) 100%);
+  border-color: rgba(239,68,68,0.35);
+}
+.dark .alert-error {
+  background: linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(220,38,38,0.10) 100%);
+  border-color: rgba(239,68,68,0.30);
+}
+
+/* ---- Warning ---- */
+.alert-warning {
+  background: linear-gradient(135deg, rgba(245,158,11,0.10) 0%, rgba(217,119,6,0.07) 100%);
+  border-color: rgba(245,158,11,0.35);
+}
+.dark .alert-warning {
+  background: linear-gradient(135deg, rgba(245,158,11,0.14) 0%, rgba(217,119,6,0.10) 100%);
+  border-color: rgba(245,158,11,0.28);
+}
+
+/* ---- Info ---- */
+.alert-info {
+  background: linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(79,70,229,0.07) 100%);
+  border-color: rgba(99,102,241,0.35);
+}
+.dark .alert-info {
+  background: linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(79,70,229,0.12) 100%);
+  border-color: rgba(99,102,241,0.30);
+}
+
+/* progress bar */
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  animation: shrink linear forwards;
+  border-radius: 0 0 14px 14px;
+}
+@keyframes shrink {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+.progress-success { background: linear-gradient(90deg, #10b981, #34d399); }
+.progress-error   { background: linear-gradient(90deg, #ef4444, #f87171); }
+.progress-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.progress-info    { background: linear-gradient(90deg, #6366f1, #818cf8); }
+
+/* icon wrap */
+.icon-success { color: #10b981; }
+.icon-error   { color: #ef4444; }
+.icon-warning { color: #f59e0b; }
+.icon-info    { color: #6366f1; }
+
+/* positioned variants */
+.alert-fixed {
+  position: fixed;
+  z-index: 9999;
+}
+.pos-top-right    { top: 1.25rem; right: 1.25rem; }
+.pos-top-left     { top: 1.25rem; left: 1.25rem; }
+.pos-top-center   { top: 1.25rem; left: 50%; transform: translateX(-50%); }
+.pos-bottom-right { bottom: 1.25rem; right: 1.25rem; }
+.pos-bottom-left  { bottom: 1.25rem; left: 1.25rem; }
+.pos-bottom-center{ bottom: 1.25rem; left: 50%; transform: translateX(-50%); }
+.pos-inline       { position: relative; width: 100%; max-width: 100%; }

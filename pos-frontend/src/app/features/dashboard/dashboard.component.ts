@@ -8,17 +8,14 @@ import {
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { fadeIn, pageTransition } from '../../shared/animations/animations';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ProductService } from '../../core/services/product.service';
-import {
-  ReportService,
-  ReportSummary,
-  TopProductEntry,
-} from '../../core/services/api/report.service';
-import { SaleService } from '../../core/services/api/sale.service';
+import { fadeIn } from '../../shared/animations/animations';
+import { Product, ReportSummary, TopProductEntry } from '../../models';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { AuthService } from '../../services/shared/auth.service';
+import { ProductService } from '../../services/shared/product.service';
+import { ReportService } from '../../services/report.service';
+import { SaleService } from '../../services/sale.service';
 
 interface SaleItem {
   id: number;
@@ -32,7 +29,7 @@ interface SaleItem {
   selector: 'app-dashboard',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, pageTransition],
+  animations: [fadeIn],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -45,20 +42,22 @@ export class DashboardComponent implements OnInit {
   // ── Computed KPIs ──────────────────────────────────────────────────────
   lowStockCount = computed(() => this.summary()?.lowStockProducts?.length ?? 0);
   nearExpiryCount = computed(() => this.productService.nearExpiryProducts().length);
-  totalProducts = computed(() => this.productService.products().length);
+  totalProducts = computed(() => this.productService.catalogProducts().length);
+
+  // ── Low stock list (mirrors the low-stock drawer styling) ────────────────
+  dashboardLowStock = computed(() => this.productService.lowStockProducts().slice(0, 8));
 
   // ── Computed greeting ──────────────────────────────────────────────────
   greeting = computed(() => {
     const hour = new Date().getHours();
     const name = this.auth.currentUser()?.name || '';
-    if (this.lang.currentLang() === 'km') {
-      if (hour < 12) return `អរុណសួស្តី ${name}`;
-      if (hour < 17) return `ទិវាសួស្តី ${name}`;
-      return `សាយ័ណ្ហសួស្តី ${name}`;
-    }
-    if (hour < 12) return `Good morning, ${name}`;
-    if (hour < 17) return `Good afternoon, ${name}`;
-    return `Good evening, ${name}`;
+    const key =
+      hour < 12
+        ? 'dashboard.greetingMorning'
+        : hour < 17
+          ? 'dashboard.greetingAfternoon'
+          : 'dashboard.greetingEvening';
+    return this.lang.t(key, { name });
   });
 
   // ── Date formatting helpers ─────────────────────────────────────────────
@@ -117,6 +116,9 @@ export class DashboardComponent implements OnInit {
   private loadData(): void {
     this.isLoading.set(true);
 
+    // Full catalog for the KPI cards (low-stock / near-expiry / total count).
+    this.productService.loadCatalog();
+
     const today = new Date().toISOString().split('T')[0];
 
     forkJoin({
@@ -148,6 +150,24 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+
+  // ── Low stock helpers ────────────────────────────────────────────────────
+  /** Percentage of the low-stock threshold remaining, clamped to 0-100. */
+  lowStockPercent(item: Product): number {
+    const threshold =
+      item.lowStockThreshold && item.lowStockThreshold > 0
+        ? item.lowStockThreshold
+        : 10;
+    return Math.max(0, Math.min(100, Math.round((item.stock / threshold) * 100)));
+  }
+
+  getCategoryName = (categoryId: string): string => {
+    const cat = this.productService
+      .categories()
+      .find((c) => c.id === categoryId);
+    if (!cat) return categoryId;
+    return this.lang.currentLang() === 'km' && cat.nameKm ? cat.nameKm : cat.name;
+  };
 
   // ── Navigation helpers ──────────────────────────────────────────────────
   goTo(route: string): void {

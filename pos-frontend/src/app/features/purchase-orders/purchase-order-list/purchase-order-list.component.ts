@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { AuthService } from '../../../services/shared/auth.service';
+import { LanguageService } from '../../../services/shared/language.service';
 import { nextSort, SortDirection } from '../../../shared/helpers/sort.helper';
-import { PurchaseOrderService } from '../../../core/services/api/purchase-order.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { PurchaseOrderService } from '../../../services/purchase-order.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { PurchaseOrderDetailComponent } from '../purchase-order-detail/purchase-order-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -17,7 +17,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
   selector: 'app-purchase-order-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimation],
   templateUrl: './purchase-order-list.component.html',
   styleUrl: './purchase-order-list.component.scss',
 })
@@ -32,6 +32,11 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   pageSizeOptions = [10, 25, 50, 100];
   pageIndex = signal(0);
   searchQuery = signal('');
+
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobilePurchaseOrders = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
 
   // Server-side sorting (fields must be in the backend sort allowlist)
   sortBy = signal('createdAt');
@@ -71,20 +76,50 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadPOs() {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, sort, delete, save) replaces
+   * the list. `append = true` (mobile infinite scroll) fetches the next page
+   * at the current appended length and merges it into `mobilePurchaseOrders`.
+   */
+  loadPOs(append = false) {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
     this.poService.getAll({
       search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
-      offset: this.pageIndex() * this.pageSize(),
+      offset: append
+        ? this.mobilePurchaseOrders().length
+        : this.pageIndex() * this.pageSize(),
       max: this.pageSize(),
     }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          this.mobilePurchaseOrders.update(list => {
+            const seen = new Set(list.map((po: any) => po.id));
+            return [...list, ...data.filter((po: any) => !seen.has(po.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobilePurchaseOrders().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
         // After a delete, the current page may be empty — step back one page.
         if (data.length === 0 && this.pageIndex() > 0) {
           this.pageIndex.update(p => p - 1);
@@ -92,19 +127,37 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
           return;
         }
         this.purchaseOrders.set(data);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobilePurchaseOrders.set(data);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load purchase orders', err);
-        this.purchaseOrders.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.purchaseOrders.set([]);
+          this.mobilePurchaseOrders.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of purchase orders. */
+  loadMorePOs(): void {
+    this.loadPOs(true);
   }
 
   /** Column header click: toggle asc/desc on the active column, else start asc. */
@@ -122,8 +175,8 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(e: Event): void {
-    this.searchSubject.next((e.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   onPageChange(page: number): void {
@@ -154,20 +207,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
     this.poService.receive(po.id, { receivedBy: userId }).subscribe({
       next: () => {
         this.alertService.success(
-          this.lang.currentLang() === 'km'
-            ? `លេខបញ្ជាទិញ ${po.orderNumber} ត្រូវបានទទួលដោយជោគជ័យ`
-            : `PO ${po.orderNumber} received successfully`,
-          this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+          this.lang.t('purchaseOrders.receivedSuccess', { number: po.orderNumber }),
+          this.lang.t('confirm.success')
         );
         this.loadPOs();
       },
       error: (err) => {
         console.error('Failed to receive PO', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការទទួលបញ្ជាទិញបរាជ័យ'
-            : 'Failed to receive purchase order'
-        );
+        this.alertService.error(this.lang.t('purchaseOrders.receiveFailed'));
       },
     });
   }
@@ -177,13 +224,10 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការបោះបង់' : 'Confirm Cancel',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `បោះបង់បញ្ជាទិញលេខ ${po.orderNumber} មែនទេ?`
-            : `Cancel PO "${po.orderNumber}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'ត្រលប់' : 'Back',
+        title: this.lang.t('purchaseOrders.confirmCancelTitle'),
+        message: this.lang.t('purchaseOrders.confirmCancelMessage', { number: po.orderNumber }),
+        confirmLabel: this.lang.t('purchaseOrders.cancel'),
+        cancelLabel: this.lang.t('button.back'),
       },
     });
 
@@ -192,20 +236,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       this.poService.cancel(po.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `បញ្ជាទិញលេខ ${po.orderNumber} ត្រូវបានបោះបង់`
-              : `PO ${po.orderNumber} has been cancelled`,
-            this.lang.currentLang() === 'km' ? 'បានបោះបង់' : 'Cancelled'
+            this.lang.t('purchaseOrders.cancelled', { number: po.orderNumber }),
+            this.lang.t('purchaseOrders.cancelledTitle')
           );
           this.loadPOs();
         },
         error: (err) => {
           console.error('Failed to cancel PO', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការបោះបង់បញ្ជាទិញបរាជ័យ'
-              : 'Failed to cancel purchase order'
-          );
+          this.alertService.error(this.lang.t('purchaseOrders.cancelFailed'));
         },
       });
     });
@@ -226,22 +264,14 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
   /** Returns translated label for PO status */
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      draft: 'Draft',
-      ordered: 'Ordered',
-      partially_received: 'Partial',
-      received: 'Received',
-      cancelled: 'Cancelled',
+      draft: 'purchaseOrders.statusDraft',
+      ordered: 'purchaseOrders.statusOrdered',
+      partially_received: 'purchaseOrders.statusPartial',
+      received: 'purchaseOrders.statusReceived',
+      cancelled: 'purchaseOrders.statusCancelled',
     };
-    const kmLabels: Record<string, string> = {
-      draft: 'ព្រាង',
-      ordered: 'បានបញ្ជា',
-      partially_received: 'ទទួលខ្លះ',
-      received: 'បានទទួល',
-      cancelled: 'បានបោះបង់',
-    };
-    return this.lang.currentLang() === 'km'
-      ? kmLabels[status] || status
-      : labels[status] || status;
+    const key = labels[status] || '';
+    return key ? this.lang.t(key) : status;
   }
 
   /** Whether the given PO can be received */
@@ -270,10 +300,10 @@ export class PurchaseOrderListComponent implements OnInit, OnDestroy {
       this.loadPOs();
       const isEdit = !!this.editingPO;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `បញ្ជាទិញត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Purchase Order ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('purchaseOrders.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingPO = null;
     });

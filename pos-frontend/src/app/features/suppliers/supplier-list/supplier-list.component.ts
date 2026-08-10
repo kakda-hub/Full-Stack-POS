@@ -1,23 +1,21 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { SupplierService } from '../../../core/services/api/supplier.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { SupplierService } from '../../../services/supplier.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '../../../shared/components/dynamic-table/dynamic-table.component';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { SupplierDetailComponent } from '../supplier-detail/supplier-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { buildListParams } from '../../../core/services/api/list-params';
+import { buildListParams } from '../../../services/list-params';
 
 @Component({
   selector: 'app-supplier-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './supplier-list.component.html',
 })
 export class SupplierListComponent implements OnInit, OnDestroy {
@@ -31,12 +29,17 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   pageIndex = signal(0);
   searchQuery = signal('');
 
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileSuppliers = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
+
   /** Column definitions passed to DynamicTableComponent */
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name', labelKm: 'ឈ្មោះ' },
-    { key: 'contactPerson', label: 'Contact Person', labelKm: 'អ្នកទំនាក់ទំនង', responsive: 'md' },
-    { key: 'phone', label: 'Phone', labelKm: 'ទូរស័ព្ទ', responsive: 'md' },
-    { key: 'email', label: 'Email', labelKm: 'អ៊ីមែល', responsive: 'lg' },
+    { key: 'name', labelKey: 'suppliers.name' },
+    { key: 'contactPerson', labelKey: 'suppliers.contactPerson', responsive: 'md' },
+    { key: 'phone', labelKey: 'suppliers.phone', responsive: 'md' },
+    { key: 'email', labelKey: 'suppliers.email', responsive: 'lg' },
   ];
 
   /** Monotonic token that invalidates in-flight requests (stale-response guard). */
@@ -72,21 +75,52 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadSuppliers() {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, delete, save) replaces the
+   * list. `append = true` (mobile infinite scroll) fetches the next page at
+   * the current appended length and merges it into `mobileSuppliers`.
+   */
+  loadSuppliers(append = false) {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileSuppliers().length
+      : this.pageIndex() * this.pageSize();
     const params = buildListParams({
       search: this.searchQuery() || undefined,
       sortBy: 'name',
       sort: 'asc',
-      offset: this.pageIndex() * this.pageSize(),
+      offset,
       max: this.pageSize(),
     });
     this.supplierService.list({ params }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          this.mobileSuppliers.update(list => {
+            const seen = new Set(list.map((s: any) => s.id));
+            return [...list, ...data.filter((s: any) => !seen.has(s.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobileSuppliers().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
         // After a delete, the current page may be empty — step back one page.
         if (data.length === 0 && this.pageIndex() > 0) {
           this.pageIndex.update(p => p - 1);
@@ -94,19 +128,37 @@ export class SupplierListComponent implements OnInit, OnDestroy {
           return;
         }
         this.suppliers.set(data);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobileSuppliers.set(data);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load suppliers', err);
-        this.suppliers.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.suppliers.set([]);
+          this.mobileSuppliers.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of suppliers. */
+  loadMoreSuppliers(): void {
+    this.loadSuppliers(true);
   }
 
   ngOnDestroy(): void {
@@ -114,8 +166,8 @@ export class SupplierListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(e: Event): void {
-    this.searchSubject.next((e.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   onPageChange(event: PageEvent) {
@@ -132,13 +184,10 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   deleteSupplier(s: any): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `លុបអ្នកផ្គត់ផ្គង់ "${s.name}" មែនទេ?`
-            : `Delete supplier "${s.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('suppliers.deleteQuestion', { name: s.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -147,20 +196,14 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       this.supplierService.delete(s.id).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `អ្នកផ្គត់ផ្គង់ "${s.name}" ត្រូវបានលុបចោល`
-              : `Supplier "${s.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('suppliers.deleted', { name: s.name }),
+            this.lang.t('confirm.deletedTitle')
           );
           this.loadSuppliers();
         },
         error: (err) => {
           console.error('Failed to delete supplier', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការលុបអ្នកផ្គត់ផ្គង់បរាជ័យ'
-              : 'Failed to delete supplier'
-          );
+          this.alertService.error(this.lang.t('suppliers.deleteFailed'));
         },
       });
     });
@@ -184,10 +227,10 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       this.loadSuppliers();
       const isEdit = !!this.editingSupplier;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `អ្នកផ្គត់ផ្គង់ត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `Supplier ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('suppliers.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingSupplier = null;
     });

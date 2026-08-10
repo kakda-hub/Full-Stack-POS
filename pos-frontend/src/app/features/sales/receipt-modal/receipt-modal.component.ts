@@ -1,8 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Transaction } from '../../../models';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { backdropAnimation, modalAnimation } from '../../../shared/animations/animations';
+
+export interface ReceiptDialogData {
+  transaction: Transaction;
+  photoResolver: (category: string) => string | undefined;
+}
 
 @Component({
   selector: 'app-receipt-modal',
@@ -13,13 +19,18 @@ import { backdropAnimation, modalAnimation } from '../../../shared/animations/an
   styleUrl: './receipt-modal.component.scss',
 })
 export class ReceiptModalComponent {
-  @Input() transaction!: Transaction;
-  @Output() close = new EventEmitter<void>();
+  transaction: Transaction;
+  photoResolver: (category: string) => string | undefined = () => undefined;
 
   constructor(
     public lang: LanguageService,
     public theme: ThemeService,
-  ) {}
+    private dialogRef: MatDialogRef<ReceiptModalComponent>,
+    @Inject(MAT_DIALOG_DATA) data: ReceiptDialogData,
+  ) {
+    this.transaction = data.transaction;
+    this.photoResolver = data.photoResolver;
+  }
 
   printReceipt(): void {
     const content = document.getElementById('receipt-print');
@@ -35,11 +46,20 @@ export class ReceiptModalComponent {
         .text-center { text-align: center; }
         .flex { display: flex; justify-content: space-between; }
         .font-black { font-weight: 900; }
+        .receipt-item { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 4px; }
+        .receipt-item-body { flex: 1; min-width: 0; }
+        .receipt-thumb { width: 28px; height: 28px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+        .receipt-thumb-ph { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         @media print { @page { size: 80mm auto; margin: 0; } }
       </style>
       </head><body>${content.innerHTML}</body></html>
     `);
     win.document.close();
     win.print();
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 }

@@ -10,7 +10,7 @@
   
   @if (inputControl.invalid && (inputControl.touched || inputControl.dirty)) {
     <mat-error>
-      {{ placeholder }} is required
+      {{ placeholder }} {{ 'validate.required' | translate }}
     </mat-error>
   }
 </mat-form-field>

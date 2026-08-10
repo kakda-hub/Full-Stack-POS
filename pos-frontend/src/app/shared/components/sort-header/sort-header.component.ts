@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { LanguageService } from '../../../core/services/language.service';
+import { LanguageService } from '../../../services/shared/language.service';
 
 /**
  * Sortable table column header. Renders the label with a sort affordance and

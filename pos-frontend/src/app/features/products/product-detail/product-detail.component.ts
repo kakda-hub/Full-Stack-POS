@@ -11,13 +11,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
-import { ProductService } from '../../../core/services/api/product.service';
-import { CategoriesService } from '../../../core/services/api/categories.service';
-import { CloudinaryService } from '../../../core/services/api/cloudinary.service';
+import { ProductService } from '../../../services/product.service';
+import { CategoriesService } from '../../../services/categories.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 import { CloudinaryMediaGalleryModalComponent, MediaGalleryData } from '../../../shared/components/cloudinary-media-gallery/cloudinary-media-gallery-modal.component';
 
 @Component({
@@ -133,20 +133,28 @@ export class ProductDetailComponent implements OnInit {
           const updated = [fileUrl, ...currentUrls];
           this.form.patchValue({ imgUrls: updated, imgUrl: fileUrl });
           this.alertService.success(
-            this.lang.currentLang() === 'km' ? 'បានបង្ហោះរូបភាពដោយជោគជ័យ' : 'Image uploaded successfully',
-            this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success',
+            this.lang.t('categories.imageUploaded'),
+            this.lang.t('confirm.success'),
           );
         }
         this.isUploading.set(false);
       },
       error: () => {
         this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Image upload failed',
-          this.lang.currentLang() === 'km' ? 'កំហុស' : 'Error',
+          this.lang.t('categories.imageUploadFailed'),
+          this.lang.t('error.title'),
         );
         this.isUploading.set(false);
       },
     });
+  }
+
+  onImageChange(url: string): void {
+    this.onGallerySelect(url);
+  }
+
+  onImageRemove(): void {
+    this.form.patchValue({ imgUrl: '', imgUrls: [] });
   }
 
   openGallery(): void {

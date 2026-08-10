@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Git hooks must stay LF — a CRLF shebang breaks execution on Unix
+.husky/** text eol=lf

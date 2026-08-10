@@ -8,7 +8,7 @@
 }
 
 .upload-dropzone {
-  @apply flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all overflow-hidden relative min-h-[8rem];
+  @apply flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all duration-200 overflow-hidden relative min-h-[8rem];
   @apply bg-slate-50 border-slate-300;
   @apply dark:bg-slate-700 dark:border-slate-600;
 
@@ -26,11 +26,12 @@
 }
 
 .upload-preview-img {
-  @apply w-full h-full object-contain bg-black/5;
+  @apply w-full h-full object-contain bg-slate-100 dark:bg-slate-800;
 }
 
 .upload-overlay {
-  @apply absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity;
+  @apply absolute inset-0 bg-slate-900/30 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200;
+  backdrop-filter: blur(2px);
 }
 
 .upload-overlay-text {
@@ -38,7 +39,7 @@
 }
 
 .upload-remove-btn {
-  @apply mt-2 p-1 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors;
+  @apply mt-2 p-1 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-sm;
 }
 
 .upload-empty-state {

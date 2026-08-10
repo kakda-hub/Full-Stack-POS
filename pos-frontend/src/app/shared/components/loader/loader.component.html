@@ -1,0 +1,54 @@
+<!-- FULLSCREEN overlay -->
+<div *ngIf="variant === 'fullscreen'"
+  class="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-5"
+  [class.bg-slate-900\/80]="true"
+  style="backdrop-filter: blur(6px);">
+  <div class="loader-ring-lg">
+    <div></div><div></div><div></div><div></div>
+  </div>
+  <div class="text-center space-y-1">
+    <p class="text-white font-semibold text-base tracking-wide">{{ text || 'Loading...' }}</p>
+    <p *ngIf="subtext" class="text-slate-400 text-sm">{{ subtext }}</p>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<span *ngIf="variant === 'spinner'" class="loader-inline" [ngClass]="sizeClass" [title]="text || 'Loading'">
+  <svg class="animate-spin" viewBox="0 0 24 24" fill="none">
+    <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
+    <path class="opacity-90" fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+  </svg>
+</span>
+
+<!-- DOTS -->
+<span *ngIf="variant === 'dots'" class="loader-dots-wrap" [ngClass]="sizeClass">
+  <span class="dot dot-1"></span>
+  <span class="dot dot-2"></span>
+  <span class="dot dot-3"></span>
+</span>
+
+<!-- BARS -->
+<span *ngIf="variant === 'bars'" class="loader-bars-wrap" [ngClass]="sizeClass">
+  <span class="bar bar-1"></span>
+  <span class="bar bar-2"></span>
+  <span class="bar bar-3"></span>
+  <span class="bar bar-4"></span>
+</span>
+
+<!-- PULSE -->
+<span *ngIf="variant === 'pulse'" class="loader-pulse-wrap" [ngClass]="sizeClass">
+  <span class="pulse-ring"></span>
+  <span class="pulse-core"></span>
+</span>
+
+<!-- RING -->
+<span *ngIf="variant === 'ring'" class="loader-ring-sm" [ngClass]="sizeClass">
+  <div></div><div></div><div></div><div></div>
+</span>
+
+<!-- WITH LABEL (inline block) -->
+<div *ngIf="variant !== 'fullscreen' && text && showLabel"
+  class="flex items-center gap-2.5 mt-0" [ngClass]="labelWrapClass">
+  <span class="text-sm font-medium" [ngClass]="labelColorClass">{{ text }}</span>
+</div>

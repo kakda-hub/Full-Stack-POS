@@ -5,10 +5,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { SharedModule } from '../../../shared/shared.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../../core/services/auth.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { createI18nMocks } from '../../../testing/i18n-mock';
+import { AuthService } from '../../../services/shared/auth.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { User } from '../../../models';
 
 describe('LoginComponent — brand panel', () => {
@@ -35,6 +37,7 @@ describe('LoginComponent — brand panel', () => {
       declarations: [LoginComponent],
       imports: [
         SharedModule,
+        TranslateModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([]),
         NoopAnimationsModule,
@@ -46,7 +49,8 @@ describe('LoginComponent — brand panel', () => {
           provide: AuthService,
           useValue: { login: () => of(true), currentUser: () => user, logout: () => {} },
         },
-        { provide: LanguageService, useValue: { currentLang: () => 'en', toggle: () => {} } },
+        { provide: LanguageService, useValue: createI18nMocks().langMock },
+        { provide: TranslateService, useValue: createI18nMocks().translateServiceMock },
       ],
     }).compileComponents();
 

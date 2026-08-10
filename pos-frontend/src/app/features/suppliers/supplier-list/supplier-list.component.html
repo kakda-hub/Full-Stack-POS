@@ -1,13 +1,13 @@
-<div @pageTransition class="flex flex-col gap-y-4 p-3">
+<div class="flex flex-col gap-y-4 p-3">
   <div class="flex items-center justify-between">
     <app-breadcrumb></app-breadcrumb>
 
     <div class="flex items-center gap-4">
-      <mat-form-field class="form-field" subscriptSizing="dynamic">
-        <mat-label>{{ lang.currentLang() === 'km' ? 'ស្វែងរកអ្នកផ្គត់ផ្គង់...' : 'Search suppliers...' }}</mat-label>
-        <input (input)="onSearch($event)" matInput>
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
+      <app-search-input
+        class="w-56"
+        placeholder="suppliers.search"
+        (search)="onSearch($event)"
+      ></app-search-input>
       <app-ui-button [variant]="'primary'" [size]="'md'" (click)="openDialog()">
         <span>{{ 'button.addNew' | translate }}</span>
       </app-ui-button>
@@ -18,12 +18,17 @@
   <app-dynamic-table
     [columns]="columns"
     [rows]="suppliers()"
+    [mobileRows]="mobileSuppliers()"
     [totalCount]="totalItems()"
     [pageIndex]="pageIndex()"
     [pageSize]="pageSize()"
     [isLoading]="isLoading()"
+    [infiniteScrollOnMobile]="true"
+    [hasMore]="hasMore()"
+    [isLoadingMore]="isLoadingMore()"
     (onEdit)="openEdit($event)"
     (onDelete)="deleteSupplier($event)"
     (pageChange)="onPageChange($event)"
+    (loadMore)="loadMoreSuppliers()"
   ></app-dynamic-table>
 </div>

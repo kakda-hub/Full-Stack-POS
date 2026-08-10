@@ -1,0 +1,133 @@
+/* ==========================================================
+   ImageUploadAvatar Component – Modern Clean UI
+   Supports single image and multiple image upload modes
+   ========================================================== */
+
+.iua-container {
+  @apply w-full;
+}
+
+/* ─── Section wrapper ─── */
+.images-section {
+  @apply flex flex-col gap-4;
+}
+
+.images-section-header {
+  @apply flex items-center justify-between;
+}
+
+.images-section-title {
+  @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+}
+
+.browse-media-btn {
+  @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200;
+  @apply bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95;
+  @apply dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20;
+}
+
+/* ─── Thumbnail Grid ─── */
+.thumbnail-grid {
+  @apply grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2.5;
+}
+
+.thumbnail-card {
+  @apply relative rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-200;
+  @apply bg-slate-50 dark:bg-slate-800;
+  @apply hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600;
+  @apply active:scale-[0.97];
+
+  &.primary {
+    @apply ring-2 ring-indigo-500 border-indigo-500 dark:ring-indigo-400 dark:border-indigo-400;
+    @apply shadow-md shadow-indigo-500/10;
+  }
+}
+
+.thumbnail-image {
+  @apply relative aspect-square overflow-hidden p-2;
+}
+
+.thumbnail-image img {
+  @apply w-full h-full object-contain;
+}
+
+.primary-badge {
+  @apply absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full;
+  @apply bg-indigo-500 text-white shadow-md;
+  @apply ring-2 ring-white dark:ring-slate-800;
+}
+
+.thumbnail-actions {
+  @apply absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 p-1.5;
+  @apply bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 transition-opacity duration-200;
+}
+
+.thumbnail-card:hover .thumbnail-actions {
+  @apply opacity-100;
+}
+
+.thumbnail-action-btn {
+  @apply w-6 h-6 flex items-center justify-center rounded-full transition-all duration-150;
+  @apply text-white bg-black/20 hover:bg-white/25 active:scale-90;
+  @apply backdrop-blur-sm;
+}
+
+.thumbnail-action-remove {
+  @apply text-rose-100 hover:text-white hover:bg-rose-500/80;
+}
+
+/* ─── Dropzone Card ─── */
+.upload-row {
+  @apply flex items-center gap-3;
+}
+
+.dropzone-card {
+  @apply relative flex-1 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600;
+  @apply transition-all duration-200 overflow-hidden cursor-pointer;
+  @apply bg-slate-50/80 dark:bg-slate-800/80;
+  @apply hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5;
+  @apply active:scale-[0.99];
+  @apply min-h-[5rem] flex items-center justify-center;
+
+  &.uploading {
+    @apply border-indigo-300 bg-indigo-50/50 dark:bg-indigo-500/10;
+    @apply pointer-events-none;
+  }
+}
+
+.dropzone-empty {
+  @apply flex flex-col items-center gap-1.5 py-2;
+}
+
+.dropzone-uploading {
+  @apply flex items-center gap-2;
+}
+
+.upload-spinner {
+  @apply w-5 h-5 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin;
+  @apply dark:border-indigo-800 dark:border-t-indigo-400;
+}
+
+/* ─── Single Image Upload Container ─── */
+.upload-container {
+  @apply relative w-48 h-48 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600;
+  @apply transition-all duration-200 overflow-hidden cursor-pointer;
+  @apply bg-slate-50 dark:bg-slate-800;
+  @apply hover:border-indigo-500 dark:hover:border-indigo-400;
+  @apply active:scale-[0.99];
+  @apply flex items-center justify-center;
+}
+
+.upload-image {
+  @apply w-full h-full object-contain p-2;
+}
+
+.upload-overlay {
+  @apply absolute inset-0 flex flex-col items-center justify-center;
+  @apply opacity-0 hover:opacity-100 transition-all duration-200;
+  @apply bg-slate-900/30 backdrop-blur-[2px];
+}
+
+.upload-empty-state {
+  @apply flex flex-col items-center justify-center w-full h-full p-4;
+}

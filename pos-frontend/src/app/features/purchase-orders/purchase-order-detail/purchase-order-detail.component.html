@@ -1,8 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="po?.id"
-    [title]="po?.orderNumber
-      || (lang.currentLang() === 'km' ? 'បង្កើតបញ្ជាទិញ' : 'New Purchase Order')"
+    [title]="po?.orderNumber || ('purchaseOrders.newTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -15,7 +14,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
           <span>
-            {{ lang.currentLang() === 'km' ? 'មើលតែប៉ុណ្ណោះ' : 'Read-only view' }}
+            {{ 'purchaseOrders.readOnly' | translate }}
           </span>
         </div>
       }
@@ -24,12 +23,12 @@
       <div class="form-grid">
         <app-input-field
           formControlName="orderNumber"
-          [placeholder]="lang.currentLang() === 'km' ? 'លេខបញ្ជាទិញ' : 'Order Number'"
+          [placeholder]="'purchaseOrders.orderNumber' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <mat-form-field appearance="outline" class="w-full form-field-outline">
-          <mat-label>{{ lang.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Supplier' }}</mat-label>
+          <mat-label>{{ 'purchaseOrders.supplier' | translate }}</mat-label>
           <mat-select formControlName="supplierId">
             @for (s of suppliers; track s.id) {
               <mat-option [value]="s.id">
@@ -39,7 +38,7 @@
           </mat-select>
           @if (form.get('supplierId')?.invalid && form.get('supplierId')?.touched) {
             <mat-error>
-              {{ lang.currentLang() === 'km' ? 'សូមជ្រើសរើសអ្នកផ្គត់ផ្គង់' : 'Supplier is required' }}
+              {{ 'purchaseOrders.supplierRequired' | translate }}
             </mat-error>
           }
         </mat-form-field>
@@ -49,14 +48,14 @@
       <div class="po-items-section">
         <div class="po-items-header-bar">
           <h3 class="po-items-title">
-            {{ lang.currentLang() === 'km' ? 'ទំនិញក្នុងបញ្ជាទិញ' : 'Order Items' }}
+            {{ 'purchaseOrders.orderItems' | translate }}
           </h3>
           @if (!isReadonly()) {
             <button type="button" (click)="addItemRow()" class="po-items-add-btn">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              {{ lang.currentLang() === 'km' ? 'បន្ថែមទំនិញ' : 'Add Item' }}
+              {{ 'purchaseOrders.addItem' | translate }}
             </button>
           }
         </div>
@@ -65,16 +64,16 @@
           <!-- Header -->
           <div class="po-items-header">
             <span class="po-items-header-cell po-items-col-product">
-              {{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Product' }}
+              {{ 'purchaseOrders.product' | translate }}
             </span>
             <span class="po-items-header-cell po-items-col-qty">
-              {{ lang.currentLang() === 'km' ? 'បរិមាណ' : 'Qty' }}
+              {{ 'purchaseOrders.qty' | translate }}
             </span>
             <span class="po-items-header-cell po-items-col-cost">
-              {{ lang.currentLang() === 'km' ? 'ថ្លៃដើម' : 'Unit Cost' }}
+              {{ 'purchaseOrders.unitCost' | translate }}
             </span>
             <span class="po-items-header-cell po-items-col-total">
-              {{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}
+              {{ 'purchaseOrders.total' | translate }}
             </span>
             @if (!isReadonly()) {
               <span class="po-items-header-cell po-items-col-action"></span>
@@ -86,7 +85,7 @@
             <div class="po-items-row" [formGroupName]="$index">
               <div class="po-items-col-product">
                 <mat-form-field appearance="outline" class="w-full form-field-outline">
-                  <mat-label>{{ lang.currentLang() === 'km' ? 'ផលិតផល' : 'Product' }}</mat-label>
+                  <mat-label>{{ 'purchaseOrders.product' | translate }}</mat-label>
                   <mat-select formControlName="productId">
                     @for (p of products; track p.id) {
                       <mat-option [value]="p.id">
@@ -101,10 +100,10 @@
                 </mat-form-field>
               </div>
               <div class="po-items-col-qty">
-                <app-input-field formControlName="quantity" [placeholder]="lang.currentLang() === 'km' ? 'បរិមាណ' : 'Qty'" [isRequired]="true"></app-input-field>
+                <app-input-field formControlName="quantity" [placeholder]="'purchaseOrders.qty' | translate" [isRequired]="true"></app-input-field>
               </div>
               <div class="po-items-col-cost">
-                <app-input-field formControlName="unitCost" [placeholder]="lang.currentLang() === 'km' ? 'ថ្លៃដើម' : 'Cost'" [isRequired]="true">
+                <app-input-field formControlName="unitCost" [placeholder]="'purchaseOrders.cost' | translate" [isRequired]="true">
                   <span prefix class="text-slate-400 mr-1">$</span>
                 </app-input-field>
               </div>
@@ -120,7 +119,7 @@
                     (click)="removeItemRow($index)"
                     class="po-item-delete-btn"
                     [disabled]="itemsFormArray.length <= 1"
-                    [title]="lang.currentLang() === 'km' ? 'លុប' : 'Remove item'"
+                    [title]="'purchaseOrders.removeItem' | translate"
                   >
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -136,12 +135,12 @@
         <div class="po-totals-card">
           <div class="po-totals">
             <div class="po-total-row">
-              <span class="po-total-label">{{ lang.currentLang() === 'km' ? 'សរុបរង' : 'Subtotal' }}</span>
+              <span class="po-total-label">{{ 'purchaseOrders.subtotal' | translate }}</span>
               <span class="po-total-value">${{ subtotal.toFixed(2) }}</span>
             </div>
 
             <div class="po-total-row po-total-row--discount">
-              <span class="po-total-label">{{ lang.currentLang() === 'km' ? 'បញ្ចុះតម្លៃ' : 'Discount' }}</span>
+              <span class="po-total-label">{{ 'purchaseOrders.discount' | translate }}</span>
               <span class="po-total-value">
                 @if (!isReadonly()) {
                   <span class="inline-input">
@@ -155,7 +154,7 @@
             </div>
 
             <div class="po-total-row">
-              <span class="po-total-label">{{ lang.currentLang() === 'km' ? 'ថ្លៃដឹកជញ្ជូន' : 'Shipping' }}</span>
+              <span class="po-total-label">{{ 'purchaseOrders.shipping' | translate }}</span>
               <span class="po-total-value">
                 @if (!isReadonly()) {
                   <span class="inline-input">
@@ -169,7 +168,7 @@
             </div>
 
             <div class="po-total-row po-total-row--grand">
-              <span class="po-total-label--grand">{{ lang.currentLang() === 'km' ? 'សរុប' : 'Total' }}</span>
+              <span class="po-total-label--grand">{{ 'purchaseOrders.total' | translate }}</span>
               <span class="po-total-value--grand">${{ total.toFixed(2) }}</span>
             </div>
           </div>
@@ -179,7 +178,7 @@
       <!-- Notes -->
       <app-textarea
         formControlName="notes"
-        [placeholder]="lang.currentLang() === 'km' ? 'កំណត់ចំណាំ' : 'Notes'"
+        [placeholder]="'purchaseOrders.notes' | translate"
         [rows]="2"
       ></app-textarea>
     </div>

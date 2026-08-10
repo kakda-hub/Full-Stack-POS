@@ -1,0 +1,25 @@
+.confirm-dialog {
+  .confirm-dialog__title {
+    @apply text-lg font-bold text-slate-800 mb-3;
+  }
+
+  .confirm-dialog__message {
+    @apply text-sm text-slate-600 mb-6;
+  }
+
+  .confirm-dialog__actions {
+    @apply flex justify-end gap-3;
+  }
+
+  .confirm-dialog__btn {
+    @apply px-4 py-2 text-sm font-semibold rounded-xl transition-colors;
+
+    &--cancel {
+      @apply text-slate-600 bg-slate-100 hover:bg-slate-200;
+    }
+
+    &--confirm {
+      @apply text-white bg-red-500 hover:bg-red-600;
+    }
+  }
+}

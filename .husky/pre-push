@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# ─────────────────────────────────────────────────────────────
+# Pre-push hook: block direct pushes to `main`.
+# All work must be pushed from `master` or a feature branch and
+# merged via Pull Request.
+# ─────────────────────────────────────────────────────────────
+
+protected_branch="main"
+
+# 1) Reject if the push is being made while checked out on `main`.
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$current_branch" = "$protected_branch" ]; then
+  echo ""
+  echo "❌ ERROR: Direct pushes to '$protected_branch' are forbidden!"
+  echo "Please ensure you are pushing from 'master' or your active feature branch."
+  echo ""
+  exit 1
+fi
+
+# 2) Reject if the push targets the remote `main` branch, regardless of the
+#    local branch (catches e.g. `git push origin master:main`).
+#    The pre-push hook receives "<local ref> <local sha> <remote ref> <remote sha>"
+#    for every ref being pushed on stdin.
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  if [ "$remote_ref" = "refs/heads/$protected_branch" ]; then
+    echo ""
+    echo "❌ ERROR: Direct pushes to '$protected_branch' are forbidden!"
+    echo "Please ensure you are pushing from 'master' or your active feature branch."
+    echo ""
+    exit 1
+  fi
+done
+
+exit 0

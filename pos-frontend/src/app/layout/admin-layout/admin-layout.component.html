@@ -13,8 +13,8 @@
           <img class="w-full h-full object-contain" src="assets/images/mini-market-logo.png" alt="Mini Mart" />
         </div>
         <div *ngIf="!isCollapsed()" class="flex flex-col min-w-0">
-          <div class="brand-title">Mini Mart</div>
-          <div class="brand-subtitle">POS Solutions</div>
+          <div class="brand-title">{{ 'brand.title' | translate }}</div>
+          <div class="brand-subtitle">{{ 'brand.subtitle' | translate }}</div>
         </div>
       </div>
     </aside>
@@ -26,8 +26,8 @@
        <button
          (click)="toggleSidebar()"
          class="sidebar-toggle-btn hidden md:flex"
-         [title]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
-         [attr.aria-label]="isCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'"
+         [title]="isCollapsed() ? ('nav.expandedSidebar' | translate) : ('nav.collapsedSidebar' | translate)"
+         [attr.aria-label]="isCollapsed() ? ('nav.expandedSidebar' | translate) : ('nav.collapsedSidebar' | translate)"
          type="button"
        >
          @if (!isCollapsed()) {
@@ -38,7 +38,7 @@
        </button>
 
        <!-- Breadcrumbs -->
-       <nav class="breadcrumbs" aria-label="Breadcrumb">
+       <nav class="breadcrumbs" [attr.aria-label]="'nav.breadcrumb' | translate">
          @for (crumb of breadcrumbs(); track crumb; let last = $last; let i = $index) {
            @if (i === 0) {
               <span class="breadcrumb-admin">{{ crumb }}</span>
@@ -61,11 +61,11 @@
           class="lang-pill"
           aria-haspopup="true"
           [attr.aria-expanded]="langMenuOpen()"
-          [title]="langService.currentLang() === 'en' ? 'Language' : 'ភាសា'"
+          [title]="'layout.language' | translate"
           type="button"
         >
           <img class="lang-flag-img" [src]="langService.currentLang() === 'en' ? 'assets/images/en-flag.png' : 'assets/images/kh-flag.png'" alt="" />
-          <span class="lang-label">{{ langService.currentLang() === 'en' ? 'ENGLISH' : 'ភាសាខ្មែរ' }}</span>
+          <span class="lang-label">{{ langService.currentLang() === 'en' ? ('layout.english' | translate) : ('layout.khmer' | translate) }}</span>
           <app-icon
             name="chevron-down"
             class="transition-transform duration-200"
@@ -111,9 +111,9 @@
         (click)="theme.toggle()"
         class="topbar-icon-btn"
         [title]="theme.isDark()
-          ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
-          : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
-        [attr.aria-label]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+          ? ('layout.switchToLight' | translate)
+          : ('layout.switchToDark' | translate)"
+        [attr.aria-label]="theme.isDark() ? ('layout.switchToLight' | translate) : ('layout.switchToDark' | translate)"
         type="button"
       >
         @if (theme.isDark()) {
@@ -153,7 +153,7 @@
             <div class="dropdown-divider"></div>
             <button class="dropdown-item dropdown-item-danger" (click)="logout()" role="menuitem" type="button">
               <app-icon name="logout" svgClass="w-4 h-4 flex-shrink-0" />
-              <span class="dropdown-item-label">{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}</span>
+              <span class="dropdown-item-label">{{ 'nav.signOut' | translate }}</span>
             </button>
           </div>
         }
@@ -178,7 +178,7 @@
     <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
       <!-- MAIN MENU section label -->
       <div *ngIf="!isCollapsed()" class="sidebar-section-label">
-        <span>{{ langService.currentLang() === 'km' ? 'ម៉ឺនុយមេ' : 'Main Menu' }}</span>
+        <span>{{ 'nav.mainMenu' | translate }}</span>
       </div>
 
       <div *ngFor="let item of navItems" class="space-y-1">
@@ -203,7 +203,7 @@
             </span>
             <!-- Warning dot for Purchase Orders with pending count -->
             @if (item.icon === 'purchase-order' && pendingPoCount() > 0) {
-              <div class="po-pending-dot" [class.po-pending-dot-collapsed]="isCollapsed()" [title]="pendingPoCount() + ' pending'"></div>
+              <div class="po-pending-dot" [class.po-pending-dot-collapsed]="isCollapsed()" [title]="pendingPoCount() + ' ' + ('nav.pending' | translate)"></div>
             }
           </a>
 
@@ -258,8 +258,8 @@
     <!-- Footer Credit -->
     <div class="sidebar-footer">
       <p class="sidebar-credit" *ngIf="!isCollapsed()">
-        {{ langService.currentLang() === 'km' ? 'បង្កើតឡើងដោយ' : 'Developed by' }}
-        <span class="sidebar-credit-name">Khiev Kakda</span>
+        {{ 'brand.developedBy' | translate }}
+        <span class="sidebar-credit-name">{{ 'brand.creditName' | translate }}</span>
       </p>
       <p class="sidebar-credit sidebar-credit-mini" *ngIf="isCollapsed()">KK</p>
     </div>
@@ -283,7 +283,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
     >
       <app-icon name="cart" svgClass="w-5 h-5" />
-      <span class="text-[10px] font-medium">{{ langService.currentLang() === 'km' ? 'លក់' : 'Register' }}</span>
+      <span class="text-[10px] font-medium">{{ 'nav.register' | translate }}</span>
     </a>
 
     <!-- Orders / Sales History Tab -->
@@ -294,7 +294,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
     >
       <app-icon name="orders" svgClass="w-5 h-5" />
-      <span class="text-[10px] font-medium">{{ langService.currentLang() === 'km' ? 'ការបញ្ជាទិញ' : 'Orders' }}</span>
+      <span class="text-[10px] font-medium">{{ 'nav.orders' | translate }}</span>
     </a>
 
     <!-- More / Menu Toggle (Pill Style) -->
@@ -304,7 +304,7 @@
       [class.active-more-btn]="isMobileMenuOpen()"
     >
       <app-icon name="menu" svgClass="w-5 h-5" />
-      <span class="text-[10px] font-bold tracking-tight">{{ langService.currentLang() === 'km' ? 'បន្ថែម' : 'More' }}</span>
+      <span class="text-[10px] font-bold tracking-tight">{{ 'nav.more' | translate }}</span>
     </button>
   </nav>
 
@@ -342,17 +342,17 @@
             ></app-ui-avatar>
             <div class="min-w-0 flex-1">
               <div class="mobile-menu-user-name truncate">
-                {{ auth.currentUser()?.name || (langService.currentLang() === 'km' ? 'អ្នកប្រើ' : 'User') }}
+                {{ auth.currentUser()?.name || ('layout.user' | translate) }}
               </div>
               <div class="mobile-menu-user-role truncate">
-                {{ auth.currentUser()?.role || (langService.currentLang() === 'km' ? 'តួនាទី' : 'Role') }}
+                {{ auth.currentUser()?.role || ('layout.role' | translate) }}
               </div>
               <div class="mobile-menu-user-email truncate">
                 {{ auth.currentUser()?.username || (langService.currentLang() === 'km' ? 'email@example.com' : 'email@example.com') }}
               </div>
             </div>
           </div>
-          <button (click)="closeMobileMenu()" class="mobile-menu-close" aria-label="Close menu">
+          <button (click)="closeMobileMenu()" class="mobile-menu-close" [attr.aria-label]="'nav.closeMenu' | translate">
             <app-icon name="x" svgClass="w-5 h-5" />
           </button>
         </div>
@@ -362,7 +362,7 @@
 
           <!-- ═══ MAIN Section ═══ -->
           <div class="mobile-menu-section">
-            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'មេ' : 'MAIN' }}</div>
+            <div class="mobile-menu-section-label">{{ 'nav.main' | translate }}</div>
 
             <!-- Dashboard -->
             <a
@@ -374,7 +374,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="dashboard" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទិដ្ឋភាពទូទៅ' : 'Dashboard' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.dashboard' | translate }}</span>
             </a>
 
             <!-- Products -->
@@ -387,7 +387,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="product" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ផលិតផល' : 'Products' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.products' | translate }}</span>
             </a>
 
             <!-- Quick Picks -->
@@ -400,13 +400,13 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="zap" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ទំនិញរហ័ស' : 'Quick Picks' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.quickPicks' | translate }}</span>
             </a>
           </div>
 
           <!-- ═══ INVENTORY Section ═══ -->
           <div class="mobile-menu-section">
-            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'ស្តុក' : 'INVENTORY' }}</div>
+            <div class="mobile-menu-section-label">{{ 'nav.inventory' | translate }}</div>
 
             <!-- Purchase Orders (with badge) -->
             <a
@@ -418,9 +418,9 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="purchase-order" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'បញ្ជាទិញ' : 'Purchase Orders' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.purchaseOrders' | translate }}</span>
               @if (pendingPoCount() > 0) {
-                <span class="mobile-menu-badge">{{ pendingPoCount() }} {{ langService.currentLang() === 'km' ? 'កំពុងរង់ចាំ' : 'Pending' }}</span>
+                <span class="mobile-menu-badge">{{ pendingPoCount() }} {{ 'nav.pending' | translate }}</span>
               }
             </a>
 
@@ -434,13 +434,13 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="supplier" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'អ្នកផ្គត់ផ្គង់' : 'Suppliers' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.suppliers' | translate }}</span>
             </a>
           </div>
 
           <!-- ═══ MANAGEMENT Section ═══ -->
           <div class="mobile-menu-section">
-            <div class="mobile-menu-section-label">{{ langService.currentLang() === 'km' ? 'គ្រប់គ្រង' : 'MANAGEMENT' }}</div>
+            <div class="mobile-menu-section-label">{{ 'nav.managementSection' | translate }}</div>
 
             <!-- Report -->
             <a
@@ -452,7 +452,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="report" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'របាយការណ៍' : 'Reports' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.reports' | translate }}</span>
             </a>
 
             <!-- User Management -->
@@ -465,7 +465,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="user" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការគ្រប់គ្រងអ្នកប្រើ' : 'User Management' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.userManagement' | translate }}</span>
             </a>
 
             <!-- Categories -->
@@ -478,7 +478,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="category" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ប្រភេទ' : 'Categories' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.categories' | translate }}</span>
             </a>
 
             <!-- Permission -->
@@ -491,7 +491,7 @@
               <div class="mobile-menu-item-icon">
                 <app-icon name="permission" svgClass="w-[18px] h-[18px]" />
               </div>
-              <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការអនុញ្ញាត' : 'Permissions' }}</span>
+              <span class="mobile-menu-item-label">{{ 'nav.permission' | translate }}</span>
             </a>
 
             <!-- Management (Settings) with submenus -->
@@ -506,7 +506,7 @@
                 <div class="mobile-menu-item-icon">
                 <app-icon name="settings" svgClass="w-[18px] h-[18px]" />
                 </div>
-                <span class="mobile-menu-item-label">{{ langService.currentLang() === 'km' ? 'ការកំណត់' : 'Settings' }}</span>
+                <span class="mobile-menu-item-label">{{ 'nav.settings' | translate }}</span>
                 <app-icon
                   name="chevron-down"
                   svgClass="w-4 h-4 ml-auto flex-shrink-0 text-slate-300 dark:text-slate-600 transition-transform duration-300"
@@ -538,7 +538,7 @@
         <div class="mobile-menu-footer">
           <button (click)="logout()" class="mobile-menu-logout-btn">
             <app-icon name="logout" svgClass="w-5 h-5" />
-            <span>{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Logout' }}</span>
+            <span>{{ 'nav.logout' | translate }}</span>
           </button>
         </div>
       </div>

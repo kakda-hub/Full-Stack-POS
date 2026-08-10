@@ -63,16 +63,30 @@
   @apply absolute left-0 top-3 bottom-3 w-1 rounded-full bg-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200;
 }
 
+.low-stock-item--out {
+  @apply border-red-200/80 bg-gradient-to-r from-red-50/80 to-rose-50/40 hover:border-red-300 hover:from-red-50 hover:to-rose-50;
+}
+
+.low-stock-item--out::before {
+  @apply bg-red-500;
+}
+
 .low-stock-item-img-wrap {
   @apply flex-shrink-0 relative;
 }
 
 .low-stock-item-img {
-  @apply w-14 h-14 object-cover rounded-xl border-2 border-white shadow-sm;
+  @apply w-12 h-12 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1;
+  @apply dark:border-slate-700 dark:bg-slate-800;
+}
+
+.low-stock-item--out .low-stock-item-img {
+  @apply opacity-70 grayscale;
 }
 
 .low-stock-item-img--placeholder {
-  @apply w-14 h-14 flex items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50;
+  @apply w-12 h-12 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-100;
+  @apply dark:border-slate-700 dark:bg-slate-800;
 }
 
 .low-stock-item-info {
@@ -87,37 +101,79 @@
   @apply text-xs text-slate-500 font-medium mt-0.5;
 }
 
+.low-stock-item-stock-row {
+  @apply flex items-center gap-2 mt-1.5;
+}
+
 .low-stock-item-stock-badge {
-  @apply inline-block mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700;
+  @apply inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700;
 }
 
-.low-stock-item-action {
-  @apply flex-shrink-0;
+.low-stock-item-stock-badge--out {
+  @apply bg-red-100 text-red-600;
 }
 
-.low-stock-toggle {
-  @apply relative inline-flex items-center cursor-pointer;
+.low-stock-item-stepper {
+  @apply ml-auto flex items-center gap-1;
 }
 
-.low-stock-toggle input {
-  @apply sr-only;
+.low-stock-item-step-btn {
+  @apply flex items-center justify-center w-6 h-6 rounded-md border border-slate-200 bg-white text-slate-500 transition-all duration-150 hover:bg-amber-500 hover:text-white hover:border-amber-500 active:scale-90 text-sm leading-none;
 }
 
-.low-stock-toggle-slider {
-  @apply w-9 h-5 bg-slate-200 rounded-full relative transition-colors duration-200;
+.low-stock-item-step-btn:disabled {
+  @apply opacity-40 cursor-not-allowed hover:bg-white hover:text-slate-500 hover:border-slate-200 active:scale-100;
 }
 
-.low-stock-toggle input:checked + .low-stock-toggle-slider {
-  @apply bg-amber-500;
+.low-stock-item-step-value {
+  @apply min-w-[26px] text-center text-xs font-bold text-slate-700;
 }
 
-.low-stock-toggle-slider::before {
-  content: '';
-  @apply absolute top-[2px] left-[2px] w-4 h-4 bg-white border border-slate-300 rounded-full transition-transform duration-200;
+.low-stock-item-step-value--out {
+  @apply text-red-600;
 }
 
-.low-stock-toggle input:checked + .low-stock-toggle-slider::before {
-  transform: translateX(16px);
+.low-stock-item-spinner {
+  @apply w-3.5 h-3.5 mx-auto text-amber-600;
+  animation: lowStockSpin 0.8s linear infinite;
+}
+
+.low-stock-item-spinner--out {
+  @apply text-red-500;
+}
+
+@keyframes lowStockSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.low-stock-item-bar {
+  @apply mt-2 w-full h-1.5 rounded-full bg-slate-200/70 overflow-hidden;
+}
+
+.low-stock-item-bar-fill {
+  @apply h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700 ease-out;
+}
+
+.low-stock-item-bar-fill--out {
+  @apply bg-gradient-to-r from-red-400 to-rose-500;
+}
+
+.low-stock-item--out .low-stock-item-bar {
+  @apply bg-red-100;
+}
+
+.low-stock-item-restock-btn {
+  @apply mt-2.5 w-full flex items-center justify-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg border border-amber-200 bg-white/70 text-amber-700 transition-all duration-200 hover:bg-amber-500 hover:text-white hover:border-amber-500 active:scale-[0.98];
+}
+
+.low-stock-item-restock-btn-icon {
+  @apply w-3.5 h-3.5;
+}
+
+.low-stock-item-restock-btn--out {
+  @apply border-red-200 text-red-600 hover:bg-red-500 hover:border-red-500 hover:text-white;
 }
 
 .low-stock-empty {

@@ -1,0 +1,46 @@
+/* ==========================================================
+   SearchInputComponent – Reusable search bar
+   Shared by every list page (products, categories, users, ...)
+   ========================================================== */
+
+:host {
+  display: block;
+}
+
+.search-input-container {
+  @apply relative w-full;
+}
+
+.search-input-icon {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors;
+  @apply text-slate-400;
+}
+
+.search-input-field {
+  @apply w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm transition-all;
+  @apply bg-white border-slate-200 text-slate-800 placeholder:text-slate-400;
+  @apply dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 dark:placeholder:text-slate-400;
+  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+}
+
+/* Extra right padding when a clear button is present */
+.search-input-container--clear .search-input-field {
+  @apply pr-9;
+}
+
+.search-input-clear {
+  @apply absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors;
+  @apply text-slate-400 hover:text-rose-500 hover:bg-rose-50;
+  @apply dark:hover:bg-rose-500/10;
+}
+
+/* ─── Large variant (prominent bars like the POS sale screen) ─── */
+.search-input-container--lg .search-input-field {
+  @apply pl-12 py-3 rounded-2xl border-0 text-sm shadow-sm;
+  @apply ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500;
+  @apply dark:ring-slate-700;
+}
+
+.search-input-container--lg .search-input-icon {
+  @apply left-5 w-5 h-5;
+}

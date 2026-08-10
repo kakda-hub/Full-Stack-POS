@@ -5,6 +5,7 @@ import { CashierLayoutComponent } from './layout/cashier-layout/cashier-layout.c
 import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
     loadChildren: () => import('./features/login/login.module').then((m) => m.LoginModule),

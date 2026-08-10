@@ -130,15 +130,34 @@ export class ProductsService {
   }
 
   async adjustStock(id: number, dto: AdjustStockDto): Promise<Product> {
-    const product = await this.findOne(id);
-    const newStock = product.stock + dto.quantity;
-    if (newStock < 0) {
+    // No-op guard: MySQL reports affected = *changed* rows, so a quantity of
+    // zero would look like a failed update and wrongly raise an error.
+    if (dto.quantity === 0) {
+      return this.findOne(id);
+    }
+
+    // Single atomic statement (stock = stock + quantity) so concurrent
+    // requests cannot lose updates; the non-negative guard is evaluated by
+    // the database in the same UPDATE.
+    const result = await this.productRepository
+      .createQueryBuilder()
+      .update(Product)
+      .set({ stock: () => 'stock + :quantity' })
+      .setParameters({ quantity: dto.quantity })
+      .where('id = :id', { id })
+      .andWhere('stock + :quantity >= 0')
+      .execute();
+
+    if ((result.affected ?? 0) === 0) {
+      // Nothing updated: either the product does not exist (findOne throws
+      // NotFoundException) or the adjustment would drive stock below zero.
+      const product = await this.findOne(id);
       throw new BadRequestException(
         `Cannot reduce stock below 0. Current stock: ${product.stock}`,
       );
     }
-    product.stock = newStock;
-    return this.productRepository.save(product);
+
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<{ message: string }> {

@@ -6,11 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { QuickPickListComponent } from './quick-pick-list.component';
-import { QuickPickService } from '../../../core/services/api/quick-pick.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { QuickPickService } from '../../../services/quick-pick.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
 
@@ -19,7 +19,7 @@ describe('QuickPickListComponent — server-side pagination', () => {
   let component: QuickPickListComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const langMock = { currentLang: () => 'en', t: (key: string) => key };
   const alertMock = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
   const quickPickServiceMock = { getPage: vi.fn(), delete: vi.fn() };
   const dialogMock = { open: vi.fn(() => ({ afterClosed: () => of(true) })) };

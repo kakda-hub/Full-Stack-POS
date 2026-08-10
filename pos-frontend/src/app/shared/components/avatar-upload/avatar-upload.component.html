@@ -33,7 +33,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
       </svg>
       <span class="text-[10px] font-bold uppercase tracking-wider">
-        {{ (imageUrl() || localPreview()) ? 'Change' : 'Upload' }}
+        {{ (imageUrl() || localPreview()) ? ('upload.change' | translate) : ('upload.upload' | translate) }}
       </span>
     </div>
 
@@ -62,10 +62,10 @@
   <!-- Bottom Hint -->
   <div class="text-center">
     @if (isDragging()) {
-      <p class="text-sm font-semibold text-indigo-600 animate-pulse">Drop to upload</p>
+      <p class="text-sm font-semibold text-indigo-600 animate-pulse">{{ 'upload.dropToUpload' | translate }}</p>
     } @else {
       <p class="text-xs text-slate-400 dark:text-slate-500">
-        JPG, PNG or GIF. Max 5MB.
+        {{ 'upload.avatarFormats' | translate }}
       </p>
     }
   </div>

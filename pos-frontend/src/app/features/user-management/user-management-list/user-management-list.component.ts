@@ -1,21 +1,21 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { Subject, debounceTime, forkJoin, takeUntil } from 'rxjs';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { UserService } from '../../../core/services/api/user.service';
-import { ReusableDialogService } from '../../../core/services/dialogs/reusable-dialog.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { UserService } from '../../../services/user.service';
+import { ReusableDialogService } from '../../../services/dialogs/reusable-dialog.service';
 import { UserDetailDialogComponent } from '../../../shared/user-detail-dialog/user-detail-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { buildListParams } from '../../../core/services/api/list-params';
+import { buildListParams } from '../../../services/list-params';
 
 @Component({
   selector: 'app-user-management-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimation],
   templateUrl: './user-management-list.component.html',
   styleUrl: './user-management-list.component.scss',
 })
@@ -29,6 +29,11 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
   pageSize = signal(10);
   pageIndex = signal(0);
   searchQuery = signal('');
+
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileItems = signal<any[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
 
   // Stats (computed server-side via role-filtered totals)
   totalUsers = computed(() => this.totalItems());
@@ -70,28 +75,41 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Loads one server-side page using the standard list query params. */
-  loadItems(): void {
-    this.isLoading.set(true);
+  /**
+   * Loads one server-side page using the standard list query params.
+   *
+   * `append = false` (desktop pagination, search, delete, save) replaces the
+   * list. `append = true` (mobile infinite scroll) fetches the next page at
+   * the current appended length and merges it into `mobileItems`.
+   */
+  loadItems(append = false): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileItems().length
+      : this.pageIndex() * this.pageSize();
     const params = buildListParams({
       search: this.searchQuery() || undefined,
       sortBy: 'name',
       sort: 'asc',
-      offset: this.pageIndex() * this.pageSize(),
+      offset,
       max: this.pageSize(),
     });
     this.userService.list({ params }).subscribe({
       next: (res: any) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
-        const raw = res?.data ?? [];
-        // After a delete, the current page may be empty — step back one page.
-        if (raw.length === 0 && this.pageIndex() > 0) {
-          this.pageIndex.update(p => p - 1);
-          this.loadItems();
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
           return;
         }
-        const mapped = raw.map((u: any) => ({
+        const raw = res?.data ?? [];
+        const total = res?.total ?? raw.length;
+        const mapUser = (u: any) => ({
           id: String(u.id),
           name: u.name,
           username: u.email?.split('@')[0] || u.name?.toLowerCase().replace(/\s+/g, '.') || '',
@@ -100,24 +118,60 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
           status: u.isActive ? 'active' : 'inactive',
           avatarUrl: u.avatarUrl || '',
           lastLogin: u.lastLogin || u.updatedAt || null,
-        }));
+        });
+
+        if (append) {
+          const page = raw.map(mapUser);
+          this.mobileItems.update(list => {
+            const seen = new Set(list.map((i: any) => i.id));
+            return [...list, ...page.filter((i: any) => !seen.has(i.id))];
+          });
+          this.hasMore.set(raw.length > 0 && this.mobileItems().length < total);
+          this.isLoadingMore.set(false);
+          this.cdr.markForCheck();
+          return;
+        }
+
+        // After a delete, the current page may be empty — step back one page.
+        if (raw.length === 0 && this.pageIndex() > 0) {
+          this.pageIndex.update(p => p - 1);
+          this.loadItems();
+          return;
+        }
+        const mapped = raw.map(mapUser);
         this.items.set(mapped);
-        this.totalItems.set(res?.total ?? raw.length);
+        this.mobileItems.set(mapped);
+        this.totalItems.set(total);
+        this.hasMore.set(raw.length > 0 && raw.length < total);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to load users', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'មិនអាចផ្ទុកអ្នកប្រើបានទេ' : 'Failed to load users'
-        );
-        this.items.set([]);
-        this.totalItems.set(0);
-        this.isLoading.set(false);
+        this.alertService.error(this.lang.t('users.loadFailed'));
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+        } else {
+          this.items.set([]);
+          this.mobileItems.set([]);
+          this.totalItems.set(0);
+          this.hasMore.set(false);
+          this.isLoading.set(false);
+        }
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of users. */
+  loadMoreItems(): void {
+    this.loadItems(true);
   }
 
   /**
@@ -148,8 +202,8 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(e: Event): void {
-    this.searchSubject.next((e.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   onPageChange(page: number): void {
@@ -171,13 +225,10 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
   deleteItem(item: any): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `លុបអ្នកប្រើ "${item.name}" មែនទេ?`
-            : `Delete user "${item.name}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('confirm.title'),
+        message: this.lang.t('users.deleteQuestion', { name: item.name }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -186,21 +237,15 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       this.userService.delete(Number(item.id)).subscribe({
         next: () => {
           this.alertService.warning(
-            this.lang.currentLang() === 'km'
-              ? `"${item.name}" ត្រូវបានលុបចោល`
-              : `"${item.name}" has been deleted`,
-            this.lang.currentLang() === 'km' ? 'បានលុប' : 'Deleted'
+            this.lang.t('users.deleted', { name: item.name }),
+            this.lang.t('users.deletedTitle')
           );
           this.loadItems();
           this.loadStats();
         },
         error: (err) => {
           console.error('Failed to delete user', err);
-          this.alertService.error(
-            this.lang.currentLang() === 'km'
-              ? 'ការលុបបរាជ័យ'
-              : 'Failed to delete user'
-          );
+          this.alertService.error(this.lang.t('users.deleteFailed'));
         },
       });
     });
@@ -225,10 +270,10 @@ export class UserManagementListComponent implements OnInit, OnDestroy {
       this.loadStats();
       const isEdit = !!this.editingItem;
       this.alertService.success(
-        this.lang.currentLang() === 'km'
-          ? `អ្នកប្រើត្រូវបាន${isEdit ? 'កែប្រែ' : 'បន្ថែម'}ដោយជោគជ័យ`
-          : `User ${isEdit ? 'updated' : 'added'} successfully`,
-        this.lang.currentLang() === 'km' ? 'ជោគជ័យ' : 'Success'
+        this.lang.t('users.saved', {
+          action: this.lang.t(isEdit ? 'confirm.actionUpdated' : 'confirm.actionAdded'),
+        }),
+        this.lang.t('confirm.success')
       );
       this.editingItem = null;
     });

@@ -1,11 +1,9 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-} from '../../../core/services/api/cloudinary.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource } from '../../../models';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { modalAnimation } from '../../../shared/animations/animations';
 
 export interface MediaGalleryData {
@@ -37,10 +35,10 @@ export class CloudinaryMediaGalleryModalComponent implements OnInit {
   // category filter (mapped to the API search param) and upload folder stay
   // consistent.
   categories = [
-    { value: 'all', label: 'All' },
-    { value: 'pos-banners', label: 'Banners' },
-    { value: 'pos-general', label: 'General' },
-    { value: 'pos-products', label: 'Products' },
+    { value: 'all', labelKey: 'mediaGallery.all' },
+    { value: 'pos-banners', labelKey: 'mediaGallery.banners' },
+    { value: 'pos-general', labelKey: 'mediaGallery.general' },
+    { value: 'pos-products', labelKey: 'mediaGallery.products' },
   ];
 
   constructor(

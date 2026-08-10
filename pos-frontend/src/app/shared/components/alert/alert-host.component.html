@@ -1,0 +1,13 @@
+<div class="alert-host-stack" aria-live="polite" aria-atomic="false">
+  <app-alert
+    *ngFor="let alert of alertService.alerts(); trackBy: trackById"
+    [type]="alert.type"
+    [title]="alert.title"
+    [message]="alert.message"
+    [duration]="alert.duration ?? 4000"
+    [dismissible]="alert.dismissible ?? true"
+    [showIcon]="alert.icon ?? true"
+    position="inline"
+    (dismissed)="alertService.dismiss(alert.id)"
+  ></app-alert>
+</div>

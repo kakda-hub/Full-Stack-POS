@@ -10,7 +10,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span>{{ langService.currentLang() === 'km' ? 'ត្រឡប់ផ្ទះ' : 'Back Home' }}</span>
+            <span>{{ langService.t('layout.backHome') }}</span>
           </app-ui-button>
         </div>
       }
@@ -33,7 +33,7 @@
       </div>
 
       <!-- Breadcrumbs -->
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <nav class="breadcrumbs" [attr.aria-label]="'nav.breadcrumb' | translate">
         @for (crumb of breadcrumbs(); track crumb; let last = $last) {
           <span class="breadcrumb-item" [class.breadcrumb-current]="last">{{ crumb }}</span>
           @if (!last) {
@@ -51,11 +51,11 @@
           class="lang-pill"
           aria-haspopup="true"
           [attr.aria-expanded]="langMenuOpen()"
-          [title]="langService.currentLang() === 'en' ? 'Language' : 'ភាសា'"
+          [title]="'layout.language' | translate"
           type="button"
         >
           <img class="lang-flag-img" [src]="langService.currentLang() === 'en' ? 'assets/images/en-flag.png' : 'assets/images/kh-flag.png'" alt="" />
-          <span class="lang-label">{{ langService.currentLang() === 'en' ? 'ENGLISH' : 'ភាសាខ្មែរ' }}</span>
+          <span class="lang-label">{{ langService.currentLang() === 'en' ? ('layout.english' | translate) : ('layout.khmer' | translate) }}</span>
           <app-icon
             name="chevron-down"
             class="transition-transform duration-200"
@@ -101,9 +101,9 @@
         (click)="theme.toggle()"
         class="topbar-icon-btn"
         [title]="theme.isDark()
-          ? (langService.currentLang() === 'km' ? 'ប្តូរទៅពន្លឺ' : 'Switch to Light')
-          : (langService.currentLang() === 'km' ? 'ប្តូរទៅងងឹត' : 'Switch to Dark')"
-        [attr.aria-label]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+          ? ('layout.switchToLight' | translate)
+          : ('layout.switchToDark' | translate)"
+        [attr.aria-label]="theme.isDark() ? ('layout.switchToLight' | translate) : ('layout.switchToDark' | translate)"
         type="button"
       >
         @if (theme.isDark()) {
@@ -159,7 +159,7 @@
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-              <span class="dropdown-item-label">{{ langService.currentLang() === 'km' ? 'ចាកចេញ' : 'Sign Out' }}</span>
+              <span class="dropdown-item-label">{{ 'nav.signOut' | translate }}</span>
             </button>
           </div>
         }

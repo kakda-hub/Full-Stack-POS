@@ -1,0 +1,300 @@
+<!-- Desktop Sidebar -->
+<div
+  [@sidebarAnimation]="isCartOpen() ? 'open' : 'closed'"
+  class="md:flex w-80 xl:w-96 h-full min-h-0 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex-col shadow-2xl z-20 overflow-hidden"
+  [class.hidden]="isMobile()"
+>
+  <!-- Cart Top -->
+  <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/80">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/40 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-base font-black text-slate-800 dark:text-slate-100">{{ 'sales.yourCart' | translate }}</h2>
+        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+          {{ cart.items().length }} {{ cart.items().length === 1 ? ('sales.item' | translate) : ('sales.items' | translate) }}
+        </p>
+      </div>
+    </div>
+    <button
+      *ngIf="cart.items().length > 0"
+      (click)="clearCart.emit()"
+      class="text-xs text-rose-500 font-bold hover:text-rose-600 transition-colors"
+    >
+      {{ 'sales.clear' | translate }}
+    </button>
+  </div>
+
+  <!-- Cart Items -->
+  <div class="flex-1 overflow-y-auto p-4 space-y-2">
+    <!-- Empty State -->
+    <div
+      *ngIf="cart.items().length === 0"
+      @fadeIn
+      class="flex flex-col items-center justify-center h-full text-center opacity-60"
+    >
+      <div class="w-24 h-24 bg-slate-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-6">
+        <svg class="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">{{ 'sales.cartEmpty' | translate }}</h3>
+      <p class="text-sm text-slate-400 dark:text-slate-500">{{ 'sales.cartEmptyHint' | translate }}</p>
+    </div>
+
+    <!-- Cart Items List -->
+    <div
+      *ngFor="let item of cart.items(); trackBy: trackByProductId"
+      @cartItemAnimation
+      class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-600 transition-all"
+    >
+      @let photo = item.product.imgUrl || photoResolver(item.product.category);
+      <div class="flex items-start gap-3">
+        <!-- Product thumbnail -->
+        <div class="w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-600 shadow-sm flex items-center justify-center">
+          @if (photo) {
+            <img
+              [src]="photo"
+              [alt]="item.product.name"
+              class="w-full h-full object-cover"
+              loading="lazy"
+              appImgFallback
+            />
+          } @else {
+            <svg class="w-6 h-6 text-slate-300 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          }
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between gap-2 mb-3">
+            <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1 text-left">
+              {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
+            </p>
+            <button
+              type="button"
+              (click)="cart.removeItem(item.product.id)"
+              class="text-slate-300 dark:text-slate-500 hover:text-rose-500 transition-colors flex-shrink-0"
+              [title]="'sales.removeItem' | translate"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button
+                (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
+                class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all motion-safe:active:scale-90"
+                [title]="'sales.decreaseQuantity' | translate"
+              >
+                -
+              </button>
+              <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
+              <button
+                (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
+                [disabled]="item.quantity >= item.product.stock"
+                class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                [title]="item.quantity >= item.product.stock ? ('sales.maxStock' | translate) : ('sales.increaseQuantity' | translate)"
+              >
+                +
+              </button>
+            </div>
+            <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">
+              ${{ (item.product.price * item.quantity).toFixed(2) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Totals & Payment Footer -->
+  <div class="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-5 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
+      <div class="space-y-3">
+        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
+          <span>{{ 'sales.subtotal' | translate }}</span>
+          <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ subtotalDisplay().toFixed(2) }}</span>
+        </div>
+
+        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
+          <span>{{ 'sales.tax' | translate }}</span>
+          <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ taxDisplay().toFixed(2) }}</span>
+        </div>
+
+        <div class="flex justify-between items-end pt-4 border-t border-slate-100 dark:border-slate-700">
+          <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
+            {{ 'sales.grandTotal' | translate }}
+          </span>
+          <span class="text-xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter tabular-nums">${{ totalDisplay().toFixed(2) }}</span>
+        </div>
+      </div>
+
+    <button
+      [disabled]="cart.items().length === 0"
+      (click)="checkout.emit()"
+      class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 motion-safe:active:scale-[0.98] flex items-center justify-center gap-2"
+    >
+      {{ 'sales.checkout' | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- MOBILE: Bottom Cart Peek Bar -->
+@if (isMobile() && cart.items().length > 0) {
+  <div
+    (click)="toggleCartSidebar.emit()"
+    class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] cursor-pointer motion-safe:active:scale-[0.99] transition-transform mobile-peek-bar safe-area-bottom"
+  >
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
+      </div>
+      <div class="text-sm">
+        <p class="font-semibold text-slate-800 dark:text-slate-200">{{ 'sales.cart' | translate }}</p>
+        <p class="text-xs text-slate-400">{{ cart.items().length }} {{ 'sales.itemUnits' | translate }}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">${{ totalDisplay().toFixed(2) }}</span>
+      <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+      </svg>
+    </div>
+  </div>
+}
+
+<!-- MOBILE: Cart Drawer Backdrop -->
+@if (isMobile() || isCartDrawerOpen()) {
+  <div
+    [@drawerBackdrop]="isCartDrawerOpen() ? 'open' : 'closed'"
+    class="md:hidden fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm"
+    (click)="closeCartDrawer.emit()"
+  ></div>
+}
+
+<!-- MOBILE: Cart Bottom Drawer -->
+@if (isMobile() || isCartDrawerOpen()) {
+  <div
+    [@drawerSlide]="isCartDrawerOpen() ? 'open' : 'closed'"
+    class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden"
+    [class.h-\[70vh\]]="true"
+  >
+    <!-- Drawer Handle -->
+    <div class="flex justify-center pt-3 pb-1 flex-shrink-0">
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+    </div>
+
+    <!-- Drawer Header -->
+    <div class="px-5 pb-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base">{{ 'sales.yourCart' | translate }}</h2>
+        @if (cart.items().length > 0) {
+          <span class="text-xs text-slate-400">({{ cart.items().length }} {{ 'sales.itemUnits' | translate }})</span>
+        }
+      </div>
+      <div class="flex items-center gap-2">
+        <button *ngIf="cart.items().length > 0" (click)="clearCart.emit()" class="text-xs text-rose-500 font-bold hover:underline">
+          {{ 'sales.clear' | translate }}
+        </button>
+        <button type="button" (click)="closeCartDrawer.emit()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drawer Cart Items -->
+    <div class="flex-1 overflow-y-auto px-5 py-2 space-y-2">
+      <div *ngIf="cart.items().length === 0" class="flex flex-col items-center justify-center h-full text-slate-300 dark:text-slate-600">
+        <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <p class="text-sm font-medium">{{ 'sales.cartEmpty' | translate }}</p>
+      </div>
+
+      <div
+        *ngFor="let item of cart.items(); trackBy: trackByProductId"
+        class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700"
+      >
+        @let photo = item.product.imgUrl || photoResolver(item.product.category);
+        <div class="flex items-start gap-3">
+          <!-- Product thumbnail -->
+          <div class="w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-600 shadow-sm flex items-center justify-center">
+            @if (photo) {
+              <img
+                [src]="photo"
+                [alt]="item.product.name"
+                class="w-full h-full object-cover"
+                loading="lazy"
+                appImgFallback
+              />
+            } @else {
+              <svg class="w-6 h-6 text-slate-300 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between gap-2 mb-3">
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1">
+                {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
+              </p>
+              <button type="button" (click)="cart.removeItem(item.product.id)" class="text-slate-300 dark:text-slate-500 hover:text-rose-500 flex-shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <button (click)="cart.updateQuantity(item.product.id, item.quantity - 1)" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 active:scale-90 transition-transform">
+                  -
+                </button>
+                <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200">{{ item.quantity }}</span>
+                <button
+                  (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
+                  [disabled]="item.quantity >= item.product.stock"
+                  class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-transform"
+                >
+                  +
+                </button>
+              </div>
+              <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">${{ (item.product.price * item.quantity).toFixed(2) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Totals & Checkout -->
+    <div class="p-5 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-3 flex-shrink-0 safe-area-bottom">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-slate-500">{{ 'sales.subtotal' | translate }}</span>
+        <span class="font-bold text-slate-700 dark:text-slate-300 tabular-nums">${{ subtotalDisplay().toFixed(2) }}</span>
+      </div>
+      <div class="flex justify-between items-center text-lg">
+        <span class="font-extrabold text-slate-900 dark:text-slate-100">{{ 'receipt.total' | translate }}</span>
+        <span class="font-black text-indigo-600 dark:text-indigo-400 tabular-nums">${{ totalDisplay().toFixed(2) }}</span>
+      </div>
+      <button
+        [disabled]="cart.items().length === 0"
+        (click)="checkout.emit()"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 active:scale-[0.98] flex items-center justify-center gap-2 text-base"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+        {{ 'sales.checkout' | translate }}
+      </button>
+    </div>
+  </div>
+}

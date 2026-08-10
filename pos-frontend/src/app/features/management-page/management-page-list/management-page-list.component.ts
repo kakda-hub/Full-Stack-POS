@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRe
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { ManagementPage, ManagementPageService } from '../../../core/services/api/management-page.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { ManagementPage } from '../../../models';
+import { ManagementPageService } from '../../../services/management-page.service';
 import { ManagementPageDetailComponent } from '../management-page-detail/management-page-detail.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
@@ -13,7 +13,6 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-management-page-list',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeIn, listAnimation, pageTransition],
   templateUrl: './management-page-list.component.html',
   styleUrl: './management-page-list.component.scss',
 })
@@ -62,14 +61,12 @@ export class ManagementPageListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(e: Event): void {
-    this.searchSubject.next((e.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
-  clearSearch(input: HTMLInputElement): void {
-    input.value = '';
+  clearSearch(): void {
     this.searchSubject.next('');
-    input.focus();
   }
 
   /**
@@ -201,8 +198,8 @@ export class ManagementPageListComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
-        title: 'Delete Management Page',
-        message: `Are you sure you want to delete "${node.title}"?`
+        title: this.lang.t('managementPages.deletePage'),
+        message: this.lang.t('managementPages.deleteQuestion', { name: node.title })
       }
     });
 

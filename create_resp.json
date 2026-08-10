@@ -1,1 +1,0 @@
-{"success":true,"statusCode":201,"data":{"name":"Product To Update","nameKh":"??????","barcode":"TEST888888","price":15.5,"costPrice":8,"stock":50,"categoryId":2,"description":"Will be updated","imgUrl":null,"expiryDate":null,"id":102,"lowStockThreshold":10,"isActive":true,"createdAt":"2026-07-29T12:41:05.000Z"},"timestamp":"2026-07-29T12:41:05.518Z"}

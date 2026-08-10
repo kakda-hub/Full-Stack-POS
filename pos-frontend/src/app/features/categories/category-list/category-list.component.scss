@@ -1,7 +1,3 @@
-/* ==========================================================
-   Category List Component Styles
-   ========================================================== */
-
 /* ─── Page wrapper ─── */
 .category-list-wrapper {
   @apply p-3 space-y-4;
@@ -15,21 +11,6 @@
 /* ─── Filters bar ─── */
 .filters-bar {
   @apply flex gap-2 sm:gap-3 flex-wrap;
-}
-
-/* ─── Search input ─── */
-.search-wrapper {
-  @apply relative flex-1 min-w-48;
-}
-
-.search-icon {
-  @apply absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400;
-}
-
-.search-input {
-  @apply w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm;
-  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
-  @apply bg-white border-slate-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100;
 }
 
 /* ─── Table container ─── */

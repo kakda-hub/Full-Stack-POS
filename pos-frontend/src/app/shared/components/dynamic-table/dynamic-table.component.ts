@@ -4,22 +4,22 @@ import {
   EventEmitter,
   Input,
   Output,
-  signal,
-  computed,
 } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { fadeIn, listAnimation } from '../../animations/animations';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
 
 /** Column definition for DynamicTableComponent */
 export interface TableColumn {
   /** Field key on the data item */
   key: string;
-  /** English header label */
-  label: string;
-  /** Khmer header label (optional) */
+  /** English header label (legacy — use labelKey for i18n) */
+  label?: string;
+  /** Khmer header label (optional, legacy) */
   labelKm?: string;
+  /** i18n key for the header label (takes precedence over label/labelKm) */
+  labelKey?: string;
   /** Cell type – controls how the cell is rendered */
   type?: 'text' | 'subtext' | 'image' | 'badge' | 'description';
   /** Secondary text field (shown beneath main text when type = 'subtext') */
@@ -60,6 +60,25 @@ export class DynamicTableComponent {
   /** Available page-size options */
   @Input() pageSizeOptions: number[] = [5, 10, 25, 100];
 
+  /**
+   * Mobile-only infinite scroll. When enabled, the mobile card layout appends
+   * pages via the `loadMore` output instead of the paginator (which is hidden
+   * on mobile). The desktop table keeps its server-side pagination untouched.
+   */
+  @Input() infiniteScrollOnMobile = false;
+
+  /**
+   * Appended rows rendered by the mobile card layout (infinite scroll mode).
+   * Falls back to `rows` when not provided, so existing consumers are unchanged.
+   */
+  @Input() mobileRows: any[] | null = null;
+
+  /** Whether more pages exist (drives when `loadMore` may fire). */
+  @Input() hasMore = true;
+
+  /** Whether the next page is currently being fetched (shows a spinner). */
+  @Input() isLoadingMore = false;
+
   /** Emitted when the user clicks the Edit button for a row */
   @Output() onEdit = new EventEmitter<any>();
 
@@ -69,6 +88,9 @@ export class DynamicTableComponent {
   /** Emitted when the paginator page changes */
   @Output() pageChange = new EventEmitter<PageEvent>();
 
+  /** Emitted when the mobile cards are scrolled near the bottom (infinite scroll). */
+  @Output() loadMore = new EventEmitter<void>();
+
   /** Skeleton row placeholders */
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
@@ -76,6 +98,14 @@ export class DynamicTableComponent {
     public theme: ThemeService,
     public lang: LanguageService,
   ) {}
+
+  /**
+   * Rows shown by the mobile card layout. In infinite-scroll mode the parent
+   * passes the appended list via `mobileRows`; otherwise the current page.
+   */
+  get mobileCardRows(): any[] {
+    return this.infiniteScrollOnMobile && this.mobileRows ? this.mobileRows : this.rows;
+  }
 
   rowNumber(index: number): number {
     return this.pageIndex * this.pageSize + index + 1;
@@ -103,7 +133,8 @@ export class DynamicTableComponent {
 
   /** Returns the label for a column in the active language */
   colLabel(col: TableColumn): string {
-    return this.lang.currentLang() === 'km' && col.labelKm ? col.labelKm : col.label;
+    if (col.labelKey) return this.lang.t(col.labelKey);
+    return this.lang.currentLang() === 'km' && col.labelKm ? col.labelKm : (col.label ?? '');
   }
 
   /** Extracts the primary display value from a row for a given column */

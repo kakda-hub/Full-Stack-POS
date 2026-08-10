@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared.module';
-import { ReusableCardComponent } from './reusable-card/reusable-card.component';
 import { InputFieldComponent } from './control-value-accessor/input-field/input-field.component';
 import { DatePickerComponent } from './control-value-accessor/date-picker/date-picker.component';
 import { SelectOptionComponent } from './control-value-accessor/select-option/select-option.component';
@@ -15,7 +14,6 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 
 @NgModule({
   declarations: [
-    ReusableCardComponent,
     InputFieldComponent,
     DatePickerComponent,
     SelectOptionComponent,
@@ -30,7 +28,6 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     InputFieldComponent,
     DatePickerComponent,
     SelectOptionComponent,
-    ReusableCardComponent,
     TextareaComponent,
     HeaderDetailComponent,
     DialogActionsComponent,

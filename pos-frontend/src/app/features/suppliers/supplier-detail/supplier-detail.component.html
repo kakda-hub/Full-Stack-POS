@@ -1,9 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <app-header-detail
     [id]="id"
-    [title]="id
-      ? (lang.currentLang() === 'km' ? 'កែប្រែអ្នកផ្គត់ផ្គង់' : 'Edit Supplier')
-      : (lang.currentLang() === 'km' ? 'បន្ថែមអ្នកផ្គត់ផ្គង់' : 'Add Supplier')"
+    [title]="id ? ('suppliers.editTitle' | translate) : ('suppliers.addTitle' | translate)"
   ></app-header-detail>
 
   <mat-dialog-content class="dialog-content">
@@ -11,41 +9,41 @@
       <div class="form-grid">
         <app-input-field
           formControlName="name"
-          [placeholder]="lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកផ្គត់ផ្គង់' : 'Supplier Name'"
+          [placeholder]="'suppliers.name' | translate"
           [isRequired]="true"
         ></app-input-field>
 
         <app-input-field
           formControlName="contactPerson"
-          [placeholder]="lang.currentLang() === 'km' ? 'អ្នកទំនាក់ទំនង' : 'Contact Person'"
+          [placeholder]="'suppliers.contactPerson' | translate"
         ></app-input-field>
 
         <app-input-field
           formControlName="phone"
-          [placeholder]="lang.currentLang() === 'km' ? 'ទូរស័ព្ទ' : 'Phone'"
+          [placeholder]="'suppliers.phone' | translate"
         ></app-input-field>
 
         <app-input-field
           formControlName="email"
-          [placeholder]="lang.currentLang() === 'km' ? 'អ៊ីមែល' : 'Email'"
+          [placeholder]="'suppliers.email' | translate"
         ></app-input-field>
 
         <app-input-field
           formControlName="taxId"
-          [placeholder]="lang.currentLang() === 'km' ? 'លេខសម្គាល់ពន្ធ' : 'Tax ID'"
+          [placeholder]="'suppliers.taxId' | translate"
         ></app-input-field>
       </div>
 
       <div class="form-grid">
         <app-textarea
           formControlName="address"
-          [placeholder]="lang.currentLang() === 'km' ? 'អាសយដ្ឋាន' : 'Address'"
+          [placeholder]="'suppliers.address' | translate"
           [rows]="2"
         ></app-textarea>
 
         <app-textarea
           formControlName="notes"
-          [placeholder]="lang.currentLang() === 'km' ? 'កំណត់ចំណាំ' : 'Notes'"
+          [placeholder]="'suppliers.notes' | translate"
           [rows]="2"
         ></app-textarea>
       </div>
