@@ -45,3 +45,12 @@ tmp/
 temp/
 *.tmp
 *.bak
+
+# ── Main-branch exclusions ────────────────────────────────────────────────────
+# These paths belong ONLY on master. They must never be tracked on main.
+pos-backend/src/database/
+pos-backend/init.sql
+pos-backend/reset-migration.js
+pos-backend/run-sql-seed.js
+pos-backend/seed-products.sql
+docs/
