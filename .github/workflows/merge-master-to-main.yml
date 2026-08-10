@@ -1,47 +1,98 @@
 name: Merge master into main
 
-# Runs the sanctioned master -> main merge workflow
-# (scripts/merge-master-to-main.ps1), which keeps master-only paths
-# (seed-products.sql, run-sql-seed.js, reset-migration.js, test/, src/database/)
-# at main's own version while merging all other application changes normally.
+# Keeps master-only paths off `main`. Master-only paths:
+#   .github  .husky  .kilo  .vscode  docs  path/to
+#   pos-backend/init.sql  pos-backend/reset-migration.js
+#   pos-backend/run-sql-seed.js  pos-backend/seed-products.sql
+#
+# How the protection works:
+#   1. `.gitattributes` marks these paths `merge=ours`; this job configures the
+#      backing driver with `git config merge.ours.driver true`. During the
+#      merge, main therefore keeps its own version of any protected path that
+#      exists on both branches.
+#   2. `merge=ours` cannot drop paths that exist ONLY on master (the merge just
+#      adds them), so this job unconditionally removes the full target list
+#      from the tree before committing to main.
+#   3. A smoke test then FAILS the workflow if any master-only path is still
+#      tracked on main, so a polluted state is never pushed.
+#   4. `.github` and `.husky` are themselves master-only, so this workflow file
+#      exists on master and runs on every push to master. It is deliberately
+#      NOT present on main. Scheduled/dispatch triggers are disabled as a
+#      consequence — enable GitHub branch protection on main to block direct
+#      pushes instead.
 
 on:
-  # Merge as soon as master receives new commits.
   push:
     branches:
       - master
-  # Daily safety-net sync (UTC) in case master changed via means other than a
-  # push to the branch (e.g. PR merges on GitHub). Scheduled runs use the
-  # workflow file from the default branch.
-  schedule:
-    - cron: '0 6 * * *'
-  # Allow triggering manually from the Actions tab.
-  workflow_dispatch:
 
 permissions:
   contents: write
 
-# Never run two merges at once (e.g. schedule overlapping a push event).
+# Never run two merges at once (e.g. a schedule overlapping a push event).
 concurrency:
   group: merge-master-to-main
   cancel-in-progress: false
 
 jobs:
   merge:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Single source of truth for the master-only paths, shared by the
+      # removal step and the smoke test so the lists can never drift apart.
+      MASTER_ONLY_PATHS: >-
+        .github
+        .husky
+        .kilo
+        .vscode
+        docs
+        path/to
+        pos-backend/init.sql
+        pos-backend/reset-migration.js
+        pos-backend/run-sql-seed.js
+        pos-backend/seed-products.sql
     steps:
-      - name: Checkout repository (full history)
+      - name: Checkout main (full history)
         uses: actions/checkout@v4
         with:
-          # The merge script compares and merges branch tips, so it needs all
-          # history and all remote branches (not a shallow single-branch clone).
+          ref: main
           fetch-depth: 0
 
-      - name: Configure git identity
+      - name: Configure git identity and merge driver
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Backing driver for the `merge=ours` attribute in .gitattributes
+          git config merge.ours.driver true
 
-      - name: Merge master into main (protects master-only paths)
-        run: powershell -ExecutionPolicy Bypass -File ./scripts/merge-master-to-main.ps1
+      - name: Merge master into main
+        run: |
+          git fetch origin master
+          git merge --no-ff -m "Merge branch 'master' into main" origin/master
+
+      - name: Remove master-only paths from main
+        run: |
+          git rm -r -f --ignore-unmatch $MASTER_ONLY_PATHS
+
+      - name: Smoke test - verify no master-only paths exist on main
+        run: |
+          fail=0
+          for p in $MASTER_ONLY_PATHS; do
+            if git ls-files "$p" | grep -q .; then
+              echo "::error::Master-only path '$p' is still tracked on main"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "Smoke test FAILED: master-only paths must never exist on main."
+            exit 1
+          fi
+          echo "Smoke test passed: none of the master-only paths are on main."
+
+      - name: Commit and push
+        run: |
+          if ! git diff --cached --quiet; then
+            git commit -m "Remove master-only paths from main"
+          fi
+          git push origin main

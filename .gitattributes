@@ -3,3 +3,29 @@
 
 # Git hooks must stay LF — a CRLF shebang breaks execution on Unix
 .husky/** text eol=lf
+
+# Shell scripts must stay LF — a CRLF shebang breaks execution on Unix
+scripts/*.sh text eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# Master-only paths — never merge master's versions into main.
+#
+# `merge=ours` is backed by the custom driver configured with
+#   git config merge.ours.driver true
+# (set locally and in CI). During a master -> main merge, main keeps its own
+# version of any protected path that exists on BOTH branches.
+#
+# Note: merge=ours cannot drop paths that exist ONLY on master — the merge
+# simply adds them. The auto-merge workflow and scripts/cleanup-main.sh
+# therefore remove the full list below from main after every merge.
+# ─────────────────────────────────────────────────────────────
+.github merge=ours
+.husky merge=ours
+.kilo merge=ours
+.vscode merge=ours
+docs merge=ours
+path/to merge=ours
+pos-backend/init.sql merge=ours
+pos-backend/reset-migration.js merge=ours
+pos-backend/run-sql-seed.js merge=ours
+pos-backend/seed-products.sql merge=ours

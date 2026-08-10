@@ -4,6 +4,6 @@
   "private": true,
   "description": "Root-level scripts for the Full-Stack-POS monorepo",
   "scripts": {
-    "merge:master-to-main": "powershell -ExecutionPolicy Bypass -File ./scripts/merge-master-to-main.ps1"
+    "merge:master-to-main": "bash scripts/merge-master-to-main.sh"
   }
 }
