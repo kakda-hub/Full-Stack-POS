@@ -69,7 +69,44 @@ jobs:
       - name: Merge master into main
         run: |
           git fetch origin master
-          git merge --no-ff -m "Merge branch 'master' into main" origin/master
+          if git merge --no-ff -m "Merge branch 'master' into main" origin/master; then
+            echo "Merge completed cleanly."
+          else
+            echo "Merge stopped - checking for conflicts..."
+            unmerged=$(git diff --name-only --diff-filter=U)
+            if [ -z "$unmerged" ]; then
+              echo "Merge failed without conflicts - aborting."
+              git merge --abort 2>/dev/null || true
+              exit 1
+            fi
+            # All conflicts must be on master-only paths: main deliberately
+            # deletes them, while master may legitimately modify them (e.g.
+            # this workflow file). Resolve by keeping main's version, i.e.
+            # the deletion - the paths never belong on main.
+            ok=1
+            for u in $unmerged; do
+              matched=0
+              for p in $MASTER_ONLY_PATHS; do
+                case "$u" in
+                  "$p"|"$p"/*) matched=1 ;;
+                esac
+              done
+              if [ "$matched" -eq 0 ]; then
+                echo "::error::Unexpected conflict outside master-only paths: $u"
+                ok=0
+              else
+                echo "Master-only conflict (resolving by deletion): $u"
+              fi
+            done
+            if [ "$ok" -ne 1 ]; then
+              echo "Aborting merge: unexpected conflicts must be resolved manually."
+              git merge --abort 2>/dev/null || true
+              exit 1
+            fi
+            git rm -r -f $unmerged
+            git commit --no-edit
+            echo "Resolved master-only conflicts; merge committed."
+          fi
 
       - name: Remove master-only paths from main
         run: |
