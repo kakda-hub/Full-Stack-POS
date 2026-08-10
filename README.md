@@ -393,6 +393,22 @@ git push origin master
 
 The workflow merges master into main, auto-resolves modify/delete conflicts on master-only paths, removes the target list, and runs a **smoke test** that fails the run if any master-only path is still tracked on main. It pushes main with `GITHUB_TOKEN`, or with `MAIN_PUSH_TOKEN` (fine-grained PAT) when that secret is set.
 
+### Docs consistency check
+
+A second master-only workflow (`.github/workflows/docs-consistency.yml`) verifies that the lists documented above never drift from what CI actually enforces. It runs on every push to `master` and on pull requests targeting `master`, and compares three sources — they must all agree:
+
+1. `MASTER_ONLY_PATHS` in `.github/workflows/merge-master-to-main.yml` — the source of truth
+2. The `.gitattributes` block above (the `merge=ours` lines)
+3. The master-only paths table above
+
+On any mismatch it fails the run with `::error::` annotations and a side-by-side diff of the three lists. Run it locally from the repo root:
+
+```bash
+bash .github/scripts/docs-consistency.sh
+```
+
+> 💡 When changing the master-only paths, update **all** of these together: the workflow's `MASTER_ONLY_PATHS`, `.gitattributes`, `scripts/cleanup-main.sh`, `scripts/merge-master-to-main.sh`, `scripts/protect-main.json`, and this README. The docs-consistency check keeps the README honest; the smoke test in the merge workflow keeps the enforcement honest.
+
 ### Branch-protection ruleset for `main`
 
 *Settings → Rules → Rulesets* → create `protect-main` targeting `main`:
