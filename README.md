@@ -341,7 +341,7 @@ Some development/internal files must **only ever exist on `master`** — they mu
 | `.kilo`, `.vscode` | Dev-local tooling — also untracked & gitignored |
 | `docs` | Internal documentation |
 | `path/to` | Scratch path |
-| `pos-backend/init.sql` · `reset-migration.js` · `run-sql-seed.js` · `seed-products.sql` | Database seed & migration tooling |
+| `pos-backend/init.sql` · `pos-backend/reset-migration.js` · `pos-backend/run-sql-seed.js` · `pos-backend/seed-products.sql` | Database seed & migration tooling |
 
 ### `.gitattributes` merge driver
 
