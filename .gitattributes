@@ -29,3 +29,4 @@ pos-backend/init.sql merge=ours
 pos-backend/reset-migration.js merge=ours
 pos-backend/run-sql-seed.js merge=ours
 pos-backend/seed-products.sql merge=ours
+pos-backend/src/database/** merge=ours
