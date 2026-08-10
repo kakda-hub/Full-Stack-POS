@@ -128,8 +128,18 @@ jobs:
           echo "Smoke test passed: none of the master-only paths are on main."
 
       - name: Commit and push
+        env:
+          # Optional fine-grained PAT. When set, the push authenticates as a
+          # user on the protect-main ruleset bypass list, so the bot can push
+          # past "require pull request before merging". When unset, falls back
+          # to the default GITHUB_TOKEN (works while main has no protection).
+          MAIN_PUSH_TOKEN: ${{ secrets.MAIN_PUSH_TOKEN }}
         run: |
           if ! git diff --cached --quiet; then
             git commit -m "Remove master-only paths from main"
           fi
-          git push origin main
+          if [ -n "$MAIN_PUSH_TOKEN" ]; then
+            git push "https://x-access-token:${MAIN_PUSH_TOKEN}@github.com/kakda-hub/Full-Stack-POS.git" main
+          else
+            git push origin main
+          fi
