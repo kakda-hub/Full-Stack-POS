@@ -25,15 +25,25 @@
     Perform the merge and the protected-path restoration locally, but do not
     push. Useful for rehearsing the workflow safely.
 
+.PARAMETER Strict
+    By default the script ignores untracked files and only fails on changes to
+    tracked files (git itself refuses a merge that would overwrite an untracked
+    file). Use -Strict to also fail on untracked files, matching the literal
+    "stop on any uncommitted change" requirement.
+
 .EXAMPLE
     ./scripts/merge-master-to-main.ps1
 
 .EXAMPLE
     ./scripts/merge-master-to-main.ps1 -SkipPush
+
+.EXAMPLE
+    ./scripts/merge-master-to-main.ps1 -Strict
 #>
 [CmdletBinding()]
 param(
-    [switch]$SkipPush
+    [switch]$SkipPush,
+    [switch]$Strict
 )
 
 $ErrorActionPreference = 'Stop'
@@ -75,16 +85,31 @@ function Invoke-GitChecked {
 
 try {
     # -- 1. Stop if the working tree contains uncommitted changes --------------
-    # Untracked files ('??') do not block the run: git itself refuses the merge
-    # if an untracked file would be overwritten. Any change to a tracked file
-    # (modified/staged/conflicted) stops the script immediately.
-    $dirty = @(@(git status --porcelain) | Where-Object { $_ -notmatch '^\?\?' })
+    # By default, untracked files ('??') do not block the run: git itself
+    # refuses a merge that would overwrite an untracked file. Any change to a
+    # tracked file (modified/staged/conflicted) stops the script. With -Strict,
+    # ANY working-tree change, including untracked files, stops the script.
+    $porcelain = @(git status --porcelain)
     if ($LASTEXITCODE -ne 0) { throw 'Could not read git status.' }
+    $dirty = if ($Strict) {
+        $porcelain
+    }
+    else {
+        @($porcelain | Where-Object { $_ -notmatch '^\?\?' })
+    }
     if ($dirty.Count -gt 0) {
         $show = (($dirty | Select-Object -First 5) -join '; ')
+        if ($Strict) {
+            throw "Working tree has uncommitted or untracked changes ($show). Commit or stash them before running this merge."
+        }
         throw "Working tree has uncommitted changes to tracked files ($show). Commit or stash them before running this merge."
     }
-    Write-Ok 'Working tree is clean (tracked files unchanged).'
+    if ($Strict) {
+        Write-Ok 'Working tree is clean (no uncommitted or untracked changes).'
+    }
+    else {
+        Write-Ok 'Working tree is clean (tracked files unchanged).'
+    }
 
     # -- 2/3. Ensure the repository is on `main` -------------------------------
     $currentBranch = (git branch --show-current)
