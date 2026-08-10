@@ -19,7 +19,6 @@ export interface IRequestOptions {
 export abstract class AbstractRest {
 
   private readonly url: string;
-
   protected baseHeaders?: HttpHeaders;
 
   constructor(private httpCore: DynamicHttp) {

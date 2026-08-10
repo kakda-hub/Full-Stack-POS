@@ -70,7 +70,11 @@ export class ProductService {
    * Create a new product
    */
   createProduct(product: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, product).pipe(
+    // The backend only stores a single imgUrl (no imgUrls column), and its
+    // ValidationPipe rejects unknown properties (forbidNonWhitelisted), so
+    // the UI-only imgUrls gallery array must not be sent to the API.
+    const { imgUrls, ...body } = product ?? {};
+    return this.http.post<any>(this.apiUrl, body).pipe(
       map((res) => res?.data ?? res)
     );
   }
@@ -79,7 +83,9 @@ export class ProductService {
    * Update a product
    */
   updateProduct(id: number, product: any): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}`, product).pipe(
+    // See createProduct: imgUrls is UI-only state and would 400 on the backend.
+    const { imgUrls, ...body } = product ?? {};
+    return this.http.patch<any>(`${this.apiUrl}/${id}`, body).pipe(
       map((res) => res?.data ?? res)
     );
   }
