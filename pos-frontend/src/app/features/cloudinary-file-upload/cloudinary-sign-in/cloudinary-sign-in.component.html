@@ -37,18 +37,14 @@
           [class.text-slate-100]="theme.isDark()"
           [class.text-slate-800]="!theme.isDark()"
         >
-          {{ lang.currentLang() === 'km' ? 'ចូលប្រើប្រព័ន្ធ' : 'Sign In' }}
+          {{ 'cloudinarySignIn.title' | translate }}
         </h3>
         <p
           class="text-sm mt-1"
           [class.text-slate-400]="theme.isDark()"
           [class.text-slate-500]="!theme.isDark()"
         >
-          {{
-            lang.currentLang() === 'km'
-              ? 'ចូលប្រើធនធាន និងផ្ទាំងគ្រប់គ្រង Cloudinary របស់អ្នក។'
-              : 'Access your Cloudinary assets and dashboard.'
-          }}
+          {{ 'cloudinarySignIn.subtitle' | translate }}
         </p>
       </div>
 
@@ -60,7 +56,7 @@
             [class.text-slate-300]="theme.isDark()"
             [class.text-slate-700]="!theme.isDark()"
           >
-            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើ' : 'Username' }}
+            {{ 'cloudinarySignIn.username' | translate }}
           </label>
           <div class="mt-1 relative">
             <input
@@ -88,11 +84,7 @@
             *ngIf="usernameInvalid()"
             class="mt-1.5 text-xs font-medium text-rose-500"
           >
-            {{
-              lang.currentLang() === 'km'
-                ? 'សូមបញ្ចូលឈ្មោះអ្នកប្រើរបស់អ្នក។'
-                : 'Please enter your username.'
-            }}
+            {{ 'cloudinarySignIn.usernameRequired' | translate }}
           </p>
         </div>
 
@@ -103,7 +95,7 @@
             [class.text-slate-300]="theme.isDark()"
             [class.text-slate-700]="!theme.isDark()"
           >
-            {{ lang.currentLang() === 'km' ? 'ពាក្យសម្ងាត់' : 'Password' }}
+            {{ 'cloudinarySignIn.password' | translate }}
           </label>
           <div class="mt-1">
             <input
@@ -131,31 +123,8 @@
             *ngIf="passwordInvalid()"
             class="mt-1.5 text-xs font-medium text-rose-500"
           >
-            {{
-              lang.currentLang() === 'km'
-                ? 'សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក។'
-                : 'Please enter your password.'
-            }}
+            {{ 'cloudinarySignIn.passwordRequired' | translate }}
           </p>
-        </div>
-
-        <div class="flex items-center">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            [checked]="remember()"
-            (change)="onRememberChange($event)"
-            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
-          >
-          <label
-            for="remember-me"
-            class="ml-2 block text-sm cursor-pointer select-none"
-            [class.text-slate-400]="theme.isDark()"
-            [class.text-slate-600]="!theme.isDark()"
-          >
-            {{ lang.currentLang() === 'km' ? 'រក្សាការចូលប្រើ' : 'Stay signed in' }}
-          </label>
         </div>
 
         <div>
@@ -163,7 +132,7 @@
             type="submit"
             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform active:scale-95"
           >
-            {{ lang.currentLang() === 'km' ? 'ចូលទៅកាន់ Cloudinary' : 'Login to Cloudinary' }}
+            {{ 'cloudinarySignIn.login' | translate }}
           </button>
         </div>
       </form>
@@ -173,7 +142,7 @@
         [class.text-slate-500]="theme.isDark()"
         [class.text-slate-400]="!theme.isDark()"
       >
-        {{ lang.currentLang() === 'km' ? 'សុវត្ថិភាពដោយ' : 'Secured by' }}
+        {{ 'cloudinarySignIn.securedBy' | translate }}
         <span class="font-semibold text-sky-500">Cloudinary</span>
       </p>
     </div>

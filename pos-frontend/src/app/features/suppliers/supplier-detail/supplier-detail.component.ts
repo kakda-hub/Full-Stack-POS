@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { SupplierService } from '../../../core/services/api/supplier.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({
@@ -69,11 +69,7 @@ export class SupplierDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save supplier', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការរក្សាទុកអ្នកផ្គត់ផ្គង់បរាជ័យ'
-            : 'Failed to save supplier'
-        );
+        this.alertService.error(this.lang.t('suppliers.saveFailed'));
         this.isSaving.set(false);
       },
     });

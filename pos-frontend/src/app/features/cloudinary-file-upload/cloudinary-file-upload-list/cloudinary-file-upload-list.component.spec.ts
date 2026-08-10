@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,16 +7,16 @@ import { Router } from '@angular/router';
 import { isSignedIn, signOut, CLOUDINARY_SESSION_KEY } from '../cloudinary-session';
 
 import { CloudinaryFileUploadListComponent } from './cloudinary-file-upload-list.component';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-  CloudinaryApiResponse,
-} from '../../../core/services/api/cloudinary.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource, CloudinaryApiResponse } from '../../../models';
+import { AlertService } from '../../../services/shared/alert.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MaterialModule } from '../../../core/material/material.module';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { createI18nMocks } from '../../../testing/i18n-mock';
 
 // NOTE: this app runs zoneless, so `fakeAsync`/`tick` are unavailable.
 // The component debounces searches by 300ms — tests use real timers instead.
@@ -28,7 +28,7 @@ describe('CloudinaryFileUploadListComponent', () => {
   let component: CloudinaryFileUploadListComponent;
 
   const themeMock = { isDark: () => false };
-  const langMock = { currentLang: () => 'en' };
+  const { langMock, translateServiceMock } = createI18nMocks();
   const alertMock = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
   const cloudinaryMock = {
     listResources: vi.fn(),
@@ -116,12 +116,16 @@ describe('CloudinaryFileUploadListComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [CloudinaryFileUploadListComponent],
-      imports: [SharedModule, MaterialModule, NoopAnimationsModule],
+      // SearchInputComponent is declared directly because the test module's
+      // SharedModule scope does not resolve it (NG0304) — declaring it here
+      // makes the search bar render so the search specs can drive it.
+      declarations: [CloudinaryFileUploadListComponent, SearchInputComponent],
+      imports: [SharedModule, MaterialModule, NoopAnimationsModule, TranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ThemeService, useValue: themeMock },
         { provide: LanguageService, useValue: langMock },
+        { provide: TranslateService, useValue: translateServiceMock },
         { provide: AlertService, useValue: alertMock },
         { provide: CloudinaryService, useValue: cloudinaryMock },
         { provide: MatDialog, useValue: dialogMock },

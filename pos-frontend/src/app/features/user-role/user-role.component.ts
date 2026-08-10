@@ -1,8 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { AlertService } from '../../core/services/alert.service';
-import { UserService } from '../../core/services/api/user.service';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { AlertService } from '../../services/shared/alert.service';
+import { UserService } from '../../services/user.service';
 
 interface UserRoleItem {
   id: number;
@@ -61,11 +61,7 @@ export class UserRoleComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load users', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'មិនអាចផ្ទុកអ្នកប្រើបានទេ'
-            : 'Failed to load users'
-        );
+        this.alertService.error(this.lang.t('users.loadFailed'));
         this.isLoading.set(false);
       },
     });
@@ -80,20 +76,12 @@ export class UserRoleComponent implements OnInit {
           users.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
         );
         this.updatingUserId.set(null);
-        this.alertService.success(
-          this.lang.currentLang() === 'km'
-            ? 'តួនាទីត្រូវបានធ្វើបច្ចុប្បន្នភាព'
-            : 'Role updated successfully'
-        );
+        this.alertService.success(this.lang.t('userRoles.roleUpdated'));
       },
       error: (err) => {
         console.error('Failed to update role', err);
         this.updatingUserId.set(null);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការផ្លាស់ប្តូរតួនាទីបរាជ័យ'
-            : 'Failed to update role'
-        );
+        this.alertService.error(this.lang.t('userRoles.roleUpdateFailed'));
       },
     });
   }

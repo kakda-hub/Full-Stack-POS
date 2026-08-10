@@ -1,0 +1,24 @@
+@if (quickPicks.length > 0) {
+  <div>
+    <h2 class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] px-1">
+      {{ 'sales.quickAddItems' | translate }}
+    </h2>
+    <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+      @for (item of quickPicks; track item.id) {
+        <button
+          (click)="addQuickPick.emit(item)"
+          class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all motion-safe:active:scale-95 group"
+          type="button"
+        >
+          @if (item.icon) {
+            <span class="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-700 rounded-lg text-lg group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">{{ item.icon }}</span>
+          }
+          <div class="text-left">
+            <p class="text-[11px] text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' && item.labelKh ? item.labelKh : item.label }}</p>
+            <p class="text-xs font-black text-indigo-600 dark:text-indigo-400">${{ item.price.toFixed(2) }}</p>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+}

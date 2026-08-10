@@ -1,49 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { backdropAnimation, fadeIn, modalAnimation, pageTransition } from '../../shared/animations/animations';
-import { LanguageService } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { SaleService } from '../../core/services/api/sale.service';
+import { backdropAnimation, fadeIn, modalAnimation } from '../../shared/animations/animations';
+import { LanguageService } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { SaleService } from '../../services/sale.service';
 import { nextSort, SortDirection } from '../../shared/helpers/sort.helper';
 import { ListQuery } from '../../models/list-query';
+import { SaleDetail, SaleDisplay } from '../../models/sales-history.model';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-
-interface SaleItemDisplay {
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  lineTotal: number;
-}
-
-interface SaleDetail {
-  id: number;
-  date: Date;
-  cashierName: string;
-  paymentMethod: string;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-  items: SaleItemDisplay[];
-}
-
-interface SaleDisplay {
-  id: number;
-  date: Date;
-  cashierName: string;
-  itemsCount: number;
-  itemsList: string;
-  paymentMethod: string;
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-}
 
 @Component({
   selector: 'app-sales-history',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [backdropAnimation, fadeIn, modalAnimation, pageTransition],
+  animations: [backdropAnimation, fadeIn, modalAnimation],
   templateUrl: './sales-history.component.html',
   styleUrl: './sales-history.component.scss',
 })
@@ -55,6 +24,11 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   error = signal<string | null>(null);
   currentPage = signal(1);
   pageSize = 15;
+
+  // Mobile infinite-scroll state (append-mode pages for the card layout)
+  mobileSales = signal<SaleDisplay[]>([]);
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
 
   // Sorting (fields must be in the backend sort allowlist: createdAt, total, ...)
   sortBy = signal('createdAt');
@@ -112,31 +86,62 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   }
 
   /** Standard offset-based list query: max/offset/sort/sortBy/search/date range. */
-  private buildQuery(): ListQuery {
+  private buildQuery(offset: number): ListQuery {
     return {
       search: this.searchQuery() || undefined,
       sortBy: this.sortBy(),
       sort: this.sortDir(),
-      offset: (this.currentPage() - 1) * this.pageSize,
+      offset,
       max: this.pageSize,
       dateFrom: this.dateFrom() || undefined,
       dateTo: this.dateTo() || undefined,
     };
   }
 
-  /** Fetches one server-side page and keeps the raw rows for the detail modal. */
-  private fetchPage(): void {
-    this.isLoading.set(true);
+  /**
+   * Fetches one server-side page and keeps the raw rows for the detail modal.
+   *
+   * `append = false` (desktop pagination, search, sort, filters) replaces the
+   * list. `append = true` (mobile infinite scroll) fetches the next page at
+   * the current appended length and merges it into `mobileSales`.
+   */
+  private fetchPage(append = false): void {
+    if (append && (this.isLoadingMore() || !this.hasMore())) return;
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
     const seq = ++this.loadSeq;
+    const offset = append
+      ? this.mobileSales().length
+      : (this.currentPage() - 1) * this.pageSize;
 
-    this.saleService.getSalesPage(this.buildQuery()).subscribe({
+    this.saleService.getSalesPage(this.buildQuery(offset)).subscribe({
       next: (res) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         const data = res?.data ?? [];
+        const total = res?.total ?? data.length;
+
+        if (append) {
+          const page = data.map((sale: any) => this.mapSale(sale));
+          this.mobileSales.update(list => {
+            const seen = new Set(list.map(s => s.id));
+            return [...list, ...page.filter(s => !seen.has(s.id))];
+          });
+          this.hasMore.set(data.length > 0 && this.mobileSales().length < total);
+          this.isLoadingMore.set(false);
+          return;
+        }
+
         // After a delete (or concurrent data shrink) the current page may be
         // empty while more records exist — step back one page.
-        if (data.length === 0 && this.currentPage() > 1 && (res?.total ?? 0) > 0) {
+        if (data.length === 0 && this.currentPage() > 1 && total > 0) {
           this.currentPage.update((p) => p - 1);
           this.fetchPage();
           return;
@@ -144,22 +149,36 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
         this._rawSales = data;
         const mapped = data.map((sale: any) => this.mapSale(sale));
         this.sales.set(mapped);
-        this.totalItems.set(res?.total ?? data.length);
+        this.mobileSales.set(mapped);
+        this.totalItems.set(total);
+        this.hasMore.set(data.length > 0 && data.length < total);
         this.isLoading.set(false);
       },
       error: (err) => {
-        if (seq !== this.loadSeq) return; // stale response — ignore
+        if (seq !== this.loadSeq) {
+          // stale response — ignore
+          if (append) this.isLoadingMore.set(false);
+          return;
+        }
         console.error('Failed to fetch sales', err);
-        this.error.set(
-          this.lang.currentLang() === 'km'
-            ? 'មិនអាចផ្ទុកប្រវត្តិការលក់បានទេ'
-            : 'Failed to load sales history'
-        );
+        if (append) {
+          // Keep `hasMore` as-is so a later scroll can retry.
+          this.isLoadingMore.set(false);
+          return;
+        }
+        this.error.set(this.lang.t('salesHistory.loadFailed'));
         this.sales.set([]);
+        this.mobileSales.set([]);
         this.totalItems.set(0);
+        this.hasMore.set(false);
         this.isLoading.set(false);
       },
     });
+  }
+
+  /** Mobile infinite scroll: fetch and append the next page of sales. */
+  loadMoreSales(): void {
+    this.fetchPage(true);
   }
 
   /**
@@ -193,12 +212,12 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     return {
       id: sale.id,
       date: new Date(sale.createdAt),
-      cashierName: sale?.user?.name ?? 'Unknown',
+      cashierName: sale?.user?.name ?? this.lang.t('reports.unknown'),
       itemsCount: items.length,
       itemsList: items
         .slice(0, 3)
         .map((i: any) => i?.product?.name ?? `#${i.productId}`)
-        .join(', ') + (items.length > 3 ? ` +${items.length - 3} more` : ''),
+        .join(', ') + (items.length > 3 ? ` +${items.length - 3} ${this.lang.t('salesHistory.more')}` : ''),
       paymentMethod: sale.paymentMethod ?? 'cash',
       subtotal: Number(sale.subtotal ?? 0),
       discount: Number(sale.discount ?? 0),
@@ -212,7 +231,7 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     return {
       id: sale.id,
       date: new Date(sale.createdAt),
-      cashierName: sale?.user?.name ?? 'Unknown',
+      cashierName: sale?.user?.name ?? this.lang.t('reports.unknown'),
       paymentMethod: sale.paymentMethod ?? 'cash',
       subtotal: Number(sale.subtotal ?? 0),
       discount: Number(sale.discount ?? 0),
@@ -263,14 +282,14 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
   }
 
   quickFilters = [
-    { key: 'all', label: 'All Time', labelKm: 'ទាំងអស់' },
-    { key: 'today', label: 'Today', labelKm: 'ថ្ងៃនេះ' },
-    { key: 'week', label: 'This Week', labelKm: 'សប្តាហ៍នេះ' },
-    { key: 'month', label: 'This Month', labelKm: 'ខែនេះ' },
+    { key: 'all', labelKey: 'salesHistory.allTime' },
+    { key: 'today', labelKey: 'salesHistory.today' },
+    { key: 'week', labelKey: 'salesHistory.week' },
+    { key: 'month', labelKey: 'salesHistory.month' },
   ];
 
-  onSearch(event: Event): void {
-    this.searchSubject.next((event.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   }
 
   clearSearch(): void {
@@ -352,11 +371,11 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
     `).join('');
 
     const discountHtml = sale.discount
-      ? `<div style="display: flex; justify-content: space-between; color: #059669;"><span>Discount</span><span> -$${sale.discount.toFixed(2)}</span></div>`
+      ? `<div style="display: flex; justify-content: space-between; color: #059669;"><span>${this.lang.t('receipt.discount')}</span><span> -$${sale.discount.toFixed(2)}</span></div>`
       : '';
 
     const taxHtml = sale.tax
-      ? `<div style="display: flex; justify-content: space-between;"><span>Tax</span><span> $${sale.tax.toFixed(2)}</span></div>`
+      ? `<div style="display: flex; justify-content: space-between;"><span>${this.lang.t('receipt.tax')}</span><span> $${sale.tax.toFixed(2)}</span></div>`
       : '';
 
     win.document.write(`
@@ -380,16 +399,16 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
       </style>
       </head><body>
         <div class="header">
-          <h3>MiniMart Store</h3>
-          <p>Phnom Penh, Cambodia</p>
-          <p>Tel: +855 23 000 000</p>
+          <h3>${this.lang.t('receipt.store')}</h3>
+          <p>${this.lang.t('receipt.address')}</p>
+          <p>${this.lang.t('receipt.tel')}</p>
         </div>
 
         <div class="meta">
-          <div class="row"><span class="label">Receipt</span><span style="font-weight: bold;">#${sale.id}</span></div>
-          <div class="row"><span class="label">Date</span><span>${sale.date.toLocaleDateString()} ${sale.date.toLocaleTimeString()}</span></div>
-          <div class="row"><span class="label">Cashier</span><span>${sale.cashierName}</span></div>
-          <div class="row"><span class="label">Payment</span><span style="text-transform: uppercase; font-weight: bold;">${sale.paymentMethod}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.receiptNo')}</span><span style="font-weight: bold;">#${sale.id}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.date')}</span><span>${sale.date.toLocaleDateString()} ${sale.date.toLocaleTimeString()}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.cashier')}</span><span>${sale.cashierName}</span></div>
+          <div class="row"><span class="label">${this.lang.t('receipt.payment')}</span><span style="text-transform: uppercase; font-weight: bold;">${sale.paymentMethod}</span></div>
         </div>
 
         <div class="items">
@@ -397,14 +416,14 @@ export class SalesHistoryComponent implements OnInit, OnDestroy {
         </div>
 
         <div class="totals">
-          <div class="total-row"><span>Subtotal</span><span>$${sale.subtotal.toFixed(2)}</span></div>
+          <div class="total-row"><span>${this.lang.t('receipt.subtotal')}</span><span>$${sale.subtotal.toFixed(2)}</span></div>
           ${discountHtml}
           ${taxHtml}
-          <div class="grand-total"><span>TOTAL</span><span>$${sale.total.toFixed(2)}</span></div>
+          <div class="grand-total"><span>${this.lang.t('receipt.total')}</span><span>$${sale.total.toFixed(2)}</span></div>
         </div>
 
         <div class="footer">
-          <p>Thank you! Please come again.</p>
+          <p>${this.lang.t('receipt.thankYou')}</p>
           <p style="margin-top:4px;">Powered by MiniMart</p>
         </div>
       </body></html>

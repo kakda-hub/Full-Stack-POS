@@ -1,13 +1,13 @@
-<div @pageTransition class="product-list-wrapper">
+<div class="product-list-wrapper">
   <!-- Page Header -->
   <div class="page-header">
     <div class="page-header-left">
-      <h1 class="page-title">Products</h1>
+      <h1 class="page-title">{{ 'products.title' | translate }}</h1>
       <button (click)="openLowStockDrawer()" class="low-stock-chip">
         <svg class="low-stock-chip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <span>{{ lowStockProducts.length }} {{ lang.currentLang() === 'km' ? 'ផលិតផលស្តុកទាប' : 'products with low stock' }}</span>
+        <span>{{ lowStockProducts.length }} {{ 'products.withLowStock' | translate }}</span>
       </button>
     </div>
     <app-ui-button [variant]="'primary'" [size]="'md'" [shape]="'solid'" (click)="onAdd()">
@@ -19,28 +19,19 @@
     *ngIf="isLowStockDrawerOpen"
     [products]="products()"
     [getCategoryName]="getCategoryName"
-    (close)="closeLowStockDrawer()">
+    [updatingIds]="pendingStockAdjusts()"
+    (close)="closeLowStockDrawer()"
+    (restock)="onRestock($event)"
+    (stockAdjust)="onStockAdjust($event)">
   </app-low-stock-drawer>
 
   <!-- Search & Filter Toolbar -->
   <div class="toolbar">
-    <div class="search-wrapper">
-      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        aria-label="Search"
-        type="text"
-        (input)="onSearch($event)"
-        [placeholder]="lang.currentLang() === 'km' ? 'ស្វែងរកផលិតផល...' : 'Search products...'"
-        class="search-input"
-      />
-    </div>
+    <app-search-input
+      class="w-full sm:w-72"
+      placeholder="products.search"
+      (search)="onSearch($event)"
+    ></app-search-input>
     <div class="category-pills">
       <button
         *ngFor="let cat of productService.categories()"
@@ -56,8 +47,9 @@
     </div>
   </div>
 
-  <!-- Skeleton loading state -->
-  <div *ngIf="isLoading()" class="skeleton-section">
+  <!-- Skeleton loading state — only on the FIRST load. After that the table
+       stays mounted and just refreshes rows (no skeleton flash per keystroke). -->
+  <div *ngIf="isLoading() && !hasLoadedOnce()" class="skeleton-section">
     <div class="skeleton-table-wrapper">
       <table class="skeleton-table">
         <thead class="skeleton-thead">
@@ -95,21 +87,28 @@
     </div>
   </div>
 
-  <!-- ===== DESKTOP: Table ===== -->
-  <div class="table-container">
+  <!-- ===== DESKTOP: Table =====
+       Mounted permanently after the first load. Reloads (search/pagination/
+       category) keep the table in place — dimmed while fetching — and only
+       newly-arrived rows animate in via the @listAnimationSnappy stagger. -->
+  <div
+    *ngIf="hasLoadedOnce()"
+    class="table-container transition-opacity duration-200"
+    [class.opacity-50]="isLoading()"
+  >
     <div class="table-overflow">
       <table class="table">
         <thead class="table-thead">
           <tr>
             <th class="th th--left">
-              {{ lang.currentLang() === 'km' ? 'ល.រ' : 'No.' }}
+              {{ 'products.no' | translate }}
             </th>
             <th class="th th--left">
-              {{ lang.currentLang() === 'km' ? 'រូបភាព' : 'Image' }}
+              {{ 'products.image' | translate }}
             </th>
             <th class="th th--left">
               <app-sort-header
-                [label]="lang.currentLang() === 'km' ? 'ឈ្មោះ' : 'Name'"
+                [label]="'products.name' | translate"
                 [field]="'name'"
                 [sortBy]="sortBy()"
                 [sortDir]="sortDir()"
@@ -118,7 +117,7 @@
             </th>
             <th class="th th--left">
               <app-sort-header
-                [label]="lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode'"
+                [label]="'products.barcode' | translate"
                 [field]="'barcode'"
                 [sortBy]="sortBy()"
                 [sortDir]="sortDir()"
@@ -126,11 +125,11 @@
               ></app-sort-header>
             </th>
             <th class="th th--left">
-              {{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}
+              {{ 'products.category' | translate }}
             </th>
             <th class="th th--right">
               <app-sort-header
-                [label]="lang.currentLang() === 'km' ? 'តម្លៃ' : 'Price'"
+                [label]="'products.price' | translate"
                 [field]="'price'"
                 [sortBy]="sortBy()"
                 [sortDir]="sortDir()"
@@ -139,7 +138,7 @@
             </th>
             <th class="th th--right">
               <app-sort-header
-                [label]="lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock'"
+                [label]="'products.stock' | translate"
                 [field]="'stock'"
                 [sortBy]="sortBy()"
                 [sortDir]="sortDir()"
@@ -147,12 +146,16 @@
               ></app-sort-header>
             </th>
             <th class="th th--right">
-              {{ lang.currentLang() === 'km' ? 'សកម្មភាព' : 'Actions' }}
+              {{ 'products.actions' | translate }}
             </th>
           </tr>
         </thead>
+        <!-- Bound to the array reference (not .length) so the stagger fires on
+             EVERY reload — otherwise same-count refreshes would skip the
+             animation. trackBy keeps existing rows unanimated; only new rows
+             stagger in. -->
         <tbody
-          [@listAnimation]="products().length"
+          [@listAnimationSnappy]="products()"
           class="table-tbody"
         >
           <tr
@@ -161,13 +164,12 @@
               index as i;
               trackBy: trackById
             "
-            @fadeIn
             class="table-row"
           >
             <td class="td">{{ i + 1 + (currentPage() - 1) * pageSize() }}</td>
             <td class="td">
               <img
-                [src]="product.imgUrl || 'assets/images/placeholder.svg'"
+                [src]="product.imgUrl || 'assets/icons/placeholder.svg'"
                 alt="Product image"
                 class="product-img"
                 appImgFallback
@@ -193,7 +195,7 @@
               <div class="actions-cell">
                 <button
                   type="button"
-                  aria-label="Edit product"
+                  [attr.aria-label]="'products.editProduct' | translate"
                   (click)="openEdit(product)"
                   class="action-btn action-btn--edit"
                 >
@@ -208,7 +210,7 @@
                 </button>
                 <button
                   type="button"
-                  aria-label="Delete product"
+                  [attr.aria-label]="'products.deleteProduct' | translate"
                   (click)="deleteProduct(product)"
                   class="action-btn action-btn--delete"
                 >
@@ -235,7 +237,7 @@
                 />
               </svg>
               <p class="empty-state-text">
-                {{ lang.currentLang() === 'km' ? 'គ្មានផលិតផល' : 'No products found' }}
+                {{ 'products.noProducts' | translate }}
               </p>
             </td>
           </tr>
@@ -252,10 +254,16 @@
       </app-pagination>
     </div>
 
-    <!-- ===== MOBILE: Product Cards ===== -->
-    <div class="pl-mobile-cards">
+    <!-- ===== MOBILE: Product Cards (infinite scroll) ===== -->
+    <div
+      class="pl-mobile-cards"
+      [appInfiniteScroll]="true"
+      [appInfiniteScrollHasMore]="hasMore()"
+      [appInfiniteScrollLoading]="isLoadingMore()"
+      (appInfiniteScrollLoad)="loadMoreProducts()"
+    >
       <div
-        *ngFor="let product of products(); index as i; trackBy: trackById"
+        *ngFor="let product of mobileProducts(); index as i; trackBy: trackById"
         @fadeIn
         class="pl-card"
         [class.pl-card--dark]="theme.isDark()"
@@ -270,7 +278,7 @@
           </div>
           <div class="pl-card-header-right">
             <img
-              [src]="product.imgUrl || 'assets/images/placeholder.svg'"
+              [src]="product.imgUrl || 'assets/icons/placeholder.svg'"
               alt="Product image"
               class="pl-card-img"
               appImgFallback
@@ -281,15 +289,15 @@
         <!-- Card body: fields -->
         <div class="pl-card-body">
           <div class="pl-card-field">
-            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'បាកូដ' : 'Barcode' }}</span>
+            <span class="pl-card-label">{{ 'products.barcode' | translate }}</span>
             <span class="pl-card-barcode">{{ product.barcode }}</span>
           </div>
           <div class="pl-card-field">
-            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'ប្រភេទ' : 'Category' }}</span>
+            <span class="pl-card-label">{{ 'products.category' | translate }}</span>
             <span class="pl-card-value">{{ getCategoryName(product.category) }}</span>
           </div>
           <div class="pl-card-field">
-            <span class="pl-card-label">{{ lang.currentLang() === 'km' ? 'ស្តុក' : 'Stock' }}</span>
+            <span class="pl-card-label">{{ 'products.stock' | translate }}</span>
             <span [class]="'pl-card-stock ' + getStockClass(product)">{{ product.stock }}</span>
           </div>
         </div>
@@ -300,37 +308,55 @@
             type="button"
             (click)="openEdit(product)"
             class="pl-card-action-btn pl-card-action-btn--edit"
-            [attr.aria-label]="'Edit product'"
+            [attr.aria-label]="'products.editProduct' | translate"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'កែ' : 'Edit' }}</span>
+            <span>{{ 'products.edit' | translate }}</span>
           </button>
           <button
             type="button"
             (click)="deleteProduct(product)"
             class="pl-card-action-btn pl-card-action-btn--delete"
-            [attr.aria-label]="'Delete product'"
+            [attr.aria-label]="'products.deleteProduct' | translate"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            <span>{{ lang.currentLang() === 'km' ? 'លុប' : 'Delete' }}</span>
+            <span>{{ 'products.delete' | translate }}</span>
           </button>
         </div>
       </div>
 
+      <!-- Infinite scroll: loading-more indicator -->
+      @if (isLoadingMore()) {
+        <div class="flex items-center justify-center gap-3 py-5" @fadeIn>
+          <span class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
+        </div>
+      }
+
+      <!-- End of list -->
+      @if (!hasMore() && mobileProducts().length > 0) {
+        <div class="flex items-center justify-center gap-3 py-4" @fadeIn>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+            {{ 'common.endOfList' | translate }}
+          </span>
+          <span class="h-px w-8 bg-slate-300 dark:bg-slate-600"></span>
+        </div>
+      }
+
       <!-- Empty state (mobile) -->
-      <div *ngIf="products().length === 0" class="pl-cards-empty">
+      <div *ngIf="mobileProducts().length === 0" class="pl-cards-empty">
         <svg class="w-16 h-16 mx-auto mb-3 opacity-30 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
         </svg>
         <p class="text-sm font-medium text-slate-400">
-          {{ lang.currentLang() === 'km' ? 'គ្មានផលិតផល' : 'No products found' }}
+          {{ 'products.noProducts' | translate }}
         </p>
       </div>
     </div>

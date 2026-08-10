@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { LanguageService } from './core/services/language.service';
-import { ThemeService } from './core/services/theme.service';
+import { LanguageService } from './services/shared/language.service';
+import { ThemeService } from './services/shared/theme.service';
 
 @Component({
   selector: 'app-root',

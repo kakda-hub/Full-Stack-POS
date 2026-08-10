@@ -1,46 +1,15 @@
-<div @pageTransition class="p-6 mx-auto space-y-6">
+<div class="p-6 mx-auto space-y-6">
   <app-breadcrumb></app-breadcrumb>
   <!-- Header & Search Bar -->
   <div class="w-full flex items-center justify-between gap-4">
-    <div class="relative w-2/4">
-      <svg
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        #searchInput
-        (input)="onSearch($event)"
-        type="text"
-        class="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-xl text-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-        [value]="searchQuery()"
-        placeholder="{{ lang.currentLang() === 'km' ? 'ស្វែងរកទំព័រ...' : 'Search pages...' }}"
-      />
-      @if (searchQuery()) {
-        <button
-          (click)="clearSearch(searchInput)"
-          type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-        >
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      }
-    </div>
+    <app-search-input
+      class="w-2/4"
+      placeholder="managementPages.search"
+      [value]="searchQuery()"
+      [showClear]="true"
+      (search)="onSearch($event)"
+      (cleared)="clearSearch()"
+    ></app-search-input>
     <app-ui-button [variant]="'primary'" [size]="'md'" type="button" (click)="onAddNew()">{{'button.addNew' | translate}}</app-ui-button>
   </div>
 
@@ -54,9 +23,9 @@
         >
           <span class="w-8"></span>
           <!-- Space for toggle -->
-          <span class="flex-1">Page Name</span>
-          <span class="flex-1">URL / Route</span>
-          <span class="w-24 text-right">Actions</span>
+          <span class="flex-1">{{ 'managementPages.pageName' | translate }}</span>
+          <span class="flex-1">{{ 'managementPages.urlRoute' | translate }}</span>
+          <span class="w-24 text-right">{{ 'managementPages.actions' | translate }}</span>
         </div>
 
         <div class="hs-accordion-group">
@@ -68,7 +37,7 @@
           @if (filteredPageList.length === 0) {
             <div class="py-12 flex flex-col items-center justify-center text-gray-400">
               <mat-icon class="text-5xl mb-2 opacity-20">search_off</mat-icon>
-              <p class="text-sm">No pages found matching your search.</p>
+              <p class="text-sm">{{ 'managementPages.empty' | translate }}</p>
             </div>
           }
         </div>
@@ -168,131 +137,20 @@
           >
             <button mat-menu-item (click)="AddSubMenu(node)">
               <mat-icon class="text-blue-500">add_circle_outline</mat-icon>
-              <span>Add Sub-item</span>
+              <span>{{ 'managementPages.addSubItem' | translate }}</span>
             </button>
             <button mat-menu-item (click)="onEdit(node)">
               <mat-icon class="text-amber-500">edit_note</mat-icon>
-              <span>Edit Details</span>
+              <span>{{ 'managementPages.editDetails' | translate }}</span>
             </button>
             <div class="h-px bg-gray-100 my-1"></div>
             <button mat-menu-item (click)="onDelete(node)" class="text-red-600">
               <mat-icon class="text-red-600">delete_outline</mat-icon>
-              <span>Delete Page</span>
+              <span>{{ 'managementPages.deletePage' | translate }}</span>
             </button>
           </mat-menu>
         </div>
       </div>
-
-      <!-- Edit Modal and add modal -->
-      <ng-template>
-        <div class="p-6 bg-gray-50">
-          <!-- Main Edit Card -->
-          <div
-            class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden relative"
-          >
-            <!-- Header: Title Chip and Buttons -->
-            <div class="px-6 pt-4 flex justify-between items-start">
-              <div
-                class="bg-emerald-50 text-emerald-700 px-4 py-1 rounded-full text-sm font-medium border border-emerald-100"
-              >
-                កែសម្រួល Link
-              </div>
-
-              <div class="flex gap-3">
-                <!-- Cancel Button -->
-                <button
-                  class="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    ></path>
-                  </svg>
-                  <span class="font-medium text-sm">បោះបង់</span>
-                </button>
-                <!-- Save Button -->
-                <button
-                  class="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                      d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
-                    />
-                  </svg>
-                  <span class="font-medium text-sm">រក្សាទុក</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Form Grid -->
-            <div class="p-6 grid grid-cols-1 md:grid-cols-5 gap-6">
-              <!-- Input Field: Name -->
-              <div class="relative">
-                <label class="text-xs text-gray-400 block mb-1">ឈ្មោះ *</label>
-                <input
-                  type="text"
-                  value="ឆាត"
-                  class="w-full border-b border-gray-300 py-1 focus:border-blue-500 focus:outline-none text-sm text-gray-700 bg-transparent"
-                />
-              </div>
-
-              <!-- Input Field: Type (Dropdown) -->
-              <div class="relative group">
-                <label class="text-xs text-gray-400 block mb-1">ប្រភេទ *</label>
-                <div class="flex items-center border-b border-gray-300">
-                  <select
-                    class="w-full py-1 focus:outline-none text-sm text-gray-700 bg-transparent appearance-none cursor-pointer"
-                  >
-                    <option>Link</option>
-                  </select>
-                  <svg
-                    class="w-4 h-4 text-gray-400 absolute right-0 bottom-2 pointer-events-none"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Input Field: Icon Name -->
-              <div class="relative">
-                <label class="text-xs text-gray-400 block mb-1">ឈ្មោះរូបតំណាង</label>
-                <input
-                  type="text"
-                  value="chat"
-                  class="w-full border-b border-gray-300 py-1 focus:border-blue-500 focus:outline-none text-sm text-gray-700 bg-transparent"
-                />
-              </div>
-
-              <!-- Input Field: URL -->
-              <div class="relative">
-                <label class="text-xs text-gray-400 block mb-1">URL</label>
-                <input
-                  type="text"
-                  value="chat"
-                  class="w-full border-b border-gray-300 py-1 focus:border-blue-500 focus:outline-none text-sm text-gray-700 bg-transparent"
-                />
-              </div>
-
-              <!-- Input Field: Description -->
-              <div class="relative">
-                <label class="text-xs text-gray-400 block mb-1">ការពិពណ៌នា</label>
-                <input
-                  type="text"
-                  placeholder="ការពិពណ៌នា"
-                  class="w-full border-b border-gray-300 py-1 focus:border-blue-500 focus:outline-none text-sm text-gray-700 bg-transparent"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </ng-template>
 
       <!-- Nested Children -->
       <div

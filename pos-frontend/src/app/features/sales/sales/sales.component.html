@@ -1,424 +1,54 @@
-<div @pageTransition class="flex h-full overflow-hidden relative bg-[#F1F5F9] dark:bg-slate-950">
+<div class="flex h-full overflow-hidden relative bg-[#F1F5F9] dark:bg-slate-950">
   <!-- LEFT: Product Grid -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
     <!-- Search & Category Bar -->
-    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800/60 px-3 sm:px-4 lg:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 space-y-4 sm:space-y-5 shadow-sm">
+    <div
+      class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800/60 px-3 sm:px-4 lg:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 space-y-4 sm:space-y-5 shadow-sm">
       <!-- Search -->
-      <div class="relative group">
-        <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-slate-400">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </span>
-        <input
-          aria-label="Search"
-          #searchInput
-          type="text"
-          [placeholder]="langService.currentLang() === 'km' ? 'ស្វែងរក ឬស្កែន... (Ctrl+F)' : 'Search products or scan barcode... (Ctrl+F)'"
-          (input)="onSearch($event)"
-          (keydown.enter)="onBarcodeEnter($event)"
-          class="block w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-100"
-        />
-      </div>
+      <app-search-input size="lg" placeholder="sales.search" (search)="onSearch($event)"
+        (enter)="onBarcodeEnter($event)"></app-search-input>
 
       <!-- Category Tabs -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        <button
-          *ngFor="let cat of productService.categories()"
-          (click)="productService.setCategory(cat.id)"
-          [class]="
-            cat.id === productService.selectedCategory()
-              ? 'px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm shadow-lg shadow-indigo-100 dark:shadow-indigo-900/30 whitespace-nowrap transition-all'
-              : 'px-4 py-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-200 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all whitespace-nowrap'
-          "
-          type="button"
-        >
-          {{ langService.currentLang() === 'km' ? cat.nameKm || cat.name : cat.name }}
-        </button>
-      </div>
+      <app-category-tabs></app-category-tabs>
 
       <!-- Quick Pick Buttons (non-barcoded items) -->
-      @if (quickPicks().length > 0) {
-        <div>
-          <h2 class="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] px-1">
-            {{ langService.currentLang() === 'km' ? 'ទំនិញគ្មានបាកូដ' : 'Quick Add Items' }}
-          </h2>
-          <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-            @for (item of quickPicks(); track item.id) {
-              <button
-                (click)="addQuickPick(item)"
-                class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all motion-safe:active:scale-95 group"
-                type="button"
-              >
-                @if (item.icon) {
-                  <span class="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-700 rounded-lg text-lg group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">{{ item.icon }}</span>
-                }
-                <div class="text-left">
-                  <p class="text-[11px] text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' && item.labelKh ? item.labelKh : item.label }}</p>
-                  <p class="text-xs font-black text-indigo-600 dark:text-indigo-400">${{ item.price.toFixed(2) }}</p>
-                </div>
-              </button>
-            }
-          </div>
-        </div>
-      }
+      <app-quick-pick-view [quickPicks]="quickPicks()" (addQuickPick)="addQuickPick($event)"></app-quick-pick-view>
     </div>
 
     <!-- Product Grid -->
-    <div class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 py-1">
-      <div *ngIf="isLoadingProducts()" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
-        <div *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8]" class="h-40 sm:h-44 lg:h-52 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-[2rem]"></div>
+    <div class="flex-1 overflow-y-auto p-4" (scroll)="onProductScroll($event)">
+      @if (isLoadingProducts()) {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <div class="h-40 sm:h-44 lg:h-52 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-[2rem]"></div>
+        }
       </div>
+      } @else {
+      <div [@listAnimation]="productService.filteredProducts().length"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4 pb-12">
+        @for (product of productService.filteredProducts(); track trackById($index, product)) {
+        <app-product-card @fadeIn [product]="product" [isInCart]="isInCart(product)" [quantity]="cartQuantity(product)"
+          [effectiveStock]="effectiveStock(product)" [photoResolver]="getProductPhoto"
+          [isLastAdded]="lastAddedId() === product.id" [isShaking]="shakingProductId() === product.id"
+          (addToCart)="addToCart(product)" (removeFromCart)="cart.removeItem(product.id)"
+          (decreaseQuantity)="cart.updateQuantity(product.id, $event)"
+          (increaseQuantity)="cart.updateQuantity(product.id, $event)" class="w-full h-full"></app-product-card>
+        }
+      </div>
+      }
 
-      <div
-        *ngIf="!isLoadingProducts()"
-        [@listAnimation]="productService.filteredProducts().length"
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 pb-12"
-      >
-        <button
-          *ngFor="let product of productService.filteredProducts(); trackBy: trackById"
-          @fadeIn
-          (click)="addToCart(product)"
-          [disabled]="effectiveStock(product) <= 0"
-          [class]="
-            isInCart(product)
-              ? 'group bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-indigo-500 shadow-xl shadow-indigo-100/50 dark:shadow-indigo-900/30 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col scale-[1.02]'
-              : 'group bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-indigo-900/20 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col motion-safe:hover:-translate-y-1'
-          "
-        >
-          <!-- Stock add animation indicator -->
-          @if (lastAddedId() === product.id) {
-            <span class="stock-add-fly text-indigo-500 dark:text-indigo-300">+1</span>
-          }
-          <!-- Shake animation -->
-          <div [class.animate-shake]="shakingProductId() === product.id" class="flex flex-col flex-1">
-            <div class="h-36 sm:h-40 lg:h-44 bg-slate-50 dark:bg-slate-700 relative overflow-hidden">
-              <!-- Cart quantity badge (top-left) -->
-              @let avail = effectiveStock(product);
-              @let qty = cartQuantity(product);
-              @if (qty > 0) {
-                <span class="cart-qty-badge absolute top-4 left-4 z-10" [@counterAnimation]="qty">{{ qty }}</span>
-              }
-              <!-- Product image with subtle scale on hover -->
-              <div class="relative img-container overflow-hidden w-full h-full" [class.img-loading]="!product.imgUrl && !getProductPhoto(product.category)">
-                <img
-                  [src]="product.imgUrl || getProductPhoto(product.category)"
-                  [alt]="product.name"
-                  [class.opacity-30]="avail <= 0"
-                  class="w-full h-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-105"
-                  (load)="onImgLoad($event)"
-                  loading="lazy"
-                  appImgFallback
-                />
-              </div>
-            </div>
-            <div class="p-3 sm:p-4 lg:p-5 flex flex-col flex-1">
-              <div class="flex-1">
-                <h3 class="text-sm text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 text-left">
-                  {{ langService.currentLang() === 'km' ? product.nameKm || product.name : product.name }}
-                </h3>
-              </div>
-              <div class="mt-4 flex items-center justify-between">
-                <span class="text-lg font-black text-slate-900 dark:text-white leading-none">
-                  ${{ product.price.toFixed(2) }}
-                </span>
-                @if (avail > 0) {
-                  <span class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                    {{ avail }} {{ langService.currentLang() === 'km' ? 'នៅស្តុក' : (avail === 1 ? 'in stock' : 'in stock') }}
-                  </span>
-                } @else {
-                  <span class="text-[10px] text-rose-500 dark:text-rose-400 uppercase tracking-widest">
-                    {{ langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Out of stock' }}
-                  </span>
-                }
-              </div>
-            </div>
-          </div>
-        </button>
+      <!-- Infinite scroll: loading-more indicator -->
+      @if (productService.loadingMore()) {
+      <div class="flex items-center justify-center gap-3 py-6" [@fadeIn]>
+        <span
+          class="w-6 h-6 border-[3px] border-indigo-200 dark:border-indigo-900/40 border-t-indigo-500 rounded-full animate-spin"></span>
       </div>
+      }
     </div>
   </div>
 
-  <!-- RIGHT: Cart Sidebar (Desktop) -->
-  <div
-    [@sidebarAnimation]="isCartOpen() ? 'open' : 'closed'"
-    class="hidden md:flex w-80 xl:w-96 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex-col shadow-2xl z-20 overflow-hidden"
-  >
-    <!-- Cart Top -->
-    <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/80">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/40 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-base font-black text-slate-800 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
-          <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-            {{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : (cart.items().length === 1 ? 'Item' : 'Items') }}
-          </p>
-        </div>
-      </div>
-      <button
-        *ngIf="cart.items().length > 0"
-        (click)="clearCart()"
-        class="text-xs text-rose-500 font-bold hover:text-rose-600 transition-colors"
-      >
-        {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
-      </button>
-    </div>
-
-    <!-- Cart Items -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-2">
-      <!-- Empty State -->
-      <div
-        *ngIf="cart.items().length === 0"
-        @fadeIn
-        class="flex flex-col items-center justify-center h-full text-center opacity-60"
-      >
-        <div class="w-24 h-24 bg-slate-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-6">
-          <svg class="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
-          </svg>
-        </div>
-        <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</h3>
-        <p class="text-sm text-slate-400 dark:text-slate-500">{{ langService.currentLang() === 'km' ? 'ស្កែន ឬជ្រើសរើសទំនិញដើម្បីចាប់ផ្ដើម' : 'Scan a barcode or select an item from the grid to begin' }}</p>
-      </div>
-
-      <!-- Cart Items List -->
-      <div
-        *ngFor="let item of cart.items(); trackBy: trackByProductId"
-        @cartItemAnimation
-        class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-600 transition-all"
-      >
-        <div class="flex justify-between gap-2 mb-3">
-          <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1 text-left">
-            {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
-          </p>
-          <button
-            type="button"
-            (click)="cart.removeItem(item.product.id)"
-            class="text-slate-300 dark:text-slate-500 hover:text-rose-500 transition-colors flex-shrink-0"
-            [title]="langService.currentLang() === 'km' ? 'លុបទំនិញ' : 'Remove Item'"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <button
-              (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
-              class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all motion-safe:active:scale-90"
-              [title]="langService.currentLang() === 'km' ? 'បន្ថយចំនួន' : 'Decrease Quantity'"
-            >
-              -
-            </button>
-            <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200" [@counterAnimation]="item.quantity">{{ item.quantity }}</span>
-            <button
-              (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
-              [disabled]="item.quantity >= item.product.stock"
-              class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
-              [title]="item.quantity >= item.product.stock ? (langService.currentLang() === 'km' ? 'អស់ស្តុក' : 'Max stock') : (langService.currentLang() === 'km' ? 'បង្កើនចំនួន' : 'Increase Quantity')"
-            >
-              +
-            </button>
-          </div>
-          <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">
-            ${{ (item.product.price * item.quantity).toFixed(2) }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Totals & Payment Footer -->
-    <div class="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-5 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
-          <span>{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
-          <div class="relative h-5 overflow-hidden text-right">
-            @if (showOldSubtotal()) {
-              <span class="absolute inset-0 font-bold text-slate-700 dark:text-slate-300 flex items-center justify-end" @slideOut>${{ prevSubtotalVal.toFixed(2) }}</span>
-            }
-            <span class="font-bold text-slate-700 dark:text-slate-300" @slideIn>${{ cart.subtotal().toFixed(2) }}</span>
-          </div>
-        </div>
-        
-        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 font-semibold">
-          <span>Tax</span>
-          <span>${{ cart.taxAmount().toFixed(2) }}</span>
-        </div>
-
-        <div class="flex justify-between items-end pt-4 border-t border-slate-100 dark:border-slate-700">
-          <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
-            {{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'Grand Total' }}
-          </span>
-          <div class="relative h-8 overflow-hidden text-right">
-            @if (showOldTotal()) {
-              <span class="absolute inset-0 text-indigo-600 dark:text-indigo-400 flex items-center justify-end text-3xl font-black" @slideOut>${{ prevTotalVal.toFixed(2) }}</span>
-            }
-            <span class="text-xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter" @slideIn>${{ cart.total().toFixed(2) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <button
-        [disabled]="cart.items().length === 0"
-        (click)="showPayment = true"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 motion-safe:active:scale-[0.98] flex items-center justify-center gap-2"
-      >
-        {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- MOBILE: Bottom Cart Peek Bar -->
-  @if (isMobile() && cart.items().length > 0) {
-    <div
-      (click)="toggleCartSidebar()"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] cursor-pointer motion-safe:active:scale-[0.99] transition-transform mobile-peek-bar safe-area-bottom"
-    >
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1" [@counterAnimation]="cart.itemCount()">{{ cart.itemCount() }}</span>
-        </div>
-        <div class="text-sm">
-          <p class="font-semibold text-slate-800 dark:text-slate-200">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Cart' }}</p>
-          <p class="text-xs text-slate-400">{{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }}</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">${{ cart.total().toFixed(2) }}</span>
-        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-        </svg>
-      </div>
-    </div>
-  }
-
-  <!-- MOBILE: Cart Drawer Backdrop -->
-  @if (isMobile() || isCartDrawerOpen()) {
-    <div
-      [@drawerBackdrop]="isCartDrawerOpen() ? 'open' : 'closed'"
-      class="md:hidden fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm"
-      (click)="closeCartDrawer()"
-    ></div>
-  }
-
-  <!-- MOBILE: Cart Bottom Drawer -->
-  @if (isMobile() || isCartDrawerOpen()) {
-    <div
-      [@drawerSlide]="isCartDrawerOpen() ? 'open' : 'closed'"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden"
-      [class.h-\[70vh\]]="true"
-    >
-      <!-- Drawer Handle -->
-      <div class="flex justify-center pt-3 pb-1 flex-shrink-0">
-        <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-      </div>
-
-      <!-- Drawer Header -->
-      <div class="px-5 pb-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
-        <div class="flex items-center gap-3">
-          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base">{{ langService.currentLang() === 'km' ? 'កន្ត្រកទំនិញ' : 'Your Cart' }}</h2>
-          @if (cart.items().length > 0) {
-            <span class="text-xs text-slate-400">({{ cart.items().length }} {{ langService.currentLang() === 'km' ? 'មុខទំនិញ' : 'items' }})</span>
-          }
-        </div>
-        <div class="flex items-center gap-2">
-          <button *ngIf="cart.items().length > 0" (click)="clearCart()" class="text-xs text-rose-500 font-bold hover:underline">
-            {{ langService.currentLang() === 'km' ? 'លុបចោល' : 'Clear' }}
-          </button>
-          <button type="button" (click)="closeCartDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Drawer Cart Items -->
-      <div class="flex-1 overflow-y-auto px-5 py-2 space-y-2">
-        <div *ngIf="cart.items().length === 0" class="flex flex-col items-center justify-center h-full text-slate-300 dark:text-slate-600">
-          <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-          <p class="text-sm font-medium">{{ langService.currentLang() === 'km' ? 'កន្ត្រកនៅទំនេរ' : 'Cart is empty' }}</p>
-        </div>
-
-        <div
-          *ngFor="let item of cart.items(); trackBy: trackByProductId"
-          class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700"
-        >
-          <div class="flex justify-between gap-2 mb-3">
-            <p class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1">
-              {{ langService.currentLang() === 'km' ? item.product.nameKm || item.product.name : item.product.name }}
-            </p>
-            <button type="button" (click)="cart.removeItem(item.product.id)" class="text-slate-300 dark:text-slate-500 hover:text-rose-500 flex-shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <button (click)="cart.updateQuantity(item.product.id, item.quantity - 1)" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 active:scale-90 transition-transform">
-                -
-              </button>
-              <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-slate-200">{{ item.quantity }}</span>
-              <button
-                (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
-                [disabled]="item.quantity >= item.product.stock"
-                class="w-8 h-8 rounded-xl bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-transform"
-              >
-                +
-              </button>
-            </div>
-            <p class="text-sm font-black text-indigo-600 dark:text-indigo-400">${{ (item.product.price * item.quantity).toFixed(2) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Drawer Totals & Checkout -->
-      <div class="p-5 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 space-y-3 flex-shrink-0 safe-area-bottom">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-slate-500">{{ langService.currentLang() === 'km' ? 'សរុប' : 'Subtotal' }}</span>
-          <span class="font-bold text-slate-700 dark:text-slate-300">${{ cart.subtotal().toFixed(2) }}</span>
-        </div>
-        <div class="flex justify-between items-center text-lg">
-          <span class="font-extrabold text-slate-900 dark:text-slate-100">{{ langService.currentLang() === 'km' ? 'សរុបរួម' : 'TOTAL' }}</span>
-          <span class="font-black text-indigo-600 dark:text-indigo-400">${{ cart.total().toFixed(2) }}</span>
-        </div>
-        <button
-          [disabled]="cart.items().length === 0"
-          (click)="showPayment = true"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[1.5rem] transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 active:scale-[0.98] flex items-center justify-center gap-2 text-base"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-          </svg>
-          {{ langService.currentLang() === 'km' ? 'បង់ប្រាក់' : 'Checkout Now' }}
-        </button>
-      </div>
-    </div>
-  }
-</div>
-
-<!-- Modals -->
-<app-payment-modal
-  *ngIf="showPayment"
-  [total]="cart.total()"
-  [subtotal]="cart.subtotal()"
-  [processing]="isProcessingSale()"
-  (paid)="onPaymentComplete($event)"
-  (cancel)="showPayment = false"
-></app-payment-modal>
-<app-receipt-modal
-  *ngIf="lastTransaction"
-  [transaction]="lastTransaction"
-  (close)="lastTransaction = null"
-></app-receipt-modal>
+  <!-- RIGHT: Cart Sidebar -->
+  <app-right-cart-sidebar [isCartOpen]="isCartOpen" [subtotalDisplay]="subtotalDisplay" [taxDisplay]="taxDisplay"
+    [totalDisplay]="totalDisplay" [photoResolver]="getProductPhoto" [isMobile]="isMobile"
+    [isCartDrawerOpen]="isCartDrawerOpen" (clearCart)="clearCart()" (checkout)="openPaymentModal()"
+    (toggleCartSidebar)="toggleCartSidebar()" (closeCartDrawer)="closeCartDrawer()"></app-right-cart-sidebar>

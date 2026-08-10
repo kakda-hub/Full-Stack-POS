@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { LanguageService } from '../../../services/shared/language.service';
 import { signIn } from '../cloudinary-session';
 
 @Component({
@@ -31,10 +31,6 @@ export class CloudinarySignInComponent {
 
   onPasswordInput(event: Event): void {
     this.password.set((event.target as HTMLInputElement).value);
-  }
-
-  onRememberChange(event: Event): void {
-    this.remember.set((event.target as HTMLInputElement).checked);
   }
 
   /** Empty fields are invalid; otherwise any credentials pass the UI gate. */

@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { AlertService } from '../../../core/services/alert.service';
-import { PurchaseOrderService } from '../../../core/services/api/purchase-order.service';
-import { SupplierService } from '../../../core/services/api/supplier.service';
-import { ProductService } from '../../../core/services/api/product.service';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { AlertService } from '../../../services/shared/alert.service';
+import { PurchaseOrderService } from '../../../services/purchase-order.service';
+import { SupplierService } from '../../../services/supplier.service';
+import { ProductService } from '../../../services/product.service';
 import { modalAnimation, backdropAnimation } from '../../../shared/animations/animations';
 
 @Component({
@@ -42,8 +42,14 @@ export class PurchaseOrderDetailComponent implements OnInit {
     private productService: ProductService,
     public theme: ThemeService,
     private dialogRef: MatDialogRef<PurchaseOrderDetailComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { purchaseOrder?: any } | null,
+    @Inject(MAT_DIALOG_DATA)
+    public data: { purchaseOrder?: any; preselectProduct?: any } | null,
   ) {}
+
+  /** Product pre-selected for restocking (opened from the low-stock drawer). */
+  get preselectProduct(): any | null {
+    return this.data?.preselectProduct ?? null;
+  }
 
   ngOnInit(): void {
     this.loadSuppliers();
@@ -68,9 +74,15 @@ export class PurchaseOrderDetailComponent implements OnInit {
       items: this.fb.array([]),
     });
 
-    // Add existing items or one empty row
+    // Add existing items, a pre-selected product, or one empty row
     if (po?.items?.length) {
       po.items.forEach((item: any) => this.addItemRow(item));
+    } else if (this.preselectProduct) {
+      this.addItemRow({
+        productId: Number(this.preselectProduct.id),
+        quantity: this.preselectProduct.lowStockThreshold || 10,
+        unitCost: this.preselectProduct.costPrice || 0,
+      });
     } else {
       this.addItemRow();
     }
@@ -99,6 +111,18 @@ export class PurchaseOrderDetailComponent implements OnInit {
   private loadProducts(): void {
     this.productService.getAllProducts().subscribe((data: any) => {
       this.products = data || [];
+      // Ensure the pre-selected (restock) product appears in the options list,
+      // even if it falls outside the first page of results.
+      const preselected = this.preselectProduct;
+      if (
+        preselected &&
+        !this.products.some((p: any) => Number(p.id) === Number(preselected.id))
+      ) {
+        this.products = [
+          { ...preselected, id: Number(preselected.id), nameKh: preselected.nameKm },
+          ...this.products,
+        ];
+      }
     });
   }
 
@@ -168,11 +192,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to create purchase order', err);
-        this.alertService.error(
-          this.lang.currentLang() === 'km'
-            ? 'ការបង្កើតបញ្ជាទិញបរាជ័យ'
-            : 'Failed to create purchase order'
-        );
+        this.alertService.error(this.lang.t('purchaseOrders.createFailed'));
         this.isSaving.set(false);
       },
     });

@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   nameKm?: string;
   price: number;
+  costPrice?: number;
   barcode: string;
   category: string;
   stock: number;

@@ -1,12 +1,12 @@
 import { Component, signal, computed, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
-import { LanguageService, AppLanguage } from '../../core/services/language.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { NavStateService, NavItem } from '../../core/services/nav-state.service';
-import { PendingCountService } from '../../core/services/pending-count.service';
-import { AlertService } from '../../core/services/alert.service';
+import { AuthService } from '../../services/shared/auth.service';
+import { LanguageService, AppLanguage } from '../../services/shared/language.service';
+import { ThemeService } from '../../services/shared/theme.service';
+import { NavStateService, NavItem } from '../../services/shared/nav-state.service';
+import { PendingCountService } from '../../services/shared/pending-count.service';
+import { AlertService } from '../../services/shared/alert.service';
 import { fadeIn, themeRotate } from '../../shared/animations/animations';
 
 @Component({
@@ -171,10 +171,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     /** Human-readable label for the current user's role (localized) */
     userRoleLabel = computed(() => {
         const role = this.auth.currentUser()?.role;
-        if (this.langService.currentLang() === 'km') {
-            return role === 'admin' ? 'អ្នកគ្រប់គ្រង' : 'អ្នកគិតលុយ';
-        }
-        return role === 'admin' ? 'Admin' : 'Cashier';
+        if (role === 'admin') return this.langService.t('field.admin');
+        return this.langService.t('field.cashier');
     });
 
     /** Sign out: close menus, clear auth state, return to login, and confirm via toast */
@@ -182,9 +180,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.closeMenus();
         this.auth.logout();
         this.alertService.success(
-            this.langService.currentLang() === 'km'
-                ? 'បានចាកចេញដោយជោគជ័យ'
-                : 'Successfully logged out'
+            this.langService.t('layout.loggedOut')
         );
     }
 

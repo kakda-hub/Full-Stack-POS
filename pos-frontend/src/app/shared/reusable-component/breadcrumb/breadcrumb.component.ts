@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, startWith } from 'rxjs/operators';
-import { LanguageService } from '../../../core/services/language.service';
+import { LanguageService } from '../../../services/shared/language.service';
 
 interface Breadcrumb {
   label: string;

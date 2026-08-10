@@ -3,10 +3,10 @@
     [class.text-slate-300]="theme.isDark()"
     [class.text-slate-700]="!theme.isDark()"
     class="block text-sm font-semibold mb-1.5"
-    >{{ lang.currentLang() === 'km' ? labelKm : label }}</label
+    >{{ label }}</label
   >
   <div
-    class="flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all overflow-hidden relative min-h-[8rem]"
+    class="flex items-center justify-center w-full border-2 border-dashed rounded-xl transition-all duration-200 overflow-hidden relative min-h-[8rem]"
     [class.bg-slate-700]="theme.isDark()"
     [class.border-slate-600]="theme.isDark()"
     [class.border-indigo-500]="isDragging() && theme.isDark()"
@@ -19,21 +19,23 @@
   >
     <label class="flex flex-col items-center justify-center w-full h-full cursor-pointer min-h-[8rem]">
       <div *ngIf="value; else noImage" class="absolute inset-0">
-        <img [src]="value" class="w-full h-full object-contain bg-black/5" />
+        <img [src]="value" class="w-full h-full object-contain bg-slate-100 dark:bg-slate-800" />
         <div
-          class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+          class="absolute inset-0 bg-slate-900/30 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
         >
-          <mat-icon class="text-white mb-1">upload</mat-icon>
-          <span class="text-white text-xs font-semibold">{{
-            lang.currentLang() === 'km' ? 'ប្តូររូបភាព' : 'Change Image'
-          }}</span>
+          <svg class="h-6 w-6 mb-1 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992h4.992m12.988 0v4.992h-4.992m-12.988-12.988h4.992m12.988 4.992h-4.992" />
+          </svg>
+          <span class="text-white text-xs font-semibold">{{ 'upload.changeImage' | translate }}</span>
           
           <button 
             type="button" 
             (click)="removeImage($event)"
-            class="mt-2 p-1 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors"
+            class="mt-2 p-1 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-sm"
           >
-            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">delete</mat-icon>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12"/>
+            </svg>
           </button>
         </div>
       </div>
@@ -43,24 +45,20 @@
           <svg
             *ngIf="!isUploading()"
             class="w-8 h-8 mb-3 text-slate-400"
-            [class.text-indigo-500]="isDragging()"
+            [class.text-indigo-400]="isDragging()"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            viewBox="0 0 20 16"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.5"
           >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
           </svg>
           
           <div *ngIf="isUploading()" class="flex flex-col items-center">
             <span class="w-8 h-8 mb-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></span>
-            <p class="text-xs text-indigo-500 font-medium">Uploading...</p>
+            <p class="text-xs text-indigo-500 font-medium">{{ 'upload.uploading' | translate }}</p>
           </div>
 
           <ng-container *ngIf="!isUploading()">
@@ -69,17 +67,15 @@
               [class.text-slate-400]="theme.isDark()"
               [class.text-slate-500]="!theme.isDark()"
             >
-              <span class="font-semibold text-indigo-500">{{
-                lang.currentLang() === 'km' ? 'ចុចដើម្បីជ្រើសរើស' : 'Click to upload'
-              }}</span>
-              {{ lang.currentLang() === 'km' ? 'ឬអូសមកទីនេះ' : 'or drag and drop' }}
+              <span class="font-semibold text-indigo-500">{{ 'upload.clickToUpload' | translate }}</span>
+              {{ 'upload.orDrag' | translate }}
             </p>
             <p
               class="text-xs"
               [class.text-slate-500]="theme.isDark()"
               [class.text-slate-400]="!theme.isDark()"
             >
-              SVG, PNG, JPG or GIF
+              {{ 'upload.formats' | translate }}
             </p>
           </ng-container>
         </div>

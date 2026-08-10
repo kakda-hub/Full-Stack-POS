@@ -1,4 +1,5 @@
 export * from './user.model';
+export * from './user-role.model';
 export * from './product.model';
 export * from './cart-item.model';
 export * from './transaction.model';
@@ -9,3 +10,9 @@ export * from './quick-pick-item.model';
 export * from './supplier.model';
 export * from './purchase-order-item.model';
 export * from './purchase-order.model';
+export * from './sale.model';
+export * from './sales-history.model';
+export * from './report.model';
+export * from './cloudinary.model';
+export * from './management-page.model';
+export * from './khqr.model';

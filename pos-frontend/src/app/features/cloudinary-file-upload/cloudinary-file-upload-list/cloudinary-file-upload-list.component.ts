@@ -21,17 +21,14 @@ import {
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import {
-  CloudinaryService,
-  CloudinaryResource,
-  CloudinaryApiResponse,
-} from '../../../core/services/api/cloudinary.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
+import { CloudinaryResource, CloudinaryApiResponse } from '../../../models';
 import { signOut, currentSession, CLOUDINARY_SIGN_IN_ROUTE } from '../cloudinary-session';
-import { AlertService } from '../../../core/services/alert.service';
+import { AlertService } from '../../../services/shared/alert.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { LanguageService } from '../../../core/services/language.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { fadeIn, listAnimation, pageTransition } from '../../../shared/animations/animations';
+import { LanguageService } from '../../../services/shared/language.service';
+import { ThemeService } from '../../../services/shared/theme.service';
+import { fadeIn, listAnimation } from '../../../shared/animations/animations';
 import { ListQuery } from '../../../models/list-query';
 
 type SortColumn = 'public_id' | 'format' | 'bytes' | 'created_at';
@@ -41,7 +38,7 @@ type SortDirection = 'asc' | 'desc';
   selector: 'app-cloudinary-file-upload-list',
   templateUrl: './cloudinary-file-upload-list.component.html',
   styleUrls: ['./cloudinary-file-upload-list.component.scss'],
-  animations: [fadeIn, listAnimation, pageTransition],
+  animations: [fadeIn, listAnimation],
   standalone: false,
 })
 export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
@@ -130,8 +127,8 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  onSearch(event: Event): void {
-    this.searchSubject.next((event.target as HTMLInputElement).value);
+  onSearch(query: string): void {
+    this.searchSubject.next(query);
   } /** Fresh fetch (refresh button, retry, after upload) using the active search term. */
   loadResources(): void {
     this.refreshSubject.next();
@@ -167,9 +164,7 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     return (
       err.error?.message ||
       err.error?.error?.message ||
-      (this.lang.currentLang() === 'km'
-        ? 'សេវាកម្ម Cloudinary មិនអាចប្រើបានទេ។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។'
-        : 'Cloudinary service is currently unavailable. Please try again later.')
+      this.lang.t('cloudinary.unavailable')
     );
   }
 
@@ -295,21 +290,14 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     this.cloudinaryService.uploadFile(this.selectedFile, this.uploadFolder).subscribe({
       next: () => {
         this.uploading = false;
-        this.uploadSuccess =
-          this.lang.currentLang() === 'km'
-            ? `ឯកសារ "${this.selectedFile?.name}" បានផ្ទុកឡើងដោយជោគជ័យ!`
-            : `File "${this.selectedFile?.name}" uploaded successfully!`;
+        this.uploadSuccess = this.lang.t('cloudinary.uploadSuccess', { name: this.selectedFile?.name });
         this.selectedFile = null;
         this.selectedFilePreview = null;
         this.loadResources();
       },
       error: (err) => {
         this.uploading = false;
-        this.uploadError =
-          err.error?.message ||
-          (this.lang.currentLang() === 'km'
-            ? 'ការផ្ទុកឯកសារបរាជ័យ។ សូមព្យាយាមម្តងទៀត។'
-            : 'Upload failed. Please try again.');
+        this.uploadError = err.error?.message || this.lang.t('cloudinary.uploadFailed');
       },
     });
   }
@@ -357,13 +345,10 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       disableClose: true,
       data: {
-        title: this.lang.currentLang() === 'km' ? 'បញ្ជាក់ការលុប' : 'Confirm Delete',
-        message:
-          this.lang.currentLang() === 'km'
-            ? `តើអ្នកប្រាកដថាចង់លុប "${resource.public_id}" មែនទេ?`
-            : `Are you sure you want to delete "${resource.public_id}"?`,
-        confirmLabel: this.lang.currentLang() === 'km' ? 'លុប' : 'Delete',
-        cancelLabel: this.lang.currentLang() === 'km' ? 'បោះបង់' : 'Cancel',
+        title: this.lang.t('cloudinary.confirmDelete'),
+        message: this.lang.t('cloudinary.confirmDeleteMessage', { name: resource.public_id }),
+        confirmLabel: this.lang.t('confirm.deleteLabel'),
+        cancelLabel: this.lang.t('confirm.cancelLabel'),
       },
     });
 
@@ -378,19 +363,12 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
           this.totalItems.update((t) => Math.max(0, t - 1));
           this.currentPage.set(1);
           this.alertService.success(
-            this.lang.currentLang() === 'km'
-              ? `ធនធាន "${resource.public_id}" ត្រូវបានលុបដោយជោគជ័យ`
-              : `Resource "${resource.public_id}" deleted successfully`,
+            this.lang.t('cloudinary.deleted', { name: resource.public_id }),
           );
         },
         error: (err) => {
           this.deleting = false;
-          this.alertService.error(
-            err.error?.message ||
-              (this.lang.currentLang() === 'km'
-                ? 'ការលុបធនធានបរាជ័យ។ សូមព្យាយាមម្តងទៀត។'
-                : 'Failed to delete resource. Please try again.'),
-          );
+          this.alertService.error(err.error?.message || this.lang.t('cloudinary.deleteFailed'));
         },
       });
     });
@@ -410,16 +388,10 @@ export class CloudinaryFileUploadListComponent implements OnInit, OnDestroy {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        this.alertService.success(
-          this.lang.currentLang() === 'km'
-            ? `${label} ត្រូវបានចម្លង`
-            : `${label} copied to clipboard`,
-        );
+        this.alertService.success(this.lang.t('cloudinary.copied', { label }));
       })
       .catch(() => {
-        this.alertService.error(
-          this.lang.currentLang() === 'km' ? 'ការចម្លងបរាជ័យ' : 'Failed to copy to clipboard',
-        );
+        this.alertService.error(this.lang.t('cloudinary.copyFailed'));
       });
   }
 

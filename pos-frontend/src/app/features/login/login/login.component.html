@@ -9,7 +9,7 @@
         class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all border border-slate-200 font-medium text-sm shadow-sm"
       >
         <span>{{ lang.currentLang() === 'en' ? '🇰🇭' : '🇬🇧' }}</span>
-        {{ lang.currentLang() === 'en' ? 'ខ្មែរ' : 'English' }}
+        {{ lang.currentLang() === 'en' ? ('login.switchToKhmer' | translate) : ('login.switchToEnglish' | translate) }}
       </button>
     </div>
 
@@ -21,11 +21,11 @@
 
       <div class="relative z-10">
         <h1 class="text-4xl font-extrabold leading-tight tracking-tight">
-          {{ lang.currentLang() === 'km' ? 'លឿន រហ័ស និង' : 'Fast. Reliable.' }} <br>
-          <span class="text-indigo-300">{{ lang.currentLang() === 'km' ? 'ងាយស្រួលលក់' : 'Seamless Sales.' }}</span>
+          {{ 'login.taglineA' | translate }} <br>
+          <span class="text-indigo-300">{{ 'login.taglineB' | translate }}</span>
         </h1>
         <p class="mt-4 text-indigo-100/80 text-lg font-medium max-w-sm">
-          {{ lang.currentLang() === 'km' ? 'គ្រប់គ្រងស្តុក និងបុគ្គលិករបស់អ្នកតាមពេលវេលាជាក់ស្តែងជាមួយប្រព័ន្ធទំនើបរបស់យើង។' : 'Manage your inventory and staff in real-time with our advanced terminal interface.' }}
+          {{ 'login.taglineDesc' | translate }}
         </p>
       </div>
 
@@ -44,10 +44,10 @@
         <div class="flex items-center gap-4 text-sm text-indigo-200/80 font-medium">
           <div class="flex items-center gap-1.5">
             <span class="w-2 h-2 bg-indigo-300 rounded-full animate-pulse"></span>
-            <span>{{ lang.currentLang() === 'km' ? 'ម៉ាស៊ីន:' : 'Terminal:' }} #001</span>
+            <span>{{ 'login.terminal' | translate }} #001</span>
           </div>
           <span class="w-px h-3 bg-indigo-400/30"></span>
-          <span>{{ lang.currentLang() === 'km' ? 'ហាង: សាខាភ្នំពេញ' : 'Store: Downtown Metro' }}</span>
+          <span>{{ 'login.store' | translate }}</span>
         </div>
       </div>
     </div>
@@ -56,17 +56,17 @@
     <div class="w-full md:w-1/2 p-8 md:p-14 bg-white">
       <div class="mb-10 text-center">
         <h2 class="text-3xl font-bold text-slate-800">
-          {{ lang.currentLang() === 'km' ? 'សូមស្វាគមន៍' : 'Welcome' }}
+          {{ 'login.welcome' | translate }}
         </h2>
         <p class="text-slate-500 mt-2">
-          {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលព័ត៌មានរបស់អ្នកដើម្បីចូលប្រើប្រាស់។' : 'Please enter your credentials to log in.' }}
+          {{ 'login.subtitle' | translate }}
         </p>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">
-            {{ lang.currentLang() === 'km' ? 'ឈ្មោះអ្នកប្រើប្រាស់' : 'UserName' }}
+            {{ 'login.username' | translate }}
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
@@ -76,12 +76,12 @@
               type="text" 
               formControlName="username"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none" 
-              [placeholder]="lang.currentLang() === 'km' ? 'បញ្ចូលអត្តលេខ' : 'Enter your ID'"
+              [placeholder]="'login.usernamePlaceholder' | translate"
               [class.border-rose-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
             >
           </div>
           <p *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="text-rose-500 text-xs mt-1">
-            {{ lang.currentLang() === 'km' ? 'សូមបញ្ចូលអ៊ីមែលឱ្យបានត្រឹមត្រូវ' : 'Please enter a valid email' }}
+            {{ 'login.usernameInvalid' | translate }}
           </p>
         </div>
 
@@ -89,10 +89,10 @@
         <div>
           <div class="flex justify-between mb-2">
             <label class="text-sm font-semibold text-slate-700">
-              {{ lang.currentLang() === 'km' ? 'លេខកូដសម្ងាត់' : 'Password' }}
+              {{ 'login.password' | translate }}
             </label>
             <a routerLink="/login/forgot-password" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-              {{ lang.currentLang() === 'km' ? 'ភ្លេចលេខកូដ?' : 'Forgot PIN?' }}
+              {{ 'login.forgotPin' | translate }}
             </a>
           </div>
 
@@ -124,20 +124,20 @@
           class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-600 text-sm flex items-center gap-3 animate-shake"
         >
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <span>{{ lang.currentLang() === 'km' ? 'អត្តលេខ ឬ លេខកូដមិនត្រឹមត្រូវ' : 'Invalid ID or PIN' }}</span>
+          <span>{{ 'login.error' | translate }}</span>
         </div>
 
         <!-- Submit Button -->
         <app-ui-button [variant]="'primary'" [size]="'md'" type="submit" [loading]="loading()" [fullWidth]="true">
-          {{ lang.currentLang() === 'km' ? 'ចូលប្រព័ន្ធ' : 'Login' }}
+          {{ 'login.submit' | translate }}
         </app-ui-button>
         <!-- Quick Demo Switch -->
         <div class="flex gap-4 justify-center">
           <button (click)="fillDemo('admin')" type="button" class="text-xs text-slate-400 hover:text-indigo-600 font-medium transition-colors border border-slate-200 px-3 py-1 rounded-lg">
-            Demo Admin
+            {{ 'login.demoAdmin' | translate }}
           </button>
           <button (click)="fillDemo('cashier')" type="button" class="text-xs text-slate-400 hover:text-indigo-600 font-medium transition-colors border border-slate-200 px-3 py-1 rounded-lg">
-            Demo Cashier
+            {{ 'login.demoCashier' | translate }}
           </button>
         </div>
       </form>
