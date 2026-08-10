@@ -37,7 +37,7 @@ Try the live demo: **[https://full-stack-mtmlk3z7r-full-stack-pos.vercel.app/das
 - [Frontend Features](#-frontend-features)
 - [Database Schema](#-database-schema)
 - [Role Permissions](#-role-permissions)
-- [Branch Strategy & Merge Workflow](#-branch-strategy--merge-workflow)
+- [Master-Only Files and Branch Protection](#master-only-files-and-branch-protection)
 - [Deployment](#-deployment)
 - [Useful Commands](#-useful-commands)
 - [Production Checklist](#-production-checklist)
@@ -325,6 +325,111 @@ docker compose down -v && docker compose up -d
 - [ ] Configure Cloudinary credentials for image uploads
 - [ ] Add rate limiting for auth endpoints
 - [ ] Monitor with Render's built-in metrics
+
+---
+
+## Master-Only Files and Branch Protection
+
+Some development/internal files must **only ever exist on `master`** — they must never appear on, or be merged into, `main`. `main` is the clean release branch; `master` is the development branch. Pushing to `master` triggers an automated merge into `main` (workflow: `.github/workflows/merge-master-to-main.yml`).
+
+### Master-only paths
+
+| Path | Why it is master-only |
+|------|-----------------------|
+| `.github` | CI workflows (including the merge workflow itself) |
+| `.husky` | Git hooks (pre-push protection) |
+| `.kilo`, `.vscode` | Dev-local tooling — also untracked & gitignored |
+| `docs` | Internal documentation |
+| `path/to` | Scratch path |
+| `pos-backend/init.sql` · `reset-migration.js` · `run-sql-seed.js` · `seed-products.sql` | Database seed & migration tooling |
+
+### `.gitattributes` merge driver
+
+These paths are marked `merge=ours` so a `master → main` merge keeps main's own version of any file that exists on **both** branches:
+
+```gitattributes
+.github merge=ours
+.husky merge=ours
+.kilo merge=ours
+.vscode merge=ours
+docs merge=ours
+path/to merge=ours
+pos-backend/init.sql merge=ours
+pos-backend/reset-migration.js merge=ours
+pos-backend/run-sql-seed.js merge=ours
+pos-backend/seed-products.sql merge=ours
+```
+
+The driver is backed by a custom git config (CI sets it automatically; set it locally too):
+
+```bash
+git config merge.ours.driver true
+```
+
+### Cleanup: remove master-only paths from `main`
+
+```bash
+# Scripted version: checkout main → git rm the list → commit → push
+./scripts/cleanup-main.sh
+
+# Manual version
+git checkout main && git pull origin main
+git rm -r -f .github .husky .kilo .vscode docs path/to \
+  pos-backend/init.sql pos-backend/reset-migration.js \
+  pos-backend/run-sql-seed.js pos-backend/seed-products.sql
+git commit -m "Remove master-only paths from main"
+git push --no-verify origin main   # pre-push hook blocks main; --no-verify bypasses it
+```
+
+### Merge: sync `master` into `main`
+
+```bash
+# Local mirror of the CI workflow (merge + remove master-only paths + smoke test)
+./scripts/merge-master-to-main.sh
+
+# Or simply push master — the workflow does the rest:
+git push origin master
+```
+
+The workflow merges master into main, auto-resolves modify/delete conflicts on master-only paths, removes the target list, and runs a **smoke test** that fails the run if any master-only path is still tracked on main. It pushes main with `GITHUB_TOKEN`, or with `MAIN_PUSH_TOKEN` (fine-grained PAT) when that secret is set.
+
+### Branch-protection ruleset for `main`
+
+*Settings → Rules → Rulesets* → create `protect-main` targeting `main`:
+
+- ☑️ **Require a pull request before merging** — 1 approval, dismiss stale approvals, require review-thread resolution
+- ☑️ **Block force pushes**
+- ☑️ **Restrict deletions**
+- **Bypass list:** GitHub Actions app (the automation) + your account for emergencies
+
+⚠️ Do **not** enable: *require linear history* (the workflow creates merge commits), *require signed commits* (bot commits are unsigned), or *required status checks* (main carries no workflows — `.github` is master-only).
+
+Equivalently via the API:
+
+```bash
+gh api --method POST repos/kakda-hub/Full-Stack-POS/rulesets --input protect-main.json
+```
+
+```json
+{
+  "name": "protect-main",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["refs/heads/main"], "exclude": [] } },
+  "bypass_actors": [
+    { "actor_id": 15368, "actor_type": "Integration", "bypass_mode": "always" }
+  ],
+  "rules": [
+    { "type": "pull_request", "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_last_push_approval": true,
+        "required_review_thread_resolution": true } },
+    { "type": "non_fast_forward" },
+    { "type": "deletion" }
+  ]
+}
+```
 
 ---
 
