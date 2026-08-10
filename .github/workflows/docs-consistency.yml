@@ -1,0 +1,23 @@
+name: Docs consistency check
+
+# Verifies that README.md's documented master-only paths match the
+# MASTER_ONLY_PATHS used by the merge workflow, so documentation can never
+# drift from what CI actually enforces. Master-only, like everything in .github/.
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify documented master-only paths match the workflow
+        run: bash .github/scripts/docs-consistency.sh
