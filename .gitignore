@@ -21,8 +21,9 @@ dist/
 Thumbs.db
 nul
 
-# IDE
+# IDE / local tooling (dev-local, never versioned)
 .vscode/
+.kilo/
 .idea/
 *.swp
 *.swo
