@@ -46,7 +46,7 @@ jobs:
         .husky
         .kilo
         .vscode
-        docs
+        docsx
         path/to
         pos-backend/init.sql
         pos-backend/reset-migration.js
